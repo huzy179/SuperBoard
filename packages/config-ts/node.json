@@ -1,0 +1,10 @@
+{
+  "extends": "./base.json",
+  "compilerOptions": {
+    "moduleResolution": "Node",
+    "module": "CommonJS",
+    "noEmit": false,
+    "lib": ["es2022"],
+    "types": ["node"]
+  }
+}

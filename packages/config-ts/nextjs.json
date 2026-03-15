@@ -1,0 +1,10 @@
+{
+  "extends": "./base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "allowJs": false,
+    "incremental": true,
+    "noEmit": true,
+    "lib": ["dom", "dom.iterable", "es2022"]
+  }
+}

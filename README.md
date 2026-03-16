@@ -33,7 +33,7 @@ npm run setup
 Lưu ý: PostgreSQL trong Docker map ra host port `5433` để tránh trùng với Postgres local.
 
 ```bash
-# Start infra (postgres, redis, minio, keycloak, mailhog)
+# Start infra (postgres, redis, minio, keycloak, mailhog, elasticsearch)
 npm run dev:infra
 
 # Chạy đồng thời web + api + ai-service
@@ -41,6 +41,7 @@ npm run dev
 ```
 
 `npm run dev` hiện chạy song song:
+
 - `@superboard/web` tại `http://localhost:3000`
 - `@superboard/api` tại `http://localhost:4000`
 - `@superboard/ai-service` tại `http://localhost:8000`
@@ -52,7 +53,8 @@ npm run health:check
 ```
 
 Kết quả mong đợi:
-- API: `{"status":"ok"}`
+
+- API: trả về health chi tiết cho DB, Redis, queue cùng `status`
 - AI service: `{"status":"ok"}`
 
 ## 5) Lệnh thường dùng
@@ -83,4 +85,5 @@ packages/
 ## 7) Ghi chú thư viện
 
 Danh sách thư viện đã cài và mục đích của từng thư viện xem tại:
+
 - [DEPENDENCIES.md](DEPENDENCIES.md)

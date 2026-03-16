@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "setup": "node scripts/setup.mjs",
+    "prepare": "husky",
     "dev": "turbo run dev --parallel",
     "dev:infra": "docker compose up -d",
     "dev:infra:down": "docker compose down",
@@ -17,12 +18,26 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
-    "format": "prettier --write ."
+    "test": "npm --ws --if-present run test",
+    "format": "prettier --write .",
+    "db:migrate": "npm --workspace @superboard/api run db:migrate",
+    "db:reset": "node scripts/db-reset.mjs",
+    "db:seed": "npm --workspace @superboard/api run db:seed"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,tsx,json,md,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.{ts,tsx,js,mjs,cjs}": [
+      "eslint --fix"
+    ]
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.57.0",
     "@typescript-eslint/parser": "^8.57.0",
     "eslint": "^9.22.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
     "prettier": "^3.5.3",
     "turbo": "^2.4.4",
     "typescript": "^5.8.2"

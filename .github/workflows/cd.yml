@@ -1,0 +1,108 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: cd-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  # ─── Detect which apps changed ────────────────────────────────────────────
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      web: ${{ steps.filter.outputs.web }}
+      api: ${{ steps.filter.outputs.api }}
+      ai-service: ${{ steps.filter.outputs.ai-service }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            web:
+              - 'apps/web/**'
+              - 'packages/shared/**'
+              - 'packages/ui/**'
+              - 'packages/config-ts/**'
+            api:
+              - 'apps/api/**'
+              - 'packages/shared/**'
+              - 'packages/config-ts/**'
+            ai-service:
+              - 'apps/ai-service/**'
+
+  # ─── Web ──────────────────────────────────────────────────────────────────
+  deploy-web:
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build web
+        run: npm --workspace @superboard/web run build
+
+      - name: Deploy web
+        run: echo "TODO — add your web deploy step here (Vercel/Fly/etc)"
+
+  # ─── API ──────────────────────────────────────────────────────────────────
+  deploy-api:
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build API
+        run: npm --workspace @superboard/api run build
+
+      - name: Run migrations
+        run: npm --workspace @superboard/api run db:deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Deploy API
+        run: echo "TODO — add your api deploy step here (Fly/Railway/etc)"
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          ELASTICSEARCH_URL: ${{ secrets.ELASTICSEARCH_URL }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          AI_SERVICE_URL: ${{ secrets.AI_SERVICE_URL }}
+
+  # ─── AI Service ───────────────────────────────────────────────────────────
+  deploy-ai-service:
+    needs: changes
+    if: needs.changes.outputs.ai-service == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install -r apps/ai-service/requirements.txt
+
+      - name: Deploy AI service
+        run: echo "TODO — add your ai-service deploy step here"

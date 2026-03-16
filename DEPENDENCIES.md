@@ -2,39 +2,45 @@
 
 ## Root (Monorepo Tooling)
 
-- `turbo`: chạy pipeline monorepo (`dev`, `build`, `lint`, `typecheck`) giữa nhiều workspace.
-- `typescript`: compiler/type system chung cho toàn repo.
+- `turbo`: điều phối pipeline monorepo (`dev`, `build`, `lint`, `typecheck`, `test`).
+- `typescript`: compiler/type system dùng chung toàn repo.
 - `eslint`: kiểm soát code quality.
 - `prettier`: format code đồng bộ.
+- `husky`, `lint-staged`: chạy check/format tự động ở pre-commit.
+- `@typescript-eslint/parser`, `@typescript-eslint/eslint-plugin`: lint TypeScript.
 
 ## apps/web (Next.js frontend)
 
-- `next`, `react`, `react-dom`: nền tảng web app với App Router + SSR/RSC.
-- `@tanstack/react-query`: cache server state, refetch, optimistic update.
-- `zustand`: state management nhẹ cho UI/socket state.
-- `socket.io-client`: client realtime.
-- `zod`: runtime schema validation.
-- `tailwindcss`, `postcss`, `autoprefixer`: styling pipeline cho Tailwind.
-- `eslint-config-next`: rule lint khuyến nghị cho Next.js.
+- `next`, `react`, `react-dom`: nền tảng frontend (App Router + SSR/RSC).
+- `@tanstack/react-query`: quản lý server state, cache, refetch.
+- `zustand`: state management nhẹ cho UI/realtime state.
+- `socket.io-client`: client realtime với backend websocket.
+- `zod`: runtime schema validation phía client.
+- `tailwindcss`, `postcss`, `autoprefixer`: styling pipeline.
+- `eslint-config-next`: lint rules chuẩn cho Next.js.
 - `@types/node`, `@types/react`, `@types/react-dom`: type definitions cho TypeScript.
 
 ## apps/api (NestJS backend)
 
 - `@nestjs/common`, `@nestjs/core`, `@nestjs/platform-express`: core framework NestJS.
-- `@nestjs/config`: quản lý cấu hình/env typed.
-- `@nestjs/swagger`, `swagger-ui-express`: generate + serve OpenAPI docs.
-- `@nestjs/websockets`, `@nestjs/platform-socket.io`, `socket.io`: websocket realtime trên backend.
-- `redis`, `@socket.io/redis-adapter`: scale websocket đa instance.
-- `@prisma/client`, `prisma`: ORM + migration cho PostgreSQL.
+- `@nestjs/config`: quản lý env/config (kết hợp validate Zod lúc startup).
+- `@nestjs/swagger`, `swagger-ui-express`: generate và serve OpenAPI docs.
+- `@nestjs/websockets`, `@nestjs/platform-socket.io`, `socket.io`: websocket realtime.
+- `redis`, `@socket.io/redis-adapter`: Redis + adapter cho scaling realtime.
+- `bullmq`: queue engine dùng Redis (health check queue/deferred jobs).
+- `pg`: PostgreSQL driver cho runtime DB checks.
+- `@prisma/client`, `prisma`: ORM + migration/seed workflow.
+- `@prisma/adapter-pg`: adapter Prisma 7 cho PostgreSQL.
 - `zod`: validate payload/schema.
-- `pino`, `pino-http`: structured logging hiệu năng cao.
+- `pino`, `pino-http`: structured logging.
 - `reflect-metadata`, `rxjs`: dependency nền của NestJS.
-- `@nestjs/cli`, `@nestjs/schematics`: tooling tạo/chạy module NestJS.
-- `ts-node`, `ts-node-dev`, `@types/node`: tooling TypeScript runtime/dev.
+- `@superboard/shared`: import shared types/schemas/id utilities từ package chung.
+- Dev tooling: `@nestjs/cli`, `@nestjs/schematics`, `ts-node`, `ts-node-dev`, `@types/node`, `@types/express`, `@types/pg`.
 
 ## packages/shared
 
-- `zod`: giữ schema validation dùng chung FE/BE.
+- `zod`: schema validation dùng chung FE/BE.
+- `ulid`: sinh sortable IDs (ULID).
 
 ## apps/ai-service (Python)
 
@@ -44,9 +50,9 @@
 - `pydantic`: validation/serialization models.
 - `openai`: gọi OpenAI models.
 - `google-generativeai`: gọi Gemini models.
-- `pgvector`: làm việc với vector embeddings trong PostgreSQL.
+- `pgvector`: vector operations trên PostgreSQL.
 
-## Ghi chú bảo mật & cập nhật
+## Notes
 
-- Sau cài đặt, nếu cần rà lỗ hổng: chạy `npm audit` tại root.
-- Khi bắt đầu phase production, nên pin version theo lockfile và bật Dependabot/Renovate.
+- Chạy `npm audit` định kỳ tại root để rà soát vulnerabilities.
+- Với production: ưu tiên lockfile, bật Dependabot/Renovate, và pin version cho các thành phần hạ tầng quan trọng.

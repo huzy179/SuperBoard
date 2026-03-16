@@ -30,21 +30,30 @@ npm run setup
 
 ## 3) Chạy dự án local
 
-Lưu ý: PostgreSQL trong Docker map ra host port `5433` để tránh trùng với Postgres local.
-
 ```bash
-# Start infra (postgres, redis, minio, keycloak, mailhog, elasticsearch)
+# 1. Start infrastructure (postgres, redis, elasticsearch, minio, keycloak, mailhog)
 npm run dev:infra
 
-# Chạy đồng thời web + api + ai-service
+# 2. Trong terminal khác, chạy đồng thời web + api + ai-service
 npm run dev
 ```
 
-`npm run dev` hiện chạy song song:
+**Infrastructure services:**
 
-- `@superboard/web` tại `http://localhost:3000`
-- `@superboard/api` tại `http://localhost:4000`
-- `@superboard/ai-service` tại `http://localhost:8000`
+- **Postgres** (port 5433) - Main database
+- **Redis** (port 6379) - Cache & session store
+- **Elasticsearch** (port 9200) - Full-text search
+- **MinIO** (port 9000, 9001) - S3-compatible storage
+- **Keycloak** (port 8080) - Authentication service
+- **MailHog** (port 1025, 8025) - Email testing
+
+**Application services (npm run dev):**
+
+- **Web** - Next.js tại `http://localhost:3001`
+- **API** - NestJS tại `http://localhost:3000`
+- **AI Service** - gRPC tại `localhost:50051`
+
+Lưu ý: PostgreSQL map ra port `5433` để tránh trùng với Postgres local.
 
 ## 4) Kiểm tra healthcheck
 
@@ -54,36 +63,235 @@ npm run health:check
 
 Kết quả mong đợi:
 
-- API: trả về health chi tiết cho DB, Redis, queue cùng `status`
-- AI service: `{"status":"ok"}`
+- **API** (`http://localhost:3000/api/v1/health`) - Chi tiết health DB, Redis, queue
+- **AI Service** (gRPC port 50051) - Service health status
 
 ## 5) Lệnh thường dùng
 
+### Development
+
 ```bash
-npm run typecheck      # check TypeScript toàn monorepo
-npm run build          # build workspace có script build
-npm run lint           # lint workspace có script lint
-npm run health:check   # check API + AI health endpoints
-npm run setup          # check prereqs + bootstrap env local
-npm run dev:infra:down # tắt docker compose
+npm run dev           # Chạy web + api + ai-service song song
+npm run dev:infra    # Start Docker containers
+npm run dev:infra:down  # Stop Docker containers
 ```
 
-## 6) Cấu trúc chính
+### Database
+
+```bash
+npm run db:reset     # Reset DB: drop + sync schema + seed data
+npm run db:seed      # Seed development data
+npm run db:migrate   # Create/run Prisma migrations
+```
+
+### Code Quality
+
+```bash
+npm run typecheck    # Check TypeScript toàn monorepo
+npm run lint         # ESLint toàn monorepo
+npm run build        # Build tất cả workspace có script build
+npm run test         # Run tests
+npm run format       # Format code với Prettier
+```
+
+### Setup & Health
+
+```bash
+npm run setup        # Check prerequisites + bootstrap .env.local
+npm run health:check # Verify API + AI service health
+```
+
+### Commands via Makefile (convenience aliases)
+
+```bash
+make dev             # npm run dev
+make dev-infra       # npm run dev:infra
+make dev-infra-down  # npm run dev:infra:down
+make db-reset        # npm run db:reset
+make db-seed         # npm run db:seed
+make typecheck       # npm run typecheck
+make lint            # npm run lint
+make setup           # npm run setup
+make health          # npm run health:check
+```
+
+## 6) Cấu trúc dự án
 
 ```text
 apps/
-	web/         # Next.js App Router
-	api/         # NestJS backend
-	ai-service/  # FastAPI + gRPC service
+  api/         # NestJS REST API
+  web/         # Next.js frontend (App Router)
+  ai-service/  # Python gRPC service
+
 packages/
-	shared/      # shared types/schemas/events
-	ui/          # shared UI package
-	config-ts/   # shared tsconfig presets
-	config-eslint/ # shared lint config
+  shared/      # Shared types, schemas, events
+  ui/          # Shared UI components (planned)
+  config-ts/   # Shared TypeScript config presets
+  config-eslint/ # Shared ESLint rules
+
+docker/
+  Dockerfile.api    # API container
+  Dockerfile.web    # Web container
+  Dockerfile.ai     # AI service container
+  docker-compose.yml # Infrastructure + services orchestration
+  README.md         # Docker detailed docs
+
+scripts/
+  setup.mjs    # Initial project setup
+  db-reset.mjs # Database reset automation
+  health-check.mjs # Health check script
+
+worklog/
+  PROJECT_STRUCTURE.md # Detailed folder documentation
+  todo.md              # Tasks to do (P0, P1, Backlog)
+  doing.md             # Work in progress
+  done.md              # Completed items
 ```
+
+**Để hiểu chi tiết từng folder và file quan trọng:**
+
+- 📖 Xem [worklog/PROJECT_STRUCTURE.md](worklog/PROJECT_STRUCTURE.md)
+- 🐳 Xem [docker/README.md](docker/README.md) để hiểu Docker setup
 
 ## 7) Ghi chú thư viện
 
 Danh sách thư viện đã cài và mục đích của từng thư viện xem tại:
 
-- [DEPENDENCIES.md](DEPENDENCIES.md)
+- 📋 [ambition/DEPENDENCIES.md](ambition/DEPENDENCIES.md)
+
+## 8) Environment Variables
+
+Khi chạy `npm run setup`, project tự động tạo `.env.local` ở root folder. Nếu cần custom:
+
+**Các biến quan trọng:**
+
+API (apps/api):
+
+```
+DATABASE_URL=postgresql://dev:devpassword@localhost:5433/superboard
+REDIS_URL=redis://localhost:6379
+KEYCLOAK_URL=http://localhost:8080
+```
+
+Web (apps/web):
+
+```
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
+AI Service (apps/ai-service):
+
+```
+ELASTICSEARCH_URL=http://localhost:9200
+REDIS_URL=redis://localhost:6379
+```
+
+## 9) Database Management
+
+### Reset hoàn toàn database
+
+```bash
+npm run db:reset
+```
+
+Thực hiện: drop DB → create DB → apply migrations → seed data
+
+### Tạo migration mới
+
+```bash
+# Sau khi sửa schema.prisma
+npm --workspace @superboard/api run prisma migrate dev --name "my_feature"
+```
+
+### Seed dữ liệu development
+
+```bash
+npm run db:seed
+```
+
+## 10) Docker Management
+
+### View logs
+
+```bash
+# Tất cả services
+docker compose -f docker/docker-compose.yml logs -f
+
+# Service cụ thể
+docker compose -f docker/docker-compose.yml logs -f postgres
+docker compose -f docker/docker-compose.yml logs -f api
+```
+
+### Check status
+
+```bash
+docker compose -f docker/docker-compose.yml ps
+```
+
+### Rebuild services
+
+```bash
+docker compose -f docker/docker-compose.yml build
+```
+
+Xem chi tiết: [docker/README.md](docker/README.md)
+
+## 11) Troubleshooting
+
+### Port đã được dùng
+
+```bash
+# Tìm process dùng port
+lsof -i :3000     # macOS/Linux
+netstat -ano | findstr :3000  # Windows PowerShell
+```
+
+### Database connection error
+
+```bash
+# Kiểm tra postgres trong Docker
+docker compose -f docker/docker-compose.yml exec postgres psql -U dev -d superboard
+
+# Reset database
+npm run db:reset
+```
+
+### AI service gRPC connection
+
+```bash
+# Check health
+npm run health:check
+
+# View logs
+docker compose -f docker/docker-compose.yml logs ai-service
+```
+
+### "Module not found" từ @superboard/shared
+
+```bash
+# Reinstall dependencies
+npm install
+
+# Hoặc rebuild shared package
+npm --workspace @superboard/shared run build
+```
+
+## 12) Tech Stack Overview
+
+| Layer              | Technology                                                     |
+| ------------------ | -------------------------------------------------------------- |
+| **Frontend**       | Next.js 14 (App Router), TypeScript, React Query, Tailwind CSS |
+| **Backend**        | NestJS, Prisma ORM, PostgreSQL, Redis, Socket.io               |
+| **AI/ML**          | Python 3.11+, gRPC, Elasticsearch                              |
+| **Auth**           | Keycloak                                                       |
+| **Storage**        | MinIO (S3-compatible)                                          |
+| **Infrastructure** | Docker, Docker Compose                                         |
+| **Monorepo**       | Turborepo                                                      |
+| **Code Quality**   | ESLint, Prettier, TypeScript strict                            |
+
+## 13) Useful Resources
+
+- 📖 [SuperBoard Master Plan](ambition/superboard-master-plan.md) - Vision & roadmap
+- 📁 [Project Structure Detail](worklog/PROJECT_STRUCTURE.md) - Chi tiết folders & files
+- 🚀 [Worklog Progress](worklog/) - todo.md, doing.md, done.md
+- 🐳 [Docker Setup](docker/README.md) - Docker detailed documentation

@@ -1,8 +1,0 @@
-# SuperBoard Docker Configuration
-# This file has been reorganized into the docker/ folder
-#
-# Use: docker compose -f docker/docker-compose.yml up -d
-# Or:  npm run dev:infra
-#
-# See docker/README.md for detailed documentation
-

@@ -12,7 +12,8 @@
     "setup": "node scripts/setup.mjs",
     "prepare": "husky",
     "dev": "turbo run dev --parallel",
-    "dev:infra": "docker compose -f docker/docker-compose.yml up -d",
+    "dev:infra": "docker compose -f docker/docker-compose.yml up -d postgres",
+    "dev:infra:full": "docker compose -f docker/docker-compose.yml up -d postgres redis elasticsearch minio keycloak mailhog",
     "dev:infra:down": "docker compose -f docker/docker-compose.yml down",
     "health:check": "node scripts/health-check.mjs",
     "build": "turbo run build",
@@ -35,12 +36,18 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.57.0",
     "@typescript-eslint/parser": "^8.57.0",
+    "chalk": "^4.1.2",
     "eslint": "^9.22.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
     "prettier": "^3.5.3",
     "turbo": "^2.4.4",
     "typescript": "^5.8.2"
+  },
+  "overrides": {
+    "@hono/node-server": "1.19.11",
+    "hono": "4.12.8",
+    "lodash": "4.17.23"
   },
   "engines": {
     "node": ">=20.11.0"

@@ -2,14 +2,14 @@
 
 ## Đang tập trung
 
-- [ ] Chuẩn hóa migration strategy Prisma 7 cho môi trường production.
+- [ ] MVP 2: bắt đầu Jira-first sau khi đã xong MVP 1 Login (FE + BE + schema + seed).
 
 ## Blockers hiện tại
 
-- Chưa có file migration trong `apps/api/prisma/migrations`, nên đang fallback `prisma db push` cho local reset.
+- Không còn blocker.
 
 ## Next actions ngay
 
-1. Tạo migration `init` từ schema hiện tại.
-2. Commit migration và kiểm tra lại `npm run db:reset` + `npm run db:seed`.
-3. Xóa fallback không cần thiết trong script nếu đã ổn định.
+1. Bắt đầu Jira backend theo thứ tự: `Project` → `Task` → `TaskEvent` → `Comment`.
+2. Dựng Jira frontend skeleton: routes + project list + board/list + task detail.
+3. Chốt contract FE-BE v1 và nối React Query mutations theo các endpoint đã sẵn sàng.

@@ -33,14 +33,6 @@ Tài liệu này mô tả chi tiết từng folder, những file quan trọng, v
   - `make dev`, `make dev-infra`, `make db-reset`, v.v.
   - Không bắt buộc, chỉ là convenience layer
 
-### `docker-compose.yml`
-
-- **Mục đích:** Redirect file chỉ dẫn tới folder docker/
-- **Quan trọng:** 🟡 Important
-- **Chi tiết:**
-  - Bây giờ chỉ chứa comment hướng dẫn
-  - Thực tế file chính: `docker/docker-compose.yml`
-
 ### `eslint.config.mjs`
 
 - **Mục đích:** Unified ESLint config cho toàn monorepo
@@ -73,10 +65,10 @@ apps/api/
 ├── prisma/
 │   ├── schema.prisma         ✅ CRITICAL - DB schema (tables, relations)
 │   ├── seed.ts               🟠 Seed dữ liệu dev (roles, permissions, users)
-│   └── migrations/           ✅ CRITICAL - Database migrations (tương lai)
+│   └── migrations/           ✅ CRITICAL - Database migrations (đã khởi tạo `init`)
 └── src/
     ├── app.module.ts         ✅ Root module, imports tất cả feature modules
-    ├── main.ts               ✅ Entry point, port 3000
+    ├── main.ts               ✅ Entry point, port 4000
     ├── health.controller.ts  🟠 Health check endpoint (/api/v1/health)
     ├── health.service.ts     🟠 DB/Redis/Queue status checks
     ├── common/
@@ -142,9 +134,9 @@ apps/web/
 
 ---
 
-### 📂 `/apps/ai-service` - Python gRPC Service
+### 📂 `/apps/ai-service` - Python AI Service
 
-**Mục đích:** AI/ML backend cho semantic search, summarization, chatbot
+**Mục đích:** AI/ML backend cho semantic search, summarization, chatbot (hiện chạy FastAPI local, có gRPC placeholder)
 
 #### Cấu trúc:
 

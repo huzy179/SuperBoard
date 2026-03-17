@@ -15,6 +15,9 @@ This folder contains all Docker-related configurations for the SuperBoard projec
 ### Infrastructure Services
 
 - **postgres** - PostgreSQL database (port 5433)
+- PostgreSQL dùng 2 database logical:
+  - `superboard` cho app data
+  - `keycloak` cho auth data
 - **redis** - Redis cache (port 6379)
 - **elasticsearch** - Elasticsearch search engine (port 9200)
 - **minio** - S3-compatible object storage (port 9000, 9001)
@@ -65,6 +68,7 @@ Update environment variables in `docker-compose.yml` or create a `.env` file:
 
 ```bash
 DATABASE_URL=postgresql://dev:devpassword@postgres:5432/superboard
+KEYCLOAK_DB_URL=postgresql://dev:devpassword@postgres:5432/keycloak
 REDIS_URL=redis://redis:6379
 ELASTICSEARCH_URL=http://elasticsearch:9200
 KEYCLOAK_URL=http://keycloak:8080

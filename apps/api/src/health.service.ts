@@ -69,6 +69,10 @@ export class HealthService {
   }
 
   private async checkRedis(): Promise<DependencyHealth> {
+    if (!this.redisService.isEnabled()) {
+      return { status: 'up', details: { enabled: false } };
+    }
+
     try {
       const ping = await this.redisService.ping();
       return { status: ping === 'PONG' ? 'up' : 'down', details: { ping } };
@@ -78,6 +82,10 @@ export class HealthService {
   }
 
   private async checkQueue(): Promise<DependencyHealth> {
+    if (!this.queueService.isEnabled()) {
+      return { status: 'up', details: { enabled: false } };
+    }
+
     try {
       const details = await this.queueService.isHealthy();
       return { status: 'up', details };

@@ -31,29 +31,33 @@ npm run setup
 ## 3) Chạy dự án local
 
 ```bash
-# 1. Start infrastructure (postgres, redis, elasticsearch, minio, keycloak, mailhog)
+# 1. Start infrastructure tối thiểu (postgres)
 npm run dev:infra
 
 # 2. Trong terminal khác, chạy đồng thời web + api + ai-service
 npm run dev
 ```
 
+Khi cần đầy đủ infrastructure services, chạy:
+
+```bash
+npm run dev:infra:full
+```
+
 **Infrastructure services:**
 
 - **Postgres** (port 5433) - Main database
-- **Redis** (port 6379) - Cache & session store
-- **Elasticsearch** (port 9200) - Full-text search
-- **MinIO** (port 9000, 9001) - S3-compatible storage
-- **Keycloak** (port 8080) - Authentication service
-- **MailHog** (port 1025, 8025) - Email testing
+- **Mặc định khi chạy `dev:infra`: chỉ bật Postgres**
+- **Tuỳ chọn khi chạy `dev:infra:full`:** Redis, Elasticsearch, MinIO, Keycloak, MailHog
 
 **Application services (npm run dev):**
 
-- **Web** - Next.js tại `http://localhost:3001`
-- **API** - NestJS tại `http://localhost:3000`
-- **AI Service** - gRPC tại `localhost:50051`
+- **Web** - Next.js tại `http://localhost:3000`
+- **API** - NestJS tại `http://localhost:4000`
+- **AI Service** - FastAPI health endpoint tại `http://localhost:8000/health`
 
 Lưu ý: PostgreSQL map ra port `5433` để tránh trùng với Postgres local.
+Keycloak dùng database riêng `keycloak` (tách khỏi `superboard`) để tránh drift khi chạy Prisma migrate.
 
 ## 4) Kiểm tra healthcheck
 
@@ -63,8 +67,8 @@ npm run health:check
 
 Kết quả mong đợi:
 
-- **API** (`http://localhost:3000/api/v1/health`) - Chi tiết health DB, Redis, queue
-- **AI Service** (gRPC port 50051) - Service health status
+- **API** (`http://localhost:4000/api/v1/health`) - Chi tiết health DB, Redis, queue
+- **AI Service** (`http://localhost:8000/health`) - Service health status
 
 ## 5) Lệnh thường dùng
 
@@ -72,7 +76,8 @@ Kết quả mong đợi:
 
 ```bash
 npm run dev           # Chạy web + api + ai-service song song
-npm run dev:infra    # Start Docker containers
+npm run dev:infra    # Start infrastructure containers (postgres only)
+npm run dev:infra:full # Start full infrastructure containers
 npm run dev:infra:down  # Stop Docker containers
 ```
 
@@ -106,6 +111,7 @@ npm run health:check # Verify API + AI service health
 ```bash
 make dev             # npm run dev
 make dev-infra       # npm run dev:infra
+make dev-infra-full  # npm run dev:infra:full
 make dev-infra-down  # npm run dev:infra:down
 make db-reset        # npm run db:reset
 make db-seed         # npm run db:seed
@@ -113,6 +119,21 @@ make typecheck       # npm run typecheck
 make lint            # npm run lint
 make setup           # npm run setup
 make health          # npm run health:check
+```
+
+### Quy trình local ngắn (khuyến nghị)
+
+```bash
+npm run setup
+npm run dev:infra
+npm run dev
+npm run health:check
+```
+
+Nếu cần reset dữ liệu trước khi code:
+
+```bash
+npm run db:reset
 ```
 
 ## 6) Cấu trúc dự án
@@ -161,7 +182,13 @@ Danh sách thư viện đã cài và mục đích của từng thư viện xem t
 
 ## 8) Environment Variables
 
-Khi chạy `npm run setup`, project tự động tạo `.env.local` ở root folder. Nếu cần custom:
+Khi chạy `npm run setup`, project tự động tạo `.env.local` cho từng app:
+
+- `apps/api/.env.local`
+- `apps/web/.env.local`
+- `apps/ai-service/.env.local`
+
+Nếu cần custom:
 
 **Các biến quan trọng:**
 
@@ -176,7 +203,7 @@ KEYCLOAK_URL=http://localhost:8080
 Web (apps/web):
 
 ```
-NEXT_PUBLIC_API_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:4000
 ```
 
 AI Service (apps/ai-service):

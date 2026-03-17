@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # ===== Database Services =====
   postgres:
@@ -13,8 +11,9 @@ services:
       POSTGRES_PASSWORD: devpassword
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init-keycloak-db.sql:/docker-entrypoint-initdb.d/01-init-keycloak-db.sql:ro
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U dev']
+      test: ['CMD-SHELL', 'pg_isready -U dev -d superboard']
       interval: 5s
       timeout: 3s
       retries: 5
@@ -84,7 +83,7 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/superboard
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
       KC_DB_USERNAME: dev
       KC_DB_PASSWORD: devpassword
       KC_HEALTH_ENABLED: 'true'

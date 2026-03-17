@@ -35,12 +35,6 @@ if (!existsSync(envPath) && !existsSync(envFallback)) {
 console.log('🗄  Resetting database…');
 run('npx', ['prisma', 'migrate', 'reset', '--force', '--schema=prisma/schema.prisma']);
 
-console.log('\n📦  Running migrations…');
-run('npx', ['prisma', 'migrate', 'deploy', '--schema=prisma/schema.prisma']);
-
-console.log('\n🧱  Syncing schema (dev fallback)…');
-run('npx', ['prisma', 'db', 'push', '--schema=prisma/schema.prisma']);
-
 if (!noSeed) {
   console.log('\n🌱  Seeding…');
   run('npx', ['prisma', 'db', 'seed']);

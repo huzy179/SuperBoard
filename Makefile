@@ -2,13 +2,16 @@
 # Usage: make <target>
 # All targets are equivalent to the npm scripts — the Makefile is purely a convenience alias.
 
-.PHONY: dev dev-infra dev-infra-down db-migrate db-reset db-seed typecheck lint test setup health
+.PHONY: dev dev-infra dev-infra-full dev-infra-down db-migrate db-reset db-seed typecheck lint test setup health
 
 dev: ## Start all apps in parallel (web + api + ai-service)
 	npm run dev
 
-dev-infra: ## Start Docker infrastructure (postgres, redis, minio, keycloak, mailhog, elasticsearch)
+dev-infra: ## Start Docker infrastructure (postgres only)
 	npm run dev:infra
+
+dev-infra-full: ## Start full Docker infrastructure (postgres, redis, minio, keycloak, mailhog, elasticsearch)
+	npm run dev:infra:full
 
 dev-infra-down: ## Stop Docker infrastructure
 	npm run dev:infra:down

@@ -4,11 +4,18 @@ import { Queue } from 'bullmq';
 
 @Injectable()
 export class QueueService implements OnModuleInit, OnModuleDestroy {
-  private readonly queue: Queue;
+  private readonly queue: Queue | null;
   private readonly queueName: string;
+  private readonly enabled: boolean;
 
   constructor(private readonly configService: ConfigService) {
     this.queueName = this.configService.get<string>('QUEUE_NAME') || 'superboard-dev';
+    this.enabled = this.configService.get<boolean>('ENABLE_QUEUE') ?? false;
+
+    if (!this.enabled) {
+      this.queue = null;
+      return;
+    }
 
     const redisUrl = new URL(this.configService.getOrThrow<string>('REDIS_URL'));
 
@@ -24,14 +31,33 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleInit(): Promise<void> {
+    if (!this.enabled || !this.queue) {
+      return;
+    }
+
     await this.queue.waitUntilReady();
   }
 
   async onModuleDestroy(): Promise<void> {
+    if (!this.enabled || !this.queue) {
+      return;
+    }
+
     await this.queue.close();
   }
 
+  isEnabled(): boolean {
+    return this.enabled;
+  }
+
   async isHealthy(): Promise<{ queueName: string; jobCounts: Record<string, number> }> {
+    if (!this.enabled || !this.queue) {
+      return {
+        queueName: this.queueName,
+        jobCounts: {},
+      };
+    }
+
     const jobCounts = await this.queue.getJobCounts(
       'active',
       'completed',

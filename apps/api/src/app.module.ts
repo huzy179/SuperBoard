@@ -6,6 +6,7 @@ import { HealthService } from './health.service';
 import { QueueService } from './common/queue.service';
 import { RedisService } from './common/redis.service';
 import { PrismaService } from './prisma/prisma.service';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PrismaService } from './prisma/prisma.service';
       envFilePath: ['.env.local', '.env', '.env.example'],
       validate: validateEnv,
     }),
+    AuthModule,
   ],
   controllers: [HealthController],
   providers: [HealthService, PrismaService, RedisService, QueueService],

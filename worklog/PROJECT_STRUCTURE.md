@@ -177,25 +177,32 @@ packages/shared/
 ├── src/
 │   ├── index.ts              🟠 Main export file
 │   ├── id.ts                 🟠 ULID generation utility
+│   ├── dtos/                 🟠 API request/response contracts (Auth/Project/Health)
 │   ├── events/
 │   │   └── index.ts          🟠 WebSocket event definitions
 │   ├── schemas/
 │   │   └── index.ts          🟠 Zod validation schemas
 │   └── types/
-│       └── index.ts          ✅ TypeScript interfaces, types
+│       ├── index.ts          🟠 Barrel export for domain types
+│       ├── auth.types.ts     ✅ Auth/User domain types
+│       ├── project.types.ts  ✅ Project domain types
+│       ├── task.types.ts     ✅ Task domain types
+│       ├── workspace.types.ts ✅ Workspace domain types
+│       └── common.types.ts   ✅ Shared API envelope/common types
 ```
 
 **Quan trọng nhất:**
 
-- `types/index.ts` - Single source of truth cho domain types (User, Project, Task, Board, v.v.)
+- `types/*` - Domain types được tách theo module để dễ maintain
+- `dtos/*` - Contract request/response dùng chung FE/BE
 - `schemas/index.ts` - Validation rules cho API payloads
 - `events/index.ts` - Real-time event definitions
 
 **Cách sử dụng:**
 
 ```typescript
-// API, Web, AI service đều import từ đây
-import type { User, Project } from '@superboard/shared/types';
+// API, Web, AI service đều import từ main barrel
+import type { User, Project } from '@superboard/shared';
 import { userSchema } from '@superboard/shared/schemas';
 ```
 

@@ -4,7 +4,7 @@ export interface Task {
   id: ID;
   title: string;
   description?: string;
-  status: 'todo' | 'in_progress' | 'done' | 'cancelled';
+  status: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
   assigneeId?: ID;
   projectId: ID;
   workspaceId: ID;

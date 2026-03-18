@@ -8,6 +8,47 @@ export type ProjectItemDTO = Pick<
 
 export type ProjectsResponseDTO = ApiResponse<ProjectItemDTO[]>;
 
+export interface ProjectTaskItemDTO {
+  id: string;
+  title: string;
+  description?: string | null;
+  status: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
+  assigneeId?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProjectDetailDTO extends ProjectItemDTO {
+  tasks: ProjectTaskItemDTO[];
+}
+
+export type ProjectDetailResponseDTO = ApiResponse<ProjectDetailDTO>;
+
+export interface CreateTaskRequestDTO {
+  title: string;
+  description?: string;
+  status?: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
+}
+
+export type CreateTaskResponseDTO = ApiResponse<ProjectTaskItemDTO>;
+
+export interface UpdateTaskStatusRequestDTO {
+  status: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
+}
+
+export type UpdateTaskStatusResponseDTO = ApiResponse<ProjectTaskItemDTO>;
+
+export interface UpdateTaskRequestDTO {
+  title?: string;
+  description?: string;
+  status?: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
+  assigneeId?: string | null;
+}
+
+export type UpdateTaskResponseDTO = ApiResponse<ProjectTaskItemDTO>;
+
+export type DeleteTaskResponseDTO = ApiResponse<{ deleted: boolean }>;
+
 export interface CreateProjectRequestDTO {
   name: string;
   description?: string;

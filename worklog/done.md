@@ -77,3 +77,16 @@
 - [x] Tách và chuẩn hóa shared types/DTO theo domain, gồm cả `health.dto.ts` dùng chung FE/BE.
 - [x] Cập nhật frontend parser cho envelope mới (`auth/login`, `auth/me`, `projects`) + chuẩn hóa token storage helper.
 - [x] Smoke test pass: `health`, `login`, `me`, `projects` và unauthorized `projects` đều đúng contract.
+
+## Jira-first v0.2 (Project + Task Board/List)
+
+- [x] Implement `GET /projects/:projectId` để lấy project detail + task list theo workspace.
+- [x] Implement `POST /projects/:projectId/tasks` để tạo task trực tiếp từ project detail page.
+- [x] Implement `PATCH /projects/:projectId/tasks/:taskId/status` để đổi trạng thái task.
+- [x] Bổ sung shared DTOs cho project detail/task create/task status update.
+- [x] Dựng route FE `/jira/projects/[projectId]` với 2 chế độ `Board` và `List`.
+- [x] Tạo task từ FE (title/description/status) và tự reload board/list sau khi tạo.
+- [x] Implement kéo-thả task giữa các cột board để cập nhật status.
+- [x] Implement inline status change trong list view bằng select.
+- [x] Implement Task Detail panel cho phép xem chi tiết, sửa Title/Description/Status và Xoá task.
+- [x] Hoàn thiện trọn bộ CRUD Task cơ bản cho Jira MVP.

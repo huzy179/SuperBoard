@@ -5,5 +5,14 @@ export const API_ENDPOINTS = {
   },
   projects: {
     list: '/api/v1/projects',
+    create: '/api/v1/projects',
+    detail: (projectId: string) => `/api/v1/projects/${projectId}`,
+    createTask: (projectId: string) => `/api/v1/projects/${projectId}/tasks`,
+    updateTaskStatus: (projectId: string, taskId: string) =>
+      `/api/v1/projects/${projectId}/tasks/${taskId}/status`,
+    updateTask: (projectId: string, taskId: string) =>
+      `/api/v1/projects/${projectId}/tasks/${taskId}`,
+    deleteTask: (projectId: string, taskId: string) =>
+      `/api/v1/projects/${projectId}/tasks/${taskId}`,
   },
 } as const;

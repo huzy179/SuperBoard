@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { BearerAuthGuard } from './common/guards/bearer-auth.guard';
 import { HealthController } from './health.controller';
 import { validateEnv } from './config/env';
 import { HealthService } from './health.service';
@@ -7,6 +9,7 @@ import { QueueService } from './common/queue.service';
 import { RedisService } from './common/redis.service';
 import { PrismaService } from './prisma/prisma.service';
 import { AuthModule } from './modules/auth/auth.module';
+import { ProjectModule } from './modules/project/project.module';
 
 @Module({
   imports: [
@@ -16,8 +19,18 @@ import { AuthModule } from './modules/auth/auth.module';
       validate: validateEnv,
     }),
     AuthModule,
+    ProjectModule,
   ],
   controllers: [HealthController],
-  providers: [HealthService, PrismaService, RedisService, QueueService],
+  providers: [
+    HealthService,
+    PrismaService,
+    RedisService,
+    QueueService,
+    {
+      provide: APP_GUARD,
+      useClass: BearerAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

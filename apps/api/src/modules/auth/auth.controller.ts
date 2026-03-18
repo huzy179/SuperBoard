@@ -1,17 +1,22 @@
-import { BadRequestException, Body, Controller, Get, Headers, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post } from '@nestjs/common';
+import type {
+  AuthResponseDTO,
+  AuthUserDTO,
+  LoginRequestDTO,
+  MeResponseDTO,
+} from '@superboard/shared';
+import { apiSuccess } from '../../common/api-response';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Public } from '../../common/decorators/public.decorator';
 import { AuthService } from './auth.service';
-
-type LoginBody = {
-  email?: string;
-  password?: string;
-};
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('login')
-  async login(@Body() body: LoginBody) {
+  async login(@Body() body: Partial<LoginRequestDTO>): Promise<AuthResponseDTO> {
     const email = body.email?.trim();
     const password = body.password;
 
@@ -19,12 +24,12 @@ export class AuthController {
       throw new BadRequestException('email and password are required');
     }
 
-    return this.authService.login(email, password);
+    const payload = await this.authService.login(email, password);
+    return apiSuccess(payload);
   }
 
   @Get('me')
-  async me(@Headers('authorization') authorization?: string) {
-    const user = await this.authService.getMeFromToken(authorization);
-    return { user };
+  me(@CurrentUser() user: AuthUserDTO): MeResponseDTO {
+    return apiSuccess({ user });
   }
 }

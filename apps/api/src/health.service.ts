@@ -1,24 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import type { ApiResponse } from '@superboard/shared';
+import type { DependencyHealthDTO, HealthResponseDTO } from '@superboard/shared';
 import { logger } from './common/logger';
 import { QueueService } from './common/queue.service';
 import { RedisService } from './common/redis.service';
 import { PrismaService } from './prisma/prisma.service';
-
-interface DependencyHealth {
-  status: 'up' | 'down';
-  details?: Record<string, unknown>;
-  error?: string;
-}
-
-interface HealthPayload {
-  status: 'ok' | 'degraded';
-  dependencies: {
-    db: DependencyHealth;
-    redis: DependencyHealth;
-    queue: DependencyHealth;
-  };
-}
 
 @Injectable()
 export class HealthService {
@@ -28,7 +13,7 @@ export class HealthService {
     private readonly queueService: QueueService,
   ) {}
 
-  async getHealth(): Promise<ApiResponse<HealthPayload>> {
+  async getHealth(): Promise<HealthResponseDTO> {
     const [db, redis, queue] = await Promise.all([
       this.checkDb(),
       this.checkRedis(),
@@ -39,7 +24,7 @@ export class HealthService {
       ? 'ok'
       : 'degraded';
 
-    const response: ApiResponse<HealthPayload> = {
+    const response: HealthResponseDTO = {
       success: status === 'ok',
       data: {
         status,
@@ -59,7 +44,7 @@ export class HealthService {
     return response;
   }
 
-  private async checkDb(): Promise<DependencyHealth> {
+  private async checkDb(): Promise<DependencyHealthDTO> {
     try {
       await this.prismaService.isHealthy();
       return { status: 'up' };
@@ -68,7 +53,7 @@ export class HealthService {
     }
   }
 
-  private async checkRedis(): Promise<DependencyHealth> {
+  private async checkRedis(): Promise<DependencyHealthDTO> {
     if (!this.redisService.isEnabled()) {
       return { status: 'up', details: { enabled: false } };
     }
@@ -81,7 +66,7 @@ export class HealthService {
     }
   }
 
-  private async checkQueue(): Promise<DependencyHealth> {
+  private async checkQueue(): Promise<DependencyHealthDTO> {
     if (!this.queueService.isEnabled()) {
       return { status: 'up', details: { enabled: false } };
     }

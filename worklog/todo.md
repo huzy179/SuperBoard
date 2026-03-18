@@ -1,5 +1,11 @@
 # TODO
 
+## Mốc vừa hoàn tất
+
+- [x] Global auth guard + `@Public()` + `@CurrentUser()` decorator đã setup.
+- [x] Response envelope đã chuẩn hóa cho Auth/Project/Health (`success`, `data/error`, `meta`).
+- [x] Shared DTO contracts FE/BE đã đồng bộ, bao gồm health response type.
+
 ## Ưu tiên cao (P0) — Kế hoạch mới
 
 - [ ] **Re-prioritize scope:** tạm hoãn implementation chi tiết Login/Register/OAuth/MFA UI-flow, chỉ giữ phần cần thiết cho data model và backend foundation.

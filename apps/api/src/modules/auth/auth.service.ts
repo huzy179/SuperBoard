@@ -1,6 +1,7 @@
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import type { AuthUserDTO } from '@superboard/shared';
 import type { User } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -10,13 +11,6 @@ type JwtPayload = {
   email: string;
 };
 
-type AuthUser = {
-  id: string;
-  email: string;
-  fullName: string;
-  defaultWorkspaceId: string | null;
-};
-
 @Injectable()
 export class AuthService {
   constructor(
@@ -24,7 +18,10 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async login(email: string, password: string): Promise<{ accessToken: string; user: AuthUser }> {
+  async login(
+    email: string,
+    password: string,
+  ): Promise<{ accessToken: string; user: AuthUserDTO }> {
     const user = await this.prisma.user.findUnique({
       where: { email: email.toLowerCase().trim() },
     });
@@ -51,7 +48,7 @@ export class AuthService {
     };
   }
 
-  async getMeFromToken(authorizationHeader?: string): Promise<AuthUser> {
+  async getMeFromToken(authorizationHeader?: string): Promise<AuthUserDTO> {
     if (!authorizationHeader?.startsWith('Bearer ')) {
       throw new UnauthorizedException('Missing bearer token');
     }
@@ -118,7 +115,7 @@ export class AuthService {
     return timingSafeEqual(expectedBuffer, calculatedBuffer);
   }
 
-  private toAuthUser(user: User): AuthUser {
+  private toAuthUser(user: User): AuthUserDTO {
     return {
       id: user.id,
       email: user.email,

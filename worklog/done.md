@@ -67,3 +67,13 @@
 - [x] Loại bỏ phụ thuộc local `@nestjs/cli` và `@nestjs/schematics` khỏi `apps/api`, chuyển scripts sang `npx nest ...`.
 - [x] Cài `chalk@4` ở root để ổn định formatter của ESLint sau khi tối ưu dependency tree.
 - [x] Xác nhận `npm audit` về **0 vulnerabilities** và `npm run lint` + `npm run typecheck` đều pass.
+
+## Base standardization v1 (FE + BE)
+
+- [x] Chuẩn hóa response contract về một envelope thống nhất: `success`, `data/error`, `meta.timestamp` cho Auth/Project/Health.
+- [x] Thêm `@Public()` decorator + global auth guard để route private được bảo vệ mặc định, không cần gắn guard lặp lại.
+- [x] Thêm `@CurrentUser()` decorator để loại bỏ logic parse Bearer token trong controller.
+- [x] Thêm global HTTP exception filter để error response cùng format với success envelope.
+- [x] Tách và chuẩn hóa shared types/DTO theo domain, gồm cả `health.dto.ts` dùng chung FE/BE.
+- [x] Cập nhật frontend parser cho envelope mới (`auth/login`, `auth/me`, `projects`) + chuẩn hóa token storage helper.
+- [x] Smoke test pass: `health`, `login`, `me`, `projects` và unauthorized `projects` đều đúng contract.

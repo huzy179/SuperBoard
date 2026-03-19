@@ -23,8 +23,7 @@ export class ProjectService {
     const projects = await this.prisma.project.findMany({
       where: {
         workspaceId,
-        deletedAt: null,
-        ...(options?.showArchived ? {} : { isArchived: false }),
+        ...(options?.showArchived ? {} : { deletedAt: null }),
       } as Prisma.ProjectWhereInput,
       select: {
         id: true,
@@ -52,14 +51,12 @@ export class ProjectService {
       where: {
         id: projectId,
         workspaceId,
-        deletedAt: null,
-        ...(options?.showArchived ? {} : { isArchived: false }),
+        ...(options?.showArchived ? {} : { deletedAt: null }),
       } as Prisma.ProjectWhereInput,
       include: {
         tasks: {
           where: {
-            ...(options?.showArchived ? {} : { isArchived: false }),
-            deletedAt: null,
+            ...(options?.showArchived ? {} : { deletedAt: null }),
           } as Prisma.TaskWhereInput,
           orderBy: {
             createdAt: 'desc',
@@ -121,7 +118,6 @@ export class ProjectService {
       where: {
         id: input.projectId,
         workspaceId: input.workspaceId,
-        isArchived: false,
         deletedAt: null,
       } as Prisma.ProjectWhereInput,
       select: { id: true },
@@ -153,7 +149,6 @@ export class ProjectService {
       where: {
         id: input.projectId,
         workspaceId: input.workspaceId,
-        isArchived: false,
         deletedAt: null,
       } as Prisma.ProjectWhereInput,
       select: { id: true },
@@ -166,7 +161,6 @@ export class ProjectService {
     await this.prisma.project.update({
       where: { id: input.projectId },
       data: {
-        isArchived: true,
         deletedAt: input.archivedAt ?? new Date(),
       } as Prisma.ProjectUpdateInput,
     });
@@ -190,7 +184,6 @@ export class ProjectService {
         workspace: {
           select: {
             id: true,
-            isArchived: true,
             deletedAt: true,
           },
         },
@@ -201,7 +194,7 @@ export class ProjectService {
       throw new NotFoundException('Project not found');
     }
 
-    if (existingProject.workspace.isArchived || existingProject.workspace.deletedAt) {
+    if (existingProject.workspace.deletedAt) {
       throw new BadRequestException(
         'Cannot restore project because parent workspace is archived. Please restore workspace first.',
       );
@@ -210,7 +203,6 @@ export class ProjectService {
     await this.prisma.project.update({
       where: { id: input.projectId },
       data: {
-        isArchived: false,
         deletedAt: null,
       } as Prisma.ProjectUpdateInput,
     });
@@ -232,7 +224,6 @@ export class ProjectService {
       where: {
         id: input.projectId,
         workspaceId: input.workspaceId,
-        isArchived: false,
         deletedAt: null,
       } as Prisma.ProjectWhereInput,
       select: {
@@ -294,7 +285,6 @@ export class ProjectService {
       where: {
         id: input.projectId,
         workspaceId: input.workspaceId,
-        isArchived: false,
         deletedAt: null,
       } as Prisma.ProjectWhereInput,
       select: {
@@ -310,7 +300,6 @@ export class ProjectService {
       where: {
         id: input.taskId,
         projectId: input.projectId,
-        isArchived: false,
         deletedAt: null,
       } as Prisma.TaskWhereInput,
       select: {
@@ -365,7 +354,6 @@ export class ProjectService {
       where: {
         id: input.projectId,
         workspaceId: input.workspaceId,
-        isArchived: false,
         deletedAt: null,
       } as Prisma.ProjectWhereInput,
       select: { id: true },
@@ -379,7 +367,6 @@ export class ProjectService {
       where: {
         id: input.taskId,
         projectId: input.projectId,
-        isArchived: false,
         deletedAt: null,
       } as Prisma.TaskWhereInput,
       select: { id: true },
@@ -440,7 +427,6 @@ export class ProjectService {
       where: {
         id: input.projectId,
         workspaceId: input.workspaceId,
-        isArchived: false,
         deletedAt: null,
       } as Prisma.ProjectWhereInput,
       select: { id: true },
@@ -454,7 +440,6 @@ export class ProjectService {
       where: {
         id: input.taskId,
         projectId: input.projectId,
-        isArchived: false,
         deletedAt: null,
       } as Prisma.TaskWhereInput,
       select: { id: true },
@@ -469,7 +454,6 @@ export class ProjectService {
         id: input.taskId,
       },
       data: {
-        isArchived: true,
         deletedAt: new Date(),
       },
     });

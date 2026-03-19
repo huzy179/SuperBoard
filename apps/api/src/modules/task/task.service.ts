@@ -14,15 +14,12 @@ export class TaskService {
     const task = await this.prisma.task.findFirst({
       where: {
         id: input.taskId,
-        isArchived: false,
         deletedAt: null,
         project: {
           workspaceId: input.workspaceId,
           deletedAt: null,
-          isArchived: false,
           workspace: {
             deletedAt: null,
-            isArchived: false,
           },
         },
       } as Prisma.TaskWhereInput,
@@ -40,7 +37,6 @@ export class TaskService {
         id: input.taskId,
       },
       data: {
-        isArchived: true,
         deletedAt: input.archivedAt ?? new Date(),
       },
     });
@@ -63,12 +59,10 @@ export class TaskService {
         project: {
           select: {
             id: true,
-            isArchived: true,
             deletedAt: true,
             workspace: {
               select: {
                 id: true,
-                isArchived: true,
                 deletedAt: true,
               },
             },
@@ -81,13 +75,13 @@ export class TaskService {
       throw new NotFoundException('Task not found');
     }
 
-    if (task.project.workspace.isArchived || task.project.workspace.deletedAt) {
+    if (task.project.workspace.deletedAt) {
       throw new BadRequestException(
         'Cannot restore task because parent workspace is archived. Please restore workspace first.',
       );
     }
 
-    if (task.project.isArchived || task.project.deletedAt) {
+    if (task.project.deletedAt) {
       throw new BadRequestException(
         'Cannot restore task because parent project is archived. Please restore project first.',
       );
@@ -98,7 +92,6 @@ export class TaskService {
         id: input.taskId,
       },
       data: {
-        isArchived: false,
         deletedAt: null,
       },
     });

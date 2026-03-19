@@ -21,6 +21,8 @@ model Workspace {
   members       WorkspaceMember[]
   userRoles     UserRole[]
   projects      Project[]
+  workflowStatusTemplates WorkspaceWorkflowStatus[]
+  workflowTemplateTransitions WorkspaceWorkflowTransition[]
   notifications Notification[]
 
   @@index([isArchived, deletedAt])
@@ -137,6 +139,8 @@ model Project {
   deletedAt   DateTime?
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workflowStatuses ProjectWorkflowStatus[]
+  workflowTransitions ProjectWorkflowTransition[]
   tasks       Task[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -148,7 +152,7 @@ model Task {
   id          String       @id @default(cuid())
   title       String
   description String?
-  status      TaskStatus   @default(todo)
+  status      String       @default("todo")
   priority    TaskPriority @default(medium)
   position    String?
   dueDate     DateTime?
@@ -158,6 +162,7 @@ model Task {
   assignee    User?        @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
   projectId   String
   project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workflowStatus ProjectWorkflowStatus @relation(fields: [projectId, status], references: [projectId, key], onDelete: Restrict)
   events      TaskEvent[]
   comments    Comment[]
   createdAt   DateTime     @default(now())
@@ -167,12 +172,77 @@ model Task {
   @@index([assigneeId])
 }
 
-enum TaskStatus {
+model WorkspaceWorkflowStatus {
+  id          String  @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  key         String
+  name        String
+  category    WorkflowStatusCategory
+  position    Int
+  isSystem    Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  transitionsFrom WorkspaceWorkflowTransition[] @relation("WorkspaceTransitionFrom")
+  transitionsTo   WorkspaceWorkflowTransition[] @relation("WorkspaceTransitionTo")
+
+  @@unique([workspaceId, key])
+  @@index([workspaceId, position])
+}
+
+model WorkspaceWorkflowTransition {
+  id           String @id @default(cuid())
+  workspaceId  String
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  fromStatusId String
+  toStatusId   String
+  fromStatus   WorkspaceWorkflowStatus @relation("WorkspaceTransitionFrom", fields: [fromStatusId], references: [id], onDelete: Cascade)
+  toStatus     WorkspaceWorkflowStatus @relation("WorkspaceTransitionTo", fields: [toStatusId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, fromStatusId, toStatusId])
+  @@index([workspaceId, fromStatusId])
+  @@index([workspaceId, toStatusId])
+}
+
+model ProjectWorkflowStatus {
+  id          String @id @default(cuid())
+  projectId   String
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  key         String
+  name        String
+  category    WorkflowStatusCategory
+  position    Int
+  isSystem    Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tasks       Task[]
+  transitionsFrom ProjectWorkflowTransition[] @relation("ProjectTransitionFrom")
+  transitionsTo   ProjectWorkflowTransition[] @relation("ProjectTransitionTo")
+
+  @@unique([projectId, key])
+  @@index([projectId, position])
+}
+
+model ProjectWorkflowTransition {
+  id           String @id @default(cuid())
+  projectId    String
+  project      Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  fromStatusId String
+  toStatusId   String
+  fromStatus   ProjectWorkflowStatus @relation("ProjectTransitionFrom", fields: [fromStatusId], references: [id], onDelete: Cascade)
+  toStatus     ProjectWorkflowStatus @relation("ProjectTransitionTo", fields: [toStatusId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, fromStatusId, toStatusId])
+  @@index([projectId, fromStatusId])
+  @@index([projectId, toStatusId])
+}
+
+enum WorkflowStatusCategory {
   todo
   in_progress
   in_review
   done
-  cancelled
+  blocked
 }
 
 enum TaskPriority {

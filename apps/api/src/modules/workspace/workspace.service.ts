@@ -20,14 +20,13 @@ export class WorkspaceService {
     options?: { showArchived?: boolean },
   ): Promise<WorkspaceItemDTO[]> {
     const where: Prisma.WorkspaceWhereInput = {
-      deletedAt: null,
       members: {
         some: {
           userId,
           deletedAt: null,
         },
       },
-      ...(options?.showArchived ? {} : { isArchived: false }),
+      ...(options?.showArchived ? {} : { deletedAt: null }),
     };
 
     const workspaces = await this.prisma.workspace.findMany({
@@ -39,7 +38,7 @@ export class WorkspaceService {
         id: true,
         name: true,
         slug: true,
-        isArchived: true,
+        deletedAt: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -55,8 +54,7 @@ export class WorkspaceService {
     const workspace = await this.prisma.workspace.findFirst({
       where: {
         id: input.workspaceId,
-        deletedAt: null,
-        ...(options?.showArchived ? {} : { isArchived: false }),
+        ...(options?.showArchived ? {} : { deletedAt: null }),
         members: {
           some: {
             userId: input.userId,
@@ -68,7 +66,7 @@ export class WorkspaceService {
         id: true,
         name: true,
         slug: true,
-        isArchived: true,
+        deletedAt: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -108,7 +106,7 @@ export class WorkspaceService {
           id: true,
           name: true,
           slug: true,
-          isArchived: true,
+          deletedAt: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -198,7 +196,7 @@ export class WorkspaceService {
         id: true,
         name: true,
         slug: true,
-        isArchived: true,
+        deletedAt: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -216,7 +214,6 @@ export class WorkspaceService {
       where: {
         id: input.workspaceId,
         deletedAt: null,
-        isArchived: false,
         members: {
           some: {
             userId: input.userId,
@@ -236,7 +233,6 @@ export class WorkspaceService {
     await this.prisma.workspace.update({
       where: { id: input.workspaceId },
       data: {
-        isArchived: true,
         deletedAt: input.archivedAt ?? new Date(),
       },
     });
@@ -272,7 +268,6 @@ export class WorkspaceService {
     await this.prisma.workspace.update({
       where: { id: input.workspaceId },
       data: {
-        isArchived: false,
         deletedAt: null,
       },
     });
@@ -298,7 +293,7 @@ export class WorkspaceService {
     id: string;
     name: string;
     slug: string;
-    isArchived: boolean;
+    deletedAt: Date | null;
     createdAt: Date;
     updatedAt: Date;
   }): WorkspaceItemDTO {
@@ -306,7 +301,7 @@ export class WorkspaceService {
       id: workspace.id,
       name: workspace.name,
       slug: workspace.slug,
-      isArchived: workspace.isArchived,
+      isArchived: workspace.deletedAt !== null,
       createdAt: workspace.createdAt.toISOString(),
       updatedAt: workspace.updatedAt.toISOString(),
     };

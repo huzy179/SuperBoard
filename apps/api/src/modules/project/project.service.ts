@@ -16,12 +16,15 @@ import type {
 export class ProjectService {
   constructor(private prisma: PrismaService) {}
 
-  async getProjectsByWorkspace(workspaceId: string): Promise<ProjectItemDTO[]> {
+  async getProjectsByWorkspace(
+    workspaceId: string,
+    options?: { showArchived?: boolean },
+  ): Promise<ProjectItemDTO[]> {
     const projects = await this.prisma.project.findMany({
       where: {
         workspaceId,
-        isArchived: false,
         deletedAt: null,
+        ...(options?.showArchived ? {} : { isArchived: false }),
       } as Prisma.ProjectWhereInput,
       select: {
         id: true,
@@ -43,17 +46,19 @@ export class ProjectService {
   async getProjectByIdForWorkspace(
     projectId: string,
     workspaceId: string,
+    options?: { showArchived?: boolean },
   ): Promise<ProjectDetailDTO | null> {
     const project = await this.prisma.project.findFirst({
       where: {
         id: projectId,
         workspaceId,
-        isArchived: false,
         deletedAt: null,
+        ...(options?.showArchived ? {} : { isArchived: false }),
       } as Prisma.ProjectWhereInput,
       include: {
         tasks: {
           where: {
+            ...(options?.showArchived ? {} : { isArchived: false }),
             deletedAt: null,
           } as Prisma.TaskWhereInput,
           orderBy: {
@@ -142,6 +147,7 @@ export class ProjectService {
   async archiveProjectForWorkspace(input: {
     projectId: string;
     workspaceId: string;
+    archivedAt?: Date;
   }): Promise<void> {
     const existingProject = await this.prisma.project.findFirst({
       where: {
@@ -161,9 +167,55 @@ export class ProjectService {
       where: { id: input.projectId },
       data: {
         isArchived: true,
-        deletedAt: new Date(),
+        deletedAt: input.archivedAt ?? new Date(),
       } as Prisma.ProjectUpdateInput,
     });
+  }
+
+  async restoreProjectForWorkspace(input: {
+    projectId: string;
+    workspaceId: string;
+    restoredAt?: Date;
+  }): Promise<void> {
+    const existingProject = await this.prisma.project.findFirst({
+      where: {
+        id: input.projectId,
+        workspaceId: input.workspaceId,
+        deletedAt: {
+          not: null,
+        },
+      } as Prisma.ProjectWhereInput,
+      select: {
+        id: true,
+        workspace: {
+          select: {
+            id: true,
+            isArchived: true,
+            deletedAt: true,
+          },
+        },
+      },
+    });
+
+    if (!existingProject) {
+      throw new NotFoundException('Project not found');
+    }
+
+    if (existingProject.workspace.isArchived || existingProject.workspace.deletedAt) {
+      throw new BadRequestException(
+        'Cannot restore project because parent workspace is archived. Please restore workspace first.',
+      );
+    }
+
+    await this.prisma.project.update({
+      where: { id: input.projectId },
+      data: {
+        isArchived: false,
+        deletedAt: null,
+      } as Prisma.ProjectUpdateInput,
+    });
+
+    void input.restoredAt;
   }
 
   async createTaskForProject(input: {
@@ -258,6 +310,7 @@ export class ProjectService {
       where: {
         id: input.taskId,
         projectId: input.projectId,
+        isArchived: false,
         deletedAt: null,
       } as Prisma.TaskWhereInput,
       select: {
@@ -326,6 +379,7 @@ export class ProjectService {
       where: {
         id: input.taskId,
         projectId: input.projectId,
+        isArchived: false,
         deletedAt: null,
       } as Prisma.TaskWhereInput,
       select: { id: true },
@@ -400,6 +454,7 @@ export class ProjectService {
       where: {
         id: input.taskId,
         projectId: input.projectId,
+        isArchived: false,
         deletedAt: null,
       } as Prisma.TaskWhereInput,
       select: { id: true },
@@ -414,6 +469,7 @@ export class ProjectService {
         id: input.taskId,
       },
       data: {
+        isArchived: true,
         deletedAt: new Date(),
       },
     });

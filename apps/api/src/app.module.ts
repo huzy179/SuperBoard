@@ -10,6 +10,8 @@ import { RedisService } from './common/redis.service';
 import { PrismaService } from './prisma/prisma.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProjectModule } from './modules/project/project.module';
+import { WorkspaceModule } from './modules/workspace/workspace.module';
+import { TaskModule } from './modules/task/task.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { ProjectModule } from './modules/project/project.module';
     }),
     AuthModule,
     ProjectModule,
+    WorkspaceModule,
+    TaskModule,
   ],
   controllers: [HealthController],
   providers: [

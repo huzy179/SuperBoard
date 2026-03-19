@@ -10,6 +10,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UnauthorizedException,
 } from '@nestjs/common';
 import type {
@@ -38,12 +39,17 @@ export class ProjectController {
   constructor(private projectService: ProjectService) {}
 
   @Get()
-  async getProjects(@CurrentUser() user: AuthUserDTO): Promise<ProjectsResponseDTO> {
+  async getProjects(
+    @CurrentUser() user: AuthUserDTO,
+    @Query('showArchived') showArchived?: string,
+  ): Promise<ProjectsResponseDTO> {
     if (!user?.defaultWorkspaceId) {
       throw new UnauthorizedException('Workspace not found');
     }
 
-    const projects = await this.projectService.getProjectsByWorkspace(user.defaultWorkspaceId);
+    const projects = await this.projectService.getProjectsByWorkspace(user.defaultWorkspaceId, {
+      showArchived: this.parseBooleanQuery(showArchived),
+    });
 
     return apiSuccess(projects);
   }
@@ -52,6 +58,7 @@ export class ProjectController {
   async getProjectDetail(
     @CurrentUser() user: AuthUserDTO,
     @Param('projectId') projectId: string,
+    @Query('showArchived') showArchived?: string,
   ): Promise<ProjectDetailResponseDTO> {
     if (!user?.defaultWorkspaceId) {
       throw new UnauthorizedException('Workspace not found');
@@ -60,6 +67,9 @@ export class ProjectController {
     const project = await this.projectService.getProjectByIdForWorkspace(
       projectId,
       user.defaultWorkspaceId,
+      {
+        showArchived: this.parseBooleanQuery(showArchived),
+      },
     );
 
     if (!project) {
@@ -142,6 +152,24 @@ export class ProjectController {
     });
 
     return apiSuccess({ deleted: true });
+  }
+
+  @Patch(':projectId/restore')
+  @HttpCode(HttpStatus.OK)
+  async restoreProject(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+  ): Promise<DeleteProjectResponseDTO> {
+    if (!user?.defaultWorkspaceId) {
+      throw new UnauthorizedException('Workspace not found');
+    }
+
+    await this.projectService.restoreProjectForWorkspace({
+      projectId,
+      workspaceId: user.defaultWorkspaceId,
+    });
+
+    return apiSuccess({ deleted: false });
   }
 
   @Post(':projectId/tasks')
@@ -276,5 +304,21 @@ export class ProjectController {
     }
 
     return parsedDate;
+  }
+
+  private parseBooleanQuery(value?: string): boolean {
+    if (value === undefined) {
+      return false;
+    }
+
+    if (value === 'true') {
+      return true;
+    }
+
+    if (value === 'false') {
+      return false;
+    }
+
+    throw new BadRequestException('showArchived must be true or false');
   }
 }

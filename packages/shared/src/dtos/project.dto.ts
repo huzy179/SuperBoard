@@ -77,3 +77,11 @@ export interface UpdateProjectRequestDTO {
 export type UpdateProjectResponseDTO = ApiResponse<ProjectItemDTO>;
 
 export type DeleteProjectResponseDTO = ApiResponse<{ deleted: boolean }>;
+
+export type ArchiveProjectResponseDTO = ApiResponse<{ archived: boolean }>;
+
+export type RestoreProjectResponseDTO = ApiResponse<{ archived: boolean }>;
+
+export type ArchiveTaskResponseDTO = ApiResponse<{ archived: boolean }>;
+
+export type RestoreTaskResponseDTO = ApiResponse<{ archived: boolean }>;

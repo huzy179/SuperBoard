@@ -32,12 +32,13 @@ Decimal phases appear between their surrounding integers in numeric order.
 1. User có thể create/read/update/archive workspace, project và task qua UI mà dữ liệu phản ánh đúng qua API.
 2. User có thể định nghĩa custom statuses theo project/workspace và sử dụng xuyên suốt mà không tạo trạng thái mâu thuẫn.
 3. User nhìn thấy cùng một trạng thái task giữa các màn hình và khi refresh session.
-   **Plans**: TBD
+   **Plans**: 3 plans
 
 Plans:
 
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — Backend lifecycle baseline cho workspace/project/task với soft-delete + restore invariants.
+- [ ] 01-02-PLAN.md — Status model custom (workspace template + project override) và strict transition backend policy.
+- [ ] 01-03-PLAN.md — UI lifecycle controls + optimistic consistency/rollback/retry cho board/list.
 
 ### Phase 2: Workflow Relationships & Backlog Triage
 
@@ -131,7 +132,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase                                      | Plans Complete | Status      | Completed |
 | ------------------------------------------ | -------------- | ----------- | --------- |
-| 1. Workflow Lifecycle Baseline             | 0/2            | Not started | -         |
+| 1. Workflow Lifecycle Baseline             | 0/3            | Not started | -         |
 | 2. Workflow Relationships & Backlog Triage | 0/2            | Not started | -         |
 | 3. AI Draft Generation with Human Review   | 0/2            | Not started | -         |
 | 4. Grounded AI Governance                  | 0/2            | Not started | -         |

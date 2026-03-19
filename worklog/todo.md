@@ -5,6 +5,11 @@
 - [x] Global auth guard + `@Public()` + `@CurrentUser()` decorator đã setup.
 - [x] Response envelope đã chuẩn hóa cho Auth/Project/Health (`success`, `data/error`, `meta`).
 - [x] Shared DTO contracts FE/BE đã đồng bộ, bao gồm health response type.
+- [x] Jira project detail page (`/jira/projects/[projectId]`) với board/list view đã chạy.
+- [x] Task create trong project detail đã hoạt động (`POST /projects/:projectId/tasks`).
+- [x] Task status update đã hoạt động cả board drag-drop và list inline update (`PATCH .../status`).
+- [x] Task CRUD cơ bản đã hoàn tất (create/update/delete + detail panel).
+- [x] Soft-delete cho Task đã hoạt động (`deletedAt`) và đã smoke test runtime pass.
 
 ## Ưu tiên cao (P0) — Kế hoạch mới
 
@@ -19,9 +24,9 @@
 
 ### Backend (API)
 
-- [ ] Implement CRUD `Project` (name, description, color, icon, archive).
-- [ ] Implement CRUD `Task` + assignee + status flow + priority + dueDate.
-- [ ] Implement task ordering cho Kanban (`position`/fractional indexing).
+- [x] Implement CRUD cơ bản `Project` (create, update, archive mềm; list/detail).
+- [x] Hoàn thiện `Task` phần còn lại: assignee + priority + dueDate.
+- [ ] Implement task ordering cho Kanban (`position`/fractional indexing) cho drag-drop theo vị trí.
 - [ ] Implement Task history qua `TaskEvent`.
 - [ ] Implement filter/sort nền tảng cho board/list (status, priority, assignee, dueDate).
 
@@ -29,9 +34,10 @@
 
 - [ ] Thiết kế routing Jira trong `apps/web/app` cho luồng: Workspace → Project → Board/List.
 - [ ] Dựng UI `Project list` + `Project create/edit` form (ưu tiên chức năng, chưa tối ưu style nâng cao).
-- [ ] Dựng UI `Task board (Kanban)` theo status cột + `Task card` cơ bản.
-- [ ] Dựng UI `Task list/table` với sort/filter tương ứng API (status/priority/assignee/dueDate).
-- [ ] Dựng `Task detail panel/page` (title, description, assignee, status, priority, dueDate, comments).
+- [x] Dựng UI `Task board (Kanban)` theo status cột + drag-drop đổi trạng thái.
+- [x] Dựng UI `Task list/table` cơ bản + inline status change.
+- [x] Dựng `Task detail panel/page` cơ bản (title, description, status, edit/delete).
+- [~] Mở rộng `Task detail panel/page` với assignee/priority/dueDate/comments (đã xong assignee/priority/dueDate, còn comments).
 - [ ] Tích hợp React Query cho fetch/mutation + optimistic update cho thao tác kéo thả và đổi trạng thái.
 - [ ] Chuẩn hóa client state (Zustand) cho UI state của board/list/filter/search.
 - [ ] Đồng bộ contract FE ↔ BE bằng types/schemas từ `packages/shared`.

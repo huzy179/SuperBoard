@@ -77,3 +77,42 @@
 - [x] Tách và chuẩn hóa shared types/DTO theo domain, gồm cả `health.dto.ts` dùng chung FE/BE.
 - [x] Cập nhật frontend parser cho envelope mới (`auth/login`, `auth/me`, `projects`) + chuẩn hóa token storage helper.
 - [x] Smoke test pass: `health`, `login`, `me`, `projects` và unauthorized `projects` đều đúng contract.
+
+## Jira-first v0.2 (Project + Task Board/List)
+
+- [x] Implement `GET /projects/:projectId` để lấy project detail + task list theo workspace.
+- [x] Implement `POST /projects/:projectId/tasks` để tạo task trực tiếp từ project detail page.
+- [x] Implement `PATCH /projects/:projectId/tasks/:taskId/status` để đổi trạng thái task.
+- [x] Bổ sung shared DTOs cho project detail/task create/task status update.
+- [x] Dựng route FE `/jira/projects/[projectId]` với 2 chế độ `Board` và `List`.
+- [x] Tạo task từ FE (title/description/status) và tự reload board/list sau khi tạo.
+- [x] Implement kéo-thả task giữa các cột board để cập nhật status.
+- [x] Implement inline status change trong list view bằng select.
+- [x] Implement Task Detail panel cho phép xem chi tiết, sửa Title/Description/Status và Xoá task.
+- [x] Hoàn thiện trọn bộ CRUD Task cơ bản cho Jira MVP.
+
+## Jira-first v0.3 (Soft Delete + Runtime Validation)
+
+- [x] Bổ sung `deletedAt` cho các bảng nghiệp vụ chính trong Prisma schema để chuẩn bị soft-delete thống nhất.
+- [x] Tạo và apply migration `add_global_soft_delete_columns` cho DB local.
+- [x] Chuyển `DELETE /projects/:projectId/tasks/:taskId` sang hành vi soft-delete (`update deletedAt`).
+- [x] Chuẩn hóa filter BE cho luồng `Auth/Project/Task` để không trả dữ liệu đã soft-delete.
+- [x] Rà lại toàn bộ call FE/BE liên quan project/task, xác nhận typecheck + lint pass.
+- [x] Smoke test runtime end-to-end pass: login → list project → create task → delete task → task biến mất khỏi project detail.
+
+## Jira-first v0.4 (Project Base CRUD Completion)
+
+- [x] Implement `PATCH /projects/:projectId` để cập nhật project (name/description/color/icon).
+- [x] Implement `DELETE /projects/:projectId` theo soft-delete (archive bằng `isArchived + deletedAt`).
+- [x] Bổ sung DTO/contracts FE/BE cho update/delete project.
+- [x] Tích hợp UI Jira Home cho sửa project và lưu trữ project.
+- [x] Smoke test runtime pass: update project → archive project → project biến mất khỏi list.
+
+## Jira-first v0.5 (Task Assignee + Priority + DueDate)
+
+- [x] Mở rộng shared DTO contracts cho Task với `priority`, `dueDate`, `assigneeId` trong create/update/detail.
+- [x] Cập nhật BE `ProjectController/ProjectService` để xử lý và trả về đầy đủ `priority`, `dueDate`, `assigneeId`.
+- [x] Thêm validate assignee theo workspace member để tránh lỗi 500 khi `assigneeId` không hợp lệ.
+- [x] Mở rộng FE project detail page: form tạo task + task detail panel hỗ trợ chỉnh `priority`, `dueDate`, `assignee`.
+- [x] Typecheck + lint pass cho cả API/Web sau thay đổi.
+- [x] Smoke test runtime pass cho create/update task với `priority/dueDate/assignee` (hợp lệ và invalid assignee).

@@ -54,26 +54,26 @@
 
 ## Traceability
 
-| Requirement | Phase     | Status  |
-| ----------- | --------- | ------- |
-| WFLO-01     | Phase TBD | Pending |
-| WFLO-02     | Phase TBD | Pending |
-| WFLO-03     | Phase TBD | Pending |
-| WFLO-04     | Phase TBD | Pending |
-| AITS-01     | Phase TBD | Pending |
-| AITS-02     | Phase TBD | Pending |
-| AITS-03     | Phase TBD | Pending |
-| AITS-04     | Phase TBD | Pending |
-| AITS-05     | Phase TBD | Pending |
-| INTG-01     | Phase TBD | Pending |
-| GOV-01      | Phase TBD | Pending |
-| GOV-02      | Phase TBD | Pending |
+| Requirement | Phase   | Status  |
+| ----------- | ------- | ------- |
+| WFLO-01     | Phase 1 | Pending |
+| WFLO-02     | Phase 1 | Pending |
+| WFLO-03     | Phase 2 | Pending |
+| WFLO-04     | Phase 2 | Pending |
+| AITS-01     | Phase 3 | Pending |
+| AITS-02     | Phase 3 | Pending |
+| AITS-03     | Phase 4 | Pending |
+| AITS-04     | Phase 5 | Pending |
+| AITS-05     | Phase 5 | Pending |
+| INTG-01     | Phase 6 | Pending |
+| GOV-01      | Phase 4 | Pending |
+| GOV-02      | Phase 4 | Pending |
 
 **Coverage:**
 
 - v1 requirements: 12 total
-- Mapped to phases: 0
-- Unmapped: 12 ⚠️
+- Mapped to phases: 12
+- Unmapped: 0 ✅
 
 ---
 

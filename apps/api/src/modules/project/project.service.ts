@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import type { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import type {
   CreateProjectRequestDTO,
@@ -6,6 +7,7 @@ import type {
   ProjectDetailDTO,
   ProjectItemDTO,
   ProjectTaskItemDTO,
+  UpdateProjectRequestDTO,
   UpdateTaskRequestDTO,
   UpdateTaskStatusRequestDTO,
 } from '@superboard/shared';
@@ -19,7 +21,8 @@ export class ProjectService {
       where: {
         workspaceId,
         isArchived: false,
-      },
+        deletedAt: null,
+      } as Prisma.ProjectWhereInput,
       select: {
         id: true,
         name: true,
@@ -46,9 +49,13 @@ export class ProjectService {
         id: projectId,
         workspaceId,
         isArchived: false,
-      },
+        deletedAt: null,
+      } as Prisma.ProjectWhereInput,
       include: {
         tasks: {
+          where: {
+            deletedAt: null,
+          } as Prisma.TaskWhereInput,
           orderBy: {
             createdAt: 'desc',
           },
@@ -57,6 +64,8 @@ export class ProjectService {
             title: true,
             description: true,
             status: true,
+            priority: true,
+            dueDate: true,
             assigneeId: true,
             createdAt: true,
             updatedAt: true,
@@ -76,6 +85,8 @@ export class ProjectService {
         title: task.title,
         description: task.description,
         status: task.status,
+        priority: task.priority,
+        dueDate: task.dueDate ? task.dueDate.toISOString() : null,
         assigneeId: task.assigneeId,
         createdAt: task.createdAt.toISOString(),
         updatedAt: task.updatedAt.toISOString(),
@@ -96,19 +107,82 @@ export class ProjectService {
     return this.toProjectItemDTO(project);
   }
 
+  async updateProjectForWorkspace(input: {
+    projectId: string;
+    workspaceId: string;
+    data: UpdateProjectRequestDTO;
+  }): Promise<ProjectItemDTO> {
+    const existingProject = await this.prisma.project.findFirst({
+      where: {
+        id: input.projectId,
+        workspaceId: input.workspaceId,
+        isArchived: false,
+        deletedAt: null,
+      } as Prisma.ProjectWhereInput,
+      select: { id: true },
+    });
+
+    if (!existingProject) {
+      throw new NotFoundException('Project not found');
+    }
+
+    const project = await this.prisma.project.update({
+      where: { id: input.projectId },
+      data: {
+        ...(input.data.name !== undefined ? { name: input.data.name } : {}),
+        ...(input.data.description !== undefined ? { description: input.data.description } : {}),
+        ...(input.data.color !== undefined ? { color: input.data.color } : {}),
+        ...(input.data.icon !== undefined ? { icon: input.data.icon } : {}),
+      },
+    });
+
+    return this.toProjectItemDTO(project);
+  }
+
+  async archiveProjectForWorkspace(input: {
+    projectId: string;
+    workspaceId: string;
+  }): Promise<void> {
+    const existingProject = await this.prisma.project.findFirst({
+      where: {
+        id: input.projectId,
+        workspaceId: input.workspaceId,
+        isArchived: false,
+        deletedAt: null,
+      } as Prisma.ProjectWhereInput,
+      select: { id: true },
+    });
+
+    if (!existingProject) {
+      throw new NotFoundException('Project not found');
+    }
+
+    await this.prisma.project.update({
+      where: { id: input.projectId },
+      data: {
+        isArchived: true,
+        deletedAt: new Date(),
+      } as Prisma.ProjectUpdateInput,
+    });
+  }
+
   async createTaskForProject(input: {
     projectId: string;
     workspaceId: string;
     title: string;
     description?: string;
     status: NonNullable<CreateTaskRequestDTO['status']>;
+    priority: NonNullable<CreateTaskRequestDTO['priority']>;
+    dueDate?: Date | null;
+    assigneeId?: string | null;
   }): Promise<ProjectTaskItemDTO> {
     const project = await this.prisma.project.findFirst({
       where: {
         id: input.projectId,
         workspaceId: input.workspaceId,
         isArchived: false,
-      },
+        deletedAt: null,
+      } as Prisma.ProjectWhereInput,
       select: {
         id: true,
       },
@@ -118,18 +192,27 @@ export class ProjectService {
       throw new NotFoundException('Project not found');
     }
 
+    if (input.assigneeId) {
+      await this.validateAssignee(input.workspaceId, input.assigneeId);
+    }
+
     const task = await this.prisma.task.create({
       data: {
         projectId: input.projectId,
         title: input.title,
         description: input.description ?? null,
         status: input.status,
+        priority: input.priority,
+        dueDate: input.dueDate ?? null,
+        assigneeId: input.assigneeId ?? null,
       },
       select: {
         id: true,
         title: true,
         description: true,
         status: true,
+        priority: true,
+        dueDate: true,
         assigneeId: true,
         createdAt: true,
         updatedAt: true,
@@ -141,6 +224,8 @@ export class ProjectService {
       title: task.title,
       description: task.description,
       status: task.status,
+      priority: task.priority,
+      dueDate: task.dueDate ? task.dueDate.toISOString() : null,
       assigneeId: task.assigneeId,
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
@@ -158,7 +243,8 @@ export class ProjectService {
         id: input.projectId,
         workspaceId: input.workspaceId,
         isArchived: false,
-      },
+        deletedAt: null,
+      } as Prisma.ProjectWhereInput,
       select: {
         id: true,
       },
@@ -172,7 +258,8 @@ export class ProjectService {
       where: {
         id: input.taskId,
         projectId: input.projectId,
-      },
+        deletedAt: null,
+      } as Prisma.TaskWhereInput,
       select: {
         id: true,
       },
@@ -194,6 +281,8 @@ export class ProjectService {
         title: true,
         description: true,
         status: true,
+        priority: true,
+        dueDate: true,
         assigneeId: true,
         createdAt: true,
         updatedAt: true,
@@ -205,6 +294,8 @@ export class ProjectService {
       title: task.title,
       description: task.description,
       status: task.status,
+      priority: task.priority,
+      dueDate: task.dueDate ? task.dueDate.toISOString() : null,
       assigneeId: task.assigneeId,
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
@@ -215,14 +306,15 @@ export class ProjectService {
     projectId: string;
     taskId: string;
     workspaceId: string;
-    data: UpdateTaskRequestDTO;
+    data: Omit<UpdateTaskRequestDTO, 'dueDate'> & { dueDate?: Date | null };
   }): Promise<ProjectTaskItemDTO> {
     const project = await this.prisma.project.findFirst({
       where: {
         id: input.projectId,
         workspaceId: input.workspaceId,
         isArchived: false,
-      },
+        deletedAt: null,
+      } as Prisma.ProjectWhereInput,
       select: { id: true },
     });
 
@@ -234,12 +326,17 @@ export class ProjectService {
       where: {
         id: input.taskId,
         projectId: input.projectId,
-      },
+        deletedAt: null,
+      } as Prisma.TaskWhereInput,
       select: { id: true },
     });
 
     if (!existingTask) {
       throw new NotFoundException('Task not found');
+    }
+
+    if (input.data.assigneeId) {
+      await this.validateAssignee(input.workspaceId, input.data.assigneeId);
     }
 
     const task = await this.prisma.task.update({
@@ -250,6 +347,8 @@ export class ProjectService {
         ...(input.data.title !== undefined ? { title: input.data.title } : {}),
         ...(input.data.description !== undefined ? { description: input.data.description } : {}),
         ...(input.data.status !== undefined ? { status: input.data.status } : {}),
+        ...(input.data.priority !== undefined ? { priority: input.data.priority } : {}),
+        ...(input.data.dueDate !== undefined ? { dueDate: input.data.dueDate } : {}),
         ...(input.data.assigneeId !== undefined ? { assigneeId: input.data.assigneeId } : {}),
       },
       select: {
@@ -257,6 +356,8 @@ export class ProjectService {
         title: true,
         description: true,
         status: true,
+        priority: true,
+        dueDate: true,
         assigneeId: true,
         createdAt: true,
         updatedAt: true,
@@ -268,6 +369,8 @@ export class ProjectService {
       title: task.title,
       description: task.description,
       status: task.status,
+      priority: task.priority,
+      dueDate: task.dueDate ? task.dueDate.toISOString() : null,
       assigneeId: task.assigneeId,
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
@@ -284,7 +387,8 @@ export class ProjectService {
         id: input.projectId,
         workspaceId: input.workspaceId,
         isArchived: false,
-      },
+        deletedAt: null,
+      } as Prisma.ProjectWhereInput,
       select: { id: true },
     });
 
@@ -296,7 +400,8 @@ export class ProjectService {
       where: {
         id: input.taskId,
         projectId: input.projectId,
-      },
+        deletedAt: null,
+      } as Prisma.TaskWhereInput,
       select: { id: true },
     });
 
@@ -304,9 +409,12 @@ export class ProjectService {
       throw new NotFoundException('Task not found');
     }
 
-    await this.prisma.task.delete({
+    await this.prisma.task.update({
       where: {
         id: input.taskId,
+      },
+      data: {
+        deletedAt: new Date(),
       },
     });
   }
@@ -329,5 +437,22 @@ export class ProjectService {
       createdAt: project.createdAt.toISOString(),
       updatedAt: project.updatedAt.toISOString(),
     };
+  }
+
+  private async validateAssignee(workspaceId: string, assigneeId: string): Promise<void> {
+    const userInWorkspace = await this.prisma.workspaceMember.findFirst({
+      where: {
+        workspaceId,
+        userId: assigneeId,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!userInWorkspace) {
+      throw new BadRequestException('Assignee is not a workspace member');
+    }
   }
 }

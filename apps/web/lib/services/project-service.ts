@@ -4,6 +4,7 @@ import type {
   ProjectDetailDTO,
   ProjectItemDTO,
   ProjectTaskItemDTO,
+  UpdateProjectRequestDTO,
   UpdateTaskRequestDTO,
   UpdateTaskStatusRequestDTO,
 } from '@superboard/shared';
@@ -16,6 +17,24 @@ export async function getProjects(): Promise<ProjectItemDTO[]> {
 
 export async function createProject(payload: CreateProjectRequestDTO): Promise<ProjectItemDTO> {
   return apiPost<ProjectItemDTO>(API_ENDPOINTS.projects.create, payload, { auth: true });
+}
+
+export async function updateProject(
+  projectId: string,
+  payload: UpdateProjectRequestDTO,
+): Promise<ProjectItemDTO> {
+  return apiRequest<ProjectItemDTO>(API_ENDPOINTS.projects.update(projectId), {
+    auth: true,
+    method: 'PATCH',
+    body: payload,
+  });
+}
+
+export async function deleteProject(projectId: string): Promise<void> {
+  return apiRequest<void>(API_ENDPOINTS.projects.delete(projectId), {
+    auth: true,
+    method: 'DELETE',
+  });
 }
 
 export async function getProjectDetail(projectId: string): Promise<ProjectDetailDTO> {

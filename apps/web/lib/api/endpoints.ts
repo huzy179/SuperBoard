@@ -7,6 +7,8 @@ export const API_ENDPOINTS = {
     list: '/api/v1/projects',
     create: '/api/v1/projects',
     detail: (projectId: string) => `/api/v1/projects/${projectId}`,
+    update: (projectId: string) => `/api/v1/projects/${projectId}`,
+    delete: (projectId: string) => `/api/v1/projects/${projectId}`,
     createTask: (projectId: string) => `/api/v1/projects/${projectId}/tasks`,
     updateTaskStatus: (projectId: string, taskId: string) =>
       `/api/v1/projects/${projectId}/tasks/${taskId}/status`,

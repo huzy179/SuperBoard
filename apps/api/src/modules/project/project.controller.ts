@@ -18,9 +18,12 @@ import type {
   CreateProjectResponseDTO,
   CreateTaskRequestDTO,
   CreateTaskResponseDTO,
+  DeleteProjectResponseDTO,
   DeleteTaskResponseDTO,
   ProjectDetailResponseDTO,
   ProjectsResponseDTO,
+  UpdateProjectRequestDTO,
+  UpdateProjectResponseDTO,
   UpdateTaskRequestDTO,
   UpdateTaskResponseDTO,
   UpdateTaskStatusRequestDTO,
@@ -94,6 +97,53 @@ export class ProjectController {
     return apiSuccess(project);
   }
 
+  @Patch(':projectId')
+  async updateProject(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+    @Body() body: UpdateProjectRequestDTO,
+  ): Promise<UpdateProjectResponseDTO> {
+    if (!user?.defaultWorkspaceId) {
+      throw new UnauthorizedException('Workspace not found');
+    }
+
+    const normalizedName = body.name?.trim();
+    if (body.name !== undefined && !normalizedName) {
+      throw new BadRequestException('Project name is required');
+    }
+
+    const project = await this.projectService.updateProjectForWorkspace({
+      projectId,
+      workspaceId: user.defaultWorkspaceId,
+      data: {
+        ...(normalizedName !== undefined ? { name: normalizedName } : {}),
+        ...(body.description !== undefined ? { description: body.description.trim() } : {}),
+        ...(body.color !== undefined ? { color: body.color.trim() } : {}),
+        ...(body.icon !== undefined ? { icon: body.icon.trim() } : {}),
+      },
+    });
+
+    return apiSuccess(project);
+  }
+
+  @Delete(':projectId')
+  @HttpCode(HttpStatus.OK)
+  async deleteProject(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+  ): Promise<DeleteProjectResponseDTO> {
+    if (!user?.defaultWorkspaceId) {
+      throw new UnauthorizedException('Workspace not found');
+    }
+
+    await this.projectService.archiveProjectForWorkspace({
+      projectId,
+      workspaceId: user.defaultWorkspaceId,
+    });
+
+    return apiSuccess({ deleted: true });
+  }
+
   @Post(':projectId/tasks')
   async createTask(
     @CurrentUser() user: AuthUserDTO,
@@ -111,6 +161,9 @@ export class ProjectController {
 
     const description = body.description?.trim();
     const status = body.status ?? 'todo';
+    const priority = body.priority ?? 'medium';
+    const assigneeId = body.assigneeId?.trim();
+    const dueDate = this.parseOptionalDate(body.dueDate);
 
     const task = await this.projectService.createTaskForProject({
       projectId,
@@ -118,6 +171,9 @@ export class ProjectController {
       title,
       ...(description ? { description } : {}),
       status,
+      priority,
+      ...(assigneeId ? { assigneeId } : {}),
+      ...(dueDate !== undefined ? { dueDate } : {}),
     });
 
     return apiSuccess(task);
@@ -159,11 +215,27 @@ export class ProjectController {
       throw new UnauthorizedException('Workspace not found');
     }
 
+    const normalizedTitle = body.title?.trim();
+    if (body.title !== undefined && !normalizedTitle) {
+      throw new BadRequestException('Task title is required');
+    }
+
+    const normalizedDescription = body.description?.trim();
+    const normalizedAssigneeId = body.assigneeId?.trim();
+    const dueDate = this.parseOptionalDate(body.dueDate);
+
     const task = await this.projectService.updateTaskForProject({
       projectId,
       taskId,
       workspaceId: user.defaultWorkspaceId,
-      data: body,
+      data: {
+        ...(normalizedTitle !== undefined ? { title: normalizedTitle } : {}),
+        ...(body.description !== undefined ? { description: normalizedDescription ?? '' } : {}),
+        ...(body.status !== undefined ? { status: body.status } : {}),
+        ...(body.priority !== undefined ? { priority: body.priority } : {}),
+        ...(body.assigneeId !== undefined ? { assigneeId: normalizedAssigneeId || null } : {}),
+        ...(dueDate !== undefined ? { dueDate } : {}),
+      },
     });
 
     return apiSuccess(task);
@@ -187,5 +259,22 @@ export class ProjectController {
     });
 
     return apiSuccess({ deleted: true });
+  }
+
+  private parseOptionalDate(rawDate?: string | null): Date | null | undefined {
+    if (rawDate === undefined) {
+      return undefined;
+    }
+
+    if (rawDate === null || rawDate === '') {
+      return null;
+    }
+
+    const parsedDate = new Date(rawDate);
+    if (Number.isNaN(parsedDate.getTime())) {
+      throw new BadRequestException('Invalid due date');
+    }
+
+    return parsedDate;
   }
 }

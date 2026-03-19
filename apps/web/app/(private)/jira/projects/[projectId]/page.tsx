@@ -20,6 +20,15 @@ type BoardColumn = {
   label: string;
 };
 
+type TaskPriority = ProjectTaskItemDTO['priority'];
+
+const PRIORITY_OPTIONS: Array<{ key: TaskPriority; label: string }> = [
+  { key: 'low', label: 'Low' },
+  { key: 'medium', label: 'Medium' },
+  { key: 'high', label: 'High' },
+  { key: 'urgent', label: 'Urgent' },
+];
+
 const BOARD_COLUMNS: BoardColumn[] = [
   { key: 'todo', label: 'To Do' },
   { key: 'in_progress', label: 'In Progress' },
@@ -41,6 +50,9 @@ export default function ProjectDetailPage() {
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
   const [taskStatus, setTaskStatus] = useState<ProjectTaskItemDTO['status']>('todo');
+  const [taskPriority, setTaskPriority] = useState<TaskPriority>('medium');
+  const [taskDueDate, setTaskDueDate] = useState('');
+  const [taskAssigneeId, setTaskAssigneeId] = useState('');
   const [createTaskLoading, setCreateTaskLoading] = useState(false);
   const [createTaskError, setCreateTaskError] = useState<string | null>(null);
   const [taskUpdatingId, setTaskUpdatingId] = useState<string | null>(null);
@@ -51,6 +63,9 @@ export default function ProjectDetailPage() {
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editStatus, setEditStatus] = useState<ProjectTaskItemDTO['status']>('todo');
+  const [editPriority, setEditPriority] = useState<TaskPriority>('medium');
+  const [editDueDate, setEditDueDate] = useState('');
+  const [editAssigneeId, setEditAssigneeId] = useState('');
   const [isEditLoading, setIsEditLoading] = useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
@@ -99,6 +114,19 @@ export default function ProjectDetailPage() {
     });
   }
 
+  function toDateInputValue(dateString?: string | null): string {
+    if (!dateString) {
+      return '';
+    }
+
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) {
+      return '';
+    }
+
+    return date.toISOString().slice(0, 10);
+  }
+
   async function handleCreateTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -113,16 +141,23 @@ export default function ProjectDetailPage() {
 
     try {
       const description = taskDescription.trim();
+      const assigneeId = taskAssigneeId.trim();
 
       await createProjectTask(projectId, {
         title: normalizedTitle,
         status: taskStatus,
+        priority: taskPriority,
+        ...(taskDueDate ? { dueDate: taskDueDate } : {}),
+        ...(assigneeId ? { assigneeId } : {}),
         ...(description ? { description } : {}),
       });
 
       setTaskTitle('');
       setTaskDescription('');
       setTaskStatus('todo');
+      setTaskPriority('medium');
+      setTaskDueDate('');
+      setTaskAssigneeId('');
       setShowCreateTaskPanel(false);
       setReloadSeed((value) => value + 1);
     } catch (caughtError) {
@@ -161,6 +196,9 @@ export default function ProjectDetailPage() {
     setEditTitle(task.title);
     setEditDescription(task.description || '');
     setEditStatus(task.status);
+    setEditPriority(task.priority);
+    setEditDueDate(toDateInputValue(task.dueDate));
+    setEditAssigneeId(task.assigneeId ?? '');
     setTaskUpdateError(null);
   }
 
@@ -168,6 +206,9 @@ export default function ProjectDetailPage() {
     setEditingTask(null);
     setEditTitle('');
     setEditDescription('');
+    setEditPriority('medium');
+    setEditDueDate('');
+    setEditAssigneeId('');
     setIsEditLoading(false);
   }
 
@@ -185,10 +226,14 @@ export default function ProjectDetailPage() {
     setTaskUpdateError(null);
 
     try {
+      const assigneeId = editAssigneeId.trim();
       await updateProjectTask(projectId, editingTask.id, {
         title: normalizedTitle,
         description: editDescription.trim(),
         status: editStatus,
+        priority: editPriority,
+        dueDate: editDueDate || null,
+        assigneeId: assigneeId || null,
       });
       setReloadSeed((v) => v + 1);
       handleCloseEdit();
@@ -351,6 +396,42 @@ export default function ProjectDetailPage() {
               </select>
             </label>
 
+            <label className="block text-sm font-medium text-slate-700">
+              Priority
+              <select
+                value={taskPriority}
+                onChange={(event) => setTaskPriority(event.target.value as TaskPriority)}
+                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+              >
+                {PRIORITY_OPTIONS.map((priority) => (
+                  <option key={priority.key} value={priority.key}>
+                    {priority.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block text-sm font-medium text-slate-700">
+              Due date
+              <input
+                type="date"
+                value={taskDueDate}
+                onChange={(event) => setTaskDueDate(event.target.value)}
+                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+              />
+            </label>
+
+            <label className="block text-sm font-medium text-slate-700">
+              Assignee ID
+              <input
+                type="text"
+                value={taskAssigneeId}
+                onChange={(event) => setTaskAssigneeId(event.target.value)}
+                placeholder="User ID"
+                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+              />
+            </label>
+
             <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
               Description
               <textarea
@@ -444,6 +525,12 @@ export default function ProjectDetailPage() {
                             {task.description}
                           </p>
                         ) : null}
+                        <div className="mt-2 flex items-center gap-2 text-[11px] text-slate-600">
+                          <span className="rounded bg-slate-100 px-1.5 py-0.5 font-medium uppercase">
+                            {task.priority}
+                          </span>
+                          {task.dueDate ? <span>Due: {formatDate(task.dueDate)}</span> : null}
+                        </div>
                         <p className="mt-2 text-[11px] text-slate-500">
                           Updated: {formatDate(task.updatedAt)}
                         </p>
@@ -479,6 +566,12 @@ export default function ProjectDetailPage() {
                         {task.description}
                       </p>
                     ) : null}
+                    <div className="mt-1 flex items-center gap-2 text-[11px] text-slate-600">
+                      <span className="rounded bg-slate-100 px-1.5 py-0.5 font-medium uppercase">
+                        {task.priority}
+                      </span>
+                      {task.dueDate ? <span>Due: {formatDate(task.dueDate)}</span> : null}
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <select
@@ -550,6 +643,42 @@ export default function ProjectDetailPage() {
                         </option>
                       ))}
                     </select>
+                  </label>
+
+                  <label className="block text-sm font-medium text-slate-700">
+                    Priority
+                    <select
+                      value={editPriority}
+                      onChange={(e) => setEditPriority(e.target.value as TaskPriority)}
+                      className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                    >
+                      {PRIORITY_OPTIONS.map((priority) => (
+                        <option key={priority.key} value={priority.key}>
+                          {priority.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="block text-sm font-medium text-slate-700">
+                    Due date
+                    <input
+                      type="date"
+                      value={editDueDate}
+                      onChange={(e) => setEditDueDate(e.target.value)}
+                      className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                    />
+                  </label>
+
+                  <label className="block text-sm font-medium text-slate-700">
+                    Assignee ID
+                    <input
+                      type="text"
+                      value={editAssigneeId}
+                      onChange={(e) => setEditAssigneeId(e.target.value)}
+                      className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                      placeholder="User ID"
+                    />
                   </label>
 
                   <label className="block text-sm font-medium text-slate-700">

@@ -1,11 +1,15 @@
 # DOING
 
-## Đang tập trung
+> Đang code. Mỗi item ở đây phải có output rõ ràng trong tuần.
 
-- [ ] Mở rộng `Task detail` với `comments`.
-- [ ] Implement task ordering cho Kanban (`position`/fractional indexing).
-- [ ] Tích hợp React Query cho fetch/mutation + optimistic updates.
+---
 
-## Blockers hiện tại
+## Sprint hiện tại — Jira v0.8: Board Polish + State
 
-- Không còn blocker.
+- [ ] Implement task ordering cho Kanban (`position` / fractional indexing) — drag-drop theo vị trí, không chỉ status
+- [ ] Mở rộng React Query: optimistic updates cho drag-drop + status change
+- [ ] Chuẩn hóa Zustand store cho UI state: board/list/filter/search
+
+## Blockers
+
+- Không có blocker.

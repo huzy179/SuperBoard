@@ -10,6 +10,9 @@
 - [x] Task status update đã hoạt động cả board drag-drop và list inline update (`PATCH .../status`).
 - [x] Task CRUD cơ bản đã hoàn tất (create/update/delete + detail panel).
 - [x] Soft-delete cho Task đã hoạt động (`deletedAt`) và đã smoke test runtime pass.
+- [x] Chuẩn hóa soft-delete lifecycle cho `Workspace/Project/Task` theo `deletedAt` trong BE services.
+- [x] Viết lại và tái cấu trúc API tests theo service (`workspace/project/task`) + loại bỏ test cũ trùng.
+- [x] Ổn định pre-commit flow bằng cách giới hạn lint scope và dọn artifact dư ngoài codebase chính.
 
 ## Ưu tiên cao (P0) — Kế hoạch mới
 
@@ -29,6 +32,7 @@
 - [ ] Implement task ordering cho Kanban (`position`/fractional indexing) cho drag-drop theo vị trí.
 - [ ] Implement Task history qua `TaskEvent`.
 - [ ] Implement filter/sort nền tảng cho board/list (status, priority, assignee, dueDate).
+- [ ] Chuẩn hóa semantics archive ở DB level (cân nhắc loại bỏ dần `isArchived` khỏi schema nếu quyết định theo `deletedAt` thuần toàn cục).
 
 ### Frontend (Web)
 

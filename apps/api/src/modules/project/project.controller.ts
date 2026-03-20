@@ -15,14 +15,20 @@ import {
 } from '@nestjs/common';
 import type {
   AuthUserDTO,
+  CommentListResponseDTO,
+  CreateCommentRequestDTO,
+  CreateCommentResponseDTO,
   CreateProjectRequestDTO,
   CreateProjectResponseDTO,
   CreateTaskRequestDTO,
   CreateTaskResponseDTO,
+  DeleteCommentResponseDTO,
   DeleteProjectResponseDTO,
   DeleteTaskResponseDTO,
   ProjectDetailResponseDTO,
   ProjectsResponseDTO,
+  UpdateCommentRequestDTO,
+  UpdateCommentResponseDTO,
   UpdateProjectRequestDTO,
   UpdateProjectResponseDTO,
   UpdateTaskRequestDTO,
@@ -32,11 +38,15 @@ import type {
 } from '@superboard/shared';
 import { apiSuccess } from '../../common/api-response';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { CommentService } from './comment.service';
 import { ProjectService } from './project.service';
 
 @Controller('projects')
 export class ProjectController {
-  constructor(private projectService: ProjectService) {}
+  constructor(
+    private projectService: ProjectService,
+    private commentService: CommentService,
+  ) {}
 
   @Get()
   async getProjects(
@@ -287,6 +297,96 @@ export class ProjectController {
     });
 
     return apiSuccess({ deleted: true });
+  }
+
+  // Comment endpoints
+
+  @Get(':projectId/tasks/:taskId/comments')
+  async listComments(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+    @Param('taskId') taskId: string,
+  ): Promise<CommentListResponseDTO> {
+    if (!user?.defaultWorkspaceId) {
+      throw new UnauthorizedException('Workspace not found');
+    }
+
+    const comments = await this.commentService.getCommentsByTask({
+      projectId,
+      taskId,
+      workspaceId: user.defaultWorkspaceId,
+    });
+
+    return apiSuccess(comments);
+  }
+
+  @Post(':projectId/tasks/:taskId/comments')
+  async createComment(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+    @Param('taskId') taskId: string,
+    @Body() body: Partial<CreateCommentRequestDTO>,
+  ): Promise<CreateCommentResponseDTO> {
+    if (!user?.defaultWorkspaceId) {
+      throw new UnauthorizedException('Workspace not found');
+    }
+
+    const comment = await this.commentService.createComment({
+      projectId,
+      taskId,
+      workspaceId: user.defaultWorkspaceId,
+      authorId: user.id,
+      content: body.content ?? '',
+    });
+
+    return apiSuccess(comment);
+  }
+
+  @Patch(':projectId/tasks/:taskId/comments/:commentId')
+  async updateComment(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+    @Param('taskId') taskId: string,
+    @Param('commentId') commentId: string,
+    @Body() body: Partial<UpdateCommentRequestDTO>,
+  ): Promise<UpdateCommentResponseDTO> {
+    if (!user?.defaultWorkspaceId) {
+      throw new UnauthorizedException('Workspace not found');
+    }
+
+    const comment = await this.commentService.updateComment({
+      projectId,
+      taskId,
+      commentId,
+      workspaceId: user.defaultWorkspaceId,
+      currentUserId: user.id,
+      content: body.content ?? '',
+    });
+
+    return apiSuccess(comment);
+  }
+
+  @Delete(':projectId/tasks/:taskId/comments/:commentId')
+  @HttpCode(HttpStatus.OK)
+  async deleteComment(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+    @Param('taskId') taskId: string,
+    @Param('commentId') commentId: string,
+  ): Promise<DeleteCommentResponseDTO> {
+    if (!user?.defaultWorkspaceId) {
+      throw new UnauthorizedException('Workspace not found');
+    }
+
+    const result = await this.commentService.deleteComment({
+      projectId,
+      taskId,
+      commentId,
+      workspaceId: user.defaultWorkspaceId,
+      currentUserId: user.id,
+    });
+
+    return apiSuccess(result);
   }
 
   private parseOptionalDate(rawDate?: string | null): Date | null | undefined {

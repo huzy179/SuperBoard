@@ -116,3 +116,20 @@
 - [x] Mở rộng FE project detail page: form tạo task + task detail panel hỗ trợ chỉnh `priority`, `dueDate`, `assignee`.
 - [x] Typecheck + lint pass cho cả API/Web sau thay đổi.
 - [x] Smoke test runtime pass cho create/update task với `priority/dueDate/assignee` (hợp lệ và invalid assignee).
+
+## Jira-first v0.6 (Soft-delete consistency + Test Restructure)
+
+- [x] Chuẩn hóa lifecycle soft-delete BE theo `deletedAt` cho `Workspace/Project/Task` trong service layer.
+- [x] Sửa và đồng bộ lại test policy/lifecycle để khớp service constructor và contract hiện tại.
+- [x] Tái cấu trúc test API theo service: `workspace.service.test.ts`, `project.service.test.ts`, `task.service.test.ts`.
+- [x] Xóa test entrypoint/test file cũ gây trùng và nhiễu suite.
+- [x] Cập nhật script test workflow lifecycle trong `apps/api/package.json` theo cấu trúc test mới.
+- [x] Xác nhận `npm --workspace @superboard/api run typecheck` và `npm --workspace @superboard/api run test` pass.
+
+## Repo hygiene & commit flow stabilization
+
+- [x] Thu hẹp scope `lint-staged` eslint để tránh fail do lint nhầm vào bộ `.github/get-shit-done/*`.
+- [x] Sửa xung đột export DTO ở `packages/shared/src/dtos/index.ts` để typecheck không bị duplicate symbol.
+- [x] Dọn file/folder tạm dư trong `.github` không thuộc tracked repository.
+- [x] Tối ưu index Prisma theo pattern query soft-delete hiện tại (`deletedAt`).
+- [x] Nhóm commit sạch theo phạm vi API/test và phần tối ưu tooling/repo.

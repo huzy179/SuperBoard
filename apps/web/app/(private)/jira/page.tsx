@@ -4,11 +4,23 @@ import { FormEvent, useMemo, useState } from 'react';
 import Link from 'next/link';
 import type { ProjectItemDTO } from '@superboard/shared';
 import { EmptyStateCard, SectionError, SectionSkeleton } from '@/components/ui/page-states';
-import { useProjectList } from '@/hooks/use-project-list';
+import { useProjects } from '@/hooks/use-projects';
 import { createProject, deleteProject, updateProject } from '@/lib/services/project-service';
+import { formatDate } from '@/lib/format-date';
 
 export default function JiraHomePage() {
-  const { projectsLoading, projects, projectsError, reloadProjects } = useProjectList(true);
+  const {
+    data: projects = [],
+    isLoading: projectsLoading,
+    isError,
+    error: projectsQueryError,
+    refetch,
+  } = useProjects();
+  const projectsError = isError ? (projectsQueryError?.message ?? 'Không tải được dự án') : null;
+
+  function reloadProjects() {
+    void refetch();
+  }
   const [showCreatePanel, setShowCreatePanel] = useState(false);
   const [projectName, setProjectName] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
@@ -16,6 +28,8 @@ export default function JiraHomePage() {
   const [projectColor, setProjectColor] = useState('');
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [archiveError, setArchiveError] = useState<string | null>(null);
   const [editingProject, setEditingProject] = useState<ProjectItemDTO | null>(null);
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
@@ -25,14 +39,6 @@ export default function JiraHomePage() {
   const [archiveLoadingId, setArchiveLoadingId] = useState<string | null>(null);
 
   const normalizedProjectName = useMemo(() => projectName.trim(), [projectName]);
-
-  function formatDate(dateString: string) {
-    return new Date(dateString).toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  }
 
   async function handleCreateProject(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -75,7 +81,7 @@ export default function JiraHomePage() {
     setEditDescription(project.description ?? '');
     setEditIcon(project.icon ?? '📌');
     setEditColor(project.color ?? '');
-    setCreateError(null);
+    setEditError(null);
   }
 
   function closeEditProject() {
@@ -93,12 +99,12 @@ export default function JiraHomePage() {
 
     const normalizedName = editName.trim();
     if (!normalizedName) {
-      setCreateError('Tên dự án là bắt buộc');
+      setEditError('Tên dự án là bắt buộc');
       return;
     }
 
     setEditLoading(true);
-    setCreateError(null);
+    setEditError(null);
 
     try {
       await updateProject(editingProject.id, {
@@ -110,9 +116,7 @@ export default function JiraHomePage() {
       closeEditProject();
       reloadProjects();
     } catch (caughtError) {
-      setCreateError(
-        caughtError instanceof Error ? caughtError.message : 'Không thể cập nhật dự án',
-      );
+      setEditError(caughtError instanceof Error ? caughtError.message : 'Không thể cập nhật dự án');
     } finally {
       setEditLoading(false);
     }
@@ -122,13 +126,13 @@ export default function JiraHomePage() {
     if (!confirm('Bạn chắc chắn muốn lưu trữ dự án này?')) return;
 
     setArchiveLoadingId(projectId);
-    setCreateError(null);
+    setArchiveError(null);
 
     try {
       await deleteProject(projectId);
       reloadProjects();
     } catch (caughtError) {
-      setCreateError(
+      setArchiveError(
         caughtError instanceof Error ? caughtError.message : 'Không thể lưu trữ dự án',
       );
     } finally {
@@ -208,7 +212,11 @@ export default function JiraHomePage() {
             </label>
           </div>
 
-          {createError ? <p className="mt-3 text-sm text-rose-600">{createError}</p> : null}
+          {createError ? (
+            <p role="alert" className="mt-3 text-sm text-rose-600">
+              {createError}
+            </p>
+          ) : null}
 
           <div className="mt-4 flex items-center justify-end gap-2">
             <button
@@ -297,9 +305,21 @@ export default function JiraHomePage() {
         </form>
       ) : null}
 
-      {createError ? (
-        <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700">
-          {createError}
+      {editError ? (
+        <div
+          role="alert"
+          className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700"
+        >
+          {editError}
+        </div>
+      ) : null}
+
+      {archiveError ? (
+        <div
+          role="alert"
+          className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700"
+        >
+          {archiveError}
         </div>
       ) : null}
 

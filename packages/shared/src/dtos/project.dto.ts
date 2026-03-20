@@ -85,3 +85,31 @@ export type RestoreProjectResponseDTO = ApiResponse<{ archived: boolean }>;
 export type ArchiveTaskResponseDTO = ApiResponse<{ archived: boolean }>;
 
 export type RestoreTaskResponseDTO = ApiResponse<{ archived: boolean }>;
+
+// Comment DTOs
+
+export interface CommentItemDTO {
+  id: string;
+  taskId: string;
+  authorId: string;
+  authorName: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCommentRequestDTO {
+  content: string;
+}
+
+export interface UpdateCommentRequestDTO {
+  content: string;
+}
+
+export type CommentListResponseDTO = ApiResponse<CommentItemDTO[]>;
+
+export type CreateCommentResponseDTO = ApiResponse<CommentItemDTO>;
+
+export type UpdateCommentResponseDTO = ApiResponse<CommentItemDTO>;
+
+export type DeleteCommentResponseDTO = ApiResponse<{ deleted: boolean }>;

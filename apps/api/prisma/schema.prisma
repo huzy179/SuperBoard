@@ -25,7 +25,7 @@ model Workspace {
   workflowTemplateTransitions WorkspaceWorkflowTransition[]
   notifications Notification[]
 
-  @@index([isArchived, deletedAt])
+  @@index([deletedAt])
 }
 
 model User {
@@ -145,7 +145,7 @@ model Project {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  @@index([workspaceId, isArchived])
+  @@index([workspaceId, deletedAt])
 }
 
 model Task {
@@ -168,7 +168,7 @@ model Task {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
-  @@index([projectId, status, isArchived])
+  @@index([projectId, status, deletedAt])
   @@index([assigneeId])
 }
 

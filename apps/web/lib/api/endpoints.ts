@@ -6,6 +6,7 @@ export const API_ENDPOINTS = {
   projects: {
     list: '/api/v1/projects',
     create: '/api/v1/projects',
+    dashboard: '/api/v1/projects/dashboard',
     detail: (projectId: string) => `/api/v1/projects/${projectId}`,
     update: (projectId: string) => `/api/v1/projects/${projectId}`,
     delete: (projectId: string) => `/api/v1/projects/${projectId}`,
@@ -24,5 +25,15 @@ export const API_ENDPOINTS = {
       `/api/v1/projects/${projectId}/tasks/${taskId}/comments/${commentId}`,
     deleteComment: (projectId: string, taskId: string, commentId: string) =>
       `/api/v1/projects/${projectId}/tasks/${taskId}/comments/${commentId}`,
+  },
+  notifications: {
+    list: '/api/v1/notifications',
+    markRead: (id: string) => `/api/v1/notifications/${id}/read`,
+    markAllRead: '/api/v1/notifications/read-all',
+  },
+  workspaces: {
+    members: (workspaceId: string) => `/api/v1/workspaces/${workspaceId}/members`,
+    updateMember: (workspaceId: string, memberId: string) =>
+      `/api/v1/workspaces/${workspaceId}/members/${memberId}`,
   },
 } as const;

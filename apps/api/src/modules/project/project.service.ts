@@ -1,9 +1,12 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { findOrThrow } from '../../common/helpers';
+import { NotificationService } from '../notification/notification.service';
 import type {
   CreateProjectRequestDTO,
   CreateTaskRequestDTO,
+  DashboardStatsDTO,
   LabelDTO,
   ProjectDetailDTO,
   ProjectItemDTO,
@@ -16,7 +19,10 @@ import type {
 
 @Injectable()
 export class ProjectService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationService: NotificationService,
+  ) {}
 
   async getProjectsByWorkspace(
     workspaceId: string,
@@ -314,6 +320,28 @@ export class ProjectService {
       select: this.taskSelect,
     });
 
+    // Notify assignee
+    if (input.assigneeId) {
+      const project = await this.prisma.project.findUnique({
+        where: { id: input.projectId },
+        select: { workspaceId: true },
+      });
+      if (project) {
+        void this.notificationService
+          .createNotification({
+            userId: input.assigneeId,
+            workspaceId: project.workspaceId,
+            type: 'task_assigned',
+            payload: {
+              taskId: task.id,
+              taskTitle: input.title,
+              message: `Bạn được gán task: ${input.title}`,
+            },
+          })
+          .catch((err: unknown) => console.error('Notification failed:', err));
+      }
+    }
+
     return this.toTaskDTO(task);
   }
 
@@ -323,35 +351,7 @@ export class ProjectService {
     workspaceId: string;
     status: UpdateTaskStatusRequestDTO['status'];
   }): Promise<ProjectTaskItemDTO> {
-    const project = await this.prisma.project.findFirst({
-      where: {
-        id: input.projectId,
-        workspaceId: input.workspaceId,
-        deletedAt: null,
-      } as Prisma.ProjectWhereInput,
-      select: {
-        id: true,
-      },
-    });
-
-    if (!project) {
-      throw new NotFoundException('Project not found');
-    }
-
-    const existingTask = await this.prisma.task.findFirst({
-      where: {
-        id: input.taskId,
-        projectId: input.projectId,
-        deletedAt: null,
-      } as Prisma.TaskWhereInput,
-      select: {
-        id: true,
-      },
-    });
-
-    if (!existingTask) {
-      throw new NotFoundException('Task not found');
-    }
+    await this.verifyProjectAndTask(input);
 
     const task = await this.prisma.task.update({
       where: {
@@ -372,18 +372,7 @@ export class ProjectService {
     workspaceId: string;
     data: Omit<UpdateTaskRequestDTO, 'dueDate'> & { dueDate?: Date | null };
   }): Promise<ProjectTaskItemDTO> {
-    const project = await this.prisma.project.findFirst({
-      where: {
-        id: input.projectId,
-        workspaceId: input.workspaceId,
-        deletedAt: null,
-      } as Prisma.ProjectWhereInput,
-      select: { id: true },
-    });
-
-    if (!project) {
-      throw new NotFoundException('Project not found');
-    }
+    await this.verifyProjectAndTask(input);
 
     const existingTask = await this.prisma.task.findFirst({
       where: {
@@ -391,7 +380,7 @@ export class ProjectService {
         projectId: input.projectId,
         deletedAt: null,
       } as Prisma.TaskWhereInput,
-      select: { id: true },
+      select: { id: true, assigneeId: true, title: true },
     });
 
     if (!existingTask) {
@@ -429,6 +418,22 @@ export class ProjectService {
       select: this.taskSelect,
     });
 
+    // Notify new assignee if changed
+    if (input.data.assigneeId && input.data.assigneeId !== existingTask.assigneeId) {
+      void this.notificationService
+        .createNotification({
+          userId: input.data.assigneeId,
+          workspaceId: input.workspaceId,
+          type: 'task_assigned',
+          payload: {
+            taskId: input.taskId,
+            taskTitle: task.title,
+            message: `Bạn được gán task: ${task.title}`,
+          },
+        })
+        .catch((err: unknown) => console.error('Notification failed:', err));
+    }
+
     return this.toTaskDTO(task);
   }
 
@@ -437,31 +442,7 @@ export class ProjectService {
     taskId: string;
     workspaceId: string;
   }): Promise<void> {
-    const project = await this.prisma.project.findFirst({
-      where: {
-        id: input.projectId,
-        workspaceId: input.workspaceId,
-        deletedAt: null,
-      } as Prisma.ProjectWhereInput,
-      select: { id: true },
-    });
-
-    if (!project) {
-      throw new NotFoundException('Project not found');
-    }
-
-    const existingTask = await this.prisma.task.findFirst({
-      where: {
-        id: input.taskId,
-        projectId: input.projectId,
-        deletedAt: null,
-      } as Prisma.TaskWhereInput,
-      select: { id: true },
-    });
-
-    if (!existingTask) {
-      throw new NotFoundException('Task not found');
-    }
+    await this.verifyProjectAndTask(input);
 
     await this.prisma.task.update({
       where: {
@@ -471,6 +452,128 @@ export class ProjectService {
         deletedAt: new Date(),
       },
     });
+  }
+
+  async getDashboardStats(workspaceId: string): Promise<DashboardStatsDTO> {
+    const tasks = await this.prisma.task.findMany({
+      where: {
+        project: { workspaceId, deletedAt: null },
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        priority: true,
+        dueDate: true,
+        assigneeId: true,
+        assignee: { select: { fullName: true, avatarColor: true } },
+        projectId: true,
+      },
+    });
+
+    // Tasks by status
+    const statusMap = new Map<string, number>();
+    for (const t of tasks) {
+      statusMap.set(t.status, (statusMap.get(t.status) ?? 0) + 1);
+    }
+    const tasksByStatus = [...statusMap.entries()].map(([status, count]) => ({ status, count }));
+
+    // Tasks by priority
+    const priorityMap = new Map<string, number>();
+    for (const t of tasks) {
+      priorityMap.set(t.priority, (priorityMap.get(t.priority) ?? 0) + 1);
+    }
+    const tasksByPriority = [...priorityMap.entries()].map(([priority, count]) => ({
+      priority,
+      count,
+    }));
+
+    // Tasks by assignee
+    const assigneeMap = new Map<string, { name: string; color: string | null; count: number }>();
+    for (const t of tasks) {
+      if (t.assigneeId && t.assignee) {
+        const existing = assigneeMap.get(t.assigneeId);
+        if (existing) {
+          existing.count++;
+        } else {
+          assigneeMap.set(t.assigneeId, {
+            name: t.assignee.fullName,
+            color: t.assignee.avatarColor ?? null,
+            count: 1,
+          });
+        }
+      }
+    }
+    const tasksByAssignee = [...assigneeMap.entries()].map(([assigneeId, v]) => ({
+      assigneeId,
+      assigneeName: v.name,
+      avatarColor: v.color,
+      count: v.count,
+    }));
+
+    // Tasks by project
+    const projects = await this.prisma.project.findMany({
+      where: { workspaceId, deletedAt: null },
+      select: { id: true, name: true, key: true, color: true },
+    });
+    const projectTaskMap = new Map<string, { total: number; done: number }>();
+    for (const t of tasks) {
+      const existing = projectTaskMap.get(t.projectId) ?? { total: 0, done: 0 };
+      existing.total++;
+      if (t.status === 'done') existing.done++;
+      projectTaskMap.set(t.projectId, existing);
+    }
+    const tasksByProject = projects.map((p) => {
+      const counts = projectTaskMap.get(p.id) ?? { total: 0, done: 0 };
+      return {
+        projectId: p.id,
+        projectName: p.name,
+        projectKey: p.key ?? null,
+        color: p.color ?? null,
+        total: counts.total,
+        done: counts.done,
+      };
+    });
+
+    // Overdue tasks
+    const now = new Date();
+    const overdueTasks = tasks.filter(
+      (t) => t.dueDate && t.dueDate < now && t.status !== 'done' && t.status !== 'cancelled',
+    ).length;
+
+    // Recent activity
+    const recentEvents = await this.prisma.taskEvent.findMany({
+      where: {
+        task: { project: { workspaceId, deletedAt: null }, deletedAt: null },
+        deletedAt: null,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+      select: {
+        id: true,
+        type: true,
+        createdAt: true,
+        task: { select: { title: true } },
+        actor: { select: { fullName: true } },
+      },
+    });
+    const recentActivity = recentEvents.map((e) => ({
+      id: e.id,
+      type: e.type,
+      taskTitle: e.task.title,
+      actorName: e.actor?.fullName ?? null,
+      createdAt: e.createdAt.toISOString(),
+    }));
+
+    return {
+      tasksByStatus,
+      tasksByPriority,
+      tasksByAssignee,
+      tasksByProject,
+      overdueTasks,
+      recentActivity,
+    };
   }
 
   private toProjectItemDTO(project: {
@@ -547,6 +650,36 @@ export class ProjectService {
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
     };
+  }
+
+  private async verifyProjectAndTask(input: {
+    projectId: string;
+    taskId: string;
+    workspaceId: string;
+  }): Promise<void> {
+    await findOrThrow(
+      this.prisma.project.findFirst({
+        where: {
+          id: input.projectId,
+          workspaceId: input.workspaceId,
+          deletedAt: null,
+        } as Prisma.ProjectWhereInput,
+        select: { id: true },
+      }),
+      'Project',
+    );
+
+    await findOrThrow(
+      this.prisma.task.findFirst({
+        where: {
+          id: input.taskId,
+          projectId: input.projectId,
+          deletedAt: null,
+        } as Prisma.TaskWhereInput,
+        select: { id: true },
+      }),
+      'Task',
+    );
   }
 
   private async validateAssignee(workspaceId: string, assigneeId: string): Promise<void> {

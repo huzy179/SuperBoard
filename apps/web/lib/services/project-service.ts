@@ -1,6 +1,7 @@
 import type {
   CreateProjectRequestDTO,
   CreateTaskRequestDTO,
+  DashboardStatsDTO,
   ProjectDetailDTO,
   ProjectItemDTO,
   ProjectTaskItemDTO,
@@ -82,4 +83,8 @@ export async function deleteProjectTask(projectId: string, taskId: string): Prom
     auth: true,
     method: 'DELETE',
   });
+}
+
+export async function getDashboardStats(): Promise<DashboardStatsDTO> {
+  return apiGet<DashboardStatsDTO>(API_ENDPOINTS.projects.dashboard, { auth: true });
 }

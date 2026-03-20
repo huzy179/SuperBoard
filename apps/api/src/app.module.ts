@@ -9,6 +9,7 @@ import { QueueService } from './common/queue.service';
 import { RedisService } from './common/redis.service';
 import { PrismaService } from './prisma/prisma.service';
 import { AuthModule } from './modules/auth/auth.module';
+import { NotificationModule } from './modules/notification/notification.module';
 import { ProjectModule } from './modules/project/project.module';
 import { WorkspaceModule } from './modules/workspace/workspace.module';
 import { TaskModule } from './modules/task/task.module';
@@ -24,6 +25,7 @@ import { TaskModule } from './modules/task/task.module';
     ProjectModule,
     WorkspaceModule,
     TaskModule,
+    NotificationModule,
   ],
   controllers: [HealthController],
   providers: [

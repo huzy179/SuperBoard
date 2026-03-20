@@ -11,14 +11,14 @@ Mục tiêu: hoàn thiện Jira MVP đủ dùng thật, không còn thiếu gì 
 ### Backend
 
 - [ ] Task history qua `TaskEvent` — ai làm gì, lúc nào
-- [ ] Filter/sort nền tảng: status, priority, assignee, dueDate
+- [x] ~~Filter/sort nền tảng: status, priority, assignee, dueDate~~ (done v0.9)
 - [ ] Chốt API contract Jira v1 (DTO/request/response/error format)
 - [ ] Dọn semantics archive: quyết định `isArchived` vs `deletedAt` thuần
 
 ### Frontend
 
-- [ ] Đồng bộ contract FE ↔ BE qua `packages/shared`
-- [ ] Filter/sort UI cho board + list
+- [x] ~~Đồng bộ contract FE ↔ BE qua `packages/shared`~~ (done v0.9)
+- [x] ~~Filter/sort UI cho board + list~~ (done v0.9)
 - [ ] Mock fallback cho endpoint BE chưa xong
 
 ### Integration
@@ -32,12 +32,6 @@ Mục tiêu: hoàn thiện Jira MVP đủ dùng thật, không còn thiếu gì 
 
 Mục tiêu: từ "chạy được" lên "dùng được nghiêm túc".
 
-### Data Model
-
-- [ ] Hoàn thiện Prisma schema đầy đủ: User fields, Role/Permission, TaskEvent, Comment, Attachment, Notification
-- [ ] Ràng buộc: relation, unique constraints, indexes, enums
-- [ ] Migration sạch + seed data nền (roles, permissions, workspace/project/task mẫu)
-
 ### Real-time
 
 - [ ] Socket.io task update — kéo task → tất cả người xem board thấy ngay
@@ -45,7 +39,6 @@ Mục tiêu: từ "chạy được" lên "dùng được nghiêm túc".
 
 ### UX Polish
 
-- [ ] Task labels/tags — tạo tag màu per workspace
 - [ ] Subtasks — nested 1 level, parent hiện progress
 - [ ] Calendar view — tasks theo month/week
 

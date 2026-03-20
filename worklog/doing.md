@@ -4,7 +4,7 @@
 
 ---
 
-## Sprint hiện tại — Jira v0.8: Board Polish + State
+## Sprint hiện tại — Jira v1.1: Board Polish + Real-time
 
 - [ ] Implement task ordering cho Kanban (`position` / fractional indexing) — drag-drop theo vị trí, không chỉ status
 - [ ] Mở rộng React Query: optimistic updates cho drag-drop + status change

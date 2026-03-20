@@ -12,8 +12,9 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import type { AuthUserDTO } from '@superboard/shared';
+import type { AuthUserDTO, WorkspaceMemberItemDTO } from '@superboard/shared';
 import { apiSuccess } from '../../common/api-response';
+import { parseBooleanQuery } from '../../common/helpers';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { WorkspaceService } from './workspace.service';
 
@@ -27,7 +28,7 @@ export class WorkspaceController {
     @Query('showArchived') showArchived?: string,
   ) {
     const workspaces = await this.workspaceService.getWorkspacesByUser(user.id, {
-      showArchived: this.parseBooleanQuery(showArchived),
+      showArchived: parseBooleanQuery(showArchived),
     });
 
     return apiSuccess(workspaces);
@@ -42,7 +43,7 @@ export class WorkspaceController {
     const workspace = await this.workspaceService.getWorkspaceByIdForUser(
       { workspaceId, userId: user.id },
       {
-        showArchived: this.parseBooleanQuery(showArchived),
+        showArchived: parseBooleanQuery(showArchived),
       },
     );
 
@@ -121,19 +122,34 @@ export class WorkspaceController {
     return apiSuccess({ archived: false });
   }
 
-  private parseBooleanQuery(value?: string): boolean {
-    if (value === undefined) {
-      return false;
-    }
+  @Get(':workspaceId/members')
+  async getWorkspaceMembers(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('workspaceId') workspaceId: string,
+  ) {
+    const members: WorkspaceMemberItemDTO[] = await this.workspaceService.getWorkspaceMembers(
+      workspaceId,
+      user.id,
+    );
+    return apiSuccess(members);
+  }
 
-    if (value === 'true') {
-      return true;
+  @Patch(':workspaceId/members/:memberId')
+  async updateMemberRole(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('workspaceId') workspaceId: string,
+    @Param('memberId') memberId: string,
+    @Body() body: { role?: string },
+  ) {
+    if (!body.role) {
+      throw new BadRequestException('Role is required');
     }
-
-    if (value === 'false') {
-      return false;
-    }
-
-    throw new BadRequestException('showArchived must be true or false');
+    await this.workspaceService.updateMemberRole({
+      workspaceId,
+      memberId,
+      role: body.role,
+      currentUserId: user.id,
+    });
+    return apiSuccess({ updated: true });
   }
 }

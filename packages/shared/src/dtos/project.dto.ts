@@ -143,3 +143,34 @@ export type CreateCommentResponseDTO = ApiResponse<CommentItemDTO>;
 export type UpdateCommentResponseDTO = ApiResponse<CommentItemDTO>;
 
 export type DeleteCommentResponseDTO = ApiResponse<{ deleted: boolean }>;
+
+// Dashboard DTOs
+
+export interface DashboardStatsDTO {
+  tasksByStatus: { status: string; count: number }[];
+  tasksByPriority: { priority: string; count: number }[];
+  tasksByAssignee: {
+    assigneeId: string;
+    assigneeName: string;
+    avatarColor: string | null;
+    count: number;
+  }[];
+  tasksByProject: {
+    projectId: string;
+    projectName: string;
+    projectKey: string | null;
+    color: string | null;
+    total: number;
+    done: number;
+  }[];
+  overdueTasks: number;
+  recentActivity: {
+    id: string;
+    type: string;
+    taskTitle: string;
+    actorName: string | null;
+    createdAt: string;
+  }[];
+}
+
+export type DashboardStatsResponseDTO = ApiResponse<DashboardStatsDTO>;

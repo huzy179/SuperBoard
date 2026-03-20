@@ -50,3 +50,31 @@ textarea {
 ::-webkit-scrollbar-thumb:hover {
   background: oklch(0.65 0.01 255);
 }
+
+/* Custom animations */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 200ms ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 250ms ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 200ms ease-out;
+}

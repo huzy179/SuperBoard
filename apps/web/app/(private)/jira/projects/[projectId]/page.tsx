@@ -3,14 +3,17 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import type {
-  CommentItemDTO,
-  ProjectTaskItemDTO,
-  TaskTypeDTO,
-  LabelDTO,
-  ProjectMemberDTO,
-} from '@superboard/shared';
+import type { ProjectTaskItemDTO, TaskTypeDTO, ProjectMemberDTO } from '@superboard/shared';
 import { FullPageError, FullPageLoader } from '@/components/ui/page-states';
+import {
+  TaskTypeIcon,
+  PriorityBadge,
+  StoryPointsBadge,
+  AssigneeAvatar,
+  LabelDots,
+  TaskIdBadge,
+} from '@/components/ui/task-badges';
+import { TaskCommentSection } from '@/components/task-comment-section';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useProjectDetail } from '@/hooks/use-project-detail';
 import {
@@ -19,155 +22,19 @@ import {
   useUpdateTaskStatus,
   useDeleteTask,
 } from '@/hooks/use-task-mutations';
+import { formatDate } from '@/lib/format-date';
 import {
-  useTaskComments,
-  useCreateComment,
-  useUpdateComment,
-  useDeleteComment,
-} from '@/hooks/use-task-comments';
-import { formatDate, formatRelativeTime } from '@/lib/format-date';
+  BOARD_COLUMNS,
+  PRIORITY_OPTIONS,
+  PRIORITY_SORT_ORDER,
+  COLUMN_BORDER,
+  TASK_TYPE_OPTIONS,
+  TASK_TYPE_ICONS,
+  type TaskPriority,
+} from '@/lib/constants/task';
+import { toDateInputValue } from '@/lib/helpers';
 
 type ViewMode = 'board' | 'list';
-
-type BoardColumn = {
-  key: ProjectTaskItemDTO['status'];
-  label: string;
-};
-
-type TaskPriority = ProjectTaskItemDTO['priority'];
-
-const PRIORITY_OPTIONS: Array<{ key: TaskPriority; label: string }> = [
-  { key: 'low', label: 'Thấp' },
-  { key: 'medium', label: 'Trung bình' },
-  { key: 'high', label: 'Cao' },
-  { key: 'urgent', label: 'Khẩn cấp' },
-];
-
-const BOARD_COLUMNS: BoardColumn[] = [
-  { key: 'todo', label: 'Cần làm' },
-  { key: 'in_progress', label: 'Đang làm' },
-  { key: 'in_review', label: 'Đang review' },
-  { key: 'done', label: 'Hoàn thành' },
-  { key: 'cancelled', label: 'Đã huỷ' },
-];
-
-const PRIORITY_STYLES: Record<TaskPriority, string> = {
-  urgent: 'bg-red-100 text-red-700',
-  high: 'bg-orange-100 text-orange-700',
-  medium: 'bg-blue-100 text-blue-700',
-  low: 'bg-slate-100 text-slate-600',
-};
-
-const PRIORITY_LABELS: Record<TaskPriority, string> = {
-  urgent: 'Khẩn',
-  high: 'Cao',
-  medium: 'TB',
-  low: 'Thấp',
-};
-
-const COLUMN_BORDER: Record<string, string> = {
-  todo: 'border-t-slate-400',
-  in_progress: 'border-t-blue-500',
-  in_review: 'border-t-amber-500',
-  done: 'border-t-emerald-500',
-  cancelled: 'border-t-slate-300',
-};
-
-const TASK_TYPE_ICONS: Record<TaskTypeDTO, { icon: string; color: string }> = {
-  task: { icon: '✓', color: 'text-blue-600 bg-blue-50' },
-  bug: { icon: '🐛', color: 'text-red-600 bg-red-50' },
-  story: { icon: '📖', color: 'text-green-600 bg-green-50' },
-  epic: { icon: '⚡', color: 'text-purple-600 bg-purple-50' },
-};
-
-const TASK_TYPE_OPTIONS: Array<{ key: TaskTypeDTO; label: string }> = [
-  { key: 'task', label: 'Task' },
-  { key: 'bug', label: 'Bug' },
-  { key: 'story', label: 'Story' },
-  { key: 'epic', label: 'Epic' },
-];
-
-/* PLACEHOLDER_COMPONENTS */
-
-function TaskTypeIcon({ type }: { type: TaskTypeDTO }) {
-  const config = TASK_TYPE_ICONS[type] ?? TASK_TYPE_ICONS.task;
-  return (
-    <span
-      className={`inline-flex h-5 w-5 items-center justify-center rounded text-[11px] ${config.color}`}
-    >
-      {config.icon}
-    </span>
-  );
-}
-
-function PriorityBadge({ priority }: { priority: TaskPriority }) {
-  return (
-    <span
-      className={`rounded px-1.5 py-0.5 text-[11px] font-semibold ${PRIORITY_STYLES[priority]}`}
-    >
-      {PRIORITY_LABELS[priority]}
-    </span>
-  );
-}
-
-function StoryPointsBadge({ points }: { points: number }) {
-  return (
-    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-100 px-1 text-[10px] font-bold text-slate-600">
-      {points}
-    </span>
-  );
-}
-
-function AssigneeAvatar({ name, color }: { name: string; color?: string | null | undefined }) {
-  const initials = name
-    .split(' ')
-    .slice(-2)
-    .map((p) => p[0])
-    .join('')
-    .toUpperCase();
-  return (
-    <span
-      className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white"
-      style={{ backgroundColor: color || '#64748b' }}
-      title={name}
-    >
-      {initials}
-    </span>
-  );
-}
-
-function LabelDots({ labels }: { labels: LabelDTO[] }) {
-  if (labels.length === 0) return null;
-  return (
-    <div className="flex flex-wrap gap-1">
-      {labels.map((label) => (
-        <span
-          key={label.id}
-          className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-600"
-          title={label.name}
-        >
-          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: label.color }} />
-          {label.name}
-        </span>
-      ))}
-    </div>
-  );
-}
-
-function TaskIdBadge({
-  projectKey,
-  number,
-}: {
-  projectKey?: string | null | undefined;
-  number?: number | null | undefined;
-}) {
-  if (!projectKey || !number) return null;
-  return (
-    <span className="font-mono text-[11px] text-slate-400">
-      {projectKey}-{number}
-    </span>
-  );
-}
 
 export default function ProjectDetailPage() {
   const params = useParams<{ projectId: string }>();
@@ -202,6 +69,73 @@ export default function ProjectDetailPage() {
   const [taskAssigneeId, setTaskAssigneeId] = useState('');
   const [createTaskError, setCreateTaskError] = useState<string | null>(null);
 
+  // Filter & Sort state
+  const [filterAssignee, setFilterAssignee] = useState('');
+  const [filterPriorities, setFilterPriorities] = useState<Set<string>>(new Set());
+  const [filterTypes, setFilterTypes] = useState<Set<string>>(new Set());
+  const [sortBy, setSortBy] = useState('');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const hasActiveFilters =
+    filterAssignee !== '' || filterPriorities.size > 0 || filterTypes.size > 0 || sortBy !== '';
+
+  function clearFilters() {
+    setFilterAssignee('');
+    setFilterPriorities(new Set());
+    setFilterTypes(new Set());
+    setSortBy('');
+    setSortDir('asc');
+  }
+
+  function toggleFilterPriority(p: string) {
+    setFilterPriorities((prev) => {
+      const next = new Set(prev);
+      if (next.has(p)) next.delete(p);
+      else next.add(p);
+      return next;
+    });
+  }
+
+  function toggleFilterType(t: string) {
+    setFilterTypes((prev) => {
+      const next = new Set(prev);
+      if (next.has(t)) next.delete(t);
+      else next.add(t);
+      return next;
+    });
+  }
+
+  const filteredTasks = useMemo(() => {
+    let tasks = project?.tasks ?? [];
+    if (filterAssignee) {
+      tasks = tasks.filter((t) => t.assigneeId === filterAssignee);
+    }
+    if (filterPriorities.size > 0) {
+      tasks = tasks.filter((t) => filterPriorities.has(t.priority));
+    }
+    if (filterTypes.size > 0) {
+      tasks = tasks.filter((t) => filterTypes.has(t.type ?? 'task'));
+    }
+    if (sortBy) {
+      tasks = [...tasks].sort((a, b) => {
+        let cmp = 0;
+        if (sortBy === 'dueDate') {
+          const da = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+          const db = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+          cmp = da - db;
+        } else if (sortBy === 'createdAt') {
+          cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        } else if (sortBy === 'priority') {
+          cmp = (PRIORITY_SORT_ORDER[a.priority] ?? 2) - (PRIORITY_SORT_ORDER[b.priority] ?? 2);
+        } else if (sortBy === 'storyPoints') {
+          cmp = (a.storyPoints ?? 0) - (b.storyPoints ?? 0);
+        }
+        return sortDir === 'desc' ? -cmp : cmp;
+      });
+    }
+    return tasks;
+  }, [project?.tasks, filterAssignee, filterPriorities, filterTypes, sortBy, sortDir]);
+
   // Edit Task State
   const [editingTask, setEditingTask] = useState<ProjectTaskItemDTO | null>(null);
   const [editTitle, setEditTitle] = useState('');
@@ -224,19 +158,12 @@ export default function ProjectDetailPage() {
     BOARD_COLUMNS.forEach((column) => {
       byStatus.set(column.key, []);
     });
-    (project?.tasks ?? []).forEach((task) => {
+    filteredTasks.forEach((task) => {
       const current = byStatus.get(task.status) ?? [];
       byStatus.set(task.status, [...current, task]);
     });
     return byStatus;
-  }, [project?.tasks]);
-
-  function toDateInputValue(dateString?: string | null): string {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    if (Number.isNaN(date.getTime())) return '';
-    return date.toISOString().slice(0, 10);
-  }
+  }, [filteredTasks]);
 
   async function handleCreateTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -611,6 +538,101 @@ export default function ProjectDetailPage() {
         </form>
       ) : null}
 
+      {/* Filter & Sort Bar */}
+      <div className="animate-fade-in mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-surface-border bg-surface-card px-3 py-2">
+        <select
+          value={filterAssignee}
+          onChange={(e) => setFilterAssignee(e.target.value)}
+          className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-700"
+          aria-label="Lọc theo người thực hiện"
+        >
+          <option value="">Người thực hiện</option>
+          {members.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.fullName}
+            </option>
+          ))}
+        </select>
+
+        <div className="h-4 w-px bg-slate-200" />
+
+        <div className="flex items-center gap-1">
+          <span className="text-[11px] text-slate-500">Ưu tiên:</span>
+          {PRIORITY_OPTIONS.map((p) => (
+            <button
+              key={p.key}
+              type="button"
+              onClick={() => toggleFilterPriority(p.key)}
+              className={`rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors ${
+                filterPriorities.has(p.key)
+                  ? 'bg-brand-100 text-brand-700 ring-1 ring-brand-300'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="h-4 w-px bg-slate-200" />
+
+        <div className="flex items-center gap-1">
+          <span className="text-[11px] text-slate-500">Loại:</span>
+          {TASK_TYPE_OPTIONS.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => toggleFilterType(t.key)}
+              className={`rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors ${
+                filterTypes.has(t.key)
+                  ? 'bg-brand-100 text-brand-700 ring-1 ring-brand-300'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="h-4 w-px bg-slate-200" />
+
+        <div className="flex items-center gap-1">
+          <span className="text-[11px] text-slate-500">Sắp xếp:</span>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-700"
+            aria-label="Sắp xếp theo"
+          >
+            <option value="">Mặc định</option>
+            <option value="dueDate">Hạn hoàn thành</option>
+            <option value="createdAt">Ngày tạo</option>
+            <option value="priority">Độ ưu tiên</option>
+            <option value="storyPoints">Story Points</option>
+          </select>
+          {sortBy ? (
+            <button
+              type="button"
+              onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+              className="rounded px-1.5 py-0.5 text-[11px] font-medium bg-slate-100 text-slate-600 hover:bg-slate-200"
+              aria-label={sortDir === 'asc' ? 'Tăng dần' : 'Giảm dần'}
+            >
+              {sortDir === 'asc' ? '↑ Tăng' : '↓ Giảm'}
+            </button>
+          ) : null}
+        </div>
+
+        {hasActiveFilters ? (
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="ml-auto rounded px-2 py-1 text-[11px] font-medium text-rose-600 hover:bg-rose-50"
+          >
+            Xoá bộ lọc
+          </button>
+        ) : null}
+      </div>
+
       {project.tasks.length === 0 ? (
         <div className="rounded-xl border border-dashed border-surface-border bg-surface-card p-10 text-center">
           <p className="text-base font-semibold text-slate-900">Project chưa có task</p>
@@ -629,7 +651,7 @@ export default function ProjectDetailPage() {
                 key={column.key}
                 className={`w-72 shrink-0 rounded-xl border border-t-2 bg-surface-card ${COLUMN_BORDER[column.key] ?? ''} ${
                   isDragOver
-                    ? 'border-dashed border-brand-400 bg-brand-50/30'
+                    ? 'border-dashed border-brand-400 bg-brand-50/30 animate-pulse'
                     : 'border-surface-border'
                 }`}
                 onDragOver={(e) => {
@@ -639,9 +661,9 @@ export default function ProjectDetailPage() {
                 onDragLeave={() => setDragOverColumn(null)}
                 onDrop={(event) => handleDrop(event, column.key)}
               >
-                <div className="flex items-center justify-between border-b border-surface-border px-3 py-2">
+                <div className="flex items-center justify-between border-b border-surface-border bg-gradient-to-r from-slate-50 to-white px-3 py-2">
                   <p className="text-sm font-semibold text-slate-900">{column.label}</p>
-                  <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                  <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-200 px-1.5 text-[11px] font-bold text-slate-700">
                     {tasks.length}
                   </span>
                 </div>
@@ -666,11 +688,19 @@ export default function ProjectDetailPage() {
                             handleOpenEdit(task);
                           }
                         }}
-                        className={`group relative rounded-lg border border-slate-200 bg-white p-3 shadow-xs ${
+                        className={`group relative rounded-lg border border-slate-200 bg-white p-3 shadow-xs border-l-2 ${
+                          task.priority === 'urgent'
+                            ? 'border-l-red-500'
+                            : task.priority === 'high'
+                              ? 'border-l-orange-500'
+                              : task.priority === 'medium'
+                                ? 'border-l-blue-400'
+                                : 'border-l-slate-300'
+                        } ${
                           updateTaskStatusMutation.isPending &&
                           updateTaskStatusMutation.variables?.taskId === task.id
                             ? 'opacity-60'
-                            : 'cursor-pointer hover:border-brand-300 hover:shadow-md'
+                            : 'cursor-pointer hover:border-brand-300 hover:shadow-md hover:scale-[1.01] transition-transform'
                         }`}
                       >
                         {/* Top: type icon + task ID + story points */}
@@ -745,7 +775,7 @@ export default function ProjectDetailPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-border bg-white">
-              {project.tasks.map((task) => (
+              {filteredTasks.map((task) => (
                 <tr
                   key={task.id}
                   tabIndex={0}
@@ -758,7 +788,7 @@ export default function ProjectDetailPage() {
                       handleOpenEdit(task);
                     }
                   }}
-                  className="cursor-pointer transition-colors hover:bg-slate-50"
+                  className="cursor-pointer transition-colors hover:bg-brand-50/50 even:bg-slate-50/50"
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -1038,199 +1068,4 @@ export default function ProjectDetailPage() {
       ) : null}
     </section>
   );
-
-  function TaskCommentSection({
-    projectId,
-    taskId,
-    currentUserId,
-  }: {
-    projectId: string;
-    taskId: string;
-    currentUserId: string;
-  }) {
-    const { data: comments, isLoading } = useTaskComments(projectId, taskId);
-    const createComment = useCreateComment(projectId, taskId);
-    const updateComment = useUpdateComment(projectId, taskId);
-    const deleteComment = useDeleteComment(projectId, taskId);
-
-    const [newComment, setNewComment] = useState('');
-    const [createError, setCreateError] = useState<string | null>(null);
-    const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-    const [editContent, setEditContent] = useState('');
-    const [editError, setEditError] = useState<string | null>(null);
-    const [deleteError, setDeleteError] = useState<string | null>(null);
-
-    async function handleCreateComment(e: FormEvent<HTMLFormElement>) {
-      e.preventDefault();
-      const trimmed = newComment.trim();
-      if (!trimmed) return;
-      setCreateError(null);
-      try {
-        await createComment.mutateAsync(trimmed);
-        setNewComment('');
-      } catch (err) {
-        setCreateError(err instanceof Error ? err.message : 'Không thể tạo bình luận');
-      }
-    }
-
-    function startEditComment(comment: CommentItemDTO) {
-      setEditingCommentId(comment.id);
-      setEditContent(comment.content);
-      setEditError(null);
-    }
-
-    function cancelEditComment() {
-      setEditingCommentId(null);
-      setEditContent('');
-      setEditError(null);
-    }
-
-    async function handleSaveEditComment(commentId: string) {
-      const trimmed = editContent.trim();
-      if (!trimmed) return;
-      setEditError(null);
-      try {
-        await updateComment.mutateAsync({ commentId, content: trimmed });
-        setEditingCommentId(null);
-        setEditContent('');
-      } catch (err) {
-        setEditError(err instanceof Error ? err.message : 'Không thể cập nhật bình luận');
-      }
-    }
-
-    async function handleDeleteComment(commentId: string) {
-      if (!confirm('Bạn có chắc chắn muốn xoá bình luận này?')) return;
-      setDeleteError(null);
-      try {
-        await deleteComment.mutateAsync(commentId);
-      } catch (err) {
-        setDeleteError(err instanceof Error ? err.message : 'Không thể xoá bình luận');
-      }
-    }
-
-    return (
-      <div className="border-t border-surface-border px-6 py-4">
-        <h3 className="mb-3 text-sm font-semibold text-slate-900">Bình luận</h3>
-
-        {deleteError ? (
-          <p role="alert" className="mb-2 text-xs text-rose-600">
-            {deleteError}
-          </p>
-        ) : null}
-
-        {isLoading ? (
-          <div className="space-y-3">
-            {[1, 2].map((i) => (
-              <div key={i} className="animate-pulse space-y-2">
-                <div className="h-3 w-24 rounded bg-slate-200" />
-                <div className="h-3 w-full rounded bg-slate-200" />
-              </div>
-            ))}
-          </div>
-        ) : !comments || comments.length === 0 ? (
-          <p className="mb-4 text-xs text-slate-500">Chưa có bình luận</p>
-        ) : (
-          <div className="mb-4 space-y-3">
-            {comments.map((comment) => (
-              <div key={comment.id} className="rounded-lg border border-slate-200 bg-white p-3">
-                {editingCommentId === comment.id ? (
-                  <div className="space-y-2">
-                    <textarea
-                      value={editContent}
-                      onChange={(e) => setEditContent(e.target.value)}
-                      rows={3}
-                      aria-label="Sửa bình luận"
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-                    />
-                    {editError ? (
-                      <p role="alert" className="text-xs text-rose-600">
-                        {editError}
-                      </p>
-                    ) : null}
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleSaveEditComment(comment.id)}
-                        disabled={updateComment.isPending || !editContent.trim()}
-                        className="rounded-md bg-brand-600 px-3 py-1 text-xs font-medium text-white hover:bg-brand-700 disabled:opacity-50"
-                      >
-                        {updateComment.isPending ? 'Đang lưu...' : 'Lưu'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={cancelEditComment}
-                        className="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                      >
-                        Huỷ
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-slate-900">
-                          {comment.authorId === currentUserId ? 'Bạn' : comment.authorName}
-                        </span>
-                        <span className="text-[11px] text-slate-500">
-                          {formatRelativeTime(comment.createdAt)}
-                        </span>
-                      </div>
-                      {comment.authorId === currentUserId ? (
-                        <div className="flex gap-1">
-                          <button
-                            type="button"
-                            onClick={() => startEditComment(comment)}
-                            aria-label={`Sửa bình luận của ${comment.authorName}`}
-                            className="rounded px-2 py-0.5 text-[11px] font-medium text-slate-600 hover:bg-slate-100"
-                          >
-                            Sửa
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteComment(comment.id)}
-                            disabled={deleteComment.isPending}
-                            aria-label={`Xoá bình luận của ${comment.authorName}`}
-                            className="rounded px-2 py-0.5 text-[11px] font-medium text-rose-600 hover:bg-rose-50 disabled:opacity-50"
-                          >
-                            Xoá
-                          </button>
-                        </div>
-                      ) : null}
-                    </div>
-                    <p className="mt-1 text-sm text-slate-700 whitespace-pre-wrap">
-                      {comment.content}
-                    </p>
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        <form onSubmit={handleCreateComment} className="space-y-2">
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            rows={2}
-            placeholder="Thêm bình luận..."
-            aria-label="Bình luận mới"
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-          />
-          {createError ? (
-            <p role="alert" className="text-xs text-rose-600">
-              {createError}
-            </p>
-          ) : null}
-          <button
-            type="submit"
-            disabled={!newComment.trim() || createComment.isPending}
-            className="rounded-md bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-400"
-          >
-            {createComment.isPending ? 'Đang gửi...' : 'Gửi'}
-          </button>
-        </form>
-      </div>
-    );
-  }
 }

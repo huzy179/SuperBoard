@@ -6,12 +6,10 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   Patch,
   Post,
   Query,
-  UnauthorizedException,
 } from '@nestjs/common';
 import type {
   AuthUserDTO,
@@ -22,6 +20,7 @@ import type {
   CreateProjectResponseDTO,
   CreateTaskRequestDTO,
   CreateTaskResponseDTO,
+  DashboardStatsResponseDTO,
   DeleteCommentResponseDTO,
   DeleteProjectResponseDTO,
   DeleteTaskResponseDTO,
@@ -37,6 +36,7 @@ import type {
   UpdateTaskStatusResponseDTO,
 } from '@superboard/shared';
 import { apiSuccess } from '../../common/api-response';
+import { requireWorkspace, findOrThrow, parseBooleanQuery } from '../../common/helpers';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { CommentService } from './comment.service';
 import { ProjectService } from './project.service';
@@ -53,15 +53,21 @@ export class ProjectController {
     @CurrentUser() user: AuthUserDTO,
     @Query('showArchived') showArchived?: string,
   ): Promise<ProjectsResponseDTO> {
-    if (!user?.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
-    const projects = await this.projectService.getProjectsByWorkspace(user.defaultWorkspaceId, {
-      showArchived: this.parseBooleanQuery(showArchived),
+    const projects = await this.projectService.getProjectsByWorkspace(workspaceId, {
+      showArchived: parseBooleanQuery(showArchived),
     });
 
     return apiSuccess(projects);
+  }
+
+  @Get('dashboard')
+  async getDashboardStats(@CurrentUser() user: AuthUserDTO): Promise<DashboardStatsResponseDTO> {
+    const workspaceId = requireWorkspace(user);
+
+    const stats = await this.projectService.getDashboardStats(workspaceId);
+    return apiSuccess(stats);
   }
 
   @Get(':projectId')
@@ -70,21 +76,14 @@ export class ProjectController {
     @Param('projectId') projectId: string,
     @Query('showArchived') showArchived?: string,
   ): Promise<ProjectDetailResponseDTO> {
-    if (!user?.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
-    const project = await this.projectService.getProjectByIdForWorkspace(
-      projectId,
-      user.defaultWorkspaceId,
-      {
-        showArchived: this.parseBooleanQuery(showArchived),
-      },
+    const project = await findOrThrow(
+      this.projectService.getProjectByIdForWorkspace(projectId, workspaceId, {
+        showArchived: parseBooleanQuery(showArchived),
+      }),
+      'Project',
     );
-
-    if (!project) {
-      throw new NotFoundException('Project not found');
-    }
 
     return apiSuccess(project);
   }
@@ -94,9 +93,7 @@ export class ProjectController {
     @CurrentUser() user: AuthUserDTO,
     @Body() body: Partial<CreateProjectRequestDTO>,
   ): Promise<CreateProjectResponseDTO> {
-    if (!user?.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
     const name = body.name?.trim();
     if (!name) {
@@ -107,7 +104,7 @@ export class ProjectController {
     const color = body.color?.trim();
     const icon = body.icon?.trim();
 
-    const project = await this.projectService.createProject(user.defaultWorkspaceId, {
+    const project = await this.projectService.createProject(workspaceId, {
       name,
       ...(description ? { description } : {}),
       ...(color ? { color } : {}),
@@ -123,9 +120,7 @@ export class ProjectController {
     @Param('projectId') projectId: string,
     @Body() body: UpdateProjectRequestDTO,
   ): Promise<UpdateProjectResponseDTO> {
-    if (!user?.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
     const normalizedName = body.name?.trim();
     if (body.name !== undefined && !normalizedName) {
@@ -134,7 +129,7 @@ export class ProjectController {
 
     const project = await this.projectService.updateProjectForWorkspace({
       projectId,
-      workspaceId: user.defaultWorkspaceId,
+      workspaceId,
       data: {
         ...(normalizedName !== undefined ? { name: normalizedName } : {}),
         ...(body.description !== undefined ? { description: body.description.trim() } : {}),
@@ -152,13 +147,11 @@ export class ProjectController {
     @CurrentUser() user: AuthUserDTO,
     @Param('projectId') projectId: string,
   ): Promise<DeleteProjectResponseDTO> {
-    if (!user?.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
     await this.projectService.archiveProjectForWorkspace({
       projectId,
-      workspaceId: user.defaultWorkspaceId,
+      workspaceId,
     });
 
     return apiSuccess({ deleted: true });
@@ -170,13 +163,11 @@ export class ProjectController {
     @CurrentUser() user: AuthUserDTO,
     @Param('projectId') projectId: string,
   ): Promise<DeleteProjectResponseDTO> {
-    if (!user?.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
     await this.projectService.restoreProjectForWorkspace({
       projectId,
-      workspaceId: user.defaultWorkspaceId,
+      workspaceId,
     });
 
     return apiSuccess({ deleted: false });
@@ -188,9 +179,7 @@ export class ProjectController {
     @Param('projectId') projectId: string,
     @Body() body: Partial<CreateTaskRequestDTO>,
   ): Promise<CreateTaskResponseDTO> {
-    if (!user?.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
     const title = body.title?.trim();
     if (!title) {
@@ -205,7 +194,7 @@ export class ProjectController {
 
     const task = await this.projectService.createTaskForProject({
       projectId,
-      workspaceId: user.defaultWorkspaceId,
+      workspaceId,
       title,
       ...(description ? { description } : {}),
       status,
@@ -227,9 +216,7 @@ export class ProjectController {
     @Param('taskId') taskId: string,
     @Body() body: Partial<UpdateTaskStatusRequestDTO>,
   ): Promise<UpdateTaskStatusResponseDTO> {
-    if (!user?.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
     if (!body.status) {
       throw new BadRequestException('Task status is required');
@@ -238,7 +225,7 @@ export class ProjectController {
     const task = await this.projectService.updateTaskStatusForProject({
       projectId,
       taskId,
-      workspaceId: user.defaultWorkspaceId,
+      workspaceId,
       status: body.status,
     });
 
@@ -252,9 +239,7 @@ export class ProjectController {
     @Param('taskId') taskId: string,
     @Body() body: UpdateTaskRequestDTO,
   ): Promise<UpdateTaskResponseDTO> {
-    if (!user?.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
     const normalizedTitle = body.title?.trim();
     if (body.title !== undefined && !normalizedTitle) {
@@ -268,7 +253,7 @@ export class ProjectController {
     const task = await this.projectService.updateTaskForProject({
       projectId,
       taskId,
-      workspaceId: user.defaultWorkspaceId,
+      workspaceId,
       data: {
         ...(normalizedTitle !== undefined ? { title: normalizedTitle } : {}),
         ...(body.description !== undefined ? { description: normalizedDescription ?? '' } : {}),
@@ -292,14 +277,12 @@ export class ProjectController {
     @Param('projectId') projectId: string,
     @Param('taskId') taskId: string,
   ): Promise<DeleteTaskResponseDTO> {
-    if (!user?.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
     await this.projectService.deleteTaskForProject({
       projectId,
       taskId,
-      workspaceId: user.defaultWorkspaceId,
+      workspaceId,
     });
 
     return apiSuccess({ deleted: true });
@@ -313,14 +296,12 @@ export class ProjectController {
     @Param('projectId') projectId: string,
     @Param('taskId') taskId: string,
   ): Promise<CommentListResponseDTO> {
-    if (!user?.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
     const comments = await this.commentService.getCommentsByTask({
       projectId,
       taskId,
-      workspaceId: user.defaultWorkspaceId,
+      workspaceId,
     });
 
     return apiSuccess(comments);
@@ -333,14 +314,12 @@ export class ProjectController {
     @Param('taskId') taskId: string,
     @Body() body: Partial<CreateCommentRequestDTO>,
   ): Promise<CreateCommentResponseDTO> {
-    if (!user?.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
     const comment = await this.commentService.createComment({
       projectId,
       taskId,
-      workspaceId: user.defaultWorkspaceId,
+      workspaceId,
       authorId: user.id,
       content: body.content ?? '',
     });
@@ -356,15 +335,13 @@ export class ProjectController {
     @Param('commentId') commentId: string,
     @Body() body: Partial<UpdateCommentRequestDTO>,
   ): Promise<UpdateCommentResponseDTO> {
-    if (!user?.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
     const comment = await this.commentService.updateComment({
       projectId,
       taskId,
       commentId,
-      workspaceId: user.defaultWorkspaceId,
+      workspaceId,
       currentUserId: user.id,
       content: body.content ?? '',
     });
@@ -380,15 +357,13 @@ export class ProjectController {
     @Param('taskId') taskId: string,
     @Param('commentId') commentId: string,
   ): Promise<DeleteCommentResponseDTO> {
-    if (!user?.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
     const result = await this.commentService.deleteComment({
       projectId,
       taskId,
       commentId,
-      workspaceId: user.defaultWorkspaceId,
+      workspaceId,
       currentUserId: user.id,
     });
 
@@ -396,35 +371,12 @@ export class ProjectController {
   }
 
   private parseOptionalDate(rawDate?: string | null): Date | null | undefined {
-    if (rawDate === undefined) {
-      return undefined;
-    }
-
-    if (rawDate === null || rawDate === '') {
-      return null;
-    }
-
+    if (rawDate === undefined) return undefined;
+    if (rawDate === null || rawDate === '') return null;
     const parsedDate = new Date(rawDate);
     if (Number.isNaN(parsedDate.getTime())) {
       throw new BadRequestException('Invalid due date');
     }
-
     return parsedDate;
-  }
-
-  private parseBooleanQuery(value?: string): boolean {
-    if (value === undefined) {
-      return false;
-    }
-
-    if (value === 'true') {
-      return true;
-    }
-
-    if (value === 'false') {
-      return false;
-    }
-
-    throw new BadRequestException('showArchived must be true or false');
   }
 }

@@ -6,6 +6,8 @@ import type { AuthUserDTO } from '@superboard/shared';
 import type { NavItem } from '@/lib/navigation';
 import { isNavItemActive } from '@/lib/navigation';
 import { AppBrand } from './app-brand';
+import { NotificationBell } from '@/components/notification-bell';
+import { getInitials } from '@/lib/helpers';
 
 type PrivateShellProps = {
   children: ReactNode;
@@ -62,19 +64,27 @@ const NAV_ICONS: Record<NavItem['icon'], ReactNode> = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
     </svg>
   ),
+  notifications: (
+    <svg
+      className="h-4 w-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
+      />
+    </svg>
+  ),
 };
-
-// PLACEHOLDER_COMPONENT
 
 export function PrivateShell({ children, user, navItems, pathname, onLogout }: PrivateShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const userInitials = user.fullName
-    .split(' ')
-    .filter(Boolean)
-    .slice(-2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('');
+  const userInitials = getInitials(user.fullName);
 
   const sidebar = (
     <div className="flex h-full flex-col">
@@ -131,6 +141,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
             <p className="truncate text-sm font-medium text-slate-900">{user.fullName}</p>
             <p className="truncate text-[11px] text-slate-500">{user.email}</p>
           </div>
+          <NotificationBell />
           <button
             type="button"
             onClick={onLogout}
@@ -174,7 +185,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
           />
           <aside
             id="mobile-sidebar"
-            className="relative z-50 h-full w-60 bg-surface-card shadow-xl"
+            className="relative z-50 h-full w-60 bg-surface-card shadow-xl animate-slide-in-left"
           >
             {sidebar}
           </aside>

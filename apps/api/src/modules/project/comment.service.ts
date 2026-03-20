@@ -6,11 +6,15 @@ import {
 } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { NotificationService } from '../notification/notification.service';
 import type { CommentItemDTO } from '@superboard/shared';
 
 @Injectable()
 export class CommentService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationService: NotificationService,
+  ) {}
 
   async getCommentsByTask(input: {
     projectId: string;
@@ -60,6 +64,26 @@ export class CommentService {
         },
       },
     });
+
+    // Notify task assignee about new comment (if different from author)
+    const task = await this.prisma.task.findFirst({
+      where: { id: input.taskId, deletedAt: null },
+      select: { assigneeId: true, title: true, project: { select: { workspaceId: true } } },
+    });
+    if (task?.assigneeId && task.assigneeId !== input.authorId) {
+      void this.notificationService
+        .createNotification({
+          userId: task.assigneeId,
+          workspaceId: task.project.workspaceId,
+          type: 'comment_added',
+          payload: {
+            taskId: input.taskId,
+            taskTitle: task.title,
+            message: `Bình luận mới trên task: ${task.title}`,
+          },
+        })
+        .catch((err: unknown) => console.error('Notification failed:', err));
+    }
 
     return this.toCommentItemDTO(comment);
   }

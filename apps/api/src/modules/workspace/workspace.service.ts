@@ -1,5 +1,11 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
+import { WorkspaceMemberRole } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
 type WorkspaceItemDTO = {
@@ -273,6 +279,73 @@ export class WorkspaceService {
     });
 
     void input.restoredAt;
+  }
+
+  async getWorkspaceMembers(workspaceId: string, userId: string) {
+    // Verify user is a member
+    const membership = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId, userId, deletedAt: null },
+      select: { id: true },
+    });
+    if (!membership) {
+      throw new NotFoundException('Workspace not found');
+    }
+
+    const members = await this.prisma.workspaceMember.findMany({
+      where: { workspaceId, deletedAt: null },
+      select: {
+        id: true,
+        userId: true,
+        role: true,
+        createdAt: true,
+        user: { select: { fullName: true, email: true, avatarColor: true } },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    return members.map((m) => ({
+      id: m.id,
+      userId: m.userId,
+      fullName: m.user.fullName,
+      email: m.user.email,
+      avatarColor: m.user.avatarColor ?? null,
+      role: m.role,
+      joinedAt: m.createdAt.toISOString(),
+    }));
+  }
+
+  async updateMemberRole(input: {
+    workspaceId: string;
+    memberId: string;
+    role: string;
+    currentUserId: string;
+  }) {
+    // Verify current user is owner or admin
+    const currentMember = await this.prisma.workspaceMember.findFirst({
+      where: { workspaceId: input.workspaceId, userId: input.currentUserId, deletedAt: null },
+      select: { role: true },
+    });
+    if (!currentMember || (currentMember.role !== 'owner' && currentMember.role !== 'admin')) {
+      throw new ForbiddenException('Chỉ owner hoặc admin mới được thay đổi role');
+    }
+
+    const targetMember = await this.prisma.workspaceMember.findFirst({
+      where: { id: input.memberId, workspaceId: input.workspaceId, deletedAt: null },
+      select: { id: true, role: true },
+    });
+    if (!targetMember) {
+      throw new NotFoundException('Member not found');
+    }
+
+    // Cannot change owner role
+    if (targetMember.role === 'owner') {
+      throw new ForbiddenException('Không thể thay đổi role của owner');
+    }
+
+    await this.prisma.workspaceMember.update({
+      where: { id: input.memberId },
+      data: { role: input.role as WorkspaceMemberRole },
+    });
   }
 
   private normalizeSlug(input: string): string {

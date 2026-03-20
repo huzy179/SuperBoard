@@ -81,3 +81,24 @@
 - [x] Implement task comments (CRUD)
 - [x] Tích hợp React Query cho project + comment management
 - [x] Fetch/mutation pattern chuẩn hóa
+
+## Jira v0.8 — Labels, Types, Story Points, Schema Enhancements
+
+- [x] TaskType enum (task/bug/story/epic), Label + TaskLabel join table
+- [x] User.avatarColor, Project.key, Task.number/storyPoints
+- [x] Seed data: 6 users, 4 projects, 29 tasks, 8 labels
+
+## Jira v0.9 — Filter/Sort, Dashboard, Notifications, Settings
+
+- [x] Client-side filter & sort (assignee/priority/type + sort by date/priority/SP)
+- [x] Dashboard page: stat cards, status/project/assignee charts, activity feed
+- [x] Notification module: bell icon, unread badge, mark read, triggers on assign/comment
+- [x] Workspace Settings: member list, role management
+
+## Jira v1.0 — Code Quality & UI Polish
+
+- [x] Extract FE constants/components (task-badges, comment-section, notification-bell)
+- [x] Shared helpers BE (requireWorkspace, findOrThrow, parseBooleanQuery)
+- [x] Shared helpers FE (toDateInputValue, getInitials, percentOf)
+- [x] React Query mutations cho project list
+- [x] UI animations, visual polish across all pages

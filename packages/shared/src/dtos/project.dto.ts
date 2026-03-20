@@ -4,7 +4,10 @@ import type { ApiResponse } from '../types/common.types';
 export type ProjectItemDTO = Pick<
   Project,
   'id' | 'name' | 'description' | 'color' | 'icon' | 'createdAt' | 'updatedAt'
->;
+> & {
+  taskCount: number;
+  doneTaskCount: number;
+};
 
 export type ProjectsResponseDTO = ApiResponse<ProjectItemDTO[]>;
 
@@ -18,6 +21,7 @@ export interface ProjectTaskItemDTO {
   priority: TaskPriorityDTO;
   dueDate?: string | null;
   assigneeId?: string | null;
+  assigneeName?: string | null;
   createdAt: string;
   updatedAt: string;
 }

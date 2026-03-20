@@ -31,19 +31,68 @@ type BoardColumn = {
 type TaskPriority = ProjectTaskItemDTO['priority'];
 
 const PRIORITY_OPTIONS: Array<{ key: TaskPriority; label: string }> = [
-  { key: 'low', label: 'Low' },
-  { key: 'medium', label: 'Medium' },
-  { key: 'high', label: 'High' },
-  { key: 'urgent', label: 'Urgent' },
+  { key: 'low', label: 'Thấp' },
+  { key: 'medium', label: 'Trung bình' },
+  { key: 'high', label: 'Cao' },
+  { key: 'urgent', label: 'Khẩn cấp' },
 ];
 
 const BOARD_COLUMNS: BoardColumn[] = [
-  { key: 'todo', label: 'To Do' },
-  { key: 'in_progress', label: 'In Progress' },
-  { key: 'in_review', label: 'In Review' },
-  { key: 'done', label: 'Done' },
-  { key: 'cancelled', label: 'Cancelled' },
+  { key: 'todo', label: 'Cần làm' },
+  { key: 'in_progress', label: 'Đang làm' },
+  { key: 'in_review', label: 'Đang review' },
+  { key: 'done', label: 'Hoàn thành' },
+  { key: 'cancelled', label: 'Đã huỷ' },
 ];
+
+const PRIORITY_STYLES: Record<TaskPriority, string> = {
+  urgent: 'bg-red-100 text-red-700',
+  high: 'bg-orange-100 text-orange-700',
+  medium: 'bg-blue-100 text-blue-700',
+  low: 'bg-slate-100 text-slate-600',
+};
+
+const PRIORITY_LABELS: Record<TaskPriority, string> = {
+  urgent: 'Khẩn',
+  high: 'Cao',
+  medium: 'TB',
+  low: 'Thấp',
+};
+
+const COLUMN_BORDER: Record<string, string> = {
+  todo: 'border-t-slate-400',
+  in_progress: 'border-t-blue-500',
+  in_review: 'border-t-amber-500',
+  done: 'border-t-emerald-500',
+  cancelled: 'border-t-slate-300',
+};
+
+function PriorityBadge({ priority }: { priority: TaskPriority }) {
+  return (
+    <span
+      className={`rounded px-1.5 py-0.5 text-[11px] font-semibold ${PRIORITY_STYLES[priority]}`}
+    >
+      {PRIORITY_LABELS[priority]}
+    </span>
+  );
+}
+
+function AssigneeAvatar({ name }: { name: string }) {
+  const initials = name
+    .split(' ')
+    .slice(-2)
+    .map((p) => p[0])
+    .join('')
+    .toUpperCase();
+  return (
+    <span
+      className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 text-[9px] font-bold text-brand-700"
+      title={name}
+    >
+      {initials}
+    </span>
+  );
+}
 
 export default function ProjectDetailPage() {
   const params = useParams<{ projectId: string }>();
@@ -321,7 +370,7 @@ export default function ProjectDetailPage() {
     <section>
       <div className="mb-6">
         <Link href="/jira" className="text-sm font-medium text-brand-700 hover:text-brand-800">
-          ← Quay lại danh sách dự án
+          ← Quay lại
         </Link>
       </div>
 
@@ -343,7 +392,7 @@ export default function ProjectDetailPage() {
               onClick={() => setShowCreateTaskPanel((value) => !value)}
               className="rounded-md px-3 py-1.5 text-sm font-medium text-brand-700 transition-colors hover:bg-brand-50"
             >
-              + Create task
+              + Tạo task
             </button>
             <button
               type="button"
@@ -489,7 +538,7 @@ export default function ProjectDetailPage() {
             return (
               <div
                 key={column.key}
-                className="rounded-xl border border-surface-border bg-surface-card"
+                className={`rounded-xl border border-surface-border border-t-2 bg-surface-card ${COLUMN_BORDER[column.key] ?? ''}`}
                 onDragOver={handleDragOver}
                 onDrop={(event) => {
                   handleDrop(event, column.key);
@@ -538,15 +587,17 @@ export default function ProjectDetailPage() {
                             {task.description}
                           </p>
                         ) : null}
-                        <div className="mt-2 flex items-center gap-2 text-[11px] text-slate-600">
-                          <span className="rounded bg-slate-100 px-1.5 py-0.5 font-medium uppercase">
-                            {task.priority}
-                          </span>
-                          {task.dueDate ? <span>Due: {formatDate(task.dueDate)}</span> : null}
+                        <div className="mt-2 flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <PriorityBadge priority={task.priority} />
+                            {task.dueDate ? (
+                              <span className="text-[11px] text-slate-500">
+                                {formatDate(task.dueDate)}
+                              </span>
+                            ) : null}
+                          </div>
+                          {task.assigneeName ? <AssigneeAvatar name={task.assigneeName} /> : null}
                         </div>
-                        <p className="mt-2 text-[11px] text-slate-500">
-                          Updated: {formatDate(task.updatedAt)}
-                        </p>
                       </article>
                     ))
                   )}
@@ -588,11 +639,14 @@ export default function ProjectDetailPage() {
                         {task.description}
                       </p>
                     ) : null}
-                    <div className="mt-1 flex items-center gap-2 text-[11px] text-slate-600">
-                      <span className="rounded bg-slate-100 px-1.5 py-0.5 font-medium uppercase">
-                        {task.priority}
-                      </span>
-                      {task.dueDate ? <span>Due: {formatDate(task.dueDate)}</span> : null}
+                    <div className="mt-1 flex items-center gap-2">
+                      <PriorityBadge priority={task.priority} />
+                      {task.dueDate ? (
+                        <span className="text-[11px] text-slate-500">
+                          {formatDate(task.dueDate)}
+                        </span>
+                      ) : null}
+                      {task.assigneeName ? <AssigneeAvatar name={task.assigneeName} /> : null}
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -637,7 +691,7 @@ export default function ProjectDetailPage() {
             <div className="flex h-full flex-col">
               <div className="flex items-center justify-between border-b border-surface-border px-6 py-4">
                 <h2 id="task-detail-title" className="text-xl font-bold text-slate-900">
-                  Task Detail
+                  Chi tiết task
                 </h2>
                 <button
                   type="button"
@@ -657,7 +711,7 @@ export default function ProjectDetailPage() {
                 <div className="p-6">
                   <div className="space-y-6">
                     <label className="block text-sm font-medium text-slate-700">
-                      Title
+                      Tiêu đề
                       <input
                         type="text"
                         value={editTitle}
@@ -668,7 +722,7 @@ export default function ProjectDetailPage() {
                     </label>
 
                     <label className="block text-sm font-medium text-slate-700">
-                      Status
+                      Trạng thái
                       <select
                         value={editStatus}
                         onChange={(e) =>
@@ -685,7 +739,7 @@ export default function ProjectDetailPage() {
                     </label>
 
                     <label className="block text-sm font-medium text-slate-700">
-                      Priority
+                      Độ ưu tiên
                       <select
                         value={editPriority}
                         onChange={(e) => setEditPriority(e.target.value as TaskPriority)}
@@ -699,7 +753,7 @@ export default function ProjectDetailPage() {
                       </select>
                     </label>
                     <label className="block text-sm font-medium text-slate-700">
-                      Due date
+                      Hạn hoàn thành
                       <input
                         type="date"
                         value={editDueDate}
@@ -709,7 +763,7 @@ export default function ProjectDetailPage() {
                     </label>
 
                     <label className="block text-sm font-medium text-slate-700">
-                      Assignee ID
+                      Người thực hiện (ID)
                       <input
                         type="text"
                         value={editAssigneeId}
@@ -720,13 +774,13 @@ export default function ProjectDetailPage() {
                     </label>
 
                     <label className="block text-sm font-medium text-slate-700">
-                      Description
+                      Mô tả
                       <textarea
                         value={editDescription}
                         onChange={(e) => setEditDescription(e.target.value)}
                         rows={6}
                         className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-                        placeholder="Add a more detailed description..."
+                        placeholder="Thêm mô tả chi tiết..."
                       />
                     </label>
 
@@ -754,11 +808,13 @@ export default function ProjectDetailPage() {
               <div className="flex items-center justify-between border-t border-surface-border px-6 py-4 bg-slate-50">
                 <button
                   type="button"
-                  onClick={handleDeleteTask}
+                  onClick={() => {
+                    void handleDeleteTask();
+                  }}
                   disabled={deleteTaskMutation.isPending}
                   className="rounded-lg border border-rose-200 bg-white px-4 py-2 text-sm font-medium text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-50"
                 >
-                  {deleteTaskMutation.isPending ? 'Deleting...' : 'Delete Task'}
+                  {deleteTaskMutation.isPending ? 'Đang xoá...' : 'Xoá task'}
                 </button>
                 <div className="flex gap-2">
                   <button
@@ -766,7 +822,7 @@ export default function ProjectDetailPage() {
                     onClick={handleCloseEdit}
                     className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
                   >
-                    Cancel
+                    Huỷ
                   </button>
                   <button
                     type="submit"
@@ -774,7 +830,7 @@ export default function ProjectDetailPage() {
                     disabled={updateTaskMutation.isPending}
                     className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
                   >
-                    {updateTaskMutation.isPending ? 'Saving...' : 'Save Changes'}
+                    {updateTaskMutation.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
                   </button>
                 </div>
               </div>
@@ -880,7 +936,7 @@ function TaskCommentSection({
   }
   return (
     <div className="border-t border-surface-border px-6 py-4">
-      <h3 className="mb-3 text-sm font-semibold text-slate-900">Comments</h3>
+      <h3 className="mb-3 text-sm font-semibold text-slate-900">Bình luận</h3>
 
       {deleteError ? (
         <p role="alert" className="mb-2 text-xs text-rose-600">
@@ -898,7 +954,7 @@ function TaskCommentSection({
           ))}
         </div>
       ) : !comments || comments.length === 0 ? (
-        <p className="mb-4 text-xs text-slate-500">No comments yet</p>
+        <p className="mb-4 text-xs text-slate-500">Chưa có bình luận</p>
       ) : (
         <div className="mb-4 space-y-3">
           {comments.map((comment) => (
@@ -984,8 +1040,8 @@ function TaskCommentSection({
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           rows={2}
-          placeholder="Add a comment..."
-          aria-label="New comment"
+          placeholder="Thêm bình luận..."
+          aria-label="Bình luận mới"
           className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
         />
         {createError ? (
@@ -998,7 +1054,7 @@ function TaskCommentSection({
           disabled={!newComment.trim() || createComment.isPending}
           className="rounded-md bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-400"
         >
-          {createComment.isPending ? 'Posting...' : 'Post Comment'}
+          {createComment.isPending ? 'Đang gửi...' : 'Gửi'}
         </button>
       </form>
     </div>

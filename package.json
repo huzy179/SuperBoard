@@ -21,9 +21,16 @@
     "typecheck": "turbo run typecheck",
     "test": "npm --ws --if-present run test",
     "format": "prettier --write .",
+    "db:generate": "npm --workspace @superboard/api run db:generate",
     "db:migrate": "npm --workspace @superboard/api run db:migrate",
+    "db:deploy": "npm --workspace @superboard/api run db:deploy",
+    "db:push": "npm --workspace @superboard/api run db:push",
+    "db:push:force": "npm --workspace @superboard/api run db:push:force",
+    "db:seed": "npm --workspace @superboard/api run db:seed",
+    "db:status": "npm --workspace @superboard/api run db:status",
+    "db:fresh": "npm --workspace @superboard/api run db:fresh",
     "db:reset": "node scripts/db-reset.mjs",
-    "db:seed": "npm --workspace @superboard/api run db:seed"
+    "db:studio": "npm --workspace @superboard/api run db:studio"
   },
   "lint-staged": {
     "*.{js,mjs,cjs,ts,tsx,json,md,yml,yaml}": [

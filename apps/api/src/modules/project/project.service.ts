@@ -33,13 +33,28 @@ export class ProjectService {
         icon: true,
         createdAt: true,
         updatedAt: true,
+        _count: {
+          select: {
+            tasks: {
+              where: { deletedAt: null },
+            },
+          },
+        },
+        tasks: {
+          where: { deletedAt: null, status: 'done' },
+          select: { id: true },
+        },
       },
       orderBy: {
         createdAt: 'desc',
       },
     });
 
-    return projects.map((project) => this.toProjectItemDTO(project));
+    return projects.map((project) => ({
+      ...this.toProjectItemDTO(project),
+      taskCount: project._count.tasks,
+      doneTaskCount: project.tasks.length,
+    }));
   }
 
   async getProjectByIdForWorkspace(
@@ -69,6 +84,7 @@ export class ProjectService {
             priority: true,
             dueDate: true,
             assigneeId: true,
+            assignee: { select: { fullName: true } },
             createdAt: true,
             updatedAt: true,
           },
@@ -82,14 +98,17 @@ export class ProjectService {
 
     return {
       ...this.toProjectItemDTO(project),
+      taskCount: project.tasks.length,
+      doneTaskCount: project.tasks.filter((t) => t.status === 'done').length,
       tasks: project.tasks.map((task) => ({
         id: task.id,
         title: task.title,
         description: task.description,
-        status: task.status,
+        status: task.status as ProjectTaskItemDTO['status'],
         priority: task.priority,
         dueDate: task.dueDate ? task.dueDate.toISOString() : null,
         assigneeId: task.assigneeId,
+        assigneeName: task.assignee?.fullName ?? null,
         createdAt: task.createdAt.toISOString(),
         updatedAt: task.updatedAt.toISOString(),
       })),
@@ -249,30 +268,10 @@ export class ProjectService {
         dueDate: input.dueDate ?? null,
         assigneeId: input.assigneeId ?? null,
       },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        status: true,
-        priority: true,
-        dueDate: true,
-        assigneeId: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: this.taskSelect,
     });
 
-    return {
-      id: task.id,
-      title: task.title,
-      description: task.description,
-      status: task.status,
-      priority: task.priority,
-      dueDate: task.dueDate ? task.dueDate.toISOString() : null,
-      assigneeId: task.assigneeId,
-      createdAt: task.createdAt.toISOString(),
-      updatedAt: task.updatedAt.toISOString(),
-    };
+    return this.toTaskDTO(task);
   }
 
   async updateTaskStatusForProject(input: {
@@ -318,30 +317,10 @@ export class ProjectService {
       data: {
         status: input.status,
       },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        status: true,
-        priority: true,
-        dueDate: true,
-        assigneeId: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: this.taskSelect,
     });
 
-    return {
-      id: task.id,
-      title: task.title,
-      description: task.description,
-      status: task.status,
-      priority: task.priority,
-      dueDate: task.dueDate ? task.dueDate.toISOString() : null,
-      assigneeId: task.assigneeId,
-      createdAt: task.createdAt.toISOString(),
-      updatedAt: task.updatedAt.toISOString(),
-    };
+    return this.toTaskDTO(task);
   }
 
   async updateTaskForProject(input: {
@@ -392,30 +371,10 @@ export class ProjectService {
         ...(input.data.dueDate !== undefined ? { dueDate: input.data.dueDate } : {}),
         ...(input.data.assigneeId !== undefined ? { assigneeId: input.data.assigneeId } : {}),
       },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        status: true,
-        priority: true,
-        dueDate: true,
-        assigneeId: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: this.taskSelect,
     });
 
-    return {
-      id: task.id,
-      title: task.title,
-      description: task.description,
-      status: task.status,
-      priority: task.priority,
-      dueDate: task.dueDate ? task.dueDate.toISOString() : null,
-      assigneeId: task.assigneeId,
-      createdAt: task.createdAt.toISOString(),
-      updatedAt: task.updatedAt.toISOString(),
-    };
+    return this.toTaskDTO(task);
   }
 
   async deleteTaskForProject(input: {
@@ -476,6 +435,47 @@ export class ProjectService {
       icon: project.icon,
       createdAt: project.createdAt.toISOString(),
       updatedAt: project.updatedAt.toISOString(),
+      taskCount: 0,
+      doneTaskCount: 0,
+    };
+  }
+
+  private readonly taskSelect = {
+    id: true,
+    title: true,
+    description: true,
+    status: true,
+    priority: true,
+    dueDate: true,
+    assigneeId: true,
+    assignee: { select: { fullName: true } },
+    createdAt: true,
+    updatedAt: true,
+  } as const;
+
+  private toTaskDTO(task: {
+    id: string;
+    title: string;
+    description: string | null;
+    status: string;
+    priority: string;
+    dueDate: Date | null;
+    assigneeId: string | null;
+    assignee: { fullName: string } | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }): ProjectTaskItemDTO {
+    return {
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      status: task.status as ProjectTaskItemDTO['status'],
+      priority: task.priority as ProjectTaskItemDTO['priority'],
+      dueDate: task.dueDate ? task.dueDate.toISOString() : null,
+      assigneeId: task.assigneeId,
+      assigneeName: task.assignee?.fullName ?? null,
+      createdAt: task.createdAt.toISOString(),
+      updatedAt: task.updatedAt.toISOString(),
     };
   }
 

@@ -372,6 +372,30 @@ export default function JiraHomePage() {
                         <span>📅</span>
                         <time>{formatDate(project.createdAt)}</time>
                       </div>
+
+                      {project.taskCount > 0 && (
+                        <div className="mt-3">
+                          <div className="flex items-center justify-between text-xs text-slate-500">
+                            <span>
+                              {project.doneTaskCount}/{project.taskCount} hoàn thành
+                            </span>
+                            <span>
+                              {project.taskCount > 0
+                                ? Math.round((project.doneTaskCount / project.taskCount) * 100)
+                                : 0}
+                              %
+                            </span>
+                          </div>
+                          <div className="mt-1 h-1.5 w-full rounded-full bg-slate-100">
+                            <div
+                              className="h-1.5 rounded-full bg-brand-500 transition-all"
+                              style={{
+                                width: `${project.taskCount > 0 ? Math.round((project.doneTaskCount / project.taskCount) * 100) : 0}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {project.color && (

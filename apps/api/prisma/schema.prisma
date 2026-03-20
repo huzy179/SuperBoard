@@ -24,6 +24,7 @@ model Workspace {
   workflowStatusTemplates WorkspaceWorkflowStatus[]
   workflowTemplateTransitions WorkspaceWorkflowTransition[]
   notifications Notification[]
+  labels        Label[]
 
   @@index([deletedAt])
 }
@@ -35,6 +36,7 @@ model User {
   passwordHash       String
   fullName           String
   avatarUrl          String?
+  avatarColor        String?
   isActive           Boolean           @default(true)
   lastLoginAt        DateTime?
   deletedAt          DateTime?
@@ -135,6 +137,7 @@ model Project {
   description String?
   color       String?
   icon        String?
+  key         String?
   isArchived  Boolean   @default(false)
   deletedAt   DateTime?
   workspaceId String
@@ -145,6 +148,7 @@ model Project {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  @@unique([workspaceId, key])
   @@index([workspaceId, deletedAt])
 }
 
@@ -154,6 +158,9 @@ model Task {
   description String?
   status      String       @default("todo")
   priority    TaskPriority @default(medium)
+  type        TaskType     @default(task)
+  number      Int?
+  storyPoints Int?
   position    String?
   dueDate     DateTime?
   isArchived  Boolean      @default(false)
@@ -165,9 +172,11 @@ model Task {
   workflowStatus ProjectWorkflowStatus @relation(fields: [projectId, status], references: [projectId, key], onDelete: Restrict)
   events      TaskEvent[]
   comments    Comment[]
+  labels      TaskLabel[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
+  @@unique([projectId, number])
   @@index([projectId, status, deletedAt])
   @@index([assigneeId])
 }
@@ -252,6 +261,13 @@ enum TaskPriority {
   urgent
 }
 
+enum TaskType {
+  task
+  bug
+  story
+  epic
+}
+
 model TaskEvent {
   id        String        @id @default(cuid())
   taskId     String
@@ -314,4 +330,27 @@ model Notification {
 
   @@index([userId, readAt])
   @@index([workspaceId, createdAt])
+}
+
+model Label {
+  id          String      @id @default(cuid())
+  name        String
+  color       String
+  workspaceId String
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  tasks       TaskLabel[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([workspaceId, name])
+}
+
+model TaskLabel {
+  taskId  String
+  labelId String
+  task    Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  label   Label  @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, labelId])
+  @@index([labelId])
 }

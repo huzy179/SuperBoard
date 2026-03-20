@@ -6,6 +6,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import {
   PrismaClient,
   TaskPriority,
+  TaskType,
   WorkflowStatusCategory,
   TaskEventType,
   WorkspaceMemberRole,
@@ -58,36 +59,42 @@ const USER_SPECS = [
     fullName: 'Nguyễn Minh Tuấn',
     wsRole: WorkspaceMemberRole.owner,
     roleKey: 'workspace-owner',
+    avatarColor: '#2563eb',
   },
   {
     email: 'tran.thi.lan@techviet.local',
     fullName: 'Trần Thị Lan',
     wsRole: WorkspaceMemberRole.admin,
     roleKey: 'workspace-admin',
+    avatarColor: '#059669',
   },
   {
     email: 'le.van.duc@techviet.local',
     fullName: 'Lê Văn Đức',
     wsRole: WorkspaceMemberRole.member,
     roleKey: 'workspace-member',
+    avatarColor: '#7c3aed',
   },
   {
     email: 'pham.ngoc.anh@techviet.local',
     fullName: 'Phạm Ngọc Anh',
     wsRole: WorkspaceMemberRole.member,
     roleKey: 'workspace-member',
+    avatarColor: '#dc2626',
   },
   {
     email: 'hoang.quoc.bao@techviet.local',
     fullName: 'Hoàng Quốc Bảo',
     wsRole: WorkspaceMemberRole.member,
     roleKey: 'workspace-member',
+    avatarColor: '#d97706',
   },
   {
     email: 'vo.thi.mai@techviet.local',
     fullName: 'Võ Thị Mai',
     wsRole: WorkspaceMemberRole.member,
     roleKey: 'workspace-member',
+    avatarColor: '#db2777',
   },
 ] as const;
 
@@ -100,6 +107,7 @@ const PROJECT_SPECS = [
     description: 'Xây dựng hệ thống mua sắm trực tuyến B2C với tích hợp thanh toán VNPay và Momo',
     color: '#2563eb',
     icon: '🛒',
+    key: 'ECOM',
   },
   {
     id: 'seed-project-banking',
@@ -108,6 +116,7 @@ const PROJECT_SPECS = [
       'Phát triển app ngân hàng di động cho iOS và Android với tính năng chuyển khoản, nạp tiền',
     color: '#059669',
     icon: '🏦',
+    key: 'BANK',
   },
   {
     id: 'seed-project-hr',
@@ -115,6 +124,7 @@ const PROJECT_SPECS = [
     description: 'Hệ thống quản lý nhân viên, chấm công, tính lương và đánh giá hiệu suất nội bộ',
     color: '#7c3aed',
     icon: '👥',
+    key: 'HR',
   },
   {
     id: 'seed-project-infra',
@@ -123,6 +133,7 @@ const PROJECT_SPECS = [
       'Thiết lập CI/CD pipeline, Kubernetes cluster và monitoring stack cho toàn bộ hệ thống',
     color: '#dc2626',
     icon: '⚙️',
+    key: 'INFRA',
   },
 ];
 
@@ -133,6 +144,9 @@ type TaskSpec = {
   description: string;
   status: string;
   priority: TaskPriority;
+  type: TaskType;
+  number: number;
+  storyPoints?: number;
   assigneeIdx: number | null;
   dueDate: string | null;
   position: string;
@@ -149,6 +163,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Bao gồm bảng products, categories, product_variants, product_images. Hỗ trợ multi-tenant.',
       status: 'done',
       priority: TaskPriority.high,
+      type: TaskType.task,
+      number: 1,
+      storyPoints: 5,
       assigneeIdx: 2,
       dueDate: '2026-02-15',
       position: '1000',
@@ -160,6 +177,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'REST API cho tạo, sửa, xoá, lấy danh sách sản phẩm. Hỗ trợ pagination, filter theo category.',
       status: 'done',
       priority: TaskPriority.high,
+      type: TaskType.story,
+      number: 2,
+      storyPoints: 8,
       assigneeIdx: 2,
       dueDate: '2026-02-28',
       position: '2000',
@@ -171,6 +191,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Implement VNPay sandbox, xử lý callback IPN, verify checksum. Hỗ trợ QR code và thẻ nội địa.',
       status: 'in_progress',
       priority: TaskPriority.urgent,
+      type: TaskType.story,
+      number: 3,
+      storyPoints: 13,
       assigneeIdx: 3,
       dueDate: '2026-03-25',
       position: '3000',
@@ -182,6 +205,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Responsive grid layout, filter sidebar, sort options. Theo design system đã thống nhất.',
       status: 'in_progress',
       priority: TaskPriority.medium,
+      type: TaskType.task,
+      number: 4,
+      storyPoints: 5,
       assigneeIdx: 5,
       dueDate: '2026-03-28',
       position: '4000',
@@ -193,6 +219,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Cart persistence (localStorage + API sync), address form, shipping method selection, order summary.',
       status: 'in_review',
       priority: TaskPriority.high,
+      type: TaskType.epic,
+      number: 5,
+      storyPoints: 13,
       assigneeIdx: 2,
       dueDate: '2026-03-22',
       position: '5000',
@@ -204,6 +233,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Coverage tối thiểu 80% cho OrderService. Mock payment gateway, test edge cases (hết hàng, timeout).',
       status: 'todo',
       priority: TaskPriority.medium,
+      type: TaskType.task,
+      number: 6,
+      storyPoints: 3,
       assigneeIdx: 4,
       dueDate: '2026-04-05',
       position: '6000',
@@ -215,6 +247,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Index products vào ES, implement full-text search với Vietnamese analyzer, autocomplete suggestions.',
       status: 'todo',
       priority: TaskPriority.low,
+      type: TaskType.story,
+      number: 7,
+      storyPoints: 8,
       assigneeIdx: null,
       dueDate: '2026-04-20',
       position: '7000',
@@ -228,6 +263,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Tách thành account-service, transaction-service, notification-service. Dùng event-driven architecture.',
       status: 'done',
       priority: TaskPriority.urgent,
+      type: TaskType.epic,
+      number: 1,
+      storyPoints: 13,
       assigneeIdx: 0,
       dueDate: '2026-01-31',
       position: '1000',
@@ -239,6 +277,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Tích hợp Twilio/SpeedSMS cho OTP. Rate limiting 5 lần/phút. OTP expire sau 5 phút.',
       status: 'done',
       priority: TaskPriority.urgent,
+      type: TaskType.story,
+      number: 2,
+      storyPoints: 8,
       assigneeIdx: 3,
       dueDate: '2026-02-20',
       position: '2000',
@@ -250,6 +291,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Form nhập số tài khoản, số tiền, nội dung. Xác nhận bằng OTP. Hiển thị biên lai sau khi thành công.',
       status: 'in_progress',
       priority: TaskPriority.high,
+      type: TaskType.story,
+      number: 3,
+      storyPoints: 8,
       assigneeIdx: 5,
       dueDate: '2026-03-20',
       position: '3000',
@@ -261,6 +305,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Kết nối Napas gateway, xử lý reconciliation, retry mechanism cho failed transactions.',
       status: 'in_progress',
       priority: TaskPriority.urgent,
+      type: TaskType.story,
+      number: 4,
+      storyPoints: 13,
       assigneeIdx: 2,
       dueDate: '2026-03-18',
       position: '4000',
@@ -272,6 +319,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'OWASP Top 10 checklist, SQL injection, XSS, CSRF testing. Dùng Burp Suite và OWASP ZAP.',
       status: 'in_review',
       priority: TaskPriority.urgent,
+      type: TaskType.task,
+      number: 5,
+      storyPoints: 5,
       assigneeIdx: 4,
       dueDate: '2026-03-21',
       position: '5000',
@@ -282,6 +332,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
       description: 'Danh sách giao dịch với filter theo ngày, loại, trạng thái. Export PDF/Excel.',
       status: 'todo',
       priority: TaskPriority.medium,
+      type: TaskType.task,
+      number: 6,
+      storyPoints: 5,
       assigneeIdx: 5,
       dueDate: '2026-04-10',
       position: '6000',
@@ -292,6 +345,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
       description: 'Swagger/OpenAPI spec cho tất cả endpoints. Bao gồm examples và error codes.',
       status: 'todo',
       priority: TaskPriority.low,
+      type: TaskType.task,
+      number: 7,
+      storyPoints: 3,
       assigneeIdx: null,
       dueDate: '2026-04-15',
       position: '7000',
@@ -306,6 +362,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Thu thập requirements từ phòng HR, viết SRS document. Bao gồm use case diagrams.',
       status: 'done',
       priority: TaskPriority.high,
+      type: TaskType.task,
+      number: 1,
+      storyPoints: 5,
       assigneeIdx: 1,
       dueDate: '2026-02-10',
       position: '1000',
@@ -317,6 +376,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Bảng employees, departments, positions, contracts. Quan hệ manager-subordinate.',
       status: 'done',
       priority: TaskPriority.medium,
+      type: TaskType.task,
+      number: 2,
+      storyPoints: 3,
       assigneeIdx: 2,
       dueDate: '2026-02-25',
       position: '2000',
@@ -328,6 +390,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Hỗ trợ ca sáng/chiều/đêm, OT calculation, nghỉ phép tích hợp. API check-in/check-out.',
       status: 'in_progress',
       priority: TaskPriority.high,
+      type: TaskType.story,
+      number: 3,
+      storyPoints: 13,
       assigneeIdx: 4,
       dueDate: '2026-03-30',
       position: '3000',
@@ -339,6 +404,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Form xin phép, approval workflow (manager → HR), tính số ngày phép còn lại tự động.',
       status: 'in_progress',
       priority: TaskPriority.medium,
+      type: TaskType.story,
+      number: 4,
+      storyPoints: 8,
       assigneeIdx: 3,
       dueDate: '2026-04-05',
       position: '4000',
@@ -349,6 +417,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
       description: 'Đồng bộ user từ AD, auto-provision accounts, group mapping sang roles.',
       status: 'todo',
       priority: TaskPriority.high,
+      type: TaskType.story,
+      number: 5,
+      storyPoints: 8,
       assigneeIdx: null,
       dueDate: '2026-04-15',
       position: '5000',
@@ -360,6 +431,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Template payslip PDF, tính gross/net, BHXH/BHYT/TNCN. Gửi email tự động cuối tháng.',
       status: 'todo',
       priority: TaskPriority.medium,
+      type: TaskType.task,
+      number: 6,
+      storyPoints: 5,
       assigneeIdx: null,
       dueDate: '2026-04-25',
       position: '6000',
@@ -371,6 +445,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Playwright tests cho flow: tạo nhân viên → gán phòng ban → cấp tài khoản → gửi welcome email.',
       status: 'todo',
       priority: TaskPriority.low,
+      type: TaskType.task,
+      number: 7,
+      storyPoints: 3,
       assigneeIdx: null,
       dueDate: '2026-05-01',
       position: '7000',
@@ -384,6 +461,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         '3 node pools (system, app, worker), autoscaling 2-10 nodes, private cluster với Cloud NAT.',
       status: 'done',
       priority: TaskPriority.urgent,
+      type: TaskType.epic,
+      number: 1,
+      storyPoints: 13,
       assigneeIdx: 0,
       dueDate: '2026-02-05',
       position: '1000',
@@ -395,6 +475,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Build → test → lint → Docker build → push to GCR → deploy to GKE. Separate staging/production.',
       status: 'done',
       priority: TaskPriority.high,
+      type: TaskType.story,
+      number: 2,
+      storyPoints: 8,
       assigneeIdx: 4,
       dueDate: '2026-02-18',
       position: '2000',
@@ -406,6 +489,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Prometheus scrape metrics, Grafana dashboards cho API latency, error rate, resource usage.',
       status: 'in_progress',
       priority: TaskPriority.high,
+      type: TaskType.story,
+      number: 3,
+      storyPoints: 8,
       assigneeIdx: 4,
       dueDate: '2026-03-25',
       position: '3000',
@@ -417,6 +503,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         "Cert-manager với Let's Encrypt, wildcard cert cho *.techviet.dev, rate limiting rules.",
       status: 'done',
       priority: TaskPriority.medium,
+      type: TaskType.task,
+      number: 4,
+      storyPoints: 3,
       assigneeIdx: 0,
       dueDate: '2026-03-01',
       position: '4000',
@@ -428,6 +517,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Filebeat → Logstash → Elasticsearch → Kibana. Structured JSON logging, retention 30 ngày.',
       status: 'in_progress',
       priority: TaskPriority.medium,
+      type: TaskType.story,
+      number: 5,
+      storyPoints: 8,
       assigneeIdx: 2,
       dueDate: '2026-04-01',
       position: '5000',
@@ -439,6 +531,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Quy trình xử lý sự cố: escalation matrix, communication template, post-mortem checklist.',
       status: 'todo',
       priority: TaskPriority.low,
+      type: TaskType.task,
+      number: 6,
+      storyPoints: 2,
       assigneeIdx: null,
       dueDate: '2026-04-20',
       position: '6000',
@@ -450,6 +545,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'Multi-stage builds, Alpine base, .dockerignore cleanup. Target: giảm từ 1.2GB xuống < 300MB.',
       status: 'todo',
       priority: TaskPriority.medium,
+      type: TaskType.bug,
+      number: 7,
+      storyPoints: 5,
       assigneeIdx: null,
       dueDate: '2026-04-10',
       position: '7000',
@@ -461,6 +559,9 @@ const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
         'HPA dựa trên CPU/memory, custom metrics (request rate). Min 2 replicas cho production.',
       status: 'in_review',
       priority: TaskPriority.high,
+      type: TaskType.task,
+      number: 8,
+      storyPoints: 5,
       assigneeIdx: 0,
       dueDate: '2026-03-22',
       position: '8000',
@@ -559,6 +660,37 @@ const COMMENTS: CommentSpec[] = [
   },
 ];
 
+const LABEL_SPECS = [
+  { id: 'seed-label-bug', name: 'Bug', color: '#dc2626' },
+  { id: 'seed-label-feature', name: 'Tính năng', color: '#2563eb' },
+  { id: 'seed-label-improvement', name: 'Cải tiến', color: '#7c3aed' },
+  { id: 'seed-label-docs', name: 'Tài liệu', color: '#6b7280' },
+  { id: 'seed-label-perf', name: 'Hiệu năng', color: '#d97706' },
+  { id: 'seed-label-security', name: 'Bảo mật', color: '#dc2626' },
+  { id: 'seed-label-uiux', name: 'UI/UX', color: '#db2777' },
+  { id: 'seed-label-testing', name: 'Kiểm thử', color: '#059669' },
+];
+
+const TASK_LABEL_SPECS: Array<{ taskId: string; labelId: string }> = [
+  { taskId: 'seed-task-ecom-1', labelId: 'seed-label-feature' },
+  { taskId: 'seed-task-ecom-3', labelId: 'seed-label-feature' },
+  { taskId: 'seed-task-ecom-4', labelId: 'seed-label-uiux' },
+  { taskId: 'seed-task-ecom-5', labelId: 'seed-label-feature' },
+  { taskId: 'seed-task-ecom-6', labelId: 'seed-label-testing' },
+  { taskId: 'seed-task-ecom-7', labelId: 'seed-label-perf' },
+  { taskId: 'seed-task-bank-2', labelId: 'seed-label-security' },
+  { taskId: 'seed-task-bank-4', labelId: 'seed-label-feature' },
+  { taskId: 'seed-task-bank-5', labelId: 'seed-label-security' },
+  { taskId: 'seed-task-bank-5', labelId: 'seed-label-testing' },
+  { taskId: 'seed-task-bank-7', labelId: 'seed-label-docs' },
+  { taskId: 'seed-task-hr-1', labelId: 'seed-label-docs' },
+  { taskId: 'seed-task-hr-3', labelId: 'seed-label-feature' },
+  { taskId: 'seed-task-hr-7', labelId: 'seed-label-testing' },
+  { taskId: 'seed-task-infra-3', labelId: 'seed-label-improvement' },
+  { taskId: 'seed-task-infra-7', labelId: 'seed-label-perf' },
+  { taskId: 'seed-task-infra-8', labelId: 'seed-label-improvement' },
+];
+
 // PLACEHOLDER_MAIN
 
 async function main() {
@@ -646,6 +778,7 @@ async function main() {
       update: {
         passwordHash: hashPassword(defaultPassword),
         fullName: spec.fullName,
+        avatarColor: spec.avatarColor,
         isActive: true,
         defaultWorkspaceId: workspace.id,
       },
@@ -653,6 +786,7 @@ async function main() {
         email: spec.email,
         passwordHash: hashPassword(defaultPassword),
         fullName: spec.fullName,
+        avatarColor: spec.avatarColor,
         isActive: true,
         defaultWorkspaceId: workspace.id,
       },
@@ -685,6 +819,7 @@ async function main() {
         description: spec.description,
         color: spec.color,
         icon: spec.icon,
+        key: spec.key,
         isArchived: false,
       },
       create: {
@@ -693,6 +828,7 @@ async function main() {
         description: spec.description,
         color: spec.color,
         icon: spec.icon,
+        key: spec.key,
         workspaceId: workspace.id,
       },
     });
@@ -724,6 +860,9 @@ async function main() {
           description: t.description,
           status: t.status,
           priority: t.priority,
+          type: t.type,
+          number: t.number,
+          storyPoints: t.storyPoints ?? null,
           position: t.position,
           assigneeId,
           dueDate: t.dueDate ? new Date(t.dueDate) : null,
@@ -734,6 +873,9 @@ async function main() {
           description: t.description,
           status: t.status,
           priority: t.priority,
+          type: t.type,
+          number: t.number,
+          storyPoints: t.storyPoints ?? null,
           position: t.position,
           assigneeId,
           dueDate: t.dueDate ? new Date(t.dueDate) : null,
@@ -766,6 +908,26 @@ async function main() {
     });
   }
   console.log(`  ✓ Comments: ${COMMENTS.length}`);
+
+  // 7. Labels
+  for (const label of LABEL_SPECS) {
+    await prisma.label.upsert({
+      where: { id: label.id },
+      update: { name: label.name, color: label.color },
+      create: { id: label.id, name: label.name, color: label.color, workspaceId: workspace.id },
+    });
+  }
+  console.log(`  ✓ Labels: ${LABEL_SPECS.length}`);
+
+  // 8. Task-Label assignments
+  for (const tl of TASK_LABEL_SPECS) {
+    await prisma.taskLabel.upsert({
+      where: { taskId_labelId: { taskId: tl.taskId, labelId: tl.labelId } },
+      update: {},
+      create: { taskId: tl.taskId, labelId: tl.labelId },
+    });
+  }
+  console.log(`  ✓ Task labels: ${TASK_LABEL_SPECS.length}`);
 
   console.log('  ✓ Login: nguyen.minh.tuan@techviet.local / Passw0rd!');
   console.log('✅ Seed complete');

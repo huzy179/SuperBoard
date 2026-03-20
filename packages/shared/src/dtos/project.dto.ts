@@ -3,7 +3,7 @@ import type { ApiResponse } from '../types/common.types';
 
 export type ProjectItemDTO = Pick<
   Project,
-  'id' | 'name' | 'description' | 'color' | 'icon' | 'createdAt' | 'updatedAt'
+  'id' | 'name' | 'description' | 'color' | 'icon' | 'key' | 'createdAt' | 'updatedAt'
 > & {
   taskCount: number;
   doneTaskCount: number;
@@ -13,21 +13,41 @@ export type ProjectsResponseDTO = ApiResponse<ProjectItemDTO[]>;
 
 export type TaskPriorityDTO = 'low' | 'medium' | 'high' | 'urgent';
 
+export type TaskTypeDTO = 'task' | 'bug' | 'story' | 'epic';
+
+export interface LabelDTO {
+  id: string;
+  name: string;
+  color: string;
+}
+
+export interface ProjectMemberDTO {
+  id: string;
+  fullName: string;
+  avatarColor?: string | null;
+}
+
 export interface ProjectTaskItemDTO {
   id: string;
   title: string;
   description?: string | null;
   status: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
   priority: TaskPriorityDTO;
+  type: TaskTypeDTO;
+  number?: number | null;
+  storyPoints?: number | null;
+  labels: LabelDTO[];
   dueDate?: string | null;
   assigneeId?: string | null;
   assigneeName?: string | null;
+  assigneeAvatarColor?: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface ProjectDetailDTO extends ProjectItemDTO {
   tasks: ProjectTaskItemDTO[];
+  members: ProjectMemberDTO[];
 }
 
 export type ProjectDetailResponseDTO = ApiResponse<ProjectDetailDTO>;
@@ -37,6 +57,9 @@ export interface CreateTaskRequestDTO {
   description?: string;
   status?: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
   priority?: TaskPriorityDTO;
+  type?: TaskTypeDTO;
+  storyPoints?: number | null;
+  labelIds?: string[];
   dueDate?: string | null;
   assigneeId?: string | null;
 }
@@ -54,6 +77,9 @@ export interface UpdateTaskRequestDTO {
   description?: string;
   status?: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
   priority?: TaskPriorityDTO;
+  type?: TaskTypeDTO;
+  storyPoints?: number | null;
+  labelIds?: string[];
   dueDate?: string | null;
   assigneeId?: string | null;
 }

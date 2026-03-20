@@ -21,11 +21,13 @@ export default function JiraHomePage() {
   function reloadProjects() {
     void refetch();
   }
+
+  const [searchQuery, setSearchQuery] = useState('');
   const [showCreatePanel, setShowCreatePanel] = useState(false);
   const [projectName, setProjectName] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
   const [projectIcon, setProjectIcon] = useState('📌');
-  const [projectColor, setProjectColor] = useState('');
+  const [projectColor, setProjectColor] = useState('#2563eb');
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
@@ -39,6 +41,17 @@ export default function JiraHomePage() {
   const [archiveLoadingId, setArchiveLoadingId] = useState<string | null>(null);
 
   const normalizedProjectName = useMemo(() => projectName.trim(), [projectName]);
+
+  const filteredProjects = useMemo(() => {
+    if (!searchQuery.trim()) return projects;
+    const q = searchQuery.toLowerCase();
+    return projects.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        (p.key && p.key.toLowerCase().includes(q)) ||
+        (p.description && p.description.toLowerCase().includes(q)),
+    );
+  }, [projects, searchQuery]);
 
   async function handleCreateProject(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -65,7 +78,7 @@ export default function JiraHomePage() {
       setProjectName('');
       setProjectDescription('');
       setProjectIcon('📌');
-      setProjectColor('');
+      setProjectColor('#2563eb');
       setShowCreatePanel(false);
       reloadProjects();
     } catch (caughtError) {
@@ -80,7 +93,7 @@ export default function JiraHomePage() {
     setEditName(project.name);
     setEditDescription(project.description ?? '');
     setEditIcon(project.icon ?? '📌');
-    setEditColor(project.color ?? '');
+    setEditColor(project.color ?? '#2563eb');
     setEditError(null);
   }
 
@@ -160,6 +173,17 @@ export default function JiraHomePage() {
         </button>
       </div>
 
+      {/* Search bar */}
+      <div className="mb-6">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Tìm kiếm dự án theo tên, mã hoặc mô tả..."
+          className="w-full max-w-md rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400"
+        />
+      </div>
+
       {showCreatePanel ? (
         <form
           onSubmit={handleCreateProject}
@@ -190,14 +214,22 @@ export default function JiraHomePage() {
             </label>
 
             <label className="block text-sm font-medium text-slate-700">
-              Màu (tuỳ chọn)
-              <input
-                type="text"
-                value={projectColor}
-                onChange={(event) => setProjectColor(event.target.value)}
-                placeholder="Ví dụ: #2563eb"
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-              />
+              Màu
+              <div className="mt-1.5 flex items-center gap-2">
+                <input
+                  type="color"
+                  value={projectColor}
+                  onChange={(event) => setProjectColor(event.target.value)}
+                  className="h-9 w-9 shrink-0 rounded-lg border border-slate-300 p-0.5"
+                />
+                <input
+                  type="text"
+                  value={projectColor}
+                  onChange={(event) => setProjectColor(event.target.value)}
+                  placeholder="#2563eb"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                />
+              </div>
             </label>
 
             <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
@@ -267,12 +299,20 @@ export default function JiraHomePage() {
 
             <label className="block text-sm font-medium text-slate-700">
               Màu
-              <input
-                type="text"
-                value={editColor}
-                onChange={(event) => setEditColor(event.target.value)}
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-              />
+              <div className="mt-1.5 flex items-center gap-2">
+                <input
+                  type="color"
+                  value={editColor}
+                  onChange={(event) => setEditColor(event.target.value)}
+                  className="h-9 w-9 shrink-0 rounded-lg border border-slate-300 p-0.5"
+                />
+                <input
+                  type="text"
+                  value={editColor}
+                  onChange={(event) => setEditColor(event.target.value)}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                />
+              </div>
             </label>
 
             <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
@@ -333,7 +373,7 @@ export default function JiraHomePage() {
             actionLabel="Thử lại"
             onAction={reloadProjects}
           />
-        ) : projects.length === 0 ? (
+        ) : filteredProjects.length === 0 ? (
           <EmptyStateCard
             title="Chưa có dự án nào"
             description="Hãy tạo dự án mới để bắt đầu"
@@ -342,7 +382,7 @@ export default function JiraHomePage() {
           />
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project) => (
+            {filteredProjects.map((project) => (
               <div
                 key={project.id}
                 className="group relative overflow-hidden rounded-xl border border-surface-border bg-surface-card transition-all hover:border-brand-300 hover:shadow-lg hover:shadow-brand-100"
@@ -361,6 +401,12 @@ export default function JiraHomePage() {
                           {project.name}
                         </h3>
                       </div>
+
+                      {project.key ? (
+                        <span className="mt-1 inline-block rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] font-medium text-slate-500">
+                          {project.key}
+                        </span>
+                      ) : null}
 
                       {project.description && (
                         <p className="mt-2 line-clamp-2 text-sm text-slate-600">
@@ -418,8 +464,21 @@ export default function JiraHomePage() {
                         <button
                           type="button"
                           onClick={() => openEditProject(project)}
-                          className="text-xs font-semibold text-slate-600 hover:text-slate-900"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-900"
                         >
+                          <svg
+                            className="h-3.5 w-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"
+                            />
+                          </svg>
                           Sửa
                         </button>
                         <button
@@ -428,15 +487,41 @@ export default function JiraHomePage() {
                           onClick={() => {
                             void handleArchiveProject(project.id);
                           }}
-                          className="text-xs font-semibold text-rose-600 hover:text-rose-700 disabled:opacity-50"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600 hover:text-rose-700 disabled:opacity-50"
                         >
+                          <svg
+                            className="h-3.5 w-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
+                            />
+                          </svg>
                           {archiveLoadingId === project.id ? 'Đang lưu trữ...' : 'Lưu trữ'}
                         </button>
                         <Link
                           href={`/jira/projects/${project.id}`}
-                          className="text-xs font-semibold text-brand-700 hover:text-brand-800"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-brand-700 hover:text-brand-800"
                         >
                           Mở project
+                          <svg
+                            className="h-3.5 w-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2}
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                            />
+                          </svg>
                         </Link>
                       </div>
                     </div>

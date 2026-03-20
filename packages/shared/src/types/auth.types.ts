@@ -6,6 +6,7 @@ export interface User {
   id: ID;
   email: string;
   fullName: string;
+  avatarColor?: string | null;
   defaultWorkspaceId?: ID | null;
   role?: UserRole;
   workspaceId?: ID;

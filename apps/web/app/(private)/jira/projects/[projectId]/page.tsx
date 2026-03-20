@@ -3,7 +3,13 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import type { CommentItemDTO, ProjectTaskItemDTO } from '@superboard/shared';
+import type {
+  CommentItemDTO,
+  ProjectTaskItemDTO,
+  TaskTypeDTO,
+  LabelDTO,
+  ProjectMemberDTO,
+} from '@superboard/shared';
 import { FullPageError, FullPageLoader } from '@/components/ui/page-states';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useProjectDetail } from '@/hooks/use-project-detail';
@@ -19,7 +25,7 @@ import {
   useUpdateComment,
   useDeleteComment,
 } from '@/hooks/use-task-comments';
-import { formatDate } from '@/lib/format-date';
+import { formatDate, formatRelativeTime } from '@/lib/format-date';
 
 type ViewMode = 'board' | 'list';
 
@@ -67,6 +73,33 @@ const COLUMN_BORDER: Record<string, string> = {
   cancelled: 'border-t-slate-300',
 };
 
+const TASK_TYPE_ICONS: Record<TaskTypeDTO, { icon: string; color: string }> = {
+  task: { icon: '✓', color: 'text-blue-600 bg-blue-50' },
+  bug: { icon: '🐛', color: 'text-red-600 bg-red-50' },
+  story: { icon: '📖', color: 'text-green-600 bg-green-50' },
+  epic: { icon: '⚡', color: 'text-purple-600 bg-purple-50' },
+};
+
+const TASK_TYPE_OPTIONS: Array<{ key: TaskTypeDTO; label: string }> = [
+  { key: 'task', label: 'Task' },
+  { key: 'bug', label: 'Bug' },
+  { key: 'story', label: 'Story' },
+  { key: 'epic', label: 'Epic' },
+];
+
+/* PLACEHOLDER_COMPONENTS */
+
+function TaskTypeIcon({ type }: { type: TaskTypeDTO }) {
+  const config = TASK_TYPE_ICONS[type] ?? TASK_TYPE_ICONS.task;
+  return (
+    <span
+      className={`inline-flex h-5 w-5 items-center justify-center rounded text-[11px] ${config.color}`}
+    >
+      {config.icon}
+    </span>
+  );
+}
+
 function PriorityBadge({ priority }: { priority: TaskPriority }) {
   return (
     <span
@@ -77,7 +110,15 @@ function PriorityBadge({ priority }: { priority: TaskPriority }) {
   );
 }
 
-function AssigneeAvatar({ name }: { name: string }) {
+function StoryPointsBadge({ points }: { points: number }) {
+  return (
+    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-100 px-1 text-[10px] font-bold text-slate-600">
+      {points}
+    </span>
+  );
+}
+
+function AssigneeAvatar({ name, color }: { name: string; color?: string | null | undefined }) {
   const initials = name
     .split(' ')
     .slice(-2)
@@ -86,10 +127,44 @@ function AssigneeAvatar({ name }: { name: string }) {
     .toUpperCase();
   return (
     <span
-      className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 text-[9px] font-bold text-brand-700"
+      className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white"
+      style={{ backgroundColor: color || '#64748b' }}
       title={name}
     >
       {initials}
+    </span>
+  );
+}
+
+function LabelDots({ labels }: { labels: LabelDTO[] }) {
+  if (labels.length === 0) return null;
+  return (
+    <div className="flex flex-wrap gap-1">
+      {labels.map((label) => (
+        <span
+          key={label.id}
+          className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-600"
+          title={label.name}
+        >
+          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: label.color }} />
+          {label.name}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function TaskIdBadge({
+  projectKey,
+  number,
+}: {
+  projectKey?: string | null | undefined;
+  number?: number | null | undefined;
+}) {
+  if (!projectKey || !number) return null;
+  return (
+    <span className="font-mono text-[11px] text-slate-400">
+      {projectKey}-{number}
     </span>
   );
 }
@@ -113,12 +188,16 @@ export default function ProjectDetailPage() {
 
   const { user: currentUser } = useAuthSession();
 
+  const members: ProjectMemberDTO[] = project?.members ?? [];
+  const projectKey: string | null = project?.key ?? null;
+
   const [viewMode, setViewMode] = useState<ViewMode>('board');
   const [showCreateTaskPanel, setShowCreateTaskPanel] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
   const [taskStatus, setTaskStatus] = useState<ProjectTaskItemDTO['status']>('todo');
   const [taskPriority, setTaskPriority] = useState<TaskPriority>('medium');
+  const [taskType, setTaskType] = useState<TaskTypeDTO>('task');
   const [taskDueDate, setTaskDueDate] = useState('');
   const [taskAssigneeId, setTaskAssigneeId] = useState('');
   const [createTaskError, setCreateTaskError] = useState<string | null>(null);
@@ -129,8 +208,11 @@ export default function ProjectDetailPage() {
   const [editDescription, setEditDescription] = useState('');
   const [editStatus, setEditStatus] = useState<ProjectTaskItemDTO['status']>('todo');
   const [editPriority, setEditPriority] = useState<TaskPriority>('medium');
+  const [editType, setEditType] = useState<TaskTypeDTO>('task');
+  const [editStoryPoints, setEditStoryPoints] = useState('');
   const [editDueDate, setEditDueDate] = useState('');
   const [editAssigneeId, setEditAssigneeId] = useState('');
+  const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
 
   const [taskUpdateError, setTaskUpdateError] = useState<string | null>(null);
 
@@ -139,60 +221,48 @@ export default function ProjectDetailPage() {
 
   const boardData = useMemo(() => {
     const byStatus = new Map<ProjectTaskItemDTO['status'], ProjectTaskItemDTO[]>();
-
     BOARD_COLUMNS.forEach((column) => {
       byStatus.set(column.key, []);
     });
-
     (project?.tasks ?? []).forEach((task) => {
       const current = byStatus.get(task.status) ?? [];
       byStatus.set(task.status, [...current, task]);
     });
-
     return byStatus;
   }, [project?.tasks]);
 
   function toDateInputValue(dateString?: string | null): string {
-    if (!dateString) {
-      return '';
-    }
-
+    if (!dateString) return '';
     const date = new Date(dateString);
-    if (Number.isNaN(date.getTime())) {
-      return '';
-    }
-
+    if (Number.isNaN(date.getTime())) return '';
     return date.toISOString().slice(0, 10);
   }
 
   async function handleCreateTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     const normalizedTitle = taskTitle.trim();
     if (!normalizedTitle) {
       setCreateTaskError('Tên task là bắt buộc');
       return;
     }
-
     setCreateTaskError(null);
-
     try {
       const description = taskDescription.trim();
       const assigneeId = taskAssigneeId.trim();
-
       await createTaskMutation.mutateAsync({
         title: normalizedTitle,
         status: taskStatus,
         priority: taskPriority,
+        type: taskType,
         ...(taskDueDate ? { dueDate: taskDueDate } : {}),
         ...(assigneeId ? { assigneeId } : {}),
         ...(description ? { description } : {}),
       });
-
       setTaskTitle('');
       setTaskDescription('');
       setTaskStatus('todo');
       setTaskPriority('medium');
+      setTaskType('task');
       setTaskDueDate('');
       setTaskAssigneeId('');
       setShowCreateTaskPanel(false);
@@ -204,7 +274,6 @@ export default function ProjectDetailPage() {
   function handleUpdateTaskStatus(taskId: string, status: ProjectTaskItemDTO['status']) {
     if (!project) return;
     setTaskUpdateError(null);
-
     updateTaskStatusMutation.mutate(
       { taskId, status },
       {
@@ -218,6 +287,7 @@ export default function ProjectDetailPage() {
       },
     );
   }
+
   function handleOpenEdit(task: ProjectTaskItemDTO) {
     triggerRef.current = document.activeElement as HTMLElement;
     setEditingTask(task);
@@ -225,6 +295,8 @@ export default function ProjectDetailPage() {
     setEditDescription(task.description || '');
     setEditStatus(task.status);
     setEditPriority(task.priority);
+    setEditType(task.type ?? 'task');
+    setEditStoryPoints(task.storyPoints != null ? String(task.storyPoints) : '');
     setEditDueDate(toDateInputValue(task.dueDate));
     setEditAssigneeId(task.assigneeId ?? '');
     setTaskUpdateError(null);
@@ -236,38 +308,34 @@ export default function ProjectDetailPage() {
     setEditDescription('');
     setEditStatus('todo');
     setEditPriority('medium');
+    setEditType('task');
+    setEditStoryPoints('');
     setEditDueDate('');
     setEditAssigneeId('');
     triggerRef.current?.focus();
     triggerRef.current = null;
   }
 
-  // Focus the dialog when it opens
   useEffect(() => {
     if (editingTask && dialogRef.current) {
       dialogRef.current.focus();
     }
   }, [editingTask]);
 
-  // Focus trap: cycle Tab/Shift+Tab within the dialog
   const handleDialogKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Escape') {
       handleCloseEdit();
       return;
     }
     if (e.key !== 'Tab') return;
-
     const dialog = dialogRef.current;
     if (!dialog) return;
-
     const focusable = dialog.querySelectorAll<HTMLElement>(
       'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
     );
     if (focusable.length === 0) return;
-
     const first = focusable[0]!;
     const last = focusable[focusable.length - 1]!;
-
     if (e.shiftKey) {
       if (document.activeElement === first) {
         e.preventDefault();
@@ -284,17 +352,15 @@ export default function ProjectDetailPage() {
   async function handleUpdateTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!editingTask || !projectId) return;
-
     const normalizedTitle = editTitle.trim();
     if (!normalizedTitle) {
       setTaskUpdateError('Tên task không được để trống');
       return;
     }
-
     setTaskUpdateError(null);
-
     try {
       const assigneeId = editAssigneeId.trim();
+      const sp = editStoryPoints.trim();
       await updateTaskMutation.mutateAsync({
         taskId: editingTask.id,
         data: {
@@ -302,6 +368,8 @@ export default function ProjectDetailPage() {
           description: editDescription.trim(),
           status: editStatus,
           priority: editPriority,
+          type: editType,
+          storyPoints: sp ? parseInt(sp, 10) : null,
           dueDate: editDueDate || null,
           assigneeId: assigneeId || null,
         },
@@ -315,17 +383,16 @@ export default function ProjectDetailPage() {
   }
 
   async function handleDeleteTask() {
-    if (!editingTask || !projectId || !confirm('Bạn có chắc chắn muốn xóa task này?')) return;
-
+    if (!editingTask || !projectId || !confirm('Bạn có chắc chắn muốn xoá task này?')) return;
     setTaskUpdateError(null);
-
     try {
       await deleteTaskMutation.mutateAsync(editingTask.id);
       handleCloseEdit();
     } catch (caughtError) {
-      setTaskUpdateError(caughtError instanceof Error ? caughtError.message : 'Không thể xóa task');
+      setTaskUpdateError(caughtError instanceof Error ? caughtError.message : 'Không thể xoá task');
     }
   }
+
   function handleDragStart(event: React.DragEvent<HTMLElement>, taskId: string) {
     event.dataTransfer.setData('text/task-id', taskId);
     event.dataTransfer.effectAllowed = 'move';
@@ -338,15 +405,18 @@ export default function ProjectDetailPage() {
 
   function handleDrop(event: React.DragEvent<HTMLElement>, status: ProjectTaskItemDTO['status']) {
     event.preventDefault();
+    setDragOverColumn(null);
     const taskId = event.dataTransfer.getData('text/task-id');
     if (!taskId || updateTaskStatusMutation.isPending) return;
-
     if (!project) return;
-
     const current = project.tasks.find((task) => task.id === taskId);
     if (!current || current.status === status) return;
-
     handleUpdateTaskStatus(taskId, status);
+  }
+
+  function isOverdue(dueDate?: string | null): boolean {
+    if (!dueDate) return false;
+    return new Date(dueDate) < new Date();
   }
 
   if (loading) {
@@ -358,7 +428,7 @@ export default function ProjectDetailPage() {
       <FullPageError
         title="Không thể tải project"
         message={error ?? 'Dữ liệu không tồn tại'}
-        actionLabel="Quay lại Jira"
+        actionLabel="Quay lại danh sách"
         onAction={() => {
           window.location.href = '/jira';
         }}
@@ -380,11 +450,16 @@ export default function ProjectDetailPage() {
             <div className="flex items-center gap-2">
               <span className="text-2xl">{project.icon || '📊'}</span>
               <h1 className="text-2xl font-bold text-slate-900">{project.name}</h1>
+              {projectKey ? (
+                <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-xs font-medium text-slate-500">
+                  {projectKey}
+                </span>
+              ) : null}
             </div>
             <p className="mt-2 text-sm text-slate-600">
               {project.description || 'Chưa có mô tả cho project này.'}
             </p>
-            <p className="mt-3 text-xs text-slate-500">Updated: {formatDate(project.updatedAt)}</p>
+            <p className="mt-3 text-xs text-slate-500">Cập nhật: {formatDate(project.updatedAt)}</p>
           </div>
           <div className="flex items-center gap-2 rounded-lg border border-surface-border bg-white p-1">
             <button
@@ -414,7 +489,7 @@ export default function ProjectDetailPage() {
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
-              List
+              Danh sách
             </button>
           </div>
         </div>
@@ -427,7 +502,7 @@ export default function ProjectDetailPage() {
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
-              Task title
+              Tiêu đề task
               <input
                 type="text"
                 value={taskTitle}
@@ -437,9 +512,8 @@ export default function ProjectDetailPage() {
                 required
               />
             </label>
-
             <label className="block text-sm font-medium text-slate-700">
-              Status
+              Trạng thái
               <select
                 value={taskStatus}
                 onChange={(event) =>
@@ -455,7 +529,7 @@ export default function ProjectDetailPage() {
               </select>
             </label>
             <label className="block text-sm font-medium text-slate-700">
-              Priority
+              Độ ưu tiên
               <select
                 value={taskPriority}
                 onChange={(event) => setTaskPriority(event.target.value as TaskPriority)}
@@ -468,9 +542,22 @@ export default function ProjectDetailPage() {
                 ))}
               </select>
             </label>
-
             <label className="block text-sm font-medium text-slate-700">
-              Due date
+              Loại task
+              <select
+                value={taskType}
+                onChange={(event) => setTaskType(event.target.value as TaskTypeDTO)}
+                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+              >
+                {TASK_TYPE_OPTIONS.map((t) => (
+                  <option key={t.key} value={t.key}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block text-sm font-medium text-slate-700">
+              Hạn hoàn thành
               <input
                 type="date"
                 value={taskDueDate}
@@ -478,20 +565,23 @@ export default function ProjectDetailPage() {
                 className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
               />
             </label>
-
             <label className="block text-sm font-medium text-slate-700">
-              Assignee ID
-              <input
-                type="text"
+              Người thực hiện
+              <select
                 value={taskAssigneeId}
                 onChange={(event) => setTaskAssigneeId(event.target.value)}
-                placeholder="User ID"
                 className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-              />
+              >
+                <option value="">-- Chưa gán --</option>
+                {members.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.fullName}
+                  </option>
+                ))}
+              </select>
             </label>
-
             <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
-              Description
+              Mô tả
               <textarea
                 value={taskDescription}
                 onChange={(event) => setTaskDescription(event.target.value)}
@@ -501,9 +591,7 @@ export default function ProjectDetailPage() {
               />
             </label>
           </div>
-
           {createTaskError ? <p className="mt-3 text-sm text-rose-600">{createTaskError}</p> : null}
-
           <div className="mt-4 flex items-center justify-end gap-2">
             <button
               type="button"
@@ -527,22 +615,29 @@ export default function ProjectDetailPage() {
         <div className="rounded-xl border border-dashed border-surface-border bg-surface-card p-10 text-center">
           <p className="text-base font-semibold text-slate-900">Project chưa có task</p>
           <p className="mt-2 text-sm text-slate-600">
-            Tiếp theo mình có thể làm luôn luồng tạo task từ đây để bạn thao tác như Jira.
+            Bấm "Tạo task" để thêm task mới cho project này.
           </p>
         </div>
       ) : viewMode === 'board' ? (
-        <div className="grid gap-4 xl:grid-cols-5">
+        /* Board View */
+        <div className="flex gap-4 overflow-x-auto pb-4">
           {BOARD_COLUMNS.map((column) => {
             const tasks = boardData.get(column.key) ?? [];
-
+            const isDragOver = dragOverColumn === column.key;
             return (
               <div
                 key={column.key}
-                className={`rounded-xl border border-surface-border border-t-2 bg-surface-card ${COLUMN_BORDER[column.key] ?? ''}`}
-                onDragOver={handleDragOver}
-                onDrop={(event) => {
-                  handleDrop(event, column.key);
+                className={`w-72 shrink-0 rounded-xl border border-t-2 bg-surface-card ${COLUMN_BORDER[column.key] ?? ''} ${
+                  isDragOver
+                    ? 'border-dashed border-brand-400 bg-brand-50/30'
+                    : 'border-surface-border'
+                }`}
+                onDragOver={(e) => {
+                  handleDragOver(e);
+                  setDragOverColumn(column.key);
                 }}
+                onDragLeave={() => setDragOverColumn(null)}
+                onDrop={(event) => handleDrop(event, column.key)}
               >
                 <div className="flex items-center justify-between border-b border-surface-border px-3 py-2">
                   <p className="text-sm font-semibold text-slate-900">{column.label}</p>
@@ -550,8 +645,7 @@ export default function ProjectDetailPage() {
                     {tasks.length}
                   </span>
                 </div>
-
-                <div className="space-y-3 p-3">
+                <div className="space-y-2 p-2">
                   {tasks.length === 0 ? (
                     <p className="rounded-lg border border-dashed border-slate-200 px-3 py-5 text-center text-xs text-slate-500">
                       Không có task
@@ -576,44 +670,78 @@ export default function ProjectDetailPage() {
                           updateTaskStatusMutation.isPending &&
                           updateTaskStatusMutation.variables?.taskId === task.id
                             ? 'opacity-60'
-                            : 'cursor-grab active:cursor-grabbing hover:border-brand-300'
+                            : 'cursor-pointer hover:border-brand-300 hover:shadow-md'
                         }`}
                       >
-                        <p className="text-sm font-semibold text-slate-900 group-hover:text-brand-700">
+                        {/* Top: type icon + task ID + story points */}
+                        <div className="flex items-center justify-between gap-1 mb-1.5">
+                          <div className="flex items-center gap-1.5">
+                            <TaskTypeIcon type={task.type ?? 'task'} />
+                            <TaskIdBadge projectKey={projectKey} number={task.number} />
+                          </div>
+                          {task.storyPoints ? <StoryPointsBadge points={task.storyPoints} /> : null}
+                        </div>
+                        {/* Title */}
+                        <p className="text-sm font-medium text-slate-900 group-hover:text-brand-700">
                           {task.title}
                         </p>
-                        {task.description ? (
-                          <p className="mt-1 line-clamp-2 text-xs text-slate-600">
-                            {task.description}
-                          </p>
+                        {/* Labels */}
+                        {task.labels && task.labels.length > 0 ? (
+                          <div className="mt-1.5">
+                            <LabelDots labels={task.labels} />
+                          </div>
                         ) : null}
+                        {/* Bottom: priority + due date + assignee */}
                         <div className="mt-2 flex items-center justify-between gap-2">
                           <div className="flex items-center gap-1.5">
                             <PriorityBadge priority={task.priority} />
                             {task.dueDate ? (
-                              <span className="text-[11px] text-slate-500">
+                              <span
+                                className={`text-[11px] ${isOverdue(task.dueDate) && task.status !== 'done' ? 'font-semibold text-red-600' : 'text-slate-500'}`}
+                              >
                                 {formatDate(task.dueDate)}
                               </span>
                             ) : null}
                           </div>
-                          {task.assigneeName ? <AssigneeAvatar name={task.assigneeName} /> : null}
+                          {task.assigneeName ? (
+                            <AssigneeAvatar
+                              name={task.assigneeName}
+                              color={task.assigneeAvatarColor}
+                            />
+                          ) : null}
                         </div>
                       </article>
                     ))
                   )}
                 </div>
+                {/* Quick add button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTaskStatus(column.key);
+                    setShowCreateTaskPanel(true);
+                  }}
+                  className="w-full border-t border-surface-border px-3 py-2 text-left text-xs font-medium text-slate-400 hover:bg-slate-50 hover:text-slate-600"
+                >
+                  + Thêm task
+                </button>
               </div>
             );
           })}
         </div>
       ) : (
+        /* List View */
         <div className="overflow-hidden rounded-xl border border-surface-border bg-surface-card">
           <table className="min-w-full divide-y divide-surface-border text-sm">
             <thead className="bg-slate-50">
               <tr>
                 <th className="px-4 py-3 text-left font-semibold text-slate-700">Task</th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-700">Status</th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-700">Updated</th>
+                <th className="px-4 py-3 text-left font-semibold text-slate-700">Trạng thái</th>
+                <th className="px-4 py-3 text-left font-semibold text-slate-700">Độ ưu tiên</th>
+                <th className="px-4 py-3 text-left font-semibold text-slate-700">
+                  Người thực hiện
+                </th>
+                <th className="px-4 py-3 text-left font-semibold text-slate-700">Cập nhật</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-border bg-white">
@@ -633,21 +761,16 @@ export default function ProjectDetailPage() {
                   className="cursor-pointer transition-colors hover:bg-slate-50"
                 >
                   <td className="px-4 py-3">
-                    <p className="font-medium text-slate-900">{task.title}</p>
-                    {task.description ? (
-                      <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">
-                        {task.description}
-                      </p>
-                    ) : null}
-                    <div className="mt-1 flex items-center gap-2">
-                      <PriorityBadge priority={task.priority} />
-                      {task.dueDate ? (
-                        <span className="text-[11px] text-slate-500">
-                          {formatDate(task.dueDate)}
-                        </span>
-                      ) : null}
-                      {task.assigneeName ? <AssigneeAvatar name={task.assigneeName} /> : null}
+                    <div className="flex items-center gap-2">
+                      <TaskTypeIcon type={task.type ?? 'task'} />
+                      <TaskIdBadge projectKey={projectKey} number={task.number} />
                     </div>
+                    <p className="mt-0.5 font-medium text-slate-900">{task.title}</p>
+                    {task.labels && task.labels.length > 0 ? (
+                      <div className="mt-1">
+                        <LabelDots labels={task.labels} />
+                      </div>
+                    ) : null}
                   </td>
                   <td className="px-4 py-3">
                     <select
@@ -669,6 +792,19 @@ export default function ProjectDetailPage() {
                       ))}
                     </select>
                   </td>
+                  <td className="px-4 py-3">
+                    <PriorityBadge priority={task.priority} />
+                  </td>
+                  <td className="px-4 py-3">
+                    {task.assigneeName ? (
+                      <div className="flex items-center gap-1.5">
+                        <AssigneeAvatar name={task.assigneeName} color={task.assigneeAvatarColor} />
+                        <span className="text-xs text-slate-600">{task.assigneeName}</span>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-slate-400">Chưa gán</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-slate-600">{formatDate(task.updatedAt)}</td>
                 </tr>
               ))}
@@ -676,7 +812,8 @@ export default function ProjectDetailPage() {
           </table>
         </div>
       )}
-      {/* Edit Task Modal/Panel */}
+
+      {/* Edit Task Slide-over */}
       {editingTask ? (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/20 backdrop-blur-sm">
           <div
@@ -690,12 +827,20 @@ export default function ProjectDetailPage() {
           >
             <div className="flex h-full flex-col">
               <div className="flex items-center justify-between border-b border-surface-border px-6 py-4">
-                <h2 id="task-detail-title" className="text-xl font-bold text-slate-900">
-                  Chi tiết task
-                </h2>
+                <div className="flex items-center gap-3">
+                  <TaskTypeIcon type={editingTask.type ?? 'task'} />
+                  {projectKey && editingTask.number ? (
+                    <span className="font-mono text-sm font-semibold text-slate-500">
+                      {projectKey}-{editingTask.number}
+                    </span>
+                  ) : null}
+                  <h2 id="task-detail-title" className="text-lg font-bold text-slate-900">
+                    Chi tiết task
+                  </h2>
+                </div>
                 <button
                   type="button"
-                  aria-label="Close task detail"
+                  aria-label="Đóng chi tiết task"
                   onClick={handleCloseEdit}
                   className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
                 >
@@ -709,7 +854,7 @@ export default function ProjectDetailPage() {
                 className="flex-1 overflow-y-auto"
               >
                 <div className="p-6">
-                  <div className="space-y-6">
+                  <div className="space-y-5">
                     <label className="block text-sm font-medium text-slate-700">
                       Tiêu đề
                       <input
@@ -721,72 +866,126 @@ export default function ProjectDetailPage() {
                       />
                     </label>
 
-                    <label className="block text-sm font-medium text-slate-700">
-                      Trạng thái
-                      <select
-                        value={editStatus}
-                        onChange={(e) =>
-                          setEditStatus(e.target.value as ProjectTaskItemDTO['status'])
-                        }
-                        className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-                      >
-                        {BOARD_COLUMNS.map((col) => (
-                          <option key={col.key} value={col.key}>
-                            {col.label}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
+                    {/* Task type selector */}
+                    <div>
+                      <p className="text-sm font-medium text-slate-700 mb-2">Loại task</p>
+                      <div className="flex gap-1">
+                        {TASK_TYPE_OPTIONS.map((t) => {
+                          const config = TASK_TYPE_ICONS[t.key];
+                          return (
+                            <button
+                              key={t.key}
+                              type="button"
+                              onClick={() => setEditType(t.key)}
+                              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                                editType === t.key
+                                  ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-300'
+                                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                              }`}
+                            >
+                              <span className="text-sm">{config.icon}</span>
+                              {t.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <label className="block text-sm font-medium text-slate-700">
+                        Trạng thái
+                        <select
+                          value={editStatus}
+                          onChange={(e) =>
+                            setEditStatus(e.target.value as ProjectTaskItemDTO['status'])
+                          }
+                          className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                        >
+                          {BOARD_COLUMNS.map((col) => (
+                            <option key={col.key} value={col.key}>
+                              {col.label}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="block text-sm font-medium text-slate-700">
+                        Độ ưu tiên
+                        <select
+                          value={editPriority}
+                          onChange={(e) => setEditPriority(e.target.value as TaskPriority)}
+                          className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                        >
+                          {PRIORITY_OPTIONS.map((priority) => (
+                            <option key={priority.key} value={priority.key}>
+                              {priority.label}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <label className="block text-sm font-medium text-slate-700">
+                        Story Points
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={editStoryPoints}
+                          onChange={(e) => setEditStoryPoints(e.target.value)}
+                          placeholder="—"
+                          className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                        />
+                      </label>
+                      <label className="block text-sm font-medium text-slate-700">
+                        Hạn hoàn thành
+                        <input
+                          type="date"
+                          value={editDueDate}
+                          onChange={(e) => setEditDueDate(e.target.value)}
+                          className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                        />
+                      </label>
+                    </div>
 
                     <label className="block text-sm font-medium text-slate-700">
-                      Độ ưu tiên
+                      Người thực hiện
                       <select
-                        value={editPriority}
-                        onChange={(e) => setEditPriority(e.target.value as TaskPriority)}
-                        className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-                      >
-                        {PRIORITY_OPTIONS.map((priority) => (
-                          <option key={priority.key} value={priority.key}>
-                            {priority.label}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label className="block text-sm font-medium text-slate-700">
-                      Hạn hoàn thành
-                      <input
-                        type="date"
-                        value={editDueDate}
-                        onChange={(e) => setEditDueDate(e.target.value)}
-                        className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-                      />
-                    </label>
-
-                    <label className="block text-sm font-medium text-slate-700">
-                      Người thực hiện (ID)
-                      <input
-                        type="text"
                         value={editAssigneeId}
                         onChange={(e) => setEditAssigneeId(e.target.value)}
                         className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-                        placeholder="User ID"
-                      />
+                      >
+                        <option value="">-- Chưa gán --</option>
+                        {members.map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.fullName}
+                          </option>
+                        ))}
+                      </select>
                     </label>
+
+                    {/* Labels display */}
+                    {editingTask.labels && editingTask.labels.length > 0 ? (
+                      <div>
+                        <p className="text-sm font-medium text-slate-700 mb-2">Nhãn</p>
+                        <LabelDots labels={editingTask.labels} />
+                      </div>
+                    ) : null}
 
                     <label className="block text-sm font-medium text-slate-700">
                       Mô tả
                       <textarea
                         value={editDescription}
                         onChange={(e) => setEditDescription(e.target.value)}
-                        rows={6}
+                        rows={5}
                         className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
                         placeholder="Thêm mô tả chi tiết..."
                       />
                     </label>
 
                     <div className="text-[11px] text-slate-500">
-                      <p>Created: {formatDate(editingTask.createdAt)}</p>
-                      <p>Last updated: {formatDate(editingTask.updatedAt)}</p>
+                      <p>Tạo lúc: {formatDate(editingTask.createdAt)}</p>
+                      <p>Cập nhật: {formatDate(editingTask.updatedAt)}</p>
                     </div>
                   </div>
 
@@ -797,7 +996,6 @@ export default function ProjectDetailPage() {
                   ) : null}
                 </div>
 
-                {/* Comments Section */}
                 <TaskCommentSection
                   projectId={projectId}
                   taskId={editingTask.id}
@@ -840,223 +1038,199 @@ export default function ProjectDetailPage() {
       ) : null}
     </section>
   );
-}
 
-function formatRelativeTime(dateString: string): string {
-  const now = Date.now();
-  const then = new Date(dateString).getTime();
-  const diffMs = now - then;
-  const diffMin = Math.floor(diffMs / 60_000);
+  function TaskCommentSection({
+    projectId,
+    taskId,
+    currentUserId,
+  }: {
+    projectId: string;
+    taskId: string;
+    currentUserId: string;
+  }) {
+    const { data: comments, isLoading } = useTaskComments(projectId, taskId);
+    const createComment = useCreateComment(projectId, taskId);
+    const updateComment = useUpdateComment(projectId, taskId);
+    const deleteComment = useDeleteComment(projectId, taskId);
 
-  if (diffMin < 1) return 'just now';
-  if (diffMin < 60) return `${diffMin} minute${diffMin === 1 ? '' : 's'} ago`;
+    const [newComment, setNewComment] = useState('');
+    const [createError, setCreateError] = useState<string | null>(null);
+    const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+    const [editContent, setEditContent] = useState('');
+    const [editError, setEditError] = useState<string | null>(null);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr} hour${diffHr === 1 ? '' : 's'} ago`;
-
-  const diffDay = Math.floor(diffHr / 24);
-  if (diffDay < 30) return `${diffDay} day${diffDay === 1 ? '' : 's'} ago`;
-
-  return new Date(dateString).toLocaleDateString('vi-VN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-}
-
-function TaskCommentSection({
-  projectId,
-  taskId,
-  currentUserId,
-}: {
-  projectId: string;
-  taskId: string;
-  currentUserId: string;
-}) {
-  const { data: comments, isLoading } = useTaskComments(projectId, taskId);
-  const createComment = useCreateComment(projectId, taskId);
-  const updateComment = useUpdateComment(projectId, taskId);
-  const deleteComment = useDeleteComment(projectId, taskId);
-
-  const [newComment, setNewComment] = useState('');
-  const [createError, setCreateError] = useState<string | null>(null);
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-  const [editContent, setEditContent] = useState('');
-  const [editError, setEditError] = useState<string | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
-  async function handleCreateComment(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const trimmed = newComment.trim();
-    if (!trimmed) return;
-
-    setCreateError(null);
-    try {
-      await createComment.mutateAsync(trimmed);
-      setNewComment('');
-    } catch (err) {
-      setCreateError(err instanceof Error ? err.message : 'Failed to create comment');
+    async function handleCreateComment(e: FormEvent<HTMLFormElement>) {
+      e.preventDefault();
+      const trimmed = newComment.trim();
+      if (!trimmed) return;
+      setCreateError(null);
+      try {
+        await createComment.mutateAsync(trimmed);
+        setNewComment('');
+      } catch (err) {
+        setCreateError(err instanceof Error ? err.message : 'Không thể tạo bình luận');
+      }
     }
-  }
 
-  function startEditComment(comment: CommentItemDTO) {
-    setEditingCommentId(comment.id);
-    setEditContent(comment.content);
-    setEditError(null);
-  }
+    function startEditComment(comment: CommentItemDTO) {
+      setEditingCommentId(comment.id);
+      setEditContent(comment.content);
+      setEditError(null);
+    }
 
-  function cancelEditComment() {
-    setEditingCommentId(null);
-    setEditContent('');
-    setEditError(null);
-  }
-
-  async function handleSaveEditComment(commentId: string) {
-    const trimmed = editContent.trim();
-    if (!trimmed) return;
-
-    setEditError(null);
-    try {
-      await updateComment.mutateAsync({ commentId, content: trimmed });
+    function cancelEditComment() {
       setEditingCommentId(null);
       setEditContent('');
-    } catch (err) {
-      setEditError(err instanceof Error ? err.message : 'Failed to update comment');
+      setEditError(null);
     }
-  }
 
-  async function handleDeleteComment(commentId: string) {
-    if (!confirm('Delete this comment?')) return;
-
-    setDeleteError(null);
-    try {
-      await deleteComment.mutateAsync(commentId);
-    } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : 'Failed to delete comment');
+    async function handleSaveEditComment(commentId: string) {
+      const trimmed = editContent.trim();
+      if (!trimmed) return;
+      setEditError(null);
+      try {
+        await updateComment.mutateAsync({ commentId, content: trimmed });
+        setEditingCommentId(null);
+        setEditContent('');
+      } catch (err) {
+        setEditError(err instanceof Error ? err.message : 'Không thể cập nhật bình luận');
+      }
     }
-  }
-  return (
-    <div className="border-t border-surface-border px-6 py-4">
-      <h3 className="mb-3 text-sm font-semibold text-slate-900">Bình luận</h3>
 
-      {deleteError ? (
-        <p role="alert" className="mb-2 text-xs text-rose-600">
-          {deleteError}
-        </p>
-      ) : null}
+    async function handleDeleteComment(commentId: string) {
+      if (!confirm('Bạn có chắc chắn muốn xoá bình luận này?')) return;
+      setDeleteError(null);
+      try {
+        await deleteComment.mutateAsync(commentId);
+      } catch (err) {
+        setDeleteError(err instanceof Error ? err.message : 'Không thể xoá bình luận');
+      }
+    }
 
-      {isLoading ? (
-        <div className="space-y-3">
-          {[1, 2].map((i) => (
-            <div key={i} className="animate-pulse space-y-2">
-              <div className="h-3 w-24 rounded bg-slate-200" />
-              <div className="h-3 w-full rounded bg-slate-200" />
-            </div>
-          ))}
-        </div>
-      ) : !comments || comments.length === 0 ? (
-        <p className="mb-4 text-xs text-slate-500">Chưa có bình luận</p>
-      ) : (
-        <div className="mb-4 space-y-3">
-          {comments.map((comment) => (
-            <div key={comment.id} className="rounded-lg border border-slate-200 bg-white p-3">
-              {editingCommentId === comment.id ? (
-                <div className="space-y-2">
-                  <textarea
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                    rows={3}
-                    aria-label="Edit comment"
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-                  />
-                  {editError ? (
-                    <p role="alert" className="text-xs text-rose-600">
-                      {editError}
-                    </p>
-                  ) : null}
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleSaveEditComment(comment.id)}
-                      disabled={updateComment.isPending || !editContent.trim()}
-                      className="rounded-md bg-brand-600 px-3 py-1 text-xs font-medium text-white hover:bg-brand-700 disabled:opacity-50"
-                    >
-                      {updateComment.isPending ? 'Saving...' : 'Save'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={cancelEditComment}
-                      className="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-slate-900">
-                        {comment.authorId === currentUserId ? 'You' : comment.authorName}
-                      </span>
-                      <span className="text-[11px] text-slate-500">
-                        {formatRelativeTime(comment.createdAt)}
-                      </span>
-                    </div>
-                    {comment.authorId === currentUserId ? (
-                      <div className="flex gap-1">
-                        <button
-                          type="button"
-                          onClick={() => startEditComment(comment)}
-                          aria-label={`Edit comment by ${comment.authorName}`}
-                          className="rounded px-2 py-0.5 text-[11px] font-medium text-slate-600 hover:bg-slate-100"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteComment(comment.id)}
-                          disabled={deleteComment.isPending}
-                          aria-label={`Delete comment by ${comment.authorName}`}
-                          className="rounded px-2 py-0.5 text-[11px] font-medium text-rose-600 hover:bg-rose-50 disabled:opacity-50"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    ) : null}
-                  </div>
-                  <p className="mt-1 text-sm text-slate-700 whitespace-pre-wrap">
-                    {comment.content}
-                  </p>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+    return (
+      <div className="border-t border-surface-border px-6 py-4">
+        <h3 className="mb-3 text-sm font-semibold text-slate-900">Bình luận</h3>
 
-      {/* Add comment form */}
-      <form onSubmit={handleCreateComment} className="space-y-2">
-        <textarea
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          rows={2}
-          placeholder="Thêm bình luận..."
-          aria-label="Bình luận mới"
-          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-        />
-        {createError ? (
-          <p role="alert" className="text-xs text-rose-600">
-            {createError}
+        {deleteError ? (
+          <p role="alert" className="mb-2 text-xs text-rose-600">
+            {deleteError}
           </p>
         ) : null}
-        <button
-          type="submit"
-          disabled={!newComment.trim() || createComment.isPending}
-          className="rounded-md bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-400"
-        >
-          {createComment.isPending ? 'Đang gửi...' : 'Gửi'}
-        </button>
-      </form>
-    </div>
-  );
+
+        {isLoading ? (
+          <div className="space-y-3">
+            {[1, 2].map((i) => (
+              <div key={i} className="animate-pulse space-y-2">
+                <div className="h-3 w-24 rounded bg-slate-200" />
+                <div className="h-3 w-full rounded bg-slate-200" />
+              </div>
+            ))}
+          </div>
+        ) : !comments || comments.length === 0 ? (
+          <p className="mb-4 text-xs text-slate-500">Chưa có bình luận</p>
+        ) : (
+          <div className="mb-4 space-y-3">
+            {comments.map((comment) => (
+              <div key={comment.id} className="rounded-lg border border-slate-200 bg-white p-3">
+                {editingCommentId === comment.id ? (
+                  <div className="space-y-2">
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      rows={3}
+                      aria-label="Sửa bình luận"
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                    />
+                    {editError ? (
+                      <p role="alert" className="text-xs text-rose-600">
+                        {editError}
+                      </p>
+                    ) : null}
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleSaveEditComment(comment.id)}
+                        disabled={updateComment.isPending || !editContent.trim()}
+                        className="rounded-md bg-brand-600 px-3 py-1 text-xs font-medium text-white hover:bg-brand-700 disabled:opacity-50"
+                      >
+                        {updateComment.isPending ? 'Đang lưu...' : 'Lưu'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={cancelEditComment}
+                        className="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                      >
+                        Huỷ
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-slate-900">
+                          {comment.authorId === currentUserId ? 'Bạn' : comment.authorName}
+                        </span>
+                        <span className="text-[11px] text-slate-500">
+                          {formatRelativeTime(comment.createdAt)}
+                        </span>
+                      </div>
+                      {comment.authorId === currentUserId ? (
+                        <div className="flex gap-1">
+                          <button
+                            type="button"
+                            onClick={() => startEditComment(comment)}
+                            aria-label={`Sửa bình luận của ${comment.authorName}`}
+                            className="rounded px-2 py-0.5 text-[11px] font-medium text-slate-600 hover:bg-slate-100"
+                          >
+                            Sửa
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteComment(comment.id)}
+                            disabled={deleteComment.isPending}
+                            aria-label={`Xoá bình luận của ${comment.authorName}`}
+                            className="rounded px-2 py-0.5 text-[11px] font-medium text-rose-600 hover:bg-rose-50 disabled:opacity-50"
+                          >
+                            Xoá
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
+                    <p className="mt-1 text-sm text-slate-700 whitespace-pre-wrap">
+                      {comment.content}
+                    </p>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <form onSubmit={handleCreateComment} className="space-y-2">
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            rows={2}
+            placeholder="Thêm bình luận..."
+            aria-label="Bình luận mới"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+          />
+          {createError ? (
+            <p role="alert" className="text-xs text-rose-600">
+              {createError}
+            </p>
+          ) : null}
+          <button
+            type="submit"
+            disabled={!newComment.trim() || createComment.isPending}
+            className="rounded-md bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+          >
+            {createComment.isPending ? 'Đang gửi...' : 'Gửi'}
+          </button>
+        </form>
+      </div>
+    );
+  }
 }

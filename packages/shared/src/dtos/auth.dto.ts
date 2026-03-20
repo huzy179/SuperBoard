@@ -6,7 +6,10 @@ export interface LoginRequestDTO {
   password: string;
 }
 
-export type AuthUserDTO = Pick<User, 'id' | 'email' | 'fullName' | 'defaultWorkspaceId'>;
+export type AuthUserDTO = Pick<
+  User,
+  'id' | 'email' | 'fullName' | 'defaultWorkspaceId' | 'avatarColor'
+>;
 
 export interface LoginDataDTO {
   accessToken: string;

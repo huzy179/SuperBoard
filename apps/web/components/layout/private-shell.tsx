@@ -98,7 +98,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
                 {NAV_ICONS[item.icon]}
                 {item.label}
                 <span className="ml-auto rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-400">
-                  Soon
+                  Sắp có
                 </span>
               </span>
             );
@@ -111,8 +111,8 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
               onClick={() => setSidebarOpen(false)}
               className={`${baseClasses} ${
                 isActive
-                  ? 'bg-brand-50 text-brand-700'
-                  : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'border-l-2 border-brand-600 bg-brand-50 text-brand-700'
+                  : 'border-l-2 border-transparent text-slate-700 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
               {NAV_ICONS[item.icon]}
@@ -134,7 +134,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
           <button
             type="button"
             onClick={onLogout}
-            className="shrink-0 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            className="shrink-0 flex items-center gap-1.5 rounded-md px-2 py-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
             title="Đăng xuất"
           >
             <svg
@@ -150,6 +150,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
                 d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
               />
             </svg>
+            <span className="text-[11px] font-medium">Đăng xuất</span>
           </button>
         </div>
       </div>
@@ -171,7 +172,12 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
             onClick={() => setSidebarOpen(false)}
             aria-hidden
           />
-          <aside className="relative z-50 h-full w-60 bg-surface-card shadow-xl">{sidebar}</aside>
+          <aside
+            id="mobile-sidebar"
+            className="relative z-50 h-full w-60 bg-surface-card shadow-xl"
+          >
+            {sidebar}
+          </aside>
         </div>
       )}
 
@@ -184,6 +190,8 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
             onClick={() => setSidebarOpen(true)}
             className="rounded-md p-1.5 text-slate-600 hover:bg-slate-100"
             aria-label="Mở menu"
+            aria-expanded={sidebarOpen}
+            aria-controls="mobile-sidebar"
           >
             <svg
               className="h-5 w-5"

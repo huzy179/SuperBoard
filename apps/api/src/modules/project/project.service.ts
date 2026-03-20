@@ -4,8 +4,10 @@ import { PrismaService } from '../../prisma/prisma.service';
 import type {
   CreateProjectRequestDTO,
   CreateTaskRequestDTO,
+  LabelDTO,
   ProjectDetailDTO,
   ProjectItemDTO,
+  ProjectMemberDTO,
   ProjectTaskItemDTO,
   UpdateProjectRequestDTO,
   UpdateTaskRequestDTO,
@@ -31,6 +33,7 @@ export class ProjectService {
         description: true,
         color: true,
         icon: true,
+        key: true,
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -82,9 +85,13 @@ export class ProjectService {
             description: true,
             status: true,
             priority: true,
+            type: true,
+            number: true,
+            storyPoints: true,
             dueDate: true,
             assigneeId: true,
-            assignee: { select: { fullName: true } },
+            assignee: { select: { fullName: true, avatarColor: true } },
+            labels: { select: { label: { select: { id: true, name: true, color: true } } } },
             createdAt: true,
             updatedAt: true,
           },
@@ -96,19 +103,39 @@ export class ProjectService {
       return null;
     }
 
+    // Fetch workspace members for assignee dropdown
+    const workspaceMembers = await this.prisma.workspaceMember.findMany({
+      where: { workspaceId, deletedAt: null },
+      select: {
+        user: { select: { id: true, fullName: true, avatarColor: true } },
+      },
+    });
+
+    const members: ProjectMemberDTO[] = workspaceMembers.map((m) => ({
+      id: m.user.id,
+      fullName: m.user.fullName,
+      avatarColor: m.user.avatarColor ?? null,
+    }));
+
     return {
       ...this.toProjectItemDTO(project),
       taskCount: project.tasks.length,
       doneTaskCount: project.tasks.filter((t) => t.status === 'done').length,
+      members,
       tasks: project.tasks.map((task) => ({
         id: task.id,
         title: task.title,
         description: task.description,
         status: task.status as ProjectTaskItemDTO['status'],
         priority: task.priority,
+        type: (task.type ?? 'task') as ProjectTaskItemDTO['type'],
+        number: task.number ?? null,
+        storyPoints: task.storyPoints ?? null,
+        labels: (task.labels ?? []).map((tl) => tl.label as LabelDTO),
         dueDate: task.dueDate ? task.dueDate.toISOString() : null,
         assigneeId: task.assigneeId,
         assigneeName: task.assignee?.fullName ?? null,
+        assigneeAvatarColor: task.assignee?.avatarColor ?? null,
         createdAt: task.createdAt.toISOString(),
         updatedAt: task.updatedAt.toISOString(),
       })),
@@ -236,6 +263,9 @@ export class ProjectService {
     description?: string;
     status: NonNullable<CreateTaskRequestDTO['status']>;
     priority: NonNullable<CreateTaskRequestDTO['priority']>;
+    type?: CreateTaskRequestDTO['type'];
+    storyPoints?: number | null;
+    labelIds?: string[];
     dueDate?: Date | null;
     assigneeId?: string | null;
   }): Promise<ProjectTaskItemDTO> {
@@ -258,6 +288,13 @@ export class ProjectService {
       await this.validateAssignee(input.workspaceId, input.assigneeId);
     }
 
+    // Auto-generate task number
+    const maxNumberResult = await this.prisma.task.aggregate({
+      where: { projectId: input.projectId },
+      _max: { number: true },
+    });
+    const nextNumber = (maxNumberResult._max.number ?? 0) + 1;
+
     const task = await this.prisma.task.create({
       data: {
         projectId: input.projectId,
@@ -265,8 +302,14 @@ export class ProjectService {
         description: input.description ?? null,
         status: input.status,
         priority: input.priority,
+        type: input.type ?? 'task',
+        number: nextNumber,
+        storyPoints: input.storyPoints ?? null,
         dueDate: input.dueDate ?? null,
         assigneeId: input.assigneeId ?? null,
+        ...(input.labelIds?.length
+          ? { labels: { create: input.labelIds.map((labelId) => ({ labelId })) } }
+          : {}),
       },
       select: this.taskSelect,
     });
@@ -359,6 +402,16 @@ export class ProjectService {
       await this.validateAssignee(input.workspaceId, input.data.assigneeId);
     }
 
+    // Handle label updates via deleteMany + create
+    if (input.data.labelIds !== undefined) {
+      await this.prisma.taskLabel.deleteMany({ where: { taskId: input.taskId } });
+      if (input.data.labelIds.length > 0) {
+        await this.prisma.taskLabel.createMany({
+          data: input.data.labelIds.map((labelId) => ({ taskId: input.taskId, labelId })),
+        });
+      }
+    }
+
     const task = await this.prisma.task.update({
       where: {
         id: input.taskId,
@@ -368,6 +421,8 @@ export class ProjectService {
         ...(input.data.description !== undefined ? { description: input.data.description } : {}),
         ...(input.data.status !== undefined ? { status: input.data.status } : {}),
         ...(input.data.priority !== undefined ? { priority: input.data.priority } : {}),
+        ...(input.data.type !== undefined ? { type: input.data.type } : {}),
+        ...(input.data.storyPoints !== undefined ? { storyPoints: input.data.storyPoints } : {}),
         ...(input.data.dueDate !== undefined ? { dueDate: input.data.dueDate } : {}),
         ...(input.data.assigneeId !== undefined ? { assigneeId: input.data.assigneeId } : {}),
       },
@@ -424,6 +479,7 @@ export class ProjectService {
     description: string | null;
     color: string | null;
     icon: string | null;
+    key?: string | null;
     createdAt: Date;
     updatedAt: Date;
   }): ProjectItemDTO {
@@ -433,6 +489,7 @@ export class ProjectService {
       description: project.description,
       color: project.color,
       icon: project.icon,
+      key: project.key ?? null,
       createdAt: project.createdAt.toISOString(),
       updatedAt: project.updatedAt.toISOString(),
       taskCount: 0,
@@ -446,9 +503,13 @@ export class ProjectService {
     description: true,
     status: true,
     priority: true,
+    type: true,
+    number: true,
+    storyPoints: true,
     dueDate: true,
     assigneeId: true,
-    assignee: { select: { fullName: true } },
+    assignee: { select: { fullName: true, avatarColor: true } },
+    labels: { select: { label: { select: { id: true, name: true, color: true } } } },
     createdAt: true,
     updatedAt: true,
   } as const;
@@ -459,9 +520,13 @@ export class ProjectService {
     description: string | null;
     status: string;
     priority: string;
+    type?: string;
+    number?: number | null;
+    storyPoints?: number | null;
     dueDate: Date | null;
     assigneeId: string | null;
-    assignee: { fullName: string } | null;
+    assignee: { fullName: string; avatarColor?: string | null } | null;
+    labels?: Array<{ label: { id: string; name: string; color: string } }>;
     createdAt: Date;
     updatedAt: Date;
   }): ProjectTaskItemDTO {
@@ -471,9 +536,14 @@ export class ProjectService {
       description: task.description,
       status: task.status as ProjectTaskItemDTO['status'],
       priority: task.priority as ProjectTaskItemDTO['priority'],
+      type: (task.type ?? 'task') as ProjectTaskItemDTO['type'],
+      number: task.number ?? null,
+      storyPoints: task.storyPoints ?? null,
+      labels: (task.labels ?? []).map((tl) => tl.label),
       dueDate: task.dueDate ? task.dueDate.toISOString() : null,
       assigneeId: task.assigneeId,
       assigneeName: task.assignee?.fullName ?? null,
+      assigneeAvatarColor: task.assignee?.avatarColor ?? null,
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
     };

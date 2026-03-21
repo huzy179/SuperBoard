@@ -89,6 +89,9 @@ export type UpdateTaskResponseDTO = ApiResponse<ProjectTaskItemDTO>;
 export interface BulkTaskOperationRequestDTO {
   taskIds: string[];
   status?: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
+  priority?: TaskPriorityDTO;
+  type?: TaskTypeDTO;
+  dueDate?: string | null;
   assigneeId?: string | null;
   delete?: boolean;
 }

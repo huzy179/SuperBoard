@@ -164,8 +164,14 @@ export default function ProjectDetailPage() {
   );
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
   const [bulkStatus, setBulkStatus] = useState<ProjectTaskItemDTO['status']>('todo');
+  const [bulkPriority, setBulkPriority] = useState<TaskPriority>('medium');
+  const [bulkType, setBulkType] = useState<TaskTypeDTO>('task');
+  const [bulkDueDate, setBulkDueDate] = useState('');
   const [bulkAssigneeId, setBulkAssigneeId] = useState('');
   const [bulkUpdatePending, setBulkUpdatePending] = useState(false);
+  const [bulkPriorityPending, setBulkPriorityPending] = useState(false);
+  const [bulkTypePending, setBulkTypePending] = useState(false);
+  const [bulkDueDatePending, setBulkDueDatePending] = useState(false);
   const [bulkAssignPending, setBulkAssignPending] = useState(false);
   const [bulkDeletePending, setBulkDeletePending] = useState(false);
   const [pendingDeleteTaskIds, setPendingDeleteTaskIds] = useState<Set<string>>(new Set());
@@ -524,6 +530,108 @@ export default function ProjectDetailPage() {
       );
     } finally {
       setBulkAssignPending(false);
+    }
+  }
+
+  async function handleBulkUpdatePriority() {
+    if (pendingDeleteTaskIds.size > 0 || bulkDeletePending) {
+      return;
+    }
+
+    const targetTaskIds = visibleTasks
+      .filter((task) => selectedTaskIds.has(task.id) && task.priority !== bulkPriority)
+      .map((task) => task.id);
+
+    if (targetTaskIds.length === 0) {
+      return;
+    }
+
+    setTaskUpdateError(null);
+    setBulkPriorityPending(true);
+    try {
+      await bulkTaskMutation.mutateAsync({
+        taskIds: targetTaskIds,
+        priority: bulkPriority,
+      });
+      clearTaskSelection();
+    } catch (caughtError) {
+      setTaskUpdateError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : 'Không thể cập nhật độ ưu tiên hàng loạt',
+      );
+    } finally {
+      setBulkPriorityPending(false);
+    }
+  }
+
+  async function handleBulkUpdateType() {
+    if (pendingDeleteTaskIds.size > 0 || bulkDeletePending) {
+      return;
+    }
+
+    const targetTaskIds = visibleTasks
+      .filter((task) => selectedTaskIds.has(task.id) && (task.type ?? 'task') !== bulkType)
+      .map((task) => task.id);
+
+    if (targetTaskIds.length === 0) {
+      return;
+    }
+
+    setTaskUpdateError(null);
+    setBulkTypePending(true);
+    try {
+      await bulkTaskMutation.mutateAsync({
+        taskIds: targetTaskIds,
+        type: bulkType,
+      });
+      clearTaskSelection();
+    } catch (caughtError) {
+      setTaskUpdateError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : 'Không thể cập nhật loại task hàng loạt',
+      );
+    } finally {
+      setBulkTypePending(false);
+    }
+  }
+
+  async function handleBulkUpdateDueDate() {
+    if (pendingDeleteTaskIds.size > 0 || bulkDeletePending) {
+      return;
+    }
+
+    const targetTaskIds = visibleTasks
+      .filter((task) => {
+        if (!selectedTaskIds.has(task.id)) {
+          return false;
+        }
+        const currentDueDate = toDateInputValue(task.dueDate);
+        return currentDueDate !== bulkDueDate;
+      })
+      .map((task) => task.id);
+
+    if (targetTaskIds.length === 0) {
+      return;
+    }
+
+    setTaskUpdateError(null);
+    setBulkDueDatePending(true);
+    try {
+      await bulkTaskMutation.mutateAsync({
+        taskIds: targetTaskIds,
+        dueDate: bulkDueDate || null,
+      });
+      clearTaskSelection();
+    } catch (caughtError) {
+      setTaskUpdateError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : 'Không thể cập nhật hạn hoàn thành hàng loạt',
+      );
+    } finally {
+      setBulkDueDatePending(false);
     }
   }
 
@@ -887,16 +995,34 @@ export default function ProjectDetailPage() {
         selectedVisibleCount={selectedVisibleCount}
         totalVisibleCount={visibleTasks.length}
         bulkStatus={bulkStatus}
+        bulkPriority={bulkPriority}
+        bulkType={bulkType}
+        bulkDueDate={bulkDueDate}
         bulkAssigneeId={bulkAssigneeId}
         isStatusPending={bulkUpdatePending}
+        isPriorityPending={bulkPriorityPending}
+        isTypePending={bulkTypePending}
+        isDueDatePending={bulkDueDatePending}
         isAssignPending={bulkAssignPending}
         isDeletePending={bulkDeletePending || pendingDeleteTaskIds.size > 0}
         onBulkStatusChange={setBulkStatus}
+        onBulkPriorityChange={setBulkPriority}
+        onBulkTypeChange={setBulkType}
+        onBulkDueDateChange={setBulkDueDate}
         onBulkAssigneeIdChange={setBulkAssigneeId}
         onToggleSelectAllVisible={toggleSelectAllVisible}
         onClearSelection={clearTaskSelection}
         onApplyStatus={() => {
           void handleBulkUpdateStatus();
+        }}
+        onApplyPriority={() => {
+          void handleBulkUpdatePriority();
+        }}
+        onApplyType={() => {
+          void handleBulkUpdateType();
+        }}
+        onApplyDueDate={() => {
+          void handleBulkUpdateDueDate();
         }}
         onApplyAssignee={() => {
           void handleBulkAssignAssignee();

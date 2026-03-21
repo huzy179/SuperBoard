@@ -248,20 +248,27 @@ export class ProjectController {
     }
 
     const hasStatus = body.status !== undefined;
+    const hasPriority = body.priority !== undefined;
+    const hasType = body.type !== undefined;
+    const hasDueDate = Object.prototype.hasOwnProperty.call(body, 'dueDate');
     const hasAssignee = Object.prototype.hasOwnProperty.call(body, 'assigneeId');
     const shouldDelete = body.delete === true;
 
-    if (!hasStatus && !hasAssignee && !shouldDelete) {
+    if (!hasStatus && !hasPriority && !hasType && !hasDueDate && !hasAssignee && !shouldDelete) {
       throw new BadRequestException('At least one bulk operation is required');
     }
 
     const normalizedAssigneeId = hasAssignee ? body.assigneeId?.trim() || null : undefined;
+    const normalizedDueDate = hasDueDate ? this.parseOptionalDate(body.dueDate) : undefined;
 
     const result = await this.projectService.bulkOperateTasksForProject({
       projectId,
       workspaceId,
       taskIds,
       ...(hasStatus ? { status: body.status } : {}),
+      ...(hasPriority ? { priority: body.priority } : {}),
+      ...(hasType ? { type: body.type } : {}),
+      ...(hasDueDate ? { dueDate: normalizedDueDate ?? null } : {}),
       ...(hasAssignee ? { assigneeId: normalizedAssigneeId } : {}),
       ...(shouldDelete ? { delete: true } : {}),
     });

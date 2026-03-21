@@ -1,5 +1,10 @@
-import type { ProjectMemberDTO, ProjectTaskItemDTO } from '@superboard/shared';
-import { BOARD_COLUMNS } from '@/lib/constants/task';
+import type {
+  ProjectMemberDTO,
+  ProjectTaskItemDTO,
+  TaskPriorityDTO,
+  TaskTypeDTO,
+} from '@superboard/shared';
+import { BOARD_COLUMNS, PRIORITY_OPTIONS, TASK_TYPE_OPTIONS } from '@/lib/constants/task';
 
 type TaskBulkActionBarProps = {
   members: ProjectMemberDTO[];
@@ -7,15 +12,27 @@ type TaskBulkActionBarProps = {
   selectedVisibleCount: number;
   totalVisibleCount: number;
   bulkStatus: ProjectTaskItemDTO['status'];
+  bulkPriority: TaskPriorityDTO;
+  bulkType: TaskTypeDTO;
+  bulkDueDate: string;
   bulkAssigneeId: string;
   isStatusPending: boolean;
+  isPriorityPending: boolean;
+  isTypePending: boolean;
+  isDueDatePending: boolean;
   isAssignPending: boolean;
   isDeletePending: boolean;
   onBulkStatusChange: (value: ProjectTaskItemDTO['status']) => void;
+  onBulkPriorityChange: (value: TaskPriorityDTO) => void;
+  onBulkTypeChange: (value: TaskTypeDTO) => void;
+  onBulkDueDateChange: (value: string) => void;
   onBulkAssigneeIdChange: (value: string) => void;
   onToggleSelectAllVisible: () => void;
   onClearSelection: () => void;
   onApplyStatus: () => void;
+  onApplyPriority: () => void;
+  onApplyType: () => void;
+  onApplyDueDate: () => void;
   onApplyAssignee: () => void;
   onDeleteSelected: () => void;
 };
@@ -26,15 +43,27 @@ export function TaskBulkActionBar({
   selectedVisibleCount,
   totalVisibleCount,
   bulkStatus,
+  bulkPriority,
+  bulkType,
+  bulkDueDate,
   bulkAssigneeId,
   isStatusPending,
+  isPriorityPending,
+  isTypePending,
+  isDueDatePending,
   isAssignPending,
   isDeletePending,
   onBulkStatusChange,
+  onBulkPriorityChange,
+  onBulkTypeChange,
+  onBulkDueDateChange,
   onBulkAssigneeIdChange,
   onToggleSelectAllVisible,
   onClearSelection,
   onApplyStatus,
+  onApplyPriority,
+  onApplyType,
+  onApplyDueDate,
   onApplyAssignee,
   onDeleteSelected,
 }: TaskBulkActionBarProps) {
@@ -78,10 +107,111 @@ export function TaskBulkActionBar({
       <button
         type="button"
         onClick={onApplyStatus}
-        disabled={isStatusPending || isAssignPending || isDeletePending}
+        disabled={
+          isStatusPending ||
+          isPriorityPending ||
+          isTypePending ||
+          isDueDatePending ||
+          isAssignPending ||
+          isDeletePending
+        }
         className="rounded bg-brand-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
       >
         {isStatusPending ? 'Đang cập nhật...' : 'Áp dụng'}
+      </button>
+
+      <div className="h-4 w-px bg-brand-200" />
+
+      <label className="text-[11px] text-slate-600">
+        Đổi ưu tiên:
+        <select
+          value={bulkPriority}
+          onChange={(event) => onBulkPriorityChange(event.target.value as TaskPriorityDTO)}
+          className="ml-2 rounded-md border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-700"
+        >
+          {PRIORITY_OPTIONS.map((priority) => (
+            <option key={priority.key} value={priority.key}>
+              {priority.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <button
+        type="button"
+        onClick={onApplyPriority}
+        disabled={
+          isPriorityPending ||
+          isStatusPending ||
+          isTypePending ||
+          isDueDatePending ||
+          isAssignPending ||
+          isDeletePending
+        }
+        className="rounded bg-violet-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-violet-700 disabled:opacity-50"
+      >
+        {isPriorityPending ? 'Đang cập nhật...' : 'Áp dụng ưu tiên'}
+      </button>
+
+      <div className="h-4 w-px bg-brand-200" />
+
+      <label className="text-[11px] text-slate-600">
+        Đổi loại task:
+        <select
+          value={bulkType}
+          onChange={(event) => onBulkTypeChange(event.target.value as TaskTypeDTO)}
+          className="ml-2 rounded-md border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-700"
+        >
+          {TASK_TYPE_OPTIONS.map((type) => (
+            <option key={type.key} value={type.key}>
+              {type.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <button
+        type="button"
+        onClick={onApplyType}
+        disabled={
+          isTypePending ||
+          isStatusPending ||
+          isPriorityPending ||
+          isDueDatePending ||
+          isAssignPending ||
+          isDeletePending
+        }
+        className="rounded bg-sky-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-sky-700 disabled:opacity-50"
+      >
+        {isTypePending ? 'Đang cập nhật...' : 'Áp dụng loại'}
+      </button>
+
+      <div className="h-4 w-px bg-brand-200" />
+
+      <label className="text-[11px] text-slate-600">
+        Đổi hạn hoàn thành:
+        <input
+          type="date"
+          value={bulkDueDate}
+          onChange={(event) => onBulkDueDateChange(event.target.value)}
+          className="ml-2 rounded-md border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-700"
+        />
+      </label>
+
+      <button
+        type="button"
+        onClick={onApplyDueDate}
+        disabled={
+          isDueDatePending ||
+          isStatusPending ||
+          isPriorityPending ||
+          isTypePending ||
+          isAssignPending ||
+          isDeletePending
+        }
+        className="rounded bg-cyan-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-cyan-700 disabled:opacity-50"
+      >
+        {isDueDatePending ? 'Đang cập nhật...' : 'Áp dụng hạn'}
       </button>
 
       <div className="h-4 w-px bg-brand-200" />
@@ -105,7 +235,14 @@ export function TaskBulkActionBar({
       <button
         type="button"
         onClick={onApplyAssignee}
-        disabled={isAssignPending || isStatusPending || isDeletePending}
+        disabled={
+          isAssignPending ||
+          isStatusPending ||
+          isPriorityPending ||
+          isTypePending ||
+          isDueDatePending ||
+          isDeletePending
+        }
         className="rounded bg-indigo-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-indigo-700 disabled:opacity-50"
       >
         {isAssignPending ? 'Đang gán...' : 'Áp dụng gán'}
@@ -114,7 +251,14 @@ export function TaskBulkActionBar({
       <button
         type="button"
         onClick={onDeleteSelected}
-        disabled={isDeletePending || isStatusPending || isAssignPending}
+        disabled={
+          isDeletePending ||
+          isStatusPending ||
+          isPriorityPending ||
+          isTypePending ||
+          isDueDatePending ||
+          isAssignPending
+        }
         className="rounded bg-rose-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
       >
         {isDeletePending ? 'Đang xử lý...' : 'Xoá đã chọn'}

@@ -372,6 +372,9 @@ export class ProjectService {
     workspaceId: string;
     taskIds: string[];
     status?: UpdateTaskStatusRequestDTO['status'];
+    priority?: UpdateTaskRequestDTO['priority'];
+    type?: UpdateTaskRequestDTO['type'];
+    dueDate?: Date | null;
     assigneeId?: string | null;
     delete?: boolean;
   }): Promise<BulkTaskOperationResultDTO> {
@@ -424,6 +427,9 @@ export class ProjectService {
 
     const updateData: Prisma.TaskUpdateManyMutationInput = {
       ...(input.status !== undefined ? { status: input.status } : {}),
+      ...(input.priority !== undefined ? { priority: input.priority } : {}),
+      ...(input.type !== undefined ? { type: input.type } : {}),
+      ...(input.dueDate !== undefined ? { dueDate: input.dueDate } : {}),
       ...(input.assigneeId !== undefined ? { assigneeId: input.assigneeId } : {}),
     };
 

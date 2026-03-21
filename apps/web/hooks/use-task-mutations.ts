@@ -112,6 +112,9 @@ export function useBulkTaskOperation(projectId: string) {
           });
         } else {
           const hasStatusUpdate = payload.status !== undefined;
+          const hasPriorityUpdate = payload.priority !== undefined;
+          const hasTypeUpdate = payload.type !== undefined;
+          const hasDueDateUpdate = payload.dueDate !== undefined;
           const hasAssigneeUpdate = payload.assigneeId !== undefined;
           const assigneeMember = hasAssigneeUpdate
             ? previous.members.find((member) => member.id === payload.assigneeId)
@@ -127,6 +130,9 @@ export function useBulkTaskOperation(projectId: string) {
               return {
                 ...task,
                 ...(hasStatusUpdate ? { status: payload.status } : {}),
+                ...(hasPriorityUpdate ? { priority: payload.priority } : {}),
+                ...(hasTypeUpdate ? { type: payload.type } : {}),
+                ...(hasDueDateUpdate ? { dueDate: payload.dueDate ?? null } : {}),
                 ...(hasAssigneeUpdate
                   ? payload.assigneeId
                     ? {

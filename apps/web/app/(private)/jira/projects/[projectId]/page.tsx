@@ -35,7 +35,7 @@ import {
   TASK_TYPE_ICONS,
   type TaskPriority,
 } from '@/lib/constants/task';
-import { toDateInputValue } from '@/lib/helpers';
+import { getInitials, toDateInputValue } from '@/lib/helpers';
 import {
   buildFractionalTaskPosition,
   buildBoardData,
@@ -329,6 +329,11 @@ export default function ProjectDetailPage() {
       }).format(calendarMonth),
     [calendarMonth],
   );
+
+  const currentViewLabel =
+    viewMode === 'board' ? 'Bảng Kanban' : viewMode === 'list' ? 'Danh sách' : 'Lịch';
+
+  const visibleMemberAvatars = useMemo(() => members.slice(0, 5), [members]);
 
   useEffect(() => {
     if (!projectId) {
@@ -1040,35 +1045,60 @@ export default function ProjectDetailPage() {
   }
 
   return (
-    <section>
-      <div className="mb-6">
-        <Link href="/jira" className="text-sm font-medium text-brand-700 hover:text-brand-800">
-          ← Quay lại
-        </Link>
+    <section className="space-y-4 pb-4">
+      <div className="mb-3">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm text-slate-500">
+          <Link
+            href="/jira"
+            className="rounded-md px-2 py-1 font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+          >
+            Dự án
+          </Link>
+          <span>/</span>
+          <span className="font-medium text-slate-500">{project.name}</span>
+          <span>/</span>
+          <span className="font-semibold text-slate-700">{currentViewLabel}</span>
+        </nav>
       </div>
 
-      <div className="mb-6 rounded-xl border border-surface-border bg-surface-card p-5 shadow-sm">
+      <div className="mb-2 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <span className="text-2xl">{project.icon || '📊'}</span>
-              <h1 className="text-2xl font-bold text-slate-900">{project.name}</h1>
+              <h1 className="text-3xl font-bold text-slate-900">{project.name}</h1>
               {projectKey ? (
                 <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-xs font-medium text-slate-500">
                   {projectKey}
                 </span>
               ) : null}
             </div>
-            <p className="mt-2 text-sm text-slate-600">
-              {project.description || 'Chưa có mô tả cho project này.'}
-            </p>
-            <p className="mt-3 text-xs text-slate-500">Cập nhật: {formatDate(project.updatedAt)}</p>
+            <p className="mt-1 text-sm font-medium text-slate-500">{currentViewLabel}</p>
+            <p className="mt-2 text-sm text-slate-600">{project.description || 'Không có mô tả'}</p>
+            <div className="mt-4 flex items-center gap-3">
+              <div className="flex -space-x-2">
+                {visibleMemberAvatars.map((member) => (
+                  <div
+                    key={member.id}
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-slate-200 text-[11px] font-semibold text-slate-700"
+                    title={member.fullName}
+                  >
+                    {getInitials(member.fullName)}
+                  </div>
+                ))}
+              </div>
+              <span className="text-slate-300">|</span>
+              <span className="text-sm font-medium text-slate-500">Bộ lọc</span>
+              <span className="text-xs text-slate-400">
+                Cập nhật: {formatDate(project.updatedAt)}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 rounded-lg border border-surface-border bg-white p-1">
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-1.5">
             <button
               type="button"
               onClick={() => setShowCreateTaskPanel((value) => !value)}
-              className="rounded-md px-3 py-1.5 text-sm font-medium text-brand-700 transition-colors hover:bg-brand-50"
+              className="rounded-md px-3 py-1.5 text-sm font-semibold text-brand-700 transition-colors hover:bg-brand-50"
             >
               + Tạo task
             </button>
@@ -1080,7 +1110,7 @@ export default function ProjectDetailPage() {
               onClick={() => setViewMode('board')}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 viewMode === 'board'
-                  ? 'bg-brand-600 text-white'
+                  ? 'bg-brand-600 text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
@@ -1091,7 +1121,7 @@ export default function ProjectDetailPage() {
               onClick={() => setViewMode('list')}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 viewMode === 'list'
-                  ? 'bg-brand-600 text-white'
+                  ? 'bg-brand-600 text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
@@ -1102,7 +1132,7 @@ export default function ProjectDetailPage() {
               onClick={() => setViewMode('calendar')}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 viewMode === 'calendar'
-                  ? 'bg-brand-600 text-white'
+                  ? 'bg-brand-600 text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
@@ -1224,7 +1254,7 @@ export default function ProjectDetailPage() {
       ) : null}
 
       {project.tasks.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-surface-border bg-surface-card p-10 text-center">
+        <div className="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center">
           <p className="text-base font-semibold text-slate-900">Project chưa có task</p>
           <p className="mt-2 text-sm text-slate-600">
             Bấm "Tạo task" để thêm task mới cho project này.
@@ -1232,17 +1262,17 @@ export default function ProjectDetailPage() {
         </div>
       ) : viewMode === 'board' ? (
         /* Board View */
-        <div className="flex gap-4 overflow-x-auto pb-4">
+        <div className="flex gap-4 overflow-x-auto pb-3">
           {BOARD_COLUMNS.map((column) => {
             const tasks = boardData.get(column.key) ?? [];
             const isDragOver = dragOverColumn === column.key;
             return (
               <div
                 key={column.key}
-                className={`w-72 shrink-0 rounded-xl border border-t-2 bg-surface-card ${COLUMN_BORDER[column.key] ?? ''} ${
+                className={`w-80 shrink-0 rounded-xl border border-t-2 bg-slate-50 ${COLUMN_BORDER[column.key] ?? ''} ${
                   isDragOver
                     ? 'border-dashed border-brand-400 bg-brand-50/30 animate-pulse'
-                    : 'border-surface-border'
+                    : 'border-slate-200'
                 }`}
                 onDragOver={(e) => {
                   handleDragOver(e);
@@ -1253,13 +1283,24 @@ export default function ProjectDetailPage() {
                 onDragLeave={() => setDragOverColumn(null)}
                 onDrop={(event) => handleDrop(event, column.key)}
               >
-                <div className="flex items-center justify-between border-b border-surface-border bg-linear-to-r from-slate-50 to-white px-3 py-2">
-                  <p className="text-sm font-semibold text-slate-900">{column.label}</p>
-                  <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-200 px-1.5 text-[11px] font-bold text-slate-700">
-                    {tasks.length}
-                  </span>
+                <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-3 py-2.5">
+                  <p className="text-xs font-bold tracking-wider text-slate-600 uppercase">
+                    {column.label}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-200 px-1.5 text-[11px] font-bold text-slate-700">
+                      {tasks.length}
+                    </span>
+                    <button
+                      type="button"
+                      className="rounded px-1 text-xs leading-none text-slate-400 hover:bg-slate-200 hover:text-slate-600"
+                      aria-label={`Tùy chọn cột ${column.label}`}
+                    >
+                      ...
+                    </button>
+                  </div>
                 </div>
-                <div className="space-y-2 p-2">
+                <div className="space-y-2.5 p-2.5">
                   {tasks.length === 0 ? (
                     <p className="rounded-lg border border-dashed border-slate-200 px-3 py-5 text-center text-xs text-slate-500">
                       Không có task
@@ -1285,7 +1326,7 @@ export default function ProjectDetailPage() {
                             handleOpenEdit(task);
                           }
                         }}
-                        className={`group relative rounded-lg border border-slate-200 bg-white p-3 shadow-xs border-l-2 ${
+                        className={`group relative rounded-lg border border-slate-200 bg-white p-3.5 shadow-xs border-l-2 transition ${
                           task.priority === 'urgent'
                             ? 'border-l-red-500'
                             : task.priority === 'high'
@@ -1299,7 +1340,7 @@ export default function ProjectDetailPage() {
                             ? 'opacity-60'
                             : isDragDropLocked
                               ? 'cursor-not-allowed opacity-80'
-                              : 'cursor-pointer hover:border-brand-300 hover:shadow-md hover:scale-[1.01] transition-transform'
+                              : 'cursor-pointer hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md'
                         } ${selectedTaskIds.has(task.id) ? 'ring-1 ring-brand-300' : ''}
                       `}
                       >
@@ -1314,7 +1355,7 @@ export default function ProjectDetailPage() {
                           />
                         </div>
                         {/* Top: type icon + task ID + story points */}
-                        <div className="flex items-center justify-between gap-1 mb-1.5">
+                        <div className="mb-1.5 flex items-center justify-between gap-1">
                           <div className="flex items-center gap-1.5">
                             <TaskTypeIcon type={task.type ?? 'task'} />
                             <TaskIdBadge projectKey={projectKey} number={task.number} />
@@ -1322,7 +1363,7 @@ export default function ProjectDetailPage() {
                           {task.storyPoints ? <StoryPointsBadge points={task.storyPoints} /> : null}
                         </div>
                         {/* Title */}
-                        <p className="text-sm font-medium text-slate-900 group-hover:text-brand-700">
+                        <p className="text-[13px] font-medium text-slate-900 group-hover:text-brand-700">
                           {task.title}
                         </p>
                         {/* Labels */}
@@ -1361,7 +1402,7 @@ export default function ProjectDetailPage() {
                     setTaskStatus(column.key);
                     setShowCreateTaskPanel(true);
                   }}
-                  className="w-full border-t border-surface-border px-3 py-2 text-left text-xs font-medium text-slate-400 hover:bg-slate-50 hover:text-slate-600"
+                  className="w-full border-t border-slate-200 px-3 py-2.5 text-left text-xs font-medium text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                 >
                   + Thêm task
                 </button>
@@ -1371,8 +1412,8 @@ export default function ProjectDetailPage() {
         </div>
       ) : viewMode === 'list' ? (
         /* List View */
-        <div className="overflow-hidden rounded-xl border border-surface-border bg-surface-card">
-          <table className="min-w-full divide-y divide-surface-border text-sm">
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
+          <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-slate-50">
               <tr>
                 <th className="px-4 py-3 text-left">
@@ -1386,16 +1427,24 @@ export default function ProjectDetailPage() {
                     className="h-3.5 w-3.5 rounded border-slate-300 text-brand-600"
                   />
                 </th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-700">Task</th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-700">Trạng thái</th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-700">Độ ưu tiên</th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-700">
+                <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-700 uppercase">
+                  Task
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-700 uppercase">
+                  Trạng thái
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-700 uppercase">
+                  Độ ưu tiên
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-700 uppercase">
                   Người thực hiện
                 </th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-700">Cập nhật</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-700 uppercase">
+                  Cập nhật
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-surface-border bg-white">
+            <tbody className="divide-y divide-slate-100 bg-white">
               {visibleTasks.map((task) => (
                 <tr
                   key={task.id}
@@ -1475,8 +1524,8 @@ export default function ProjectDetailPage() {
           </table>
         </div>
       ) : (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between rounded-xl border border-surface-border bg-surface-card px-4 py-3">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-2.5 shadow-xs">
             <button
               type="button"
               onClick={() =>
@@ -1498,7 +1547,7 @@ export default function ProjectDetailPage() {
             </button>
           </div>
 
-          <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-slate-600">
+          <div className="grid grid-cols-7 gap-2 text-center text-[11px] font-semibold tracking-wide text-slate-600 uppercase">
             {['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map((day) => (
               <div key={day} className="py-1">
                 {day}
@@ -1512,10 +1561,8 @@ export default function ProjectDetailPage() {
               return (
                 <div
                   key={cell.key}
-                  className={`min-h-28 rounded-lg border p-2 ${
-                    cell.inMonth
-                      ? 'border-surface-border bg-surface-card'
-                      : 'border-slate-200 bg-slate-50'
+                  className={`min-h-32 rounded-lg border p-2.5 ${
+                    cell.inMonth ? 'border-slate-200 bg-white' : 'border-slate-200 bg-slate-50'
                   }`}
                 >
                   <p
@@ -1529,7 +1576,7 @@ export default function ProjectDetailPage() {
                         key={task.id}
                         type="button"
                         onClick={() => handleOpenEdit(task)}
-                        className="w-full rounded border border-slate-200 bg-white px-1.5 py-1 text-left text-[11px] text-slate-700 hover:border-brand-300 hover:bg-brand-50"
+                        className="w-full rounded-md border border-slate-200 bg-white px-2 py-1.5 text-left text-xs text-slate-700 hover:border-brand-300 hover:bg-brand-50"
                         title={task.title}
                       >
                         <span className="line-clamp-1">{task.title}</span>
@@ -1545,7 +1592,7 @@ export default function ProjectDetailPage() {
           </div>
 
           {tasksWithoutDueDate.length > 0 ? (
-            <div className="rounded-xl border border-surface-border bg-surface-card p-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
               <p className="mb-2 text-sm font-semibold text-slate-900">
                 Task chưa có hạn hoàn thành
               </p>
@@ -1576,10 +1623,10 @@ export default function ProjectDetailPage() {
             aria-labelledby="task-detail-title"
             tabIndex={-1}
             onKeyDown={handleDialogKeyDown}
-            className="h-full w-full max-w-lg animate-in slide-in-from-right border-l border-surface-border bg-surface-card shadow-2xl outline-none"
+            className="h-full w-full max-w-lg animate-in slide-in-from-right border-l border-slate-200 bg-white shadow-2xl outline-none"
           >
             <div className="flex h-full flex-col">
-              <div className="flex items-center justify-between border-b border-surface-border px-6 py-4">
+              <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
                 <div className="flex items-center gap-3">
                   <TaskTypeIcon type={editingTask.type ?? 'task'} />
                   {projectKey && editingTask.number ? (
@@ -1756,7 +1803,7 @@ export default function ProjectDetailPage() {
                 />
               </form>
 
-              <div className="flex items-center justify-between border-t border-surface-border px-6 py-4 bg-slate-50">
+              <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-6 py-4">
                 <button
                   type="button"
                   onClick={() => {

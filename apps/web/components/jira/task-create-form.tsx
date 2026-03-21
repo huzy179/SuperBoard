@@ -53,8 +53,13 @@ export function TaskCreateForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="mb-6 rounded-xl border border-surface-border bg-surface-card p-5 shadow-sm"
+      className="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-xs"
     >
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-slate-900">Tạo task mới</h3>
+        <span className="text-xs text-slate-500">Điền thông tin cơ bản</span>
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
           Tiêu đề task
@@ -63,7 +68,7 @@ export function TaskCreateForm({
             value={taskTitle}
             onChange={(event) => onTaskTitleChange(event.target.value)}
             placeholder="Ví dụ: Thiết kế flow login mới"
-            className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1.5 w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900"
             required
           />
         </label>
@@ -74,7 +79,7 @@ export function TaskCreateForm({
             onChange={(event) =>
               onTaskStatusChange(event.target.value as ProjectTaskItemDTO['status'])
             }
-            className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1.5 w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900"
           >
             {BOARD_COLUMNS.map((column) => (
               <option key={column.key} value={column.key}>
@@ -88,7 +93,7 @@ export function TaskCreateForm({
           <select
             value={taskPriority}
             onChange={(event) => onTaskPriorityChange(event.target.value as TaskPriority)}
-            className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1.5 w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900"
           >
             {PRIORITY_OPTIONS.map((priority) => (
               <option key={priority.key} value={priority.key}>
@@ -102,7 +107,7 @@ export function TaskCreateForm({
           <select
             value={taskType}
             onChange={(event) => onTaskTypeChange(event.target.value as TaskTypeDTO)}
-            className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1.5 w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900"
           >
             {TASK_TYPE_OPTIONS.map((taskOption) => (
               <option key={taskOption.key} value={taskOption.key}>
@@ -117,7 +122,7 @@ export function TaskCreateForm({
             type="date"
             value={taskDueDate}
             onChange={(event) => onTaskDueDateChange(event.target.value)}
-            className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1.5 w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900"
           />
         </label>
         <label className="block text-sm font-medium text-slate-700">
@@ -125,7 +130,7 @@ export function TaskCreateForm({
           <select
             value={taskAssigneeId}
             onChange={(event) => onTaskAssigneeIdChange(event.target.value)}
-            className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1.5 w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900"
           >
             <option value="">-- Chưa gán --</option>
             {members.map((member) => (
@@ -142,7 +147,7 @@ export function TaskCreateForm({
             onChange={(event) => onTaskDescriptionChange(event.target.value)}
             rows={3}
             placeholder="Chi tiết ngắn cho task"
-            className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1.5 w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900"
           />
         </label>
       </div>

@@ -176,3 +176,18 @@
 - [x] Quản lý join/switch/disconnect room để cập nhật presence chính xác
 - [x] Thêm subscriber presence ở web socket client (`subscribeProjectPresence`)
 - [x] Hiển thị badge realtime `👀 X đang xem` trên project detail header
+
+## Jira v1.10 — Project Header Style + Breadcrumb
+
+- [x] Thêm breadcrumb ở đầu trang project detail: `Dự án / <Tên project> / <View hiện tại>`
+- [x] Tinh chỉnh header theo phong cách Kanban hiện đại (title lớn, metadata gọn, chip view rõ ràng)
+- [x] Thêm avatar stack thành viên ở header để tăng ngữ cảnh team
+- [x] Tinh chỉnh giao diện cột board (nhãn uppercase, count badge, action `...`) gần với ảnh mẫu
+
+## Jira v1.11 — Full Project Detail UI Refresh (Kanban Style)
+
+- [x] Làm mới đồng bộ giao diện project detail theo cùng một phong cách (header/filter/bulk/board/list/calendar)
+- [x] Restyle `TaskFilterBar` và `TaskBulkActionBar` thành toolbar dạng card, spacing/typography nhất quán
+- [x] Restyle `TaskCreateForm` để đồng bộ với style card trắng + input nền trung tính
+- [x] Nâng cấp board task card interaction (hover, hierarchy, mật độ thông tin) và list table visual hierarchy
+- [x] Cập nhật calendar + task detail slide-over border/background để đồng bộ ngôn ngữ thiết kế

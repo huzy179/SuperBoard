@@ -17,6 +17,12 @@ const EVENT_ICONS: Record<string, string> = {
 
 export default function DashboardPage() {
   const { data: stats, isLoading, isError, error } = useDashboardStats();
+  const taskTypeLabelMap: Record<string, string> = {
+    task: 'Task',
+    bug: 'Bug',
+    story: 'Story',
+    epic: 'Epic',
+  };
 
   if (isLoading) return <FullPageLoader label="Đang tải dashboard..." />;
   if (isError || !stats) {
@@ -34,6 +40,7 @@ export default function DashboardPage() {
   const doneTasks = stats.tasksByStatus.find((i) => i.status === 'done')?.count ?? 0;
   const inProgressTasks = stats.tasksByStatus.find((i) => i.status === 'in_progress')?.count ?? 0;
   const maxStatusCount = Math.max(...stats.tasksByStatus.map((i) => i.count), 1);
+  const maxTypeCount = Math.max(...stats.tasksByType.map((i) => i.count), 1);
   const maxAssigneeCount = Math.max(...stats.tasksByAssignee.map((i) => i.count), 1);
 
   return (
@@ -145,6 +152,33 @@ export default function DashboardPage() {
                         style={{ width: `${(a.count / maxAssigneeCount) * 100}%` }}
                       />
                     </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Tasks by type */}
+        <div className="rounded-xl border border-surface-border bg-surface-card p-5">
+          <h2 className="mb-4 text-sm font-semibold text-slate-900">Tasks theo loại</h2>
+          {stats.tasksByType.length === 0 ? (
+            <p className="text-xs text-slate-500">Chưa có dữ liệu loại task</p>
+          ) : (
+            <div className="space-y-3">
+              {stats.tasksByType.map((item) => (
+                <div key={item.type}>
+                  <div className="mb-1 flex items-center justify-between text-xs">
+                    <span className="text-slate-600">
+                      {taskTypeLabelMap[item.type] ?? item.type}
+                    </span>
+                    <span className="font-semibold text-slate-900">{item.count}</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-slate-100">
+                    <div
+                      className="h-2 rounded-full bg-violet-500 transition-all duration-500"
+                      style={{ width: `${(item.count / maxTypeCount) * 100}%` }}
+                    />
                   </div>
                 </div>
               ))}

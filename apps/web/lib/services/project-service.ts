@@ -1,4 +1,6 @@
 import type {
+  BulkTaskOperationRequestDTO,
+  BulkTaskOperationResultDTO,
   CreateProjectRequestDTO,
   CreateTaskRequestDTO,
   DashboardStatsDTO,
@@ -72,6 +74,17 @@ export async function updateProjectTask(
   payload: UpdateTaskRequestDTO,
 ): Promise<ProjectTaskItemDTO> {
   return apiRequest<ProjectTaskItemDTO>(API_ENDPOINTS.projects.updateTask(projectId, taskId), {
+    auth: true,
+    method: 'PATCH',
+    body: payload,
+  });
+}
+
+export async function bulkProjectTaskOperation(
+  projectId: string,
+  payload: BulkTaskOperationRequestDTO,
+): Promise<BulkTaskOperationResultDTO> {
+  return apiRequest<BulkTaskOperationResultDTO>(API_ENDPOINTS.projects.bulkTask(projectId), {
     auth: true,
     method: 'PATCH',
     body: payload,

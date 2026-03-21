@@ -102,3 +102,16 @@
 - [x] Shared helpers FE (toDateInputValue, getInitials, percentOf)
 - [x] React Query mutations cho project list
 - [x] UI animations, visual polish across all pages
+
+## Jira v1.1 — Board/List Bulk Actions + Safety UX
+
+- [x] Refactor FE: tách components/hook cho Jira Home + Project Detail filter/create sections
+- [x] Chuẩn hoá helper FE về `lib/helpers/*` (tránh trùng file/folder helper)
+- [x] Nâng cấp filter task: search theo tiêu đề/mô tả/mã task + lọc trạng thái
+- [x] Dashboard mở rộng: `tasksByType` từ API + hiển thị chart theo loại task
+- [x] Bulk update status nhiều task (board + list)
+- [x] Bulk delete nhiều task (soft-delete) + undo 5 giây
+- [x] Banner undo với countdown + progress bar tuyến tính
+- [x] Khoá drag-drop và inline status change khi pending bulk delete để tránh xung đột
+- [x] Tooltip giải thích lý do control bị khoá
+- [x] Bulk gán / bỏ gán người thực hiện cho nhiều task

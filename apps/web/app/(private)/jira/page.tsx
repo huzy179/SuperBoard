@@ -1,152 +1,49 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
-import Link from 'next/link';
-import type { ProjectItemDTO } from '@superboard/shared';
 import { EmptyStateCard, SectionError, SectionSkeleton } from '@/components/ui/page-states';
-import { useProjects } from '@/hooks/use-projects';
-import {
-  useCreateProject,
-  useUpdateProject,
-  useDeleteProject,
-} from '@/hooks/use-project-mutations';
-import { formatDate } from '@/lib/format-date';
+import { ProjectCardsGrid } from '@/components/jira/project-cards-grid';
+import { ProjectForm } from '@/components/jira/project-form';
+import { useJiraProjectsPage } from '@/hooks/use-jira-projects-page';
 
 export default function JiraHomePage() {
   const {
-    data: projects = [],
-    isLoading: projectsLoading,
-    isError,
-    error: projectsQueryError,
-    refetch,
-  } = useProjects();
-  const projectsError = isError ? (projectsQueryError?.message ?? 'Không tải được dự án') : null;
-
-  const createProjectMutation = useCreateProject();
-  const updateProjectMutation = useUpdateProject();
-  const deleteProjectMutation = useDeleteProject();
-
-  function reloadProjects() {
-    void refetch();
-  }
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showCreatePanel, setShowCreatePanel] = useState(false);
-  const [projectName, setProjectName] = useState('');
-  const [projectDescription, setProjectDescription] = useState('');
-  const [projectIcon, setProjectIcon] = useState('📌');
-  const [projectColor, setProjectColor] = useState('#2563eb');
-  const [createError, setCreateError] = useState<string | null>(null);
-  const [editError, setEditError] = useState<string | null>(null);
-  const [archiveError, setArchiveError] = useState<string | null>(null);
-  const [editingProject, setEditingProject] = useState<ProjectItemDTO | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editDescription, setEditDescription] = useState('');
-  const [editIcon, setEditIcon] = useState('');
-  const [editColor, setEditColor] = useState('');
-
-  const normalizedProjectName = useMemo(() => projectName.trim(), [projectName]);
-
-  const filteredProjects = useMemo(() => {
-    if (!searchQuery.trim()) return projects;
-    const q = searchQuery.toLowerCase();
-    return projects.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        (p.key && p.key.toLowerCase().includes(q)) ||
-        (p.description && p.description.toLowerCase().includes(q)),
-    );
-  }, [projects, searchQuery]);
-
-  async function handleCreateProject(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!normalizedProjectName) {
-      setCreateError('Tên dự án là bắt buộc');
-      return;
-    }
-
-    setCreateError(null);
-
-    try {
-      const description = projectDescription.trim();
-      const icon = projectIcon.trim();
-      const color = projectColor.trim();
-
-      await createProjectMutation.mutateAsync({
-        name: normalizedProjectName,
-        ...(description ? { description } : {}),
-        ...(icon ? { icon } : {}),
-        ...(color ? { color } : {}),
-      });
-
-      setProjectName('');
-      setProjectDescription('');
-      setProjectIcon('📌');
-      setProjectColor('#2563eb');
-      setShowCreatePanel(false);
-    } catch (caughtError) {
-      setCreateError(caughtError instanceof Error ? caughtError.message : 'Không thể tạo dự án');
-    }
-  }
-
-  function openEditProject(project: ProjectItemDTO) {
-    setEditingProject(project);
-    setEditName(project.name);
-    setEditDescription(project.description ?? '');
-    setEditIcon(project.icon ?? '📌');
-    setEditColor(project.color ?? '#2563eb');
-    setEditError(null);
-  }
-
-  function closeEditProject() {
-    setEditingProject(null);
-    setEditName('');
-    setEditDescription('');
-    setEditIcon('');
-    setEditColor('');
-  }
-
-  async function handleUpdateProject(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!editingProject) return;
-
-    const normalizedName = editName.trim();
-    if (!normalizedName) {
-      setEditError('Tên dự án là bắt buộc');
-      return;
-    }
-
-    setEditError(null);
-
-    try {
-      await updateProjectMutation.mutateAsync({
-        id: editingProject.id,
-        data: {
-          name: normalizedName,
-          description: editDescription.trim(),
-          icon: editIcon.trim(),
-          color: editColor.trim(),
-        },
-      });
-      closeEditProject();
-    } catch (caughtError) {
-      setEditError(caughtError instanceof Error ? caughtError.message : 'Không thể cập nhật dự án');
-    }
-  }
-
-  async function handleArchiveProject(projectId: string) {
-    if (!confirm('Bạn chắc chắn muốn lưu trữ dự án này?')) return;
-
-    setArchiveError(null);
-
-    try {
-      await deleteProjectMutation.mutateAsync(projectId);
-    } catch (caughtError) {
-      setArchiveError(
-        caughtError instanceof Error ? caughtError.message : 'Không thể lưu trữ dự án',
-      );
-    }
-  }
+    projectsLoading,
+    projectsError,
+    filteredProjects,
+    reloadProjects,
+    searchQuery,
+    setSearchQuery,
+    showCreatePanel,
+    setShowCreatePanel,
+    projectName,
+    setProjectName,
+    projectDescription,
+    setProjectDescription,
+    projectIcon,
+    setProjectIcon,
+    projectColor,
+    setProjectColor,
+    createError,
+    handleCreateProject,
+    createProjectPending,
+    editingProject,
+    openEditProject,
+    closeEditProject,
+    editName,
+    setEditName,
+    editDescription,
+    setEditDescription,
+    editIcon,
+    setEditIcon,
+    editColor,
+    setEditColor,
+    editError,
+    handleUpdateProject,
+    updateProjectPending,
+    archiveError,
+    handleArchiveProject,
+    isArchivingProject,
+  } = useJiraProjectsPage();
 
   return (
     <section>
@@ -180,164 +77,39 @@ export default function JiraHomePage() {
       </div>
 
       {showCreatePanel ? (
-        <form
+        <ProjectForm
+          mode="create"
+          name={projectName}
+          description={projectDescription}
+          icon={projectIcon}
+          color={projectColor}
+          error={createError}
+          isPending={createProjectPending}
+          onNameChange={setProjectName}
+          onDescriptionChange={setProjectDescription}
+          onIconChange={setProjectIcon}
+          onColorChange={setProjectColor}
+          onCancel={() => setShowCreatePanel(false)}
           onSubmit={handleCreateProject}
-          className="mb-6 rounded-xl border border-surface-border bg-surface-card p-5 shadow-sm"
-        >
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
-              Tên dự án
-              <input
-                type="text"
-                value={projectName}
-                onChange={(event) => setProjectName(event.target.value)}
-                placeholder="Ví dụ: Mobile App Revamp"
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-                required
-              />
-            </label>
-
-            <label className="block text-sm font-medium text-slate-700">
-              Icon
-              <input
-                type="text"
-                value={projectIcon}
-                onChange={(event) => setProjectIcon(event.target.value)}
-                placeholder="📌"
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-              />
-            </label>
-
-            <label className="block text-sm font-medium text-slate-700">
-              Màu
-              <div className="mt-1.5 flex items-center gap-2">
-                <input
-                  type="color"
-                  value={projectColor}
-                  onChange={(event) => setProjectColor(event.target.value)}
-                  className="h-9 w-9 shrink-0 rounded-lg border border-slate-300 p-0.5"
-                />
-                <input
-                  type="text"
-                  value={projectColor}
-                  onChange={(event) => setProjectColor(event.target.value)}
-                  placeholder="#2563eb"
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-                />
-              </div>
-            </label>
-
-            <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
-              Mô tả
-              <textarea
-                value={projectDescription}
-                onChange={(event) => setProjectDescription(event.target.value)}
-                rows={3}
-                placeholder="Mục tiêu hoặc phạm vi chính của dự án"
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-              />
-            </label>
-          </div>
-
-          {createError ? (
-            <p role="alert" className="mt-3 text-sm text-rose-600">
-              {createError}
-            </p>
-          ) : null}
-
-          <div className="mt-4 flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => setShowCreatePanel(false)}
-              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700"
-            >
-              Huỷ
-            </button>
-            <button
-              type="submit"
-              disabled={createProjectMutation.isPending}
-              className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-400"
-            >
-              {createProjectMutation.isPending ? 'Đang tạo...' : 'Tạo dự án'}
-            </button>
-          </div>
-        </form>
+        />
       ) : null}
 
       {editingProject ? (
-        <form
+        <ProjectForm
+          mode="edit"
+          name={editName}
+          description={editDescription}
+          icon={editIcon}
+          color={editColor}
+          error={null}
+          isPending={updateProjectPending}
+          onNameChange={setEditName}
+          onDescriptionChange={setEditDescription}
+          onIconChange={setEditIcon}
+          onColorChange={setEditColor}
+          onCancel={closeEditProject}
           onSubmit={handleUpdateProject}
-          className="mb-6 rounded-xl border border-surface-border bg-surface-card p-5 shadow-sm"
-        >
-          <p className="mb-3 text-sm font-semibold text-slate-800">Chỉnh sửa dự án</p>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
-              Tên dự án
-              <input
-                type="text"
-                value={editName}
-                onChange={(event) => setEditName(event.target.value)}
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-                required
-              />
-            </label>
-
-            <label className="block text-sm font-medium text-slate-700">
-              Icon
-              <input
-                type="text"
-                value={editIcon}
-                onChange={(event) => setEditIcon(event.target.value)}
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-              />
-            </label>
-
-            <label className="block text-sm font-medium text-slate-700">
-              Màu
-              <div className="mt-1.5 flex items-center gap-2">
-                <input
-                  type="color"
-                  value={editColor}
-                  onChange={(event) => setEditColor(event.target.value)}
-                  className="h-9 w-9 shrink-0 rounded-lg border border-slate-300 p-0.5"
-                />
-                <input
-                  type="text"
-                  value={editColor}
-                  onChange={(event) => setEditColor(event.target.value)}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-                />
-              </div>
-            </label>
-
-            <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
-              Mô tả
-              <textarea
-                value={editDescription}
-                onChange={(event) => setEditDescription(event.target.value)}
-                rows={3}
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-              />
-            </label>
-          </div>
-
-          <div className="mt-4 flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={closeEditProject}
-              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700"
-            >
-              Huỷ
-            </button>
-            <button
-              type="submit"
-              disabled={updateProjectMutation.isPending}
-              className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-400"
-            >
-              {updateProjectMutation.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
-            </button>
-          </div>
-        </form>
+        />
       ) : null}
 
       {editError ? (
@@ -376,178 +148,15 @@ export default function JiraHomePage() {
             onAction={() => setShowCreatePanel(true)}
           />
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredProjects.map((project, index) => (
-              <div
-                key={project.id}
-                className="animate-slide-up group relative overflow-hidden rounded-xl border border-surface-border bg-surface-card transition-all hover:border-brand-300 hover:shadow-lg hover:shadow-brand-100"
-                style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
-              >
-                <div
-                  className="absolute left-0 top-0 h-1 w-full transition-colors group-hover:bg-brand-500"
-                  style={{ backgroundColor: project.color || 'var(--color-brand-500)' }}
-                />
-
-                <div className="p-6">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">{project.icon || '📊'}</span>
-                        <h3 className="truncate font-semibold text-slate-900 transition-colors group-hover:text-brand-600">
-                          {project.name}
-                        </h3>
-                      </div>
-
-                      {project.key ? (
-                        <span className="mt-1 inline-block rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] font-medium text-slate-500">
-                          {project.key}
-                        </span>
-                      ) : null}
-
-                      {project.description && (
-                        <p className="mt-2 line-clamp-2 text-sm text-slate-600">
-                          {project.description}
-                        </p>
-                      )}
-
-                      <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
-                        <span>📅</span>
-                        <time>{formatDate(project.createdAt)}</time>
-                      </div>
-
-                      {project.taskCount > 0 && (
-                        <div className="mt-3">
-                          <div className="flex items-center justify-between text-xs text-slate-500">
-                            <span>
-                              {project.doneTaskCount}/{project.taskCount} hoàn thành
-                            </span>
-                            <span>
-                              {project.taskCount > 0
-                                ? Math.round((project.doneTaskCount / project.taskCount) * 100)
-                                : 0}
-                              %
-                            </span>
-                          </div>
-                          <div className="mt-1 h-1.5 w-full rounded-full bg-slate-100">
-                            <div
-                              className="h-1.5 rounded-full bg-brand-500 transition-all"
-                              style={{
-                                width: `${project.taskCount > 0 ? Math.round((project.doneTaskCount / project.taskCount) * 100) : 0}%`,
-                              }}
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {project.color && (
-                      <div className="shrink-0">
-                        <div
-                          className="h-8 w-8 rounded-lg border border-surface-border shadow-sm"
-                          style={{ backgroundColor: project.color }}
-                          title={project.color}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mt-4 border-t border-surface-border pt-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="inline-block rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
-                        Hoạt động
-                      </span>
-                      <div className="flex items-center gap-3">
-                        <button
-                          type="button"
-                          onClick={() => openEditProject(project)}
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-900"
-                        >
-                          <svg
-                            className="h-3.5 w-3.5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"
-                            />
-                          </svg>
-                          Sửa
-                        </button>
-                        <button
-                          type="button"
-                          disabled={
-                            deleteProjectMutation.isPending &&
-                            deleteProjectMutation.variables === project.id
-                          }
-                          onClick={() => {
-                            void handleArchiveProject(project.id);
-                          }}
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600 hover:text-rose-700 disabled:opacity-50"
-                        >
-                          <svg
-                            className="h-3.5 w-3.5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
-                            />
-                          </svg>
-                          {deleteProjectMutation.isPending &&
-                          deleteProjectMutation.variables === project.id
-                            ? 'Đang lưu trữ...'
-                            : 'Lưu trữ'}
-                        </button>
-                        <Link
-                          href={`/jira/projects/${project.id}`}
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-brand-700 hover:text-brand-800"
-                        >
-                          Mở project
-                          <svg
-                            className="h-3.5 w-3.5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={2}
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                            />
-                          </svg>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-brand-500/0 to-brand-500/0 transition-colors group-hover:from-brand-500/5 group-hover:to-brand-500/10" />
-              </div>
-            ))}
-
-            <button
-              type="button"
-              onClick={() => setShowCreatePanel(true)}
-              className="group relative rounded-xl border-2 border-dashed border-surface-border bg-surface-bg p-6 text-center transition-all hover:border-brand-300 hover:bg-brand-50"
-            >
-              <div className="space-y-2">
-                <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-white transition-colors group-hover:bg-brand-100">
-                  <span className="text-lg text-slate-400 group-hover:text-brand-600">+</span>
-                </div>
-                <p className="font-semibold text-slate-700 group-hover:text-brand-600">Dự án mới</p>
-                <p className="text-xs text-slate-500">Tạo dự án để bắt đầu</p>
-              </div>
-            </button>
-          </div>
+          <ProjectCardsGrid
+            projects={filteredProjects}
+            onOpenCreate={() => setShowCreatePanel(true)}
+            onOpenEdit={openEditProject}
+            onArchive={(projectId) => {
+              void handleArchiveProject(projectId);
+            }}
+            isArchivingProject={isArchivingProject}
+          />
         )}
       </div>
     </section>

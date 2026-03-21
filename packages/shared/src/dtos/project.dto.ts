@@ -86,6 +86,20 @@ export interface UpdateTaskRequestDTO {
 
 export type UpdateTaskResponseDTO = ApiResponse<ProjectTaskItemDTO>;
 
+export interface BulkTaskOperationRequestDTO {
+  taskIds: string[];
+  status?: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
+  assigneeId?: string | null;
+  delete?: boolean;
+}
+
+export interface BulkTaskOperationResultDTO {
+  updated: number;
+  deleted: number;
+}
+
+export type BulkTaskOperationResponseDTO = ApiResponse<BulkTaskOperationResultDTO>;
+
 export type DeleteTaskResponseDTO = ApiResponse<{ deleted: boolean }>;
 
 export interface CreateProjectRequestDTO {
@@ -149,6 +163,7 @@ export type DeleteCommentResponseDTO = ApiResponse<{ deleted: boolean }>;
 export interface DashboardStatsDTO {
   tasksByStatus: { status: string; count: number }[];
   tasksByPriority: { priority: string; count: number }[];
+  tasksByType: { type: string; count: number }[];
   tasksByAssignee: {
     assigneeId: string;
     assigneeName: string;

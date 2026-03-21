@@ -4,6 +4,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { findOrThrow } from '../../common/helpers';
 import { NotificationService } from '../notification/notification.service';
 import type {
+  BulkTaskOperationResultDTO,
   CreateProjectRequestDTO,
   CreateTaskRequestDTO,
   DashboardStatsDTO,
@@ -366,6 +367,81 @@ export class ProjectService {
     return this.toTaskDTO(task);
   }
 
+  async bulkOperateTasksForProject(input: {
+    projectId: string;
+    workspaceId: string;
+    taskIds: string[];
+    status?: UpdateTaskStatusRequestDTO['status'];
+    assigneeId?: string | null;
+    delete?: boolean;
+  }): Promise<BulkTaskOperationResultDTO> {
+    await findOrThrow(
+      this.prisma.project.findFirst({
+        where: {
+          id: input.projectId,
+          workspaceId: input.workspaceId,
+          deletedAt: null,
+        } as Prisma.ProjectWhereInput,
+        select: { id: true },
+      }),
+      'Project',
+    );
+
+    const tasks = await this.prisma.task.findMany({
+      where: {
+        id: { in: input.taskIds },
+        projectId: input.projectId,
+        deletedAt: null,
+      },
+      select: { id: true },
+    });
+
+    if (tasks.length !== input.taskIds.length) {
+      throw new NotFoundException('One or more tasks were not found');
+    }
+
+    if (input.assigneeId) {
+      await this.validateAssignee(input.workspaceId, input.assigneeId);
+    }
+
+    if (input.delete) {
+      const deleteResult = await this.prisma.task.updateMany({
+        where: {
+          id: { in: input.taskIds },
+          projectId: input.projectId,
+          deletedAt: null,
+        },
+        data: {
+          deletedAt: new Date(),
+        },
+      });
+
+      return {
+        updated: 0,
+        deleted: deleteResult.count,
+      };
+    }
+
+    const updateData: Prisma.TaskUpdateManyMutationInput = {
+      ...(input.status !== undefined ? { status: input.status } : {}),
+      ...(input.assigneeId !== undefined ? { assigneeId: input.assigneeId } : {}),
+    };
+
+    const updateResult = await this.prisma.task.updateMany({
+      where: {
+        id: { in: input.taskIds },
+        projectId: input.projectId,
+        deletedAt: null,
+      },
+      data: updateData,
+    });
+
+    return {
+      updated: updateResult.count,
+      deleted: 0,
+    };
+  }
+
   async updateTaskForProject(input: {
     projectId: string;
     taskId: string;
@@ -465,6 +541,7 @@ export class ProjectService {
         title: true,
         status: true,
         priority: true,
+        type: true,
         dueDate: true,
         assigneeId: true,
         assignee: { select: { fullName: true, avatarColor: true } },
@@ -488,6 +565,13 @@ export class ProjectService {
       priority,
       count,
     }));
+
+    // Tasks by type
+    const typeMap = new Map<string, number>();
+    for (const t of tasks) {
+      typeMap.set(t.type ?? 'task', (typeMap.get(t.type ?? 'task') ?? 0) + 1);
+    }
+    const tasksByType = [...typeMap.entries()].map(([type, count]) => ({ type, count }));
 
     // Tasks by assignee
     const assigneeMap = new Map<string, { name: string; color: string | null; count: number }>();
@@ -569,6 +653,7 @@ export class ProjectService {
     return {
       tasksByStatus,
       tasksByPriority,
+      tasksByType,
       tasksByAssignee,
       tasksByProject,
       overdueTasks,

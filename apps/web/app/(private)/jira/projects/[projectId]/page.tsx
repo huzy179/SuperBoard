@@ -2,7 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { ProjectTaskItemDTO, TaskTypeDTO, ProjectMemberDTO } from '@superboard/shared';
 import { FullPageError, FullPageLoader } from '@/components/ui/page-states';
 import {
@@ -14,9 +14,13 @@ import {
   TaskIdBadge,
 } from '@/components/ui/task-badges';
 import { TaskCommentSection } from '@/components/task-comment-section';
+import { TaskCreateForm } from '@/components/jira/task-create-form';
+import { TaskFilterBar } from '@/components/jira/task-filter-bar';
+import { TaskBulkActionBar } from '@/components/jira/task-bulk-action-bar';
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useProjectDetail } from '@/hooks/use-project-detail';
 import {
+  useBulkTaskOperation,
   useCreateTask,
   useUpdateTask,
   useUpdateTaskStatus,
@@ -26,18 +30,81 @@ import { formatDate } from '@/lib/format-date';
 import {
   BOARD_COLUMNS,
   PRIORITY_OPTIONS,
-  PRIORITY_SORT_ORDER,
   COLUMN_BORDER,
   TASK_TYPE_OPTIONS,
   TASK_TYPE_ICONS,
   type TaskPriority,
 } from '@/lib/constants/task';
 import { toDateInputValue } from '@/lib/helpers';
+import {
+  buildBoardData,
+  filterAndSortProjectTasks,
+  isTaskOverdue,
+  toggleSetFilterValue,
+  type SortDirection,
+  type TaskSortBy,
+} from '@/lib/helpers/task-view';
 
 type ViewMode = 'board' | 'list';
 
+function parseCsvSet(value: string | null, allowed: ReadonlySet<string>): Set<string> {
+  if (!value) {
+    return new Set();
+  }
+  const next = new Set<string>();
+  value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .forEach((item) => {
+      if (allowed.has(item)) {
+        next.add(item);
+      }
+    });
+  return next;
+}
+
+function serializeCsvSet(value: Set<string>): string {
+  return [...value].sort().join(',');
+}
+
+function parseViewMode(value: string | null): ViewMode {
+  return value === 'list' ? 'list' : 'board';
+}
+
+function parseTaskSortBy(value: string | null): TaskSortBy {
+  if (
+    value === 'dueDate' ||
+    value === 'createdAt' ||
+    value === 'priority' ||
+    value === 'storyPoints'
+  ) {
+    return value;
+  }
+  return '';
+}
+
+function parseSortDirection(value: string | null): SortDirection {
+  return value === 'desc' ? 'desc' : 'asc';
+}
+
+function areSetsEqual(a: Set<string>, b: Set<string>): boolean {
+  if (a.size !== b.size) {
+    return false;
+  }
+  for (const value of a) {
+    if (!b.has(value)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export default function ProjectDetailPage() {
   const params = useParams<{ projectId: string }>();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const projectId = params.projectId;
 
   const {
@@ -49,6 +116,7 @@ export default function ProjectDetailPage() {
   const error = isError ? (queryError?.message ?? 'Không tải được dự án') : null;
 
   const createTaskMutation = useCreateTask(projectId);
+  const bulkTaskMutation = useBulkTaskOperation(projectId);
   const updateTaskMutation = useUpdateTask(projectId);
   const updateTaskStatusMutation = useUpdateTaskStatus(projectId);
   const deleteTaskMutation = useDeleteTask(projectId);
@@ -58,7 +126,14 @@ export default function ProjectDetailPage() {
   const members: ProjectMemberDTO[] = project?.members ?? [];
   const projectKey: string | null = project?.key ?? null;
 
-  const [viewMode, setViewMode] = useState<ViewMode>('board');
+  const allowedStatuses = useMemo(() => new Set(BOARD_COLUMNS.map((column) => column.key)), []);
+  const allowedPriorities = useMemo(
+    () => new Set(PRIORITY_OPTIONS.map((priority) => priority.key)),
+    [],
+  );
+  const allowedTypes = useMemo(() => new Set(TASK_TYPE_OPTIONS.map((type) => type.key)), []);
+
+  const [viewMode, setViewMode] = useState<ViewMode>(() => parseViewMode(searchParams.get('view')));
   const [showCreateTaskPanel, setShowCreateTaskPanel] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
@@ -70,71 +145,83 @@ export default function ProjectDetailPage() {
   const [createTaskError, setCreateTaskError] = useState<string | null>(null);
 
   // Filter & Sort state
-  const [filterAssignee, setFilterAssignee] = useState('');
-  const [filterPriorities, setFilterPriorities] = useState<Set<string>>(new Set());
-  const [filterTypes, setFilterTypes] = useState<Set<string>>(new Set());
-  const [sortBy, setSortBy] = useState('');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [filterAssignee, setFilterAssignee] = useState(() => searchParams.get('assignee') ?? '');
+  const [filterQuery, setFilterQuery] = useState(() => searchParams.get('q') ?? '');
+  const [filterStatuses, setFilterStatuses] = useState<Set<string>>(() =>
+    parseCsvSet(searchParams.get('statuses'), allowedStatuses),
+  );
+  const [filterPriorities, setFilterPriorities] = useState<Set<string>>(() =>
+    parseCsvSet(searchParams.get('priorities'), allowedPriorities),
+  );
+  const [filterTypes, setFilterTypes] = useState<Set<string>>(() =>
+    parseCsvSet(searchParams.get('types'), allowedTypes),
+  );
+  const [sortBy, setSortBy] = useState<TaskSortBy>(() =>
+    parseTaskSortBy(searchParams.get('sortBy')),
+  );
+  const [sortDir, setSortDir] = useState<SortDirection>(() =>
+    parseSortDirection(searchParams.get('sortDir')),
+  );
+  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
+  const [bulkStatus, setBulkStatus] = useState<ProjectTaskItemDTO['status']>('todo');
+  const [bulkAssigneeId, setBulkAssigneeId] = useState('');
+  const [bulkUpdatePending, setBulkUpdatePending] = useState(false);
+  const [bulkAssignPending, setBulkAssignPending] = useState(false);
+  const [bulkDeletePending, setBulkDeletePending] = useState(false);
+  const [pendingDeleteTaskIds, setPendingDeleteTaskIds] = useState<Set<string>>(new Set());
+  const [pendingDeleteSecondsLeft, setPendingDeleteSecondsLeft] = useState(0);
+  const [pendingDeleteProgress, setPendingDeleteProgress] = useState(0);
 
   const hasActiveFilters =
-    filterAssignee !== '' || filterPriorities.size > 0 || filterTypes.size > 0 || sortBy !== '';
+    filterQuery.trim() !== '' ||
+    filterAssignee !== '' ||
+    filterStatuses.size > 0 ||
+    filterPriorities.size > 0 ||
+    filterTypes.size > 0 ||
+    sortBy !== '';
 
   function clearFilters() {
+    setFilterQuery('');
     setFilterAssignee('');
+    setFilterStatuses(new Set());
     setFilterPriorities(new Set());
     setFilterTypes(new Set());
     setSortBy('');
     setSortDir('asc');
   }
 
+  function toggleFilterStatus(status: string) {
+    setFilterStatuses((prev) => toggleSetFilterValue(prev, status));
+  }
+
   function toggleFilterPriority(p: string) {
-    setFilterPriorities((prev) => {
-      const next = new Set(prev);
-      if (next.has(p)) next.delete(p);
-      else next.add(p);
-      return next;
-    });
+    setFilterPriorities((prev) => toggleSetFilterValue(prev, p));
   }
 
   function toggleFilterType(t: string) {
-    setFilterTypes((prev) => {
-      const next = new Set(prev);
-      if (next.has(t)) next.delete(t);
-      else next.add(t);
-      return next;
-    });
+    setFilterTypes((prev) => toggleSetFilterValue(prev, t));
   }
 
   const filteredTasks = useMemo(() => {
-    let tasks = project?.tasks ?? [];
-    if (filterAssignee) {
-      tasks = tasks.filter((t) => t.assigneeId === filterAssignee);
-    }
-    if (filterPriorities.size > 0) {
-      tasks = tasks.filter((t) => filterPriorities.has(t.priority));
-    }
-    if (filterTypes.size > 0) {
-      tasks = tasks.filter((t) => filterTypes.has(t.type ?? 'task'));
-    }
-    if (sortBy) {
-      tasks = [...tasks].sort((a, b) => {
-        let cmp = 0;
-        if (sortBy === 'dueDate') {
-          const da = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
-          const db = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
-          cmp = da - db;
-        } else if (sortBy === 'createdAt') {
-          cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        } else if (sortBy === 'priority') {
-          cmp = (PRIORITY_SORT_ORDER[a.priority] ?? 2) - (PRIORITY_SORT_ORDER[b.priority] ?? 2);
-        } else if (sortBy === 'storyPoints') {
-          cmp = (a.storyPoints ?? 0) - (b.storyPoints ?? 0);
-        }
-        return sortDir === 'desc' ? -cmp : cmp;
-      });
-    }
-    return tasks;
-  }, [project?.tasks, filterAssignee, filterPriorities, filterTypes, sortBy, sortDir]);
+    return filterAndSortProjectTasks(project?.tasks ?? [], {
+      query: filterQuery,
+      assigneeId: filterAssignee,
+      statuses: filterStatuses,
+      priorities: filterPriorities,
+      types: filterTypes,
+      sortBy,
+      sortDir,
+    });
+  }, [
+    project?.tasks,
+    filterQuery,
+    filterAssignee,
+    filterStatuses,
+    filterPriorities,
+    filterTypes,
+    sortBy,
+    sortDir,
+  ]);
 
   // Edit Task State
   const [editingTask, setEditingTask] = useState<ProjectTaskItemDTO | null>(null);
@@ -152,18 +239,341 @@ export default function ProjectDetailPage() {
 
   const dialogRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
+  const bulkDeleteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const bulkDeleteCountdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isApplyingUrlStateRef = useRef(false);
+
+  const visibleTasks = useMemo(
+    () => filteredTasks.filter((task) => !pendingDeleteTaskIds.has(task.id)),
+    [filteredTasks, pendingDeleteTaskIds],
+  );
 
   const boardData = useMemo(() => {
-    const byStatus = new Map<ProjectTaskItemDTO['status'], ProjectTaskItemDTO[]>();
-    BOARD_COLUMNS.forEach((column) => {
-      byStatus.set(column.key, []);
+    return buildBoardData(
+      visibleTasks,
+      BOARD_COLUMNS.map((column) => column.key),
+    );
+  }, [visibleTasks]);
+
+  const selectedVisibleCount = useMemo(
+    () => visibleTasks.filter((task) => selectedTaskIds.has(task.id)).length,
+    [visibleTasks, selectedTaskIds],
+  );
+
+  const isDragDropLocked = pendingDeleteTaskIds.size > 0 || bulkDeletePending;
+  const statusSelectLockReason = isDragDropLocked
+    ? 'Đang chờ xác nhận xoá, tạm khoá chỉnh sửa'
+    : updateTaskStatusMutation.isPending
+      ? 'Đang cập nhật trạng thái task'
+      : undefined;
+
+  useEffect(() => {
+    const nextViewMode = parseViewMode(searchParams.get('view'));
+    const nextQuery = searchParams.get('q') ?? '';
+    const nextAssignee = searchParams.get('assignee') ?? '';
+    const nextStatuses = parseCsvSet(searchParams.get('statuses'), allowedStatuses);
+    const nextPriorities = parseCsvSet(searchParams.get('priorities'), allowedPriorities);
+    const nextTypes = parseCsvSet(searchParams.get('types'), allowedTypes);
+    const nextSortBy = parseTaskSortBy(searchParams.get('sortBy'));
+    const nextSortDir = parseSortDirection(searchParams.get('sortDir'));
+
+    let changed = false;
+    if (viewMode !== nextViewMode) {
+      changed = true;
+      setViewMode(nextViewMode);
+    }
+    if (filterQuery !== nextQuery) {
+      changed = true;
+      setFilterQuery(nextQuery);
+    }
+    if (filterAssignee !== nextAssignee) {
+      changed = true;
+      setFilterAssignee(nextAssignee);
+    }
+    if (!areSetsEqual(filterStatuses, nextStatuses)) {
+      changed = true;
+      setFilterStatuses(nextStatuses);
+    }
+    if (!areSetsEqual(filterPriorities, nextPriorities)) {
+      changed = true;
+      setFilterPriorities(nextPriorities);
+    }
+    if (!areSetsEqual(filterTypes, nextTypes)) {
+      changed = true;
+      setFilterTypes(nextTypes);
+    }
+    if (sortBy !== nextSortBy) {
+      changed = true;
+      setSortBy(nextSortBy);
+    }
+    if (sortDir !== nextSortDir) {
+      changed = true;
+      setSortDir(nextSortDir);
+    }
+
+    if (changed) {
+      isApplyingUrlStateRef.current = true;
+    }
+  }, [searchParams, allowedStatuses, allowedPriorities, allowedTypes]);
+
+  useEffect(() => {
+    if (isApplyingUrlStateRef.current) {
+      isApplyingUrlStateRef.current = false;
+      return;
+    }
+
+    const nextParams = new URLSearchParams(searchParams.toString());
+
+    if (viewMode === 'board') {
+      nextParams.delete('view');
+    } else {
+      nextParams.set('view', viewMode);
+    }
+
+    const normalizedQuery = filterQuery.trim();
+    if (!normalizedQuery) {
+      nextParams.delete('q');
+    } else {
+      nextParams.set('q', normalizedQuery);
+    }
+
+    if (!filterAssignee) {
+      nextParams.delete('assignee');
+    } else {
+      nextParams.set('assignee', filterAssignee);
+    }
+
+    const statusesValue = serializeCsvSet(filterStatuses);
+    if (!statusesValue) {
+      nextParams.delete('statuses');
+    } else {
+      nextParams.set('statuses', statusesValue);
+    }
+
+    const prioritiesValue = serializeCsvSet(filterPriorities);
+    if (!prioritiesValue) {
+      nextParams.delete('priorities');
+    } else {
+      nextParams.set('priorities', prioritiesValue);
+    }
+
+    const typesValue = serializeCsvSet(filterTypes);
+    if (!typesValue) {
+      nextParams.delete('types');
+    } else {
+      nextParams.set('types', typesValue);
+    }
+
+    if (!sortBy) {
+      nextParams.delete('sortBy');
+      nextParams.delete('sortDir');
+    } else {
+      nextParams.set('sortBy', sortBy);
+      nextParams.set('sortDir', sortDir);
+    }
+
+    const nextQuery = nextParams.toString();
+    const currentQuery = searchParams.toString();
+    if (nextQuery !== currentQuery) {
+      const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+      router.replace(nextUrl, { scroll: false });
+    }
+  }, [
+    viewMode,
+    filterQuery,
+    filterAssignee,
+    filterStatuses,
+    filterPriorities,
+    filterTypes,
+    sortBy,
+    sortDir,
+    pathname,
+    router,
+    searchParams,
+  ]);
+
+  useEffect(() => {
+    const currentTaskIds = new Set((project?.tasks ?? []).map((task) => task.id));
+    setSelectedTaskIds((prev) => {
+      const next = new Set<string>();
+      prev.forEach((id) => {
+        if (currentTaskIds.has(id)) {
+          next.add(id);
+        }
+      });
+      return next;
     });
-    filteredTasks.forEach((task) => {
-      const current = byStatus.get(task.status) ?? [];
-      byStatus.set(task.status, [...current, task]);
+  }, [project?.tasks]);
+
+  function toggleTaskSelection(taskId: string) {
+    setSelectedTaskIds((prev) => toggleSetFilterValue(prev, taskId));
+  }
+
+  function clearTaskSelection() {
+    setSelectedTaskIds(new Set());
+  }
+
+  function toggleSelectAllVisible() {
+    const visibleIds = visibleTasks.map((task) => task.id);
+    const allVisibleSelected = visibleIds.every((id) => selectedTaskIds.has(id));
+    setSelectedTaskIds((prev) => {
+      const next = new Set(prev);
+      if (allVisibleSelected) {
+        visibleIds.forEach((id) => next.delete(id));
+      } else {
+        visibleIds.forEach((id) => next.add(id));
+      }
+      return next;
     });
-    return byStatus;
-  }, [filteredTasks]);
+  }
+
+  function clearBulkDeleteTimer() {
+    if (bulkDeleteTimerRef.current) {
+      clearTimeout(bulkDeleteTimerRef.current);
+      bulkDeleteTimerRef.current = null;
+    }
+    if (bulkDeleteCountdownRef.current) {
+      clearInterval(bulkDeleteCountdownRef.current);
+      bulkDeleteCountdownRef.current = null;
+    }
+  }
+
+  async function commitPendingBulkDelete(taskIds: string[]) {
+    if (taskIds.length === 0) {
+      return;
+    }
+    setTaskUpdateError(null);
+    setBulkDeletePending(true);
+    try {
+      await bulkTaskMutation.mutateAsync({
+        taskIds,
+        delete: true,
+      });
+    } catch (caughtError) {
+      setTaskUpdateError(
+        caughtError instanceof Error ? caughtError.message : 'Không thể xoá task hàng loạt',
+      );
+    } finally {
+      setBulkDeletePending(false);
+      setPendingDeleteTaskIds(new Set());
+      setPendingDeleteSecondsLeft(0);
+      setPendingDeleteProgress(0);
+      clearBulkDeleteTimer();
+    }
+  }
+
+  function handleUndoBulkDelete() {
+    clearBulkDeleteTimer();
+    setPendingDeleteTaskIds(new Set());
+    setPendingDeleteSecondsLeft(0);
+    setPendingDeleteProgress(0);
+  }
+
+  async function handleBulkUpdateStatus() {
+    const targetTaskIds = visibleTasks
+      .filter((task) => selectedTaskIds.has(task.id) && task.status !== bulkStatus)
+      .map((task) => task.id);
+
+    if (targetTaskIds.length === 0) {
+      return;
+    }
+
+    setTaskUpdateError(null);
+    setBulkUpdatePending(true);
+    try {
+      await bulkTaskMutation.mutateAsync({
+        taskIds: targetTaskIds,
+        status: bulkStatus,
+      });
+      clearTaskSelection();
+    } catch (caughtError) {
+      setTaskUpdateError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : 'Không thể cập nhật trạng thái hàng loạt',
+      );
+    } finally {
+      setBulkUpdatePending(false);
+    }
+  }
+
+  async function handleBulkAssignAssignee() {
+    if (pendingDeleteTaskIds.size > 0 || bulkDeletePending) {
+      return;
+    }
+
+    const targetTaskIds = visibleTasks
+      .filter((task) => selectedTaskIds.has(task.id) && (task.assigneeId ?? '') !== bulkAssigneeId)
+      .map((task) => task.id);
+
+    if (targetTaskIds.length === 0) {
+      return;
+    }
+
+    setTaskUpdateError(null);
+    setBulkAssignPending(true);
+    try {
+      await bulkTaskMutation.mutateAsync({
+        taskIds: targetTaskIds,
+        assigneeId: bulkAssigneeId || null,
+      });
+      clearTaskSelection();
+    } catch (caughtError) {
+      setTaskUpdateError(
+        caughtError instanceof Error ? caughtError.message : 'Không thể cập nhật người thực hiện',
+      );
+    } finally {
+      setBulkAssignPending(false);
+    }
+  }
+
+  async function handleBulkDeleteTasks() {
+    if (pendingDeleteTaskIds.size > 0 || bulkDeletePending) {
+      return;
+    }
+
+    const targetTaskIds = [...selectedTaskIds];
+    if (targetTaskIds.length === 0) {
+      return;
+    }
+    if (!confirm(`Bạn có chắc chắn muốn xoá ${targetTaskIds.length} task đã chọn?`)) {
+      return;
+    }
+
+    setTaskUpdateError(null);
+    if (editingTask && selectedTaskIds.has(editingTask.id)) {
+      handleCloseEdit();
+    }
+    clearTaskSelection();
+    setPendingDeleteTaskIds(new Set(targetTaskIds));
+    setPendingDeleteSecondsLeft(5);
+    setPendingDeleteProgress(100);
+    clearBulkDeleteTimer();
+    requestAnimationFrame(() => {
+      setPendingDeleteProgress(0);
+    });
+    bulkDeleteCountdownRef.current = setInterval(() => {
+      setPendingDeleteSecondsLeft((prev) => {
+        if (prev <= 1) {
+          if (bulkDeleteCountdownRef.current) {
+            clearInterval(bulkDeleteCountdownRef.current);
+            bulkDeleteCountdownRef.current = null;
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    bulkDeleteTimerRef.current = setTimeout(() => {
+      void commitPendingBulkDelete(targetTaskIds);
+    }, 5000);
+  }
+
+  useEffect(() => {
+    return () => {
+      clearBulkDeleteTimer();
+    };
+  }, []);
 
   async function handleCreateTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -321,16 +731,26 @@ export default function ProjectDetailPage() {
   }
 
   function handleDragStart(event: React.DragEvent<HTMLElement>, taskId: string) {
+    if (isDragDropLocked) {
+      event.preventDefault();
+      return;
+    }
     event.dataTransfer.setData('text/task-id', taskId);
     event.dataTransfer.effectAllowed = 'move';
   }
 
   function handleDragOver(event: React.DragEvent<HTMLElement>) {
+    if (isDragDropLocked) {
+      return;
+    }
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   }
 
   function handleDrop(event: React.DragEvent<HTMLElement>, status: ProjectTaskItemDTO['status']) {
+    if (isDragDropLocked) {
+      return;
+    }
     event.preventDefault();
     setDragOverColumn(null);
     const taskId = event.dataTransfer.getData('text/task-id');
@@ -339,11 +759,6 @@ export default function ProjectDetailPage() {
     const current = project.tasks.find((task) => task.id === taskId);
     if (!current || current.status === status) return;
     handleUpdateTaskStatus(taskId, status);
-  }
-
-  function isOverdue(dueDate?: string | null): boolean {
-    if (!dueDate) return false;
-    return new Date(dueDate) < new Date();
   }
 
   if (loading) {
@@ -423,215 +838,97 @@ export default function ProjectDetailPage() {
       </div>
 
       {showCreateTaskPanel ? (
-        <form
+        <TaskCreateForm
+          members={members}
+          taskTitle={taskTitle}
+          taskDescription={taskDescription}
+          taskStatus={taskStatus}
+          taskPriority={taskPriority}
+          taskType={taskType}
+          taskDueDate={taskDueDate}
+          taskAssigneeId={taskAssigneeId}
+          createTaskError={createTaskError}
+          createTaskPending={createTaskMutation.isPending}
+          onTaskTitleChange={setTaskTitle}
+          onTaskDescriptionChange={setTaskDescription}
+          onTaskStatusChange={setTaskStatus}
+          onTaskPriorityChange={setTaskPriority}
+          onTaskTypeChange={setTaskType}
+          onTaskDueDateChange={setTaskDueDate}
+          onTaskAssigneeIdChange={setTaskAssigneeId}
+          onCancel={() => setShowCreateTaskPanel(false)}
           onSubmit={handleCreateTask}
-          className="mb-6 rounded-xl border border-surface-border bg-surface-card p-5 shadow-sm"
-        >
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
-              Tiêu đề task
-              <input
-                type="text"
-                value={taskTitle}
-                onChange={(event) => setTaskTitle(event.target.value)}
-                placeholder="Ví dụ: Thiết kế flow login mới"
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-                required
-              />
-            </label>
-            <label className="block text-sm font-medium text-slate-700">
-              Trạng thái
-              <select
-                value={taskStatus}
-                onChange={(event) =>
-                  setTaskStatus(event.target.value as ProjectTaskItemDTO['status'])
-                }
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-              >
-                {BOARD_COLUMNS.map((column) => (
-                  <option key={column.key} value={column.key}>
-                    {column.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block text-sm font-medium text-slate-700">
-              Độ ưu tiên
-              <select
-                value={taskPriority}
-                onChange={(event) => setTaskPriority(event.target.value as TaskPriority)}
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-              >
-                {PRIORITY_OPTIONS.map((priority) => (
-                  <option key={priority.key} value={priority.key}>
-                    {priority.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block text-sm font-medium text-slate-700">
-              Loại task
-              <select
-                value={taskType}
-                onChange={(event) => setTaskType(event.target.value as TaskTypeDTO)}
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-              >
-                {TASK_TYPE_OPTIONS.map((t) => (
-                  <option key={t.key} value={t.key}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block text-sm font-medium text-slate-700">
-              Hạn hoàn thành
-              <input
-                type="date"
-                value={taskDueDate}
-                onChange={(event) => setTaskDueDate(event.target.value)}
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-              />
-            </label>
-            <label className="block text-sm font-medium text-slate-700">
-              Người thực hiện
-              <select
-                value={taskAssigneeId}
-                onChange={(event) => setTaskAssigneeId(event.target.value)}
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-              >
-                <option value="">-- Chưa gán --</option>
-                {members.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.fullName}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
-              Mô tả
-              <textarea
-                value={taskDescription}
-                onChange={(event) => setTaskDescription(event.target.value)}
-                rows={3}
-                placeholder="Chi tiết ngắn cho task"
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
-              />
-            </label>
-          </div>
-          {createTaskError ? <p className="mt-3 text-sm text-rose-600">{createTaskError}</p> : null}
-          <div className="mt-4 flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => setShowCreateTaskPanel(false)}
-              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700"
-            >
-              Huỷ
-            </button>
-            <button
-              type="submit"
-              disabled={createTaskMutation.isPending}
-              className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-400"
-            >
-              {createTaskMutation.isPending ? 'Đang tạo...' : 'Tạo task'}
-            </button>
-          </div>
-        </form>
+        />
       ) : null}
 
-      {/* Filter & Sort Bar */}
-      <div className="animate-fade-in mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-surface-border bg-surface-card px-3 py-2">
-        <select
-          value={filterAssignee}
-          onChange={(e) => setFilterAssignee(e.target.value)}
-          className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-700"
-          aria-label="Lọc theo người thực hiện"
-        >
-          <option value="">Người thực hiện</option>
-          {members.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.fullName}
-            </option>
-          ))}
-        </select>
+      <TaskFilterBar
+        members={members}
+        filterQuery={filterQuery}
+        filterAssignee={filterAssignee}
+        filterStatuses={filterStatuses}
+        filterPriorities={filterPriorities}
+        filterTypes={filterTypes}
+        sortBy={sortBy}
+        sortDir={sortDir}
+        hasActiveFilters={hasActiveFilters}
+        onFilterQueryChange={setFilterQuery}
+        onFilterAssigneeChange={setFilterAssignee}
+        onToggleStatus={toggleFilterStatus}
+        onTogglePriority={toggleFilterPriority}
+        onToggleType={toggleFilterType}
+        onSortByChange={setSortBy}
+        onToggleSortDir={() => setSortDir((direction) => (direction === 'asc' ? 'desc' : 'asc'))}
+        onClearFilters={clearFilters}
+      />
 
-        <div className="h-4 w-px bg-slate-200" />
+      <TaskBulkActionBar
+        members={members}
+        selectedCount={selectedTaskIds.size}
+        selectedVisibleCount={selectedVisibleCount}
+        totalVisibleCount={visibleTasks.length}
+        bulkStatus={bulkStatus}
+        bulkAssigneeId={bulkAssigneeId}
+        isStatusPending={bulkUpdatePending}
+        isAssignPending={bulkAssignPending}
+        isDeletePending={bulkDeletePending || pendingDeleteTaskIds.size > 0}
+        onBulkStatusChange={setBulkStatus}
+        onBulkAssigneeIdChange={setBulkAssigneeId}
+        onToggleSelectAllVisible={toggleSelectAllVisible}
+        onClearSelection={clearTaskSelection}
+        onApplyStatus={() => {
+          void handleBulkUpdateStatus();
+        }}
+        onApplyAssignee={() => {
+          void handleBulkAssignAssignee();
+        }}
+        onDeleteSelected={() => {
+          void handleBulkDeleteTasks();
+        }}
+      />
 
-        <div className="flex items-center gap-1">
-          <span className="text-[11px] text-slate-500">Ưu tiên:</span>
-          {PRIORITY_OPTIONS.map((p) => (
-            <button
-              key={p.key}
-              type="button"
-              onClick={() => toggleFilterPriority(p.key)}
-              className={`rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors ${
-                filterPriorities.has(p.key)
-                  ? 'bg-brand-100 text-brand-700 ring-1 ring-brand-300'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="h-4 w-px bg-slate-200" />
-
-        <div className="flex items-center gap-1">
-          <span className="text-[11px] text-slate-500">Loại:</span>
-          {TASK_TYPE_OPTIONS.map((t) => (
-            <button
-              key={t.key}
-              type="button"
-              onClick={() => toggleFilterType(t.key)}
-              className={`rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors ${
-                filterTypes.has(t.key)
-                  ? 'bg-brand-100 text-brand-700 ring-1 ring-brand-300'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="h-4 w-px bg-slate-200" />
-
-        <div className="flex items-center gap-1">
-          <span className="text-[11px] text-slate-500">Sắp xếp:</span>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-700"
-            aria-label="Sắp xếp theo"
-          >
-            <option value="">Mặc định</option>
-            <option value="dueDate">Hạn hoàn thành</option>
-            <option value="createdAt">Ngày tạo</option>
-            <option value="priority">Độ ưu tiên</option>
-            <option value="storyPoints">Story Points</option>
-          </select>
-          {sortBy ? (
+      {pendingDeleteTaskIds.size > 0 ? (
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-amber-800">
+              Đã đưa {pendingDeleteTaskIds.size} task vào hàng chờ xoá. Tự động xoá sau{' '}
+              {pendingDeleteSecondsLeft} giây.
+            </span>
             <button
               type="button"
-              onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
-              className="rounded px-1.5 py-0.5 text-[11px] font-medium bg-slate-100 text-slate-600 hover:bg-slate-200"
-              aria-label={sortDir === 'asc' ? 'Tăng dần' : 'Giảm dần'}
+              onClick={handleUndoBulkDelete}
+              className="ml-auto rounded bg-white px-2.5 py-1 text-[11px] font-semibold text-amber-700 hover:bg-amber-100"
             >
-              {sortDir === 'asc' ? '↑ Tăng' : '↓ Giảm'}
+              Hoàn tác
             </button>
-          ) : null}
+          </div>
+          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-amber-100">
+            <div
+              className="h-full rounded-full bg-amber-500"
+              style={{ width: `${pendingDeleteProgress}%`, transition: 'width 5s linear' }}
+            />
+          </div>
         </div>
-
-        {hasActiveFilters ? (
-          <button
-            type="button"
-            onClick={clearFilters}
-            className="ml-auto rounded px-2 py-1 text-[11px] font-medium text-rose-600 hover:bg-rose-50"
-          >
-            Xoá bộ lọc
-          </button>
-        ) : null}
-      </div>
+      ) : null}
 
       {project.tasks.length === 0 ? (
         <div className="rounded-xl border border-dashed border-surface-border bg-surface-card p-10 text-center">
@@ -656,12 +953,14 @@ export default function ProjectDetailPage() {
                 }`}
                 onDragOver={(e) => {
                   handleDragOver(e);
-                  setDragOverColumn(column.key);
+                  if (!isDragDropLocked) {
+                    setDragOverColumn(column.key);
+                  }
                 }}
                 onDragLeave={() => setDragOverColumn(null)}
                 onDrop={(event) => handleDrop(event, column.key)}
               >
-                <div className="flex items-center justify-between border-b border-surface-border bg-gradient-to-r from-slate-50 to-white px-3 py-2">
+                <div className="flex items-center justify-between border-b border-surface-border bg-linear-to-r from-slate-50 to-white px-3 py-2">
                   <p className="text-sm font-semibold text-slate-900">{column.label}</p>
                   <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-200 px-1.5 text-[11px] font-bold text-slate-700">
                     {tasks.length}
@@ -679,7 +978,7 @@ export default function ProjectDetailPage() {
                         tabIndex={0}
                         role="button"
                         aria-label={task.title}
-                        draggable={!updateTaskStatusMutation.isPending}
+                        draggable={!updateTaskStatusMutation.isPending && !isDragDropLocked}
                         onDragStart={(event) => handleDragStart(event, task.id)}
                         onClick={() => handleOpenEdit(task)}
                         onKeyDown={(e) => {
@@ -700,9 +999,22 @@ export default function ProjectDetailPage() {
                           updateTaskStatusMutation.isPending &&
                           updateTaskStatusMutation.variables?.taskId === task.id
                             ? 'opacity-60'
-                            : 'cursor-pointer hover:border-brand-300 hover:shadow-md hover:scale-[1.01] transition-transform'
-                        }`}
+                            : isDragDropLocked
+                              ? 'cursor-not-allowed opacity-80'
+                              : 'cursor-pointer hover:border-brand-300 hover:shadow-md hover:scale-[1.01] transition-transform'
+                        } ${selectedTaskIds.has(task.id) ? 'ring-1 ring-brand-300' : ''}
+                      `}
                       >
+                        <div className="mb-1 flex justify-end">
+                          <input
+                            type="checkbox"
+                            checked={selectedTaskIds.has(task.id)}
+                            onChange={() => toggleTaskSelection(task.id)}
+                            onClick={(event) => event.stopPropagation()}
+                            aria-label={`Chọn task ${task.title}`}
+                            className="h-3.5 w-3.5 rounded border-slate-300 text-brand-600"
+                          />
+                        </div>
                         {/* Top: type icon + task ID + story points */}
                         <div className="flex items-center justify-between gap-1 mb-1.5">
                           <div className="flex items-center gap-1.5">
@@ -727,7 +1039,7 @@ export default function ProjectDetailPage() {
                             <PriorityBadge priority={task.priority} />
                             {task.dueDate ? (
                               <span
-                                className={`text-[11px] ${isOverdue(task.dueDate) && task.status !== 'done' ? 'font-semibold text-red-600' : 'text-slate-500'}`}
+                                className={`text-[11px] ${isTaskOverdue(task.dueDate) && task.status !== 'done' ? 'font-semibold text-red-600' : 'text-slate-500'}`}
                               >
                                 {formatDate(task.dueDate)}
                               </span>
@@ -765,6 +1077,17 @@ export default function ProjectDetailPage() {
           <table className="min-w-full divide-y divide-surface-border text-sm">
             <thead className="bg-slate-50">
               <tr>
+                <th className="px-4 py-3 text-left">
+                  <input
+                    type="checkbox"
+                    checked={
+                      visibleTasks.length > 0 && selectedVisibleCount === visibleTasks.length
+                    }
+                    onChange={toggleSelectAllVisible}
+                    aria-label="Chọn tất cả task đang hiển thị"
+                    className="h-3.5 w-3.5 rounded border-slate-300 text-brand-600"
+                  />
+                </th>
                 <th className="px-4 py-3 text-left font-semibold text-slate-700">Task</th>
                 <th className="px-4 py-3 text-left font-semibold text-slate-700">Trạng thái</th>
                 <th className="px-4 py-3 text-left font-semibold text-slate-700">Độ ưu tiên</th>
@@ -775,7 +1098,7 @@ export default function ProjectDetailPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-border bg-white">
-              {filteredTasks.map((task) => (
+              {visibleTasks.map((task) => (
                 <tr
                   key={task.id}
                   tabIndex={0}
@@ -788,8 +1111,19 @@ export default function ProjectDetailPage() {
                       handleOpenEdit(task);
                     }
                   }}
-                  className="cursor-pointer transition-colors hover:bg-brand-50/50 even:bg-slate-50/50"
+                  className={`cursor-pointer transition-colors hover:bg-brand-50/50 even:bg-slate-50/50 ${
+                    selectedTaskIds.has(task.id) ? 'bg-brand-50/40' : ''
+                  }`}
                 >
+                  <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      checked={selectedTaskIds.has(task.id)}
+                      onChange={() => toggleTaskSelection(task.id)}
+                      aria-label={`Chọn task ${task.title}`}
+                      className="h-3.5 w-3.5 rounded border-slate-300 text-brand-600"
+                    />
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <TaskTypeIcon type={task.type ?? 'task'} />
@@ -805,7 +1139,8 @@ export default function ProjectDetailPage() {
                   <td className="px-4 py-3">
                     <select
                       value={task.status}
-                      disabled={updateTaskStatusMutation.isPending}
+                      disabled={updateTaskStatusMutation.isPending || isDragDropLocked}
+                      title={statusSelectLockReason}
                       onChange={(event) => {
                         handleUpdateTaskStatus(
                           task.id,
@@ -813,7 +1148,7 @@ export default function ProjectDetailPage() {
                         );
                       }}
                       onClick={(e) => e.stopPropagation()}
-                      className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700"
+                      className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100"
                     >
                       {BOARD_COLUMNS.map((column) => (
                         <option key={column.key} value={column.key}>

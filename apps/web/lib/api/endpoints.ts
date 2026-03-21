@@ -11,6 +11,7 @@ export const API_ENDPOINTS = {
     update: (projectId: string) => `/api/v1/projects/${projectId}`,
     delete: (projectId: string) => `/api/v1/projects/${projectId}`,
     createTask: (projectId: string) => `/api/v1/projects/${projectId}/tasks`,
+    bulkTask: (projectId: string) => `/api/v1/projects/${projectId}/tasks/bulk`,
     updateTaskStatus: (projectId: string, taskId: string) =>
       `/api/v1/projects/${projectId}/tasks/${taskId}/status`,
     updateTask: (projectId: string, taskId: string) =>

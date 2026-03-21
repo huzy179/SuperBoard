@@ -13,6 +13,8 @@ import {
 } from '@nestjs/common';
 import type {
   AuthUserDTO,
+  BulkTaskOperationRequestDTO,
+  BulkTaskOperationResponseDTO,
   CommentListResponseDTO,
   CreateCommentRequestDTO,
   CreateCommentResponseDTO,
@@ -230,6 +232,41 @@ export class ProjectController {
     });
 
     return apiSuccess(task);
+  }
+
+  @Patch(':projectId/tasks/bulk')
+  async bulkTaskOperation(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+    @Body() body: Partial<BulkTaskOperationRequestDTO>,
+  ): Promise<BulkTaskOperationResponseDTO> {
+    const workspaceId = requireWorkspace(user);
+
+    const taskIds = (body.taskIds ?? []).map((id) => id.trim()).filter(Boolean);
+    if (taskIds.length === 0) {
+      throw new BadRequestException('Task ids are required');
+    }
+
+    const hasStatus = body.status !== undefined;
+    const hasAssignee = Object.prototype.hasOwnProperty.call(body, 'assigneeId');
+    const shouldDelete = body.delete === true;
+
+    if (!hasStatus && !hasAssignee && !shouldDelete) {
+      throw new BadRequestException('At least one bulk operation is required');
+    }
+
+    const normalizedAssigneeId = hasAssignee ? body.assigneeId?.trim() || null : undefined;
+
+    const result = await this.projectService.bulkOperateTasksForProject({
+      projectId,
+      workspaceId,
+      taskIds,
+      ...(hasStatus ? { status: body.status } : {}),
+      ...(hasAssignee ? { assigneeId: normalizedAssigneeId } : {}),
+      ...(shouldDelete ? { delete: true } : {}),
+    });
+
+    return apiSuccess(result);
   }
 
   @Patch(':projectId/tasks/:taskId')

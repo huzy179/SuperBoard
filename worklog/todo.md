@@ -14,12 +14,15 @@ Mục tiêu: hoàn thiện Jira MVP đủ dùng thật, không còn thiếu gì 
 - [x] ~~Filter/sort nền tảng: status, priority, assignee, dueDate~~ (done v0.9)
 - [ ] Chốt API contract Jira v1 (DTO/request/response/error format)
 - [ ] Dọn semantics archive: quyết định `isArchived` vs `deletedAt` thuần
+- [ ] Bulk API endpoint (status/assignee/delete) để tránh loop N requests từ FE
 
 ### Frontend
 
 - [x] ~~Đồng bộ contract FE ↔ BE qua `packages/shared`~~ (done v0.9)
 - [x] ~~Filter/sort UI cho board + list~~ (done v0.9)
+- [x] ~~Bulk actions + undo UX cho board/list~~ (done v1.1)
 - [ ] Mock fallback cho endpoint BE chưa xong
+- [ ] Persist filter/search/viewMode vào URL query params
 
 ### Integration
 
@@ -36,6 +39,7 @@ Mục tiêu: từ "chạy được" lên "dùng được nghiêm túc".
 
 - [ ] Socket.io task update — kéo task → tất cả người xem board thấy ngay
 - [ ] Presence trên board — avatar ai đang xem
+- [ ] Đồng bộ realtime cho bulk actions (status/assignee/delete)
 
 ### UX Polish
 

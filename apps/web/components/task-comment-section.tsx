@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import type { CommentItemDTO } from '@superboard/shared';
+import type { CommentItemDTO, TaskHistoryItemDTO } from '@superboard/shared';
 import {
   useTaskComments,
   useTaskHistory,
@@ -175,11 +175,7 @@ export function TaskCommentSection({
   );
 }
 
-function describeTaskEvent(event: {
-  type: string;
-  actorName?: string | null;
-  payload?: Record<string, unknown> | null;
-}) {
+function describeTaskEvent(event: TaskHistoryItemDTO) {
   const actor = event.actorName ?? 'Hệ thống';
 
   if (event.type === 'created') {

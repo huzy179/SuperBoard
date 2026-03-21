@@ -12,7 +12,7 @@ type WorkspaceItemDTO = {
   id: string;
   name: string;
   slug: string;
-  isArchived: boolean;
+  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -374,7 +374,7 @@ export class WorkspaceService {
       id: workspace.id,
       name: workspace.name,
       slug: workspace.slug,
-      isArchived: workspace.deletedAt !== null,
+      deletedAt: workspace.deletedAt ? workspace.deletedAt.toISOString() : null,
       createdAt: workspace.createdAt.toISOString(),
       updatedAt: workspace.updatedAt.toISOString(),
     };

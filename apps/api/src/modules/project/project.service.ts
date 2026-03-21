@@ -13,6 +13,7 @@ import type {
   ProjectItemDTO,
   ProjectMemberDTO,
   ProjectTaskItemDTO,
+  TaskHistoryPayloadDTO,
   TaskHistoryItemDTO,
   UpdateProjectRequestDTO,
   UpdateTaskRequestDTO,
@@ -784,13 +785,13 @@ export class ProjectService {
 
     return events.map((event) => ({
       id: event.id,
-      type: event.type,
+      type: event.type as TaskHistoryItemDTO['type'],
       actorId: event.actorId,
       actorName: event.actor?.fullName ?? null,
       createdAt: event.createdAt.toISOString(),
       payload:
         event.payload && typeof event.payload === 'object' && !Array.isArray(event.payload)
-          ? (event.payload as Record<string, unknown>)
+          ? (event.payload as TaskHistoryPayloadDTO)
           : null,
     }));
   }
@@ -819,7 +820,10 @@ export class ProjectService {
     for (const t of tasks) {
       statusMap.set(t.status, (statusMap.get(t.status) ?? 0) + 1);
     }
-    const tasksByStatus = [...statusMap.entries()].map(([status, count]) => ({ status, count }));
+    const tasksByStatus = [...statusMap.entries()].map(([status, count]) => ({
+      status: status as DashboardStatsDTO['tasksByStatus'][number]['status'],
+      count,
+    }));
 
     // Tasks by priority
     const priorityMap = new Map<string, number>();
@@ -827,7 +831,7 @@ export class ProjectService {
       priorityMap.set(t.priority, (priorityMap.get(t.priority) ?? 0) + 1);
     }
     const tasksByPriority = [...priorityMap.entries()].map(([priority, count]) => ({
-      priority,
+      priority: priority as DashboardStatsDTO['tasksByPriority'][number]['priority'],
       count,
     }));
 
@@ -836,7 +840,10 @@ export class ProjectService {
     for (const t of tasks) {
       typeMap.set(t.type ?? 'task', (typeMap.get(t.type ?? 'task') ?? 0) + 1);
     }
-    const tasksByType = [...typeMap.entries()].map(([type, count]) => ({ type, count }));
+    const tasksByType = [...typeMap.entries()].map(([type, count]) => ({
+      type: type as DashboardStatsDTO['tasksByType'][number]['type'],
+      count,
+    }));
 
     // Tasks by assignee
     const assigneeMap = new Map<string, { name: string; color: string | null; count: number }>();
@@ -909,7 +916,7 @@ export class ProjectService {
     });
     const recentActivity = recentEvents.map((e) => ({
       id: e.id,
-      type: e.type,
+      type: e.type as DashboardStatsDTO['recentActivity'][number]['type'],
       taskTitle: e.task.title,
       actorName: e.actor?.fullName ?? null,
       createdAt: e.createdAt.toISOString(),

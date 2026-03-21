@@ -7,7 +7,6 @@ export interface Project {
   color?: string | null;
   icon?: string | null;
   key?: string | null;
-  isArchived: boolean;
   workspaceId: ID;
   createdAt: string;
   updatedAt: string;

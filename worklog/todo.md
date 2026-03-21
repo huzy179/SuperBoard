@@ -12,8 +12,8 @@ Mục tiêu: hoàn thiện Jira MVP đủ dùng thật, không còn thiếu gì 
 
 - [x] ~~Task history qua `TaskEvent` — ai làm gì, lúc nào~~ (done v1.4)
 - [x] ~~Filter/sort nền tảng: status, priority, assignee, dueDate~~ (done v0.9)
-- [ ] Chốt API contract Jira v1 (DTO/request/response/error format)
-- [ ] Dọn semantics archive: quyết định `isArchived` vs `deletedAt` thuần
+- [x] ~~Chốt API contract Jira v1 (DTO/request/response/error format)~~ (done v1.5)
+- [x] ~~Dọn semantics archive: quyết định `isArchived` vs `deletedAt` thuần~~ (done v1.6)
 - [x] ~~Bulk API endpoint (status/assignee/delete) để tránh loop N requests từ FE~~ (done v1.2)
 
 ### Frontend
@@ -39,13 +39,13 @@ Mục tiêu: từ "chạy được" lên "dùng được nghiêm túc".
 ### Real-time
 
 - [ ] Socket.io task update đa user — kéo task → tất cả người xem board thấy ngay
-- [ ] Presence trên board — avatar ai đang xem
+- [x] ~~Presence trên board — avatar ai đang xem~~ (done v1.9)
 - [x] ~~Đồng bộ realtime multi-tab cho bulk actions + project/comments~~ (done v1.2)
 
 ### UX Polish
 
 - [ ] Subtasks — nested 1 level, parent hiện progress
-- [ ] Calendar view — tasks theo month/week
+- [x] ~~Calendar view — tasks theo month/week~~ (done v1.8)
 
 ---
 

@@ -46,8 +46,9 @@ import {
   type TaskSortBy,
 } from '@/lib/helpers/task-view';
 import { useJiraProjectUiStore } from '@/stores/jira-project-ui-store';
+import { subscribeProjectPresence } from '@/lib/realtime/project-socket';
 
-type ViewMode = 'board' | 'list';
+type ViewMode = 'board' | 'list' | 'calendar';
 
 function parseCsvSet(value: string | null, allowed: ReadonlySet<string>): Set<string> {
   if (!value) {
@@ -71,7 +72,13 @@ function serializeCsvSet(value: Set<string>): string {
 }
 
 function parseViewMode(value: string | null): ViewMode {
-  return value === 'list' ? 'list' : 'board';
+  if (value === 'list') {
+    return 'list';
+  }
+  if (value === 'calendar') {
+    return 'calendar';
+  }
+  return 'board';
 }
 
 function parseTaskSortBy(value: string | null): TaskSortBy {
@@ -88,6 +95,33 @@ function parseTaskSortBy(value: string | null): TaskSortBy {
 
 function parseSortDirection(value: string | null): SortDirection {
   return value === 'desc' ? 'desc' : 'asc';
+}
+
+function toLocalDayKey(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getCalendarCells(
+  currentMonth: Date,
+): Array<{ date: Date; inMonth: boolean; key: string }> {
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+  const firstOfMonth = new Date(year, month, 1);
+  const firstWeekday = (firstOfMonth.getDay() + 6) % 7;
+  const startDate = new Date(year, month, 1 - firstWeekday);
+
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(startDate);
+    date.setDate(startDate.getDate() + index);
+    return {
+      date,
+      inMonth: date.getMonth() === month,
+      key: toLocalDayKey(date),
+    };
+  });
 }
 
 function areSetsEqual(a: Set<string>, b: Set<string>): boolean {
@@ -182,6 +216,7 @@ export default function ProjectDetailPage() {
   const [pendingDeleteTaskIds, setPendingDeleteTaskIds] = useState<Set<string>>(new Set());
   const [pendingDeleteSecondsLeft, setPendingDeleteSecondsLeft] = useState(0);
   const [pendingDeleteProgress, setPendingDeleteProgress] = useState(0);
+  const [viewerCount, setViewerCount] = useState(1);
 
   const hasActiveFilters =
     filterQuery.trim() !== '' ||
@@ -253,11 +288,61 @@ export default function ProjectDetailPage() {
   const bulkDeleteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bulkDeleteCountdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isApplyingUrlStateRef = useRef(false);
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
 
   const visibleTasks = useMemo(
     () => filteredTasks.filter((task) => !pendingDeleteTaskIds.has(task.id)),
     [filteredTasks, pendingDeleteTaskIds],
   );
+
+  const tasksWithoutDueDate = useMemo(
+    () => visibleTasks.filter((task) => !task.dueDate),
+    [visibleTasks],
+  );
+
+  const dueTasksByDate = useMemo(() => {
+    const map = new Map<string, ProjectTaskItemDTO[]>();
+
+    visibleTasks.forEach((task) => {
+      if (!task.dueDate) {
+        return;
+      }
+
+      const key = toLocalDayKey(new Date(task.dueDate));
+      const current = map.get(key) ?? [];
+      map.set(key, [...current, task]);
+    });
+
+    return map;
+  }, [visibleTasks]);
+
+  const calendarCells = useMemo(() => getCalendarCells(calendarMonth), [calendarMonth]);
+
+  const calendarMonthLabel = useMemo(
+    () =>
+      new Intl.DateTimeFormat('vi-VN', {
+        month: 'long',
+        year: 'numeric',
+      }).format(calendarMonth),
+    [calendarMonth],
+  );
+
+  useEffect(() => {
+    if (!projectId) {
+      return;
+    }
+
+    const unsubscribe = subscribeProjectPresence(projectId, (payload) => {
+      setViewerCount(Math.max(1, payload.viewerCount));
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [projectId]);
 
   const boardData = useMemo(() => {
     return buildBoardData(
@@ -987,6 +1072,9 @@ export default function ProjectDetailPage() {
             >
               + Tạo task
             </button>
+            <span className="rounded-md bg-slate-100 px-2.5 py-1.5 text-xs font-medium text-slate-600">
+              👀 {viewerCount} đang xem
+            </span>
             <button
               type="button"
               onClick={() => setViewMode('board')}
@@ -1008,6 +1096,17 @@ export default function ProjectDetailPage() {
               }`}
             >
               Danh sách
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('calendar')}
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                viewMode === 'calendar'
+                  ? 'bg-brand-600 text-white'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              Lịch
             </button>
           </div>
         </div>
@@ -1270,7 +1369,7 @@ export default function ProjectDetailPage() {
             );
           })}
         </div>
-      ) : (
+      ) : viewMode === 'list' ? (
         /* List View */
         <div className="overflow-hidden rounded-xl border border-surface-border bg-surface-card">
           <table className="min-w-full divide-y divide-surface-border text-sm">
@@ -1374,6 +1473,96 @@ export default function ProjectDetailPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between rounded-xl border border-surface-border bg-surface-card px-4 py-3">
+            <button
+              type="button"
+              onClick={() =>
+                setCalendarMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))
+              }
+              className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            >
+              ← Tháng trước
+            </button>
+            <p className="text-sm font-semibold text-slate-900 capitalize">{calendarMonthLabel}</p>
+            <button
+              type="button"
+              onClick={() =>
+                setCalendarMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))
+              }
+              className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            >
+              Tháng sau →
+            </button>
+          </div>
+
+          <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-slate-600">
+            {['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map((day) => (
+              <div key={day} className="py-1">
+                {day}
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-7 gap-2">
+            {calendarCells.map((cell) => {
+              const dayTasks = dueTasksByDate.get(cell.key) ?? [];
+              return (
+                <div
+                  key={cell.key}
+                  className={`min-h-28 rounded-lg border p-2 ${
+                    cell.inMonth
+                      ? 'border-surface-border bg-surface-card'
+                      : 'border-slate-200 bg-slate-50'
+                  }`}
+                >
+                  <p
+                    className={`mb-1 text-xs font-semibold ${cell.inMonth ? 'text-slate-700' : 'text-slate-400'}`}
+                  >
+                    {cell.date.getDate()}
+                  </p>
+                  <div className="space-y-1">
+                    {dayTasks.slice(0, 3).map((task) => (
+                      <button
+                        key={task.id}
+                        type="button"
+                        onClick={() => handleOpenEdit(task)}
+                        className="w-full rounded border border-slate-200 bg-white px-1.5 py-1 text-left text-[11px] text-slate-700 hover:border-brand-300 hover:bg-brand-50"
+                        title={task.title}
+                      >
+                        <span className="line-clamp-1">{task.title}</span>
+                      </button>
+                    ))}
+                    {dayTasks.length > 3 ? (
+                      <p className="text-[11px] text-slate-500">+{dayTasks.length - 3} task</p>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {tasksWithoutDueDate.length > 0 ? (
+            <div className="rounded-xl border border-surface-border bg-surface-card p-4">
+              <p className="mb-2 text-sm font-semibold text-slate-900">
+                Task chưa có hạn hoàn thành
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {tasksWithoutDueDate.map((task) => (
+                  <button
+                    key={task.id}
+                    type="button"
+                    onClick={() => handleOpenEdit(task)}
+                    className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 hover:border-brand-300 hover:bg-brand-50"
+                  >
+                    {task.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
       )}
 

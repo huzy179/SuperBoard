@@ -69,3 +69,33 @@ export function subscribeProjectSocketUpdated(
     socket.off('project:updated', listener);
   };
 }
+
+export function subscribeProjectPresence(
+  projectId: string,
+  onPresence: (payload: { projectId: string; viewerCount: number; at: number }) => void,
+): () => void {
+  const socket = getProjectSocket(projectId);
+
+  if (!socket) {
+    return () => {};
+  }
+
+  const listener = (payload: { projectId?: string; viewerCount?: number; at?: number }) => {
+    if (payload?.projectId !== projectId || typeof payload.viewerCount !== 'number') {
+      return;
+    }
+
+    onPresence({
+      projectId,
+      viewerCount: payload.viewerCount,
+      at: typeof payload.at === 'number' ? payload.at : Date.now(),
+    });
+  };
+
+  socket.on('project:presence', listener);
+  socket.emit('project:join', { projectId });
+
+  return () => {
+    socket.off('project:presence', listener);
+  };
+}

@@ -141,3 +141,38 @@
 - [x] Ghi `TaskEvent` cho các thao tác chính: create/update/status/assignee/bulk/delete/comment
 - [x] FE thêm hook/service lấy task history theo task
 - [x] Task detail panel hiển thị timeline lịch sử thao tác (ai làm gì, lúc nào)
+
+## Jira v1.5 — API Contract Hardening
+
+- [x] Chuẩn hoá DTO dùng chung cho Jira: `TaskStatusDTO`, `TaskEventTypeDTO`, `TaskEventActionDTO`
+- [x] Siết type cho `TaskHistoryItemDTO` và `TaskHistoryPayloadDTO` (loại bỏ payload tự do)
+- [x] Siết type cho `DashboardStatsDTO` (`tasksByStatus/priority/type`, `recentActivity.type`)
+- [x] Đồng bộ mapping BE `project.service` và FE timeline theo contract typed mới
+
+## Jira v1.6 — Archive Semantics Cleanup
+
+- [x] Thống nhất archive semantics dùng `deletedAt` làm nguồn sự thật duy nhất
+- [x] Loại bỏ cột `isArchived` khỏi schema Prisma (`Workspace`, `Project`, `Task`)
+- [x] Tạo và apply migration `20260321142214_remove_is_archived_columns`
+- [x] Cập nhật seed và shared types để bỏ phụ thuộc `isArchived`
+
+## Jira v1.7 — Service Test Coverage for Task History
+
+- [x] Cập nhật `project.service.test.ts` theo logic mới (`task.aggregate`, `taskEvent.create`)
+- [x] Thêm test `getTaskHistoryForProject` để verify mapping payload + actor + type
+- [x] Chạy test mục tiêu `test/services/project.service.test.ts` pass 100%
+
+## Jira v1.8 — Calendar View (Project Tasks)
+
+- [x] Thêm view mode `calendar` trong Jira project detail (song song board/list)
+- [x] Lịch theo tháng có điều hướng tháng trước/sau, hiển thị task theo `dueDate`
+- [x] Mỗi ngày hiển thị tối đa 3 task + chỉ báo số task còn lại
+- [x] Click task trong lịch mở panel chi tiết task như các view khác
+- [x] Bổ sung khu vực task chưa có hạn hoàn thành trong calendar view
+
+## Jira v1.9 — Realtime Presence on Project Board
+
+- [x] Mở rộng `ProjectGateway` phát event `project:presence` theo số client trong room
+- [x] Quản lý join/switch/disconnect room để cập nhật presence chính xác
+- [x] Thêm subscriber presence ở web socket client (`subscribeProjectPresence`)
+- [x] Hiển thị badge realtime `👀 X đang xem` trên project detail header

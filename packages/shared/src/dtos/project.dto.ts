@@ -15,6 +15,23 @@ export type TaskPriorityDTO = 'low' | 'medium' | 'high' | 'urgent';
 
 export type TaskTypeDTO = 'task' | 'bug' | 'story' | 'epic';
 
+export type TaskStatusDTO = 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
+
+export type TaskEventTypeDTO =
+  | 'created'
+  | 'updated'
+  | 'status_changed'
+  | 'assignee_changed'
+  | 'comment_added';
+
+export type TaskEventActionDTO =
+  | 'task_updated'
+  | 'task_deleted'
+  | 'bulk_delete'
+  | 'bulk_update'
+  | 'comment_updated'
+  | 'comment_deleted';
+
 export interface LabelDTO {
   id: string;
   name: string;
@@ -31,7 +48,7 @@ export interface ProjectTaskItemDTO {
   id: string;
   title: string;
   description?: string | null;
-  status: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
+  status: TaskStatusDTO;
   priority: TaskPriorityDTO;
   type: TaskTypeDTO;
   number?: number | null;
@@ -56,7 +73,7 @@ export type ProjectDetailResponseDTO = ApiResponse<ProjectDetailDTO>;
 export interface CreateTaskRequestDTO {
   title: string;
   description?: string;
-  status?: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
+  status?: TaskStatusDTO;
   priority?: TaskPriorityDTO;
   type?: TaskTypeDTO;
   storyPoints?: number | null;
@@ -68,7 +85,7 @@ export interface CreateTaskRequestDTO {
 export type CreateTaskResponseDTO = ApiResponse<ProjectTaskItemDTO>;
 
 export interface UpdateTaskStatusRequestDTO {
-  status: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
+  status: TaskStatusDTO;
   position?: string | null;
 }
 
@@ -77,7 +94,7 @@ export type UpdateTaskStatusResponseDTO = ApiResponse<ProjectTaskItemDTO>;
 export interface UpdateTaskRequestDTO {
   title?: string;
   description?: string;
-  status?: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
+  status?: TaskStatusDTO;
   priority?: TaskPriorityDTO;
   type?: TaskTypeDTO;
   storyPoints?: number | null;
@@ -91,7 +108,7 @@ export type UpdateTaskResponseDTO = ApiResponse<ProjectTaskItemDTO>;
 
 export interface BulkTaskOperationRequestDTO {
   taskIds: string[];
-  status?: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
+  status?: TaskStatusDTO;
   priority?: TaskPriorityDTO;
   type?: TaskTypeDTO;
   dueDate?: string | null;
@@ -164,13 +181,37 @@ export type UpdateCommentResponseDTO = ApiResponse<CommentItemDTO>;
 
 export type DeleteCommentResponseDTO = ApiResponse<{ deleted: boolean }>;
 
+export interface TaskHistoryPayloadDTO {
+  action?: TaskEventActionDTO;
+  from?: string | null;
+  to?: string | null;
+  changedFields?: Array<
+    | 'title'
+    | 'description'
+    | 'priority'
+    | 'type'
+    | 'storyPoints'
+    | 'dueDate'
+    | 'assigneeId'
+    | 'labelIds'
+  >;
+  status?: TaskStatusDTO;
+  priority?: TaskPriorityDTO;
+  type?: TaskTypeDTO;
+  dueDate?: string | null;
+  assigneeId?: string | null;
+  commentId?: string;
+  deletedAt?: string;
+  title?: string;
+}
+
 export interface TaskHistoryItemDTO {
   id: string;
-  type: string;
+  type: TaskEventTypeDTO;
   actorId?: string | null;
   actorName?: string | null;
   createdAt: string;
-  payload?: Record<string, unknown> | null;
+  payload?: TaskHistoryPayloadDTO | null;
 }
 
 export type TaskHistoryResponseDTO = ApiResponse<TaskHistoryItemDTO[]>;
@@ -178,9 +219,9 @@ export type TaskHistoryResponseDTO = ApiResponse<TaskHistoryItemDTO[]>;
 // Dashboard DTOs
 
 export interface DashboardStatsDTO {
-  tasksByStatus: { status: string; count: number }[];
-  tasksByPriority: { priority: string; count: number }[];
-  tasksByType: { type: string; count: number }[];
+  tasksByStatus: { status: TaskStatusDTO; count: number }[];
+  tasksByPriority: { priority: TaskPriorityDTO; count: number }[];
+  tasksByType: { type: TaskTypeDTO; count: number }[];
   tasksByAssignee: {
     assigneeId: string;
     assigneeName: string;
@@ -198,7 +239,7 @@ export interface DashboardStatsDTO {
   overdueTasks: number;
   recentActivity: {
     id: string;
-    type: string;
+    type: TaskEventTypeDTO;
     taskTitle: string;
     actorName: string | null;
     createdAt: string;

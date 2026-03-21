@@ -820,7 +820,6 @@ async function main() {
         color: spec.color,
         icon: spec.icon,
         key: spec.key,
-        isArchived: false,
       },
       create: {
         id: spec.id,

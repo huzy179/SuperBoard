@@ -33,8 +33,11 @@ export function useUpdateTask(projectId: string) {
   return useMutation({
     mutationFn: ({ taskId, data }: { taskId: string; data: UpdateTaskRequestDTO }) =>
       updateProjectTask(projectId, taskId, data),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       void queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+      void queryClient.invalidateQueries({
+        queryKey: ['projects', projectId, 'tasks', variables.taskId, 'history'],
+      });
       publishProjectDetailUpdated(projectId);
     },
   });
@@ -47,11 +50,17 @@ export function useUpdateTaskStatus(projectId: string) {
     mutationFn: ({
       taskId,
       status,
+      position,
     }: {
       taskId: string;
       status: UpdateTaskStatusRequestDTO['status'];
-    }) => updateProjectTaskStatus(projectId, taskId, { status }),
-    onMutate: async ({ taskId, status }) => {
+      position?: string | null;
+    }) =>
+      updateProjectTaskStatus(projectId, taskId, {
+        status,
+        ...(position !== undefined ? { position } : {}),
+      }),
+    onMutate: async ({ taskId, status, position }) => {
       await queryClient.cancelQueries({ queryKey: ['projects', projectId] });
 
       const previous = queryClient.getQueryData<ProjectDetailDTO>(['projects', projectId]);
@@ -59,7 +68,15 @@ export function useUpdateTaskStatus(projectId: string) {
       if (previous) {
         queryClient.setQueryData<ProjectDetailDTO>(['projects', projectId], {
           ...previous,
-          tasks: previous.tasks.map((task) => (task.id === taskId ? { ...task, status } : task)),
+          tasks: previous.tasks.map((task) =>
+            task.id === taskId
+              ? {
+                  ...task,
+                  status,
+                  ...(position !== undefined ? { position } : {}),
+                }
+              : task,
+          ),
         });
       }
 
@@ -70,7 +87,10 @@ export function useUpdateTaskStatus(projectId: string) {
         queryClient.setQueryData(['projects', projectId], context.previous);
       }
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      void queryClient.invalidateQueries({
+        queryKey: ['projects', projectId, 'tasks', variables.taskId, 'history'],
+      });
       publishProjectDetailUpdated(projectId);
     },
     onSettled: () => {
@@ -84,8 +104,11 @@ export function useDeleteTask(projectId: string) {
 
   return useMutation({
     mutationFn: (taskId: string) => deleteProjectTask(projectId, taskId),
-    onSuccess: () => {
+    onSuccess: (_data, taskId) => {
       void queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+      void queryClient.invalidateQueries({
+        queryKey: ['projects', projectId, 'tasks', taskId, 'history'],
+      });
       publishProjectDetailUpdated(projectId);
     },
   });
@@ -159,7 +182,12 @@ export function useBulkTaskOperation(projectId: string) {
         queryClient.setQueryData(['projects', projectId], context.previous);
       }
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      for (const taskId of variables.taskIds) {
+        void queryClient.invalidateQueries({
+          queryKey: ['projects', projectId, 'tasks', taskId, 'history'],
+        });
+      }
       publishProjectDetailUpdated(projectId);
     },
     onSettled: () => {

@@ -28,6 +28,7 @@ import type {
   DeleteTaskResponseDTO,
   ProjectDetailResponseDTO,
   ProjectsResponseDTO,
+  TaskHistoryResponseDTO,
   UpdateCommentRequestDTO,
   UpdateCommentResponseDTO,
   UpdateProjectRequestDTO,
@@ -41,6 +42,7 @@ import { apiSuccess } from '../../common/api-response';
 import { requireWorkspace, findOrThrow, parseBooleanQuery } from '../../common/helpers';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { CommentService } from './comment.service';
+import { ProjectGateway } from './project.gateway';
 import { ProjectService } from './project.service';
 
 @Controller('projects')
@@ -48,6 +50,7 @@ export class ProjectController {
   constructor(
     private projectService: ProjectService,
     private commentService: CommentService,
+    private projectGateway: ProjectGateway,
   ) {}
 
   @Get()
@@ -197,6 +200,7 @@ export class ProjectController {
     const task = await this.projectService.createTaskForProject({
       projectId,
       workspaceId,
+      actorId: user.id,
       title,
       ...(description ? { description } : {}),
       status,
@@ -207,6 +211,8 @@ export class ProjectController {
       ...(assigneeId ? { assigneeId } : {}),
       ...(dueDate !== undefined ? { dueDate } : {}),
     });
+
+    this.projectGateway.emitProjectUpdated(projectId);
 
     return apiSuccess(task);
   }
@@ -228,8 +234,14 @@ export class ProjectController {
       projectId,
       taskId,
       workspaceId,
+      actorId: user.id,
       status: body.status,
+      ...(Object.prototype.hasOwnProperty.call(body, 'position')
+        ? { position: body.position ?? null }
+        : {}),
     });
+
+    this.projectGateway.emitProjectUpdated(projectId);
 
     return apiSuccess(task);
   }
@@ -258,12 +270,13 @@ export class ProjectController {
       throw new BadRequestException('At least one bulk operation is required');
     }
 
-    const normalizedAssigneeId = hasAssignee ? body.assigneeId?.trim() || null : undefined;
+    const normalizedAssigneeId: string | null = body.assigneeId?.trim() || null;
     const normalizedDueDate = hasDueDate ? this.parseOptionalDate(body.dueDate) : undefined;
 
     const result = await this.projectService.bulkOperateTasksForProject({
       projectId,
       workspaceId,
+      actorId: user.id,
       taskIds,
       ...(hasStatus ? { status: body.status } : {}),
       ...(hasPriority ? { priority: body.priority } : {}),
@@ -272,6 +285,8 @@ export class ProjectController {
       ...(hasAssignee ? { assigneeId: normalizedAssigneeId } : {}),
       ...(shouldDelete ? { delete: true } : {}),
     });
+
+    this.projectGateway.emitProjectUpdated(projectId);
 
     return apiSuccess(result);
   }
@@ -298,6 +313,7 @@ export class ProjectController {
       projectId,
       taskId,
       workspaceId,
+      actorId: user.id,
       data: {
         ...(normalizedTitle !== undefined ? { title: normalizedTitle } : {}),
         ...(body.description !== undefined ? { description: normalizedDescription ?? '' } : {}),
@@ -305,11 +321,14 @@ export class ProjectController {
         ...(body.priority !== undefined ? { priority: body.priority } : {}),
         ...(body.type !== undefined ? { type: body.type } : {}),
         ...(body.storyPoints !== undefined ? { storyPoints: body.storyPoints } : {}),
+        ...(body.position !== undefined ? { position: body.position } : {}),
         ...(body.labelIds !== undefined ? { labelIds: body.labelIds } : {}),
         ...(body.assigneeId !== undefined ? { assigneeId: normalizedAssigneeId || null } : {}),
         ...(dueDate !== undefined ? { dueDate } : {}),
       },
     });
+
+    this.projectGateway.emitProjectUpdated(projectId);
 
     return apiSuccess(task);
   }
@@ -327,12 +346,32 @@ export class ProjectController {
       projectId,
       taskId,
       workspaceId,
+      actorId: user.id,
     });
+
+    this.projectGateway.emitProjectUpdated(projectId);
 
     return apiSuccess({ deleted: true });
   }
 
   // Comment endpoints
+
+  @Get(':projectId/tasks/:taskId/history')
+  async getTaskHistory(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+    @Param('taskId') taskId: string,
+  ): Promise<TaskHistoryResponseDTO> {
+    const workspaceId = requireWorkspace(user);
+
+    const history = await this.projectService.getTaskHistoryForProject({
+      projectId,
+      taskId,
+      workspaceId,
+    });
+
+    return apiSuccess(history);
+  }
 
   @Get(':projectId/tasks/:taskId/comments')
   async listComments(

@@ -7,6 +7,7 @@ import type {
   ProjectDetailDTO,
   ProjectItemDTO,
   ProjectTaskItemDTO,
+  TaskHistoryItemDTO,
   UpdateProjectRequestDTO,
   UpdateTaskRequestDTO,
   UpdateTaskStatusRequestDTO,
@@ -100,4 +101,13 @@ export async function deleteProjectTask(projectId: string, taskId: string): Prom
 
 export async function getDashboardStats(): Promise<DashboardStatsDTO> {
   return apiGet<DashboardStatsDTO>(API_ENDPOINTS.projects.dashboard, { auth: true });
+}
+
+export async function getTaskHistory(
+  projectId: string,
+  taskId: string,
+): Promise<TaskHistoryItemDTO[]> {
+  return apiGet<TaskHistoryItemDTO[]>(API_ENDPOINTS.projects.taskHistory(projectId, taskId), {
+    auth: true,
+  });
 }

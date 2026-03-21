@@ -115,3 +115,29 @@
 - [x] Khoá drag-drop và inline status change khi pending bulk delete để tránh xung đột
 - [x] Tooltip giải thích lý do control bị khoá
 - [x] Bulk gán / bỏ gán người thực hiện cho nhiều task
+
+## Jira v1.2 — Bulk API Maturity + URL/Realtime Improvements
+
+- [x] Đồng bộ trạng thái UI vào URL query params (view/filter/sort/search) + sync Back/Forward
+- [x] Chuyển bulk actions FE từ nhiều request/task sang 1 bulk API request
+- [x] Bulk API mở rộng cập nhật nhiều trường trong một lần gọi
+- [x] Optimistic cache update cho bulk operations (rollback khi lỗi)
+- [x] Cross-tab realtime sync bằng BroadcastChannel cho project detail
+- [x] Mở rộng cross-tab sync cho projects list và task comments
+- [x] Debounce invalidate khi nhận burst events để giảm refetch dư thừa
+- [x] Visibility-aware refetch: tab hidden thì defer, tab visible thì flush một lần
+
+## Jira v1.3 — Bulk Field Expansion
+
+- [x] Bulk cập nhật `priority` cho nhiều task
+- [x] Bulk cập nhật `type` cho nhiều task
+- [x] Bulk cập nhật/clear `dueDate` cho nhiều task
+- [x] Mở rộng Task Bulk Action Bar với control cho priority/type/due date
+- [x] API contract shared DTO cập nhật đồng bộ FE ↔ BE cho bulk fields mới
+
+## Jira v1.4 — Task History via TaskEvent
+
+- [x] Thêm endpoint `GET /projects/:projectId/tasks/:taskId/history`
+- [x] Ghi `TaskEvent` cho các thao tác chính: create/update/status/assignee/bulk/delete/comment
+- [x] FE thêm hook/service lấy task history theo task
+- [x] Task detail panel hiển thị timeline lịch sử thao tác (ai làm gì, lúc nào)

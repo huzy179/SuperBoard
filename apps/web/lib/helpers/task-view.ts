@@ -94,7 +94,50 @@ export function buildBoardData(
     byStatus.set(task.status, [...current, task]);
   });
 
+  statuses.forEach((status) => {
+    const inColumn = byStatus.get(status) ?? [];
+    const sorted = [...inColumn].sort((a, b) => {
+      const positionA = parseTaskPosition(a.position);
+      const positionB = parseTaskPosition(b.position);
+      if (positionA !== positionB) {
+        return positionA - positionB;
+      }
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    });
+    byStatus.set(status, sorted);
+  });
+
   return byStatus;
+}
+
+export function parseTaskPosition(position?: string | null): number {
+  const numericPosition = Number(position);
+  return Number.isFinite(numericPosition) ? numericPosition : 0;
+}
+
+export function buildFractionalTaskPosition(input: {
+  previousPosition?: string | null | undefined;
+  nextPosition?: string | null | undefined;
+}): string {
+  const previous =
+    input.previousPosition != null && Number.isFinite(Number(input.previousPosition))
+      ? Number(input.previousPosition)
+      : null;
+  const next =
+    input.nextPosition != null && Number.isFinite(Number(input.nextPosition))
+      ? Number(input.nextPosition)
+      : null;
+
+  let result = 1000;
+  if (previous != null && next != null) {
+    result = next > previous ? previous + (next - previous) / 2 : previous + 1;
+  } else if (previous != null) {
+    result = previous + 1000;
+  } else if (next != null) {
+    result = next - 1000;
+  }
+
+  return Number.isFinite(result) ? String(result) : '1000';
 }
 
 export function isTaskOverdue(dueDate?: string | null): boolean {

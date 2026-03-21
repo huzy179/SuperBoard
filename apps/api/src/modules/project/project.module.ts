@@ -4,12 +4,13 @@ import { NotificationModule } from '../notification/notification.module';
 import { CommentService } from './comment.service';
 import { ProjectService } from './project.service';
 import { ProjectController } from './project.controller';
+import { ProjectGateway } from './project.gateway';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Module({
   imports: [AuthModule, NotificationModule],
   controllers: [ProjectController],
-  providers: [ProjectService, CommentService, PrismaService],
+  providers: [ProjectService, CommentService, ProjectGateway, PrismaService],
   exports: [ProjectService],
 })
 export class ProjectModule {}

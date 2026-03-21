@@ -18,6 +18,8 @@ export const API_ENDPOINTS = {
       `/api/v1/projects/${projectId}/tasks/${taskId}`,
     deleteTask: (projectId: string, taskId: string) =>
       `/api/v1/projects/${projectId}/tasks/${taskId}`,
+    taskHistory: (projectId: string, taskId: string) =>
+      `/api/v1/projects/${projectId}/tasks/${taskId}/history`,
     listComments: (projectId: string, taskId: string) =>
       `/api/v1/projects/${projectId}/tasks/${taskId}/comments`,
     createComment: (projectId: string, taskId: string) =>

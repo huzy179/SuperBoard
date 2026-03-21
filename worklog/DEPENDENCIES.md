@@ -1,5 +1,10 @@
 # SuperBoard - Dependencies & Purpose
 
+## Cập nhật trạng thái (2026-03)
+
+- Jira realtime hiện tại (multi-tab) đang dùng `BroadcastChannel` native của browser, chưa cần thêm package mới.
+- Realtime đa user qua `socket.io` vẫn là hạng mục kế tiếp (đã có dependency nền ở web/api).
+
 ## Root (Monorepo Tooling)
 
 - `turbo`: điều phối pipeline monorepo (`dev`, `build`, `lint`, `typecheck`, `test`).

@@ -37,6 +37,7 @@ import {
 } from '@/lib/constants/task';
 import { toDateInputValue } from '@/lib/helpers';
 import {
+  buildFractionalTaskPosition,
   buildBoardData,
   filterAndSortProjectTasks,
   isTaskOverdue,
@@ -44,6 +45,7 @@ import {
   type SortDirection,
   type TaskSortBy,
 } from '@/lib/helpers/task-view';
+import { useJiraProjectUiStore } from '@/stores/jira-project-ui-store';
 
 type ViewMode = 'board' | 'list';
 
@@ -133,8 +135,28 @@ export default function ProjectDetailPage() {
   );
   const allowedTypes = useMemo(() => new Set(TASK_TYPE_OPTIONS.map((type) => type.key)), []);
 
-  const [viewMode, setViewMode] = useState<ViewMode>(() => parseViewMode(searchParams.get('view')));
-  const [showCreateTaskPanel, setShowCreateTaskPanel] = useState(false);
+  const {
+    viewMode,
+    showCreateTaskPanel,
+    filterAssignee,
+    filterQuery,
+    filterStatuses,
+    filterPriorities,
+    filterTypes,
+    sortBy,
+    sortDir,
+    setViewMode,
+    setShowCreateTaskPanel,
+    setFilterAssignee,
+    setFilterQuery,
+    setFilterStatuses,
+    setFilterPriorities,
+    setFilterTypes,
+    setSortBy,
+    setSortDir,
+    resetUiState,
+  } = useJiraProjectUiStore();
+
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
   const [taskStatus, setTaskStatus] = useState<ProjectTaskItemDTO['status']>('todo');
@@ -145,23 +167,6 @@ export default function ProjectDetailPage() {
   const [createTaskError, setCreateTaskError] = useState<string | null>(null);
 
   // Filter & Sort state
-  const [filterAssignee, setFilterAssignee] = useState(() => searchParams.get('assignee') ?? '');
-  const [filterQuery, setFilterQuery] = useState(() => searchParams.get('q') ?? '');
-  const [filterStatuses, setFilterStatuses] = useState<Set<string>>(() =>
-    parseCsvSet(searchParams.get('statuses'), allowedStatuses),
-  );
-  const [filterPriorities, setFilterPriorities] = useState<Set<string>>(() =>
-    parseCsvSet(searchParams.get('priorities'), allowedPriorities),
-  );
-  const [filterTypes, setFilterTypes] = useState<Set<string>>(() =>
-    parseCsvSet(searchParams.get('types'), allowedTypes),
-  );
-  const [sortBy, setSortBy] = useState<TaskSortBy>(() =>
-    parseTaskSortBy(searchParams.get('sortBy')),
-  );
-  const [sortDir, setSortDir] = useState<SortDirection>(() =>
-    parseSortDirection(searchParams.get('sortDir')),
-  );
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
   const [bulkStatus, setBulkStatus] = useState<ProjectTaskItemDTO['status']>('todo');
   const [bulkPriority, setBulkPriority] = useState<TaskPriority>('medium');
@@ -272,6 +277,10 @@ export default function ProjectDetailPage() {
     : updateTaskStatusMutation.isPending
       ? 'Đang cập nhật trạng thái task'
       : undefined;
+
+  useEffect(() => {
+    resetUiState();
+  }, [projectId, resetUiState]);
 
   useEffect(() => {
     const nextViewMode = parseViewMode(searchParams.get('view'));
@@ -716,11 +725,19 @@ export default function ProjectDetailPage() {
     }
   }
 
-  function handleUpdateTaskStatus(taskId: string, status: ProjectTaskItemDTO['status']) {
+  function handleUpdateTaskStatus(
+    taskId: string,
+    status: ProjectTaskItemDTO['status'],
+    position?: string,
+  ) {
     if (!project) return;
     setTaskUpdateError(null);
     updateTaskStatusMutation.mutate(
-      { taskId, status },
+      {
+        taskId,
+        status,
+        ...(position !== undefined ? { position } : {}),
+      },
       {
         onError: (caughtError) => {
           setTaskUpdateError(
@@ -856,17 +873,68 @@ export default function ProjectDetailPage() {
   }
 
   function handleDrop(event: React.DragEvent<HTMLElement>, status: ProjectTaskItemDTO['status']) {
+    handleDropByPosition(event, status);
+  }
+
+  function buildDropPosition(
+    status: ProjectTaskItemDTO['status'],
+    draggedTaskId: string,
+    targetTaskId?: string,
+  ): string {
+    const tasksInTargetColumn = (boardData.get(status) ?? []).filter(
+      (task) => task.id !== draggedTaskId,
+    );
+
+    if (!targetTaskId) {
+      const previousTask = tasksInTargetColumn[tasksInTargetColumn.length - 1];
+      return buildFractionalTaskPosition({
+        previousPosition: previousTask?.position,
+      });
+    }
+
+    const targetIndex = tasksInTargetColumn.findIndex((task) => task.id === targetTaskId);
+    if (targetIndex === -1) {
+      const previousTask = tasksInTargetColumn[tasksInTargetColumn.length - 1];
+      return buildFractionalTaskPosition({
+        previousPosition: previousTask?.position,
+      });
+    }
+
+    const previousTask = targetIndex > 0 ? tasksInTargetColumn[targetIndex - 1] : undefined;
+    const nextTask = tasksInTargetColumn[targetIndex];
+    return buildFractionalTaskPosition({
+      previousPosition: previousTask?.position,
+      nextPosition: nextTask?.position,
+    });
+  }
+
+  function handleDropByPosition(
+    event: React.DragEvent<HTMLElement>,
+    status: ProjectTaskItemDTO['status'],
+    targetTaskId?: string,
+  ) {
     if (isDragDropLocked) {
       return;
     }
     event.preventDefault();
+    event.stopPropagation();
     setDragOverColumn(null);
+
     const taskId = event.dataTransfer.getData('text/task-id');
     if (!taskId || updateTaskStatusMutation.isPending) return;
+    if (targetTaskId && taskId === targetTaskId) return;
+
     if (!project) return;
     const current = project.tasks.find((task) => task.id === taskId);
-    if (!current || current.status === status) return;
-    handleUpdateTaskStatus(taskId, status);
+    if (!current) return;
+
+    const nextPosition = buildDropPosition(status, taskId, targetTaskId);
+    const samePosition = current.position === nextPosition;
+    if (current.status === status && samePosition) {
+      return;
+    }
+
+    handleUpdateTaskStatus(taskId, status, nextPosition);
   }
 
   if (loading) {
@@ -1106,6 +1174,11 @@ export default function ProjectDetailPage() {
                         aria-label={task.title}
                         draggable={!updateTaskStatusMutation.isPending && !isDragDropLocked}
                         onDragStart={(event) => handleDragStart(event, task.id)}
+                        onDragOver={(event) => {
+                          handleDragOver(event);
+                          event.stopPropagation();
+                        }}
+                        onDrop={(event) => handleDropByPosition(event, column.key, task.id)}
                         onClick={() => handleOpenEdit(task)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' || e.key === ' ') {

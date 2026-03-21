@@ -13,6 +13,7 @@ import type {
   ProjectItemDTO,
   ProjectMemberDTO,
   ProjectTaskItemDTO,
+  TaskHistoryItemDTO,
   UpdateProjectRequestDTO,
   UpdateTaskRequestDTO,
   UpdateTaskStatusRequestDTO,
@@ -95,6 +96,7 @@ export class ProjectService {
             type: true,
             number: true,
             storyPoints: true,
+            position: true,
             dueDate: true,
             assigneeId: true,
             assignee: { select: { fullName: true, avatarColor: true } },
@@ -138,6 +140,7 @@ export class ProjectService {
         type: (task.type ?? 'task') as ProjectTaskItemDTO['type'],
         number: task.number ?? null,
         storyPoints: task.storyPoints ?? null,
+        position: task.position ?? null,
         labels: (task.labels ?? []).map((tl) => tl.label as LabelDTO),
         dueDate: task.dueDate ? task.dueDate.toISOString() : null,
         assigneeId: task.assigneeId,
@@ -266,6 +269,7 @@ export class ProjectService {
   async createTaskForProject(input: {
     projectId: string;
     workspaceId: string;
+    actorId?: string;
     title: string;
     description?: string;
     status: NonNullable<CreateTaskRequestDTO['status']>;
@@ -311,6 +315,7 @@ export class ProjectService {
         priority: input.priority,
         type: input.type ?? 'task',
         number: nextNumber,
+        position: String(nextNumber * 1000),
         storyPoints: input.storyPoints ?? null,
         dueDate: input.dueDate ?? null,
         assigneeId: input.assigneeId ?? null,
@@ -319,6 +324,19 @@ export class ProjectService {
           : {}),
       },
       select: this.taskSelect,
+    });
+
+    await this.prisma.taskEvent.create({
+      data: {
+        taskId: task.id,
+        actorId: input.actorId ?? null,
+        type: 'created',
+        payload: {
+          title: task.title,
+          status: task.status,
+          priority: task.priority,
+        },
+      },
     });
 
     // Notify assignee
@@ -350,9 +368,24 @@ export class ProjectService {
     projectId: string;
     taskId: string;
     workspaceId: string;
+    actorId?: string;
     status: UpdateTaskStatusRequestDTO['status'];
+    position?: string | null;
   }): Promise<ProjectTaskItemDTO> {
     await this.verifyProjectAndTask(input);
+
+    const existingTask = await this.prisma.task.findFirst({
+      where: {
+        id: input.taskId,
+        projectId: input.projectId,
+        deletedAt: null,
+      } as Prisma.TaskWhereInput,
+      select: { status: true },
+    });
+
+    if (!existingTask) {
+      throw new NotFoundException('Task not found');
+    }
 
     const task = await this.prisma.task.update({
       where: {
@@ -360,9 +393,24 @@ export class ProjectService {
       },
       data: {
         status: input.status,
+        ...(input.position !== undefined ? { position: input.position } : {}),
       },
       select: this.taskSelect,
     });
+
+    if (existingTask.status !== input.status) {
+      await this.prisma.taskEvent.create({
+        data: {
+          taskId: input.taskId,
+          actorId: input.actorId ?? null,
+          type: 'status_changed',
+          payload: {
+            from: existingTask.status,
+            to: input.status,
+          },
+        },
+      });
+    }
 
     return this.toTaskDTO(task);
   }
@@ -370,6 +418,7 @@ export class ProjectService {
   async bulkOperateTasksForProject(input: {
     projectId: string;
     workspaceId: string;
+    actorId?: string;
     taskIds: string[];
     status?: UpdateTaskStatusRequestDTO['status'];
     priority?: UpdateTaskRequestDTO['priority'];
@@ -396,7 +445,7 @@ export class ProjectService {
         projectId: input.projectId,
         deletedAt: null,
       },
-      select: { id: true },
+      select: { id: true, status: true, assigneeId: true },
     });
 
     if (tasks.length !== input.taskIds.length) {
@@ -408,6 +457,7 @@ export class ProjectService {
     }
 
     if (input.delete) {
+      const deletedAt = new Date();
       const deleteResult = await this.prisma.task.updateMany({
         where: {
           id: { in: input.taskIds },
@@ -415,9 +465,23 @@ export class ProjectService {
           deletedAt: null,
         },
         data: {
-          deletedAt: new Date(),
+          deletedAt,
         },
       });
+
+      if (deleteResult.count > 0) {
+        await this.prisma.taskEvent.createMany({
+          data: tasks.map((task) => ({
+            taskId: task.id,
+            actorId: input.actorId ?? null,
+            type: 'updated',
+            payload: {
+              action: 'bulk_delete',
+              deletedAt: deletedAt.toISOString(),
+            },
+          })),
+        });
+      }
 
       return {
         updated: 0,
@@ -442,6 +506,54 @@ export class ProjectService {
       data: updateData,
     });
 
+    if (updateResult.count > 0) {
+      const events: Prisma.TaskEventCreateManyInput[] = [];
+
+      for (const task of tasks) {
+        if (input.status !== undefined && input.status !== task.status) {
+          events.push({
+            taskId: task.id,
+            actorId: input.actorId ?? null,
+            type: 'status_changed',
+            payload: {
+              from: task.status,
+              to: input.status,
+              action: 'bulk_update',
+            },
+          });
+        }
+
+        if (input.assigneeId !== undefined && input.assigneeId !== task.assigneeId) {
+          events.push({
+            taskId: task.id,
+            actorId: input.actorId ?? null,
+            type: 'assignee_changed',
+            payload: {
+              from: task.assigneeId,
+              to: input.assigneeId,
+              action: 'bulk_update',
+            },
+          });
+        }
+
+        events.push({
+          taskId: task.id,
+          actorId: input.actorId ?? null,
+          type: 'updated',
+          payload: {
+            action: 'bulk_update',
+            status: input.status,
+            priority: input.priority,
+            type: input.type,
+            dueDate: input.dueDate?.toISOString() ?? input.dueDate ?? undefined,
+            assigneeId: input.assigneeId,
+          },
+        });
+      }
+
+      await this.prisma.taskEvent.createMany({ data: events });
+    }
+
     return {
       updated: updateResult.count,
       deleted: 0,
@@ -452,6 +564,7 @@ export class ProjectService {
     projectId: string;
     taskId: string;
     workspaceId: string;
+    actorId?: string;
     data: Omit<UpdateTaskRequestDTO, 'dueDate'> & { dueDate?: Date | null };
   }): Promise<ProjectTaskItemDTO> {
     await this.verifyProjectAndTask(input);
@@ -462,7 +575,17 @@ export class ProjectService {
         projectId: input.projectId,
         deletedAt: null,
       } as Prisma.TaskWhereInput,
-      select: { id: true, assigneeId: true, title: true },
+      select: {
+        id: true,
+        assigneeId: true,
+        title: true,
+        status: true,
+        priority: true,
+        type: true,
+        storyPoints: true,
+        dueDate: true,
+        description: true,
+      },
     });
 
     if (!existingTask) {
@@ -500,6 +623,84 @@ export class ProjectService {
       select: this.taskSelect,
     });
 
+    const changedFields: string[] = [];
+
+    if (input.data.title !== undefined && input.data.title !== existingTask.title) {
+      changedFields.push('title');
+    }
+    if (
+      input.data.description !== undefined &&
+      input.data.description !== existingTask.description
+    ) {
+      changedFields.push('description');
+    }
+    if (input.data.priority !== undefined && input.data.priority !== existingTask.priority) {
+      changedFields.push('priority');
+    }
+    if (input.data.type !== undefined && input.data.type !== existingTask.type) {
+      changedFields.push('type');
+    }
+    if (
+      input.data.storyPoints !== undefined &&
+      input.data.storyPoints !== existingTask.storyPoints
+    ) {
+      changedFields.push('storyPoints');
+    }
+    if (input.data.dueDate !== undefined) {
+      const previousDueDate = existingTask.dueDate?.toISOString() ?? null;
+      const currentDueDate = input.data.dueDate?.toISOString() ?? null;
+      if (previousDueDate !== currentDueDate) {
+        changedFields.push('dueDate');
+      }
+    }
+
+    if (input.data.status !== undefined && input.data.status !== existingTask.status) {
+      await this.prisma.taskEvent.create({
+        data: {
+          taskId: input.taskId,
+          actorId: input.actorId ?? null,
+          type: 'status_changed',
+          payload: {
+            from: existingTask.status,
+            to: input.data.status,
+          },
+        },
+      });
+    }
+
+    if (input.data.assigneeId !== undefined && input.data.assigneeId !== existingTask.assigneeId) {
+      await this.prisma.taskEvent.create({
+        data: {
+          taskId: input.taskId,
+          actorId: input.actorId ?? null,
+          type: 'assignee_changed',
+          payload: {
+            from: existingTask.assigneeId,
+            to: input.data.assigneeId,
+          },
+        },
+      });
+      changedFields.push('assigneeId');
+    }
+
+    if (input.data.labelIds !== undefined) {
+      changedFields.push('labelIds');
+    }
+
+    if (changedFields.length > 0) {
+      await this.prisma.taskEvent.create({
+        data: {
+          taskId: input.taskId,
+          actorId: input.actorId ?? null,
+          type: 'updated',
+          payload: {
+            action: 'task_updated',
+            changedFields,
+          },
+        },
+      });
+    }
+
     // Notify new assignee if changed
     if (input.data.assigneeId && input.data.assigneeId !== existingTask.assigneeId) {
       void this.notificationService
@@ -523,17 +724,75 @@ export class ProjectService {
     projectId: string;
     taskId: string;
     workspaceId: string;
+    actorId?: string;
   }): Promise<void> {
     await this.verifyProjectAndTask(input);
+
+    const deletedAt = new Date();
 
     await this.prisma.task.update({
       where: {
         id: input.taskId,
       },
       data: {
-        deletedAt: new Date(),
+        deletedAt,
       },
     });
+
+    await this.prisma.taskEvent.create({
+      data: {
+        taskId: input.taskId,
+        actorId: input.actorId ?? null,
+        type: 'updated',
+        payload: {
+          action: 'task_deleted',
+          deletedAt: deletedAt.toISOString(),
+        },
+      },
+    });
+  }
+
+  async getTaskHistoryForProject(input: {
+    projectId: string;
+    taskId: string;
+    workspaceId: string;
+  }): Promise<TaskHistoryItemDTO[]> {
+    await this.verifyProjectAndTask(input);
+
+    const events = await this.prisma.taskEvent.findMany({
+      where: {
+        taskId: input.taskId,
+        deletedAt: null,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 50,
+      select: {
+        id: true,
+        type: true,
+        actorId: true,
+        createdAt: true,
+        payload: true,
+        actor: {
+          select: {
+            fullName: true,
+          },
+        },
+      },
+    });
+
+    return events.map((event) => ({
+      id: event.id,
+      type: event.type,
+      actorId: event.actorId,
+      actorName: event.actor?.fullName ?? null,
+      createdAt: event.createdAt.toISOString(),
+      payload:
+        event.payload && typeof event.payload === 'object' && !Array.isArray(event.payload)
+          ? (event.payload as Record<string, unknown>)
+          : null,
+    }));
   }
 
   async getDashboardStats(workspaceId: string): Promise<DashboardStatsDTO> {
@@ -700,6 +959,7 @@ export class ProjectService {
     type: true,
     number: true,
     storyPoints: true,
+    position: true,
     dueDate: true,
     assigneeId: true,
     assignee: { select: { fullName: true, avatarColor: true } },
@@ -717,6 +977,7 @@ export class ProjectService {
     type?: string;
     number?: number | null;
     storyPoints?: number | null;
+    position?: string | null;
     dueDate: Date | null;
     assigneeId: string | null;
     assignee: { fullName: string; avatarColor?: string | null } | null;
@@ -733,6 +994,7 @@ export class ProjectService {
       type: (task.type ?? 'task') as ProjectTaskItemDTO['type'],
       number: task.number ?? null,
       storyPoints: task.storyPoints ?? null,
+      position: task.position ?? null,
       labels: (task.labels ?? []).map((tl) => tl.label),
       dueDate: task.dueDate ? task.dueDate.toISOString() : null,
       assigneeId: task.assigneeId,

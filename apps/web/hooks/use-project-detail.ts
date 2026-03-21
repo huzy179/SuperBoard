@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ProjectDetailDTO } from '@superboard/shared';
 import { getProjectDetail } from '@/lib/services/project-service';
 import { subscribeProjectDetailUpdated } from '@/lib/realtime/project-sync';
+import { subscribeProjectSocketUpdated } from '@/lib/realtime/project-socket';
 
 export function useProjectDetail(projectId: string) {
   const queryClient = useQueryClient();
@@ -50,13 +51,15 @@ export function useProjectDetail(projectId: string) {
       }
     };
 
-    const unsubscribe = subscribeProjectDetailUpdated(projectId, scheduleInvalidate);
+    const unsubscribeBroadcast = subscribeProjectDetailUpdated(projectId, scheduleInvalidate);
+    const unsubscribeSocket = subscribeProjectSocketUpdated(projectId, scheduleInvalidate);
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', handleVisibilityChange);
     }
 
     return () => {
-      unsubscribe();
+      unsubscribeBroadcast();
+      unsubscribeSocket();
       if (typeof document !== 'undefined') {
         document.removeEventListener('visibilitychange', handleVisibilityChange);
       }

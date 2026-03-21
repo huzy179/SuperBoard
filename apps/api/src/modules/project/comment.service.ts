@@ -65,6 +65,17 @@ export class CommentService {
       },
     });
 
+    await this.prisma.taskEvent.create({
+      data: {
+        taskId: input.taskId,
+        actorId: input.authorId,
+        type: 'comment_added',
+        payload: {
+          commentId: comment.id,
+        },
+      },
+    });
+
     // Notify task assignee about new comment (if different from author)
     const task = await this.prisma.task.findFirst({
       where: { id: input.taskId, deletedAt: null },
@@ -130,6 +141,18 @@ export class CommentService {
       },
     });
 
+    await this.prisma.taskEvent.create({
+      data: {
+        taskId: input.taskId,
+        actorId: input.currentUserId,
+        type: 'updated',
+        payload: {
+          action: 'comment_updated',
+          commentId: updated.id,
+        },
+      },
+    });
+
     return this.toCommentItemDTO(updated);
   }
   async deleteComment(input: {
@@ -161,6 +184,18 @@ export class CommentService {
     await this.prisma.comment.update({
       where: { id: input.commentId },
       data: { deletedAt: new Date() },
+    });
+
+    await this.prisma.taskEvent.create({
+      data: {
+        taskId: input.taskId,
+        actorId: input.currentUserId,
+        type: 'updated',
+        payload: {
+          action: 'comment_deleted',
+          commentId: input.commentId,
+        },
+      },
     });
 
     return { deleted: true };

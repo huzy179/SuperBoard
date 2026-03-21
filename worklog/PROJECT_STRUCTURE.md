@@ -2,6 +2,14 @@
 
 Tài liệu này mô tả chi tiết từng folder, những file quan trọng, và mục đích của chúng trong dự án SuperBoard.
 
+## Cập nhật nhanh trạng thái (2026-03)
+
+- `apps/web` đã triển khai đầy đủ App Router structure cho Jira (`app/(private)/jira/*`), không còn ở mức `app/page.tsx` đơn lẻ.
+- `apps/web/components/jira/*` đã có các component tách riêng cho form/filter/bulk actions.
+- `apps/web/hooks/*` đã dùng React Query sâu cho projects/tasks/comments + optimistic updates.
+- `apps/web/lib/realtime/*` đã có lớp sync đa tab qua BroadcastChannel cho project/tasks/comments.
+- `apps/api/src/modules/project/*` đã có bulk endpoint hợp nhất cho nhiều thao tác task.
+
 ---
 
 ## 📁 Root Level Files (Thư mục gốc)

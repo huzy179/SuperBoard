@@ -36,6 +36,7 @@ export interface ProjectTaskItemDTO {
   type: TaskTypeDTO;
   number?: number | null;
   storyPoints?: number | null;
+  position?: string | null;
   labels: LabelDTO[];
   dueDate?: string | null;
   assigneeId?: string | null;
@@ -68,6 +69,7 @@ export type CreateTaskResponseDTO = ApiResponse<ProjectTaskItemDTO>;
 
 export interface UpdateTaskStatusRequestDTO {
   status: 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
+  position?: string | null;
 }
 
 export type UpdateTaskStatusResponseDTO = ApiResponse<ProjectTaskItemDTO>;
@@ -79,6 +81,7 @@ export interface UpdateTaskRequestDTO {
   priority?: TaskPriorityDTO;
   type?: TaskTypeDTO;
   storyPoints?: number | null;
+  position?: string | null;
   labelIds?: string[];
   dueDate?: string | null;
   assigneeId?: string | null;
@@ -160,6 +163,17 @@ export type CreateCommentResponseDTO = ApiResponse<CommentItemDTO>;
 export type UpdateCommentResponseDTO = ApiResponse<CommentItemDTO>;
 
 export type DeleteCommentResponseDTO = ApiResponse<{ deleted: boolean }>;
+
+export interface TaskHistoryItemDTO {
+  id: string;
+  type: string;
+  actorId?: string | null;
+  actorName?: string | null;
+  createdAt: string;
+  payload?: Record<string, unknown> | null;
+}
+
+export type TaskHistoryResponseDTO = ApiResponse<TaskHistoryItemDTO[]>;
 
 // Dashboard DTOs
 

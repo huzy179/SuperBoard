@@ -4,6 +4,7 @@ import { FormEvent, useState } from 'react';
 import type { CommentItemDTO } from '@superboard/shared';
 import {
   useTaskComments,
+  useTaskHistory,
   useCreateComment,
   useUpdateComment,
   useDeleteComment,
@@ -20,6 +21,7 @@ export function TaskCommentSection({
   currentUserId: string;
 }) {
   const { data: comments, isLoading } = useTaskComments(projectId, taskId);
+  const { data: history, isLoading: isHistoryLoading } = useTaskHistory(projectId, taskId);
   const createComment = useCreateComment(projectId, taskId);
   const updateComment = useUpdateComment(projectId, taskId);
   const deleteComment = useDeleteComment(projectId, taskId);
@@ -142,8 +144,77 @@ export function TaskCommentSection({
           {createComment.isPending ? 'Đang gửi...' : 'Gửi'}
         </button>
       </form>
+
+      <div className="mt-6 border-t border-surface-border pt-4">
+        <h4 className="mb-3 text-sm font-semibold text-slate-900">Lịch sử task</h4>
+        {isHistoryLoading ? (
+          <div className="space-y-2">
+            {[1, 2, 3].map((item) => (
+              <div key={item} className="h-3 w-full animate-pulse rounded bg-slate-200" />
+            ))}
+          </div>
+        ) : !history || history.length === 0 ? (
+          <p className="text-xs text-slate-500">Chưa có lịch sử thay đổi</p>
+        ) : (
+          <div className="space-y-2">
+            {history.map((event) => (
+              <div
+                key={event.id}
+                className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs"
+              >
+                <p className="text-slate-700">{describeTaskEvent(event)}</p>
+                <p className="mt-1 text-[11px] text-slate-500">
+                  {formatRelativeTime(event.createdAt)}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
+}
+
+function describeTaskEvent(event: {
+  type: string;
+  actorName?: string | null;
+  payload?: Record<string, unknown> | null;
+}) {
+  const actor = event.actorName ?? 'Hệ thống';
+
+  if (event.type === 'created') {
+    return `${actor} đã tạo task`;
+  }
+
+  if (event.type === 'status_changed') {
+    const from = typeof event.payload?.from === 'string' ? event.payload.from : null;
+    const to = typeof event.payload?.to === 'string' ? event.payload.to : null;
+    if (from && to) {
+      return `${actor} đổi trạng thái từ ${from} → ${to}`;
+    }
+    return `${actor} đã cập nhật trạng thái`;
+  }
+
+  if (event.type === 'assignee_changed') {
+    return `${actor} đã cập nhật người thực hiện`;
+  }
+
+  if (event.type === 'comment_added') {
+    return `${actor} đã thêm bình luận`;
+  }
+
+  const action = typeof event.payload?.action === 'string' ? event.payload.action : null;
+  if (action === 'task_deleted' || action === 'bulk_delete') {
+    return `${actor} đã xoá task`;
+  }
+  if (action === 'comment_updated') {
+    return `${actor} đã sửa bình luận`;
+  }
+  if (action === 'comment_deleted') {
+    return `${actor} đã xoá bình luận`;
+  }
+
+  return `${actor} đã cập nhật task`;
 }
 
 function CommentItem({

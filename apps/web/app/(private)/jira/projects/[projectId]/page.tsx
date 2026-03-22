@@ -42,59 +42,11 @@ import {
   filterAndSortProjectTasks,
   isTaskOverdue,
   toggleSetFilterValue,
-  type SortDirection,
-  type TaskSortBy,
 } from '@/lib/helpers/task-view';
-import { useJiraProjectUiStore, type ViewMode } from '@/stores/jira-project-ui-store';
+import { useJiraProjectUiStore } from '@/stores/jira-project-ui-store';
 import { subscribeProjectPresence } from '@/lib/realtime/project-socket';
-import { LAST_PROJECT_QUERY_KEY, LAST_PROJECT_VIEW_KEY } from '@/lib/constants/project';
-
-function parseCsvSet(value: string | null, allowed: ReadonlySet<string>): Set<string> {
-  if (!value) {
-    return new Set();
-  }
-  const next = new Set<string>();
-  value
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .forEach((item) => {
-      if (allowed.has(item)) {
-        next.add(item);
-      }
-    });
-  return next;
-}
-
-function serializeCsvSet(value: Set<string>): string {
-  return [...value].sort().join(',');
-}
-
-function parseViewMode(value: string | null): ViewMode {
-  if (value === 'list') {
-    return 'list';
-  }
-  if (value === 'calendar') {
-    return 'calendar';
-  }
-  return 'board';
-}
-
-function parseTaskSortBy(value: string | null): TaskSortBy {
-  if (
-    value === 'dueDate' ||
-    value === 'createdAt' ||
-    value === 'priority' ||
-    value === 'storyPoints'
-  ) {
-    return value;
-  }
-  return '';
-}
-
-function parseSortDirection(value: string | null): SortDirection {
-  return value === 'desc' ? 'desc' : 'asc';
-}
+import { useProjectUrlState } from '@/hooks/use-project-url-state';
+import { useTaskSelection } from '@/hooks/use-task-selection';
 
 function toLocalDayKey(date: Date): string {
   const year = date.getFullYear();
@@ -121,18 +73,6 @@ function getCalendarCells(
       key: toLocalDayKey(date),
     };
   });
-}
-
-function areSetsEqual(a: Set<string>, b: Set<string>): boolean {
-  if (a.size !== b.size) {
-    return false;
-  }
-  for (const value of a) {
-    if (!b.has(value)) {
-      return false;
-    }
-  }
-  return true;
 }
 
 export default function ProjectDetailPage() {
@@ -200,7 +140,6 @@ export default function ProjectDetailPage() {
   const [createTaskError, setCreateTaskError] = useState<string | null>(null);
 
   // Filter & Sort state
-  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
   const [bulkStatus, setBulkStatus] = useState<ProjectTaskItemDTO['status']>('todo');
   const [bulkPriority, setBulkPriority] = useState<TaskPriority>('medium');
   const [bulkType, setBulkType] = useState<TaskTypeDTO>('task');
@@ -326,7 +265,6 @@ export default function ProjectDetailPage() {
   const triggerRef = useRef<HTMLElement | null>(null);
   const bulkDeleteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bulkDeleteCountdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const isApplyingUrlStateRef = useRef(false);
   const [calendarMonth, setCalendarMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -422,11 +360,6 @@ export default function ProjectDetailPage() {
     );
   }, [visibleTasks]);
 
-  const selectedVisibleCount = useMemo(
-    () => visibleTasks.filter((task) => selectedTaskIds.has(task.id)).length,
-    [visibleTasks, selectedTaskIds],
-  );
-
   const isDragDropLocked = pendingDeleteTaskIds.size > 0 || bulkDeletePending;
   const statusSelectLockReason = isDragDropLocked
     ? 'Đang chờ xác nhận xoá, tạm khoá chỉnh sửa'
@@ -438,118 +371,14 @@ export default function ProjectDetailPage() {
     resetUiState();
   }, [projectId, resetUiState]);
 
-  useEffect(() => {
-    const nextViewMode = parseViewMode(searchParams.get('view'));
-    const nextQuery = searchParams.get('q') ?? '';
-    const nextAssignee = searchParams.get('assignee') ?? '';
-    const nextStatuses = parseCsvSet(searchParams.get('statuses'), allowedStatuses);
-    const nextPriorities = parseCsvSet(searchParams.get('priorities'), allowedPriorities);
-    const nextTypes = parseCsvSet(searchParams.get('types'), allowedTypes);
-    const nextSortBy = parseTaskSortBy(searchParams.get('sortBy'));
-    const nextSortDir = parseSortDirection(searchParams.get('sortDir'));
-
-    let changed = false;
-    if (viewMode !== nextViewMode) {
-      changed = true;
-      setViewMode(nextViewMode);
-    }
-    if (filterQuery !== nextQuery) {
-      changed = true;
-      setFilterQuery(nextQuery);
-    }
-    if (filterAssignee !== nextAssignee) {
-      changed = true;
-      setFilterAssignee(nextAssignee);
-    }
-    if (!areSetsEqual(filterStatuses, nextStatuses)) {
-      changed = true;
-      setFilterStatuses(nextStatuses);
-    }
-    if (!areSetsEqual(filterPriorities, nextPriorities)) {
-      changed = true;
-      setFilterPriorities(nextPriorities);
-    }
-    if (!areSetsEqual(filterTypes, nextTypes)) {
-      changed = true;
-      setFilterTypes(nextTypes);
-    }
-    if (sortBy !== nextSortBy) {
-      changed = true;
-      setSortBy(nextSortBy);
-    }
-    if (sortDir !== nextSortDir) {
-      changed = true;
-      setSortDir(nextSortDir);
-    }
-
-    if (changed) {
-      isApplyingUrlStateRef.current = true;
-    }
-  }, [searchParams, allowedStatuses, allowedPriorities, allowedTypes]);
-
-  useEffect(() => {
-    if (isApplyingUrlStateRef.current) {
-      isApplyingUrlStateRef.current = false;
-      return;
-    }
-
-    const nextParams = new URLSearchParams(searchParams.toString());
-
-    if (viewMode === 'board') {
-      nextParams.delete('view');
-    } else {
-      nextParams.set('view', viewMode);
-    }
-
-    const normalizedQuery = filterQuery.trim();
-    if (!normalizedQuery) {
-      nextParams.delete('q');
-    } else {
-      nextParams.set('q', normalizedQuery);
-    }
-
-    if (!filterAssignee) {
-      nextParams.delete('assignee');
-    } else {
-      nextParams.set('assignee', filterAssignee);
-    }
-
-    const statusesValue = serializeCsvSet(filterStatuses);
-    if (!statusesValue) {
-      nextParams.delete('statuses');
-    } else {
-      nextParams.set('statuses', statusesValue);
-    }
-
-    const prioritiesValue = serializeCsvSet(filterPriorities);
-    if (!prioritiesValue) {
-      nextParams.delete('priorities');
-    } else {
-      nextParams.set('priorities', prioritiesValue);
-    }
-
-    const typesValue = serializeCsvSet(filterTypes);
-    if (!typesValue) {
-      nextParams.delete('types');
-    } else {
-      nextParams.set('types', typesValue);
-    }
-
-    if (!sortBy) {
-      nextParams.delete('sortBy');
-      nextParams.delete('sortDir');
-    } else {
-      nextParams.set('sortBy', sortBy);
-      nextParams.set('sortDir', sortDir);
-    }
-
-    const nextQuery = nextParams.toString();
-    const currentQuery = searchParams.toString();
-    if (nextQuery !== currentQuery) {
-      const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
-      router.replace(nextUrl, { scroll: false });
-    }
-  }, [
+  useProjectUrlState({
+    projectId,
+    pathname,
+    router,
+    searchParams,
+    allowedStatuses,
+    allowedPriorities,
+    allowedTypes,
     viewMode,
     filterQuery,
     filterAssignee,
@@ -558,73 +387,23 @@ export default function ProjectDetailPage() {
     filterTypes,
     sortBy,
     sortDir,
-    pathname,
-    router,
-    searchParams,
-  ]);
+    setViewMode,
+    setFilterQuery,
+    setFilterAssignee,
+    setFilterStatuses,
+    setFilterPriorities,
+    setFilterTypes,
+    setSortBy,
+    setSortDir,
+  });
 
-  useEffect(() => {
-    if (typeof window === 'undefined' || !projectId) {
-      return;
-    }
-
-    try {
-      const currentQuery = searchParams.toString();
-
-      const raw = window.localStorage.getItem(LAST_PROJECT_VIEW_KEY);
-      const current = raw ? (JSON.parse(raw) as Record<string, ViewMode>) : {};
-      const nextViews = {
-        ...current,
-        [projectId]: viewMode,
-      };
-      window.localStorage.setItem(LAST_PROJECT_VIEW_KEY, JSON.stringify(nextViews));
-
-      const rawQueries = window.localStorage.getItem(LAST_PROJECT_QUERY_KEY);
-      const currentQueries = rawQueries ? (JSON.parse(rawQueries) as Record<string, string>) : {};
-      const nextQueries = {
-        ...currentQueries,
-        [projectId]: currentQuery,
-      };
-      window.localStorage.setItem(LAST_PROJECT_QUERY_KEY, JSON.stringify(nextQueries));
-    } catch {
-      // ignore localStorage parse/write errors
-    }
-  }, [projectId, viewMode, searchParams]);
-
-  useEffect(() => {
-    const currentTaskIds = new Set((project?.tasks ?? []).map((task) => task.id));
-    setSelectedTaskIds((prev) => {
-      const next = new Set<string>();
-      prev.forEach((id) => {
-        if (currentTaskIds.has(id)) {
-          next.add(id);
-        }
-      });
-      return next;
-    });
-  }, [project?.tasks]);
-
-  function toggleTaskSelection(taskId: string) {
-    setSelectedTaskIds((prev) => toggleSetFilterValue(prev, taskId));
-  }
-
-  function clearTaskSelection() {
-    setSelectedTaskIds(new Set());
-  }
-
-  function toggleSelectAllVisible() {
-    const visibleIds = visibleTasks.map((task) => task.id);
-    const allVisibleSelected = visibleIds.every((id) => selectedTaskIds.has(id));
-    setSelectedTaskIds((prev) => {
-      const next = new Set(prev);
-      if (allVisibleSelected) {
-        visibleIds.forEach((id) => next.delete(id));
-      } else {
-        visibleIds.forEach((id) => next.add(id));
-      }
-      return next;
-    });
-  }
+  const {
+    selectedTaskIds,
+    toggleTaskSelection,
+    clearTaskSelection,
+    toggleSelectAllVisible,
+    selectedVisibleCount,
+  } = useTaskSelection(project?.tasks, visibleTasks);
 
   function clearBulkDeleteTimer() {
     if (bulkDeleteTimerRef.current) {

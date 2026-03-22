@@ -4,6 +4,15 @@
 
 ---
 
+## Jira v1.37 — Frontend Structure Foundation Cleanup
+
+- [x] Tách `project constants` dùng chung để tránh lặp localStorage keys và `ViewMode`
+- [x] Tách `project-service` theo domain rõ hơn (`project-service`, `task-service`, `dashboard-service`)
+- [x] Dời các component đặt sai chỗ về đúng layer (`notification-bell`, `task-comment-section`, `task-badges`)
+- [x] Xoá dead component `app-frame.tsx`
+- [x] Thêm barrel exports cho `components/jira`, `components/layout`, `components/notifications`, `components/ui`
+- [x] Chạy `npx turbo lint` và `npx turbo typecheck` pass sau cleanup
+
 ## Jira v1.36 — Dashboard Chart Tooltip Polish
 
 - [x] Thêm hover tooltip cho donut chart trạng thái (`count + percent`)

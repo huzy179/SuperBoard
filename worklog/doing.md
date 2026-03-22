@@ -4,14 +4,23 @@
 
 ---
 
-## Sprint hiện tại — Jira v1.36: Dashboard Chart Tooltip Polish
+## Sprint hiện tại — Jira v1.38: Productization Baseline
 
-- [x] Thêm tooltip `count + percent` khi hover donut segments (trạng thái)
-- [x] Thêm tooltip `count + percent` cho stacked priority bar
-- [x] Thêm tooltip `count + percent` cho cột loại task
-- [x] Sửa layout stacked priority bar dùng `flex` để hiển thị composition chính xác
-- [x] Kiểm tra typecheck web và diagnostics sau polish
+Mục tiêu: đưa SuperBoard từ mức “feature demo rất mạnh” sang mức “Jira MVP dùng thật, dễ maintain, dễ verify, dễ ship”.
+
+### Chất lượng sản phẩm
+
+- [ ] Hoàn thiện E2E flow cốt lõi: đăng nhập → vào Jira Home → tạo project → tạo task → kéo task → xem lịch sử
+- [ ] Viết smoke test checklist cho toàn bộ Jira flow hiện có (Home / Project Detail / Dashboard / Settings / Notifications)
+- [ ] Rà lại các lỗi UX mức P0/P1: empty state, loading state, error state, responsive breakpoints
+
+### Kỹ thuật / maintainability
+
+- [ ] Tiếp tục refactor FE theo hướng layer-based an toàn: tách `god hook` và `god page` ở Jira detail thành các phần nhỏ hơn
+- [ ] Cập nhật `worklog/PROJECT_STRUCTURE.md` để phản ánh đúng cấu trúc hiện tại của FE/BE, tránh tài liệu cũ gây nhiễu
+- [ ] Chốt roadmap thực tế theo hướng Jira-first: chưa mở rộng Slack / Notion / AI platform cho tới khi Jira đủ ổn định
 
 ## Blockers
 
-- Không có blocker.
+- Không có blocker kỹ thuật nghiêm trọng.
+- Blocker lớn nhất hiện tại là **scope quá rộng so với trạng thái thực tế**; cần giữ kỷ luật Jira-first để tránh phân tán.

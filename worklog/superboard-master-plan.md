@@ -127,6 +127,15 @@ Pha 9  — Billing & Business      Tuần 31–33
 Pha 10 — Production & Scale      Tuần 34–36
 ```
 
+## Trạng thái thực tế (rolling update)
+
+> Snapshot cập nhật: 2026-03-22
+
+- Jira đã hoàn thiện tới mốc **v1.24** (calendar, task history, robust ordering + rebalance, realtime multi-user drag sync, favorites + recency grouping ở Jira Home).
+- Hướng ưu tiên hiện tại: **P1 UX Polish** để nâng trải nghiệm sử dụng hàng ngày.
+- Tính năng chuẩn bị triển khai tiếp theo: **Jira v1.25 — Subtasks MVP (nested 1 level + parent progress)**.
+- Test integration/E2E vẫn còn trong TODO, nhưng đang ưu tiên nhịp ship feature trước theo định hướng hiện tại.
+
 ---
 
 ---

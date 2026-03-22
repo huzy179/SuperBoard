@@ -4,17 +4,15 @@
 
 ---
 
-## Sprint hiện tại — Jira v1.2: Bulk Completion + Realtime Sync
+## Sprint hiện tại — Jira v1.25: Subtasks MVP (nested 1 level)
 
-- [x] Bulk actions đầy đủ: status, assignee, priority, type, due date, delete
-- [x] Bulk endpoint BE hợp nhất (`PATCH /projects/:projectId/tasks/bulk`) thay cho loop N requests
-- [x] Optimistic update cho bulk mutations (status/assignee/priority/type/dueDate/delete)
-- [x] Undo bulk delete 5 giây + countdown/progress bar
-- [x] Realtime sync đa tab cho project detail / projects list / task comments
-- [x] Tối ưu realtime: debounce invalidate + visibility-aware refetch
-- [x] Implement task ordering cho Kanban (`position` / fractional indexing) — drag-drop theo vị trí, không chỉ status
-- [x] Realtime collaborative board đa user bằng Socket.io (không chỉ multi-tab cùng browser)
-- [x] Chuẩn hóa Zustand store cho UI state: board/list/filter/search/panel
+- [ ] Chốt contract shared DTO cho subtask (FE/BE đồng bộ)
+- [ ] Mở rộng schema + migration cho quan hệ parent-child 1 cấp (Task ↔ Task)
+- [ ] API subtask trong project detail: create/update/delete/status
+- [ ] FE task detail: danh sách subtasks + quick add + toggle done
+- [ ] Parent task hiển thị progress subtasks (x/y và %)
+- [ ] Realtime sync subtask update trong room project (reuse socket flow hiện có)
+- [ ] Kiểm tra typecheck/lint scope file thay đổi và cập nhật worklog `done.md`
 
 ## Blockers
 

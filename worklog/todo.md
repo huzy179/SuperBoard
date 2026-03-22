@@ -45,6 +45,15 @@ Mục tiêu: từ "chạy được" lên "dùng được nghiêm túc".
 ### UX Polish
 
 - [ ] Subtasks — nested 1 level, parent hiện progress
+  - Scope v1.25 (MVP):
+    - Model parent-child 1 cấp cho task trong cùng project
+    - API CRUD subtask cơ bản (tạo/sửa/xoá/chuyển trạng thái)
+    - UI task detail: danh sách subtasks + quick add
+    - Parent hiển thị progress `% done` dựa trên subtasks
+  - Out of scope v1.25:
+    - Nested nhiều hơn 1 cấp
+    - Drag reorder subtasks
+    - Dependencies giữa subtasks
 - [x] ~~Calendar view — tasks theo month/week~~ (done v1.8)
 
 ---

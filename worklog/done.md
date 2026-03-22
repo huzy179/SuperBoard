@@ -191,3 +191,52 @@
 - [x] Restyle `TaskCreateForm` để đồng bộ với style card trắng + input nền trung tính
 - [x] Nâng cấp board task card interaction (hover, hierarchy, mật độ thông tin) và list table visual hierarchy
 - [x] Cập nhật calendar + task detail slide-over border/background để đồng bộ ngôn ngữ thiết kế
+
+## Jira v1.12 — Settings Member Management Enhancements
+
+- [x] Thêm tìm kiếm thành viên theo tên/email ở trang settings
+- [x] Thêm lọc vai trò (all/owner/admin/member) cho bảng thành viên
+- [x] Thêm sắp xếp ngày tham gia (mới trước/cũ trước)
+- [x] Thêm trạng thái rỗng và nút đặt lại bộ lọc cho trải nghiệm quản trị tốt hơn
+
+## Jira v1.13 — Notification Center Usability
+
+- [x] Thêm tab lọc thông báo `Tất cả / Chưa đọc` trong dropdown chuông
+- [x] Thêm tìm kiếm nhanh theo nội dung thông báo
+- [x] Thêm thống kê số thông báo đang hiển thị sau khi lọc/tìm kiếm
+- [x] Giữ nguyên API hiện tại, cải thiện UX hoàn toàn ở frontend
+
+## Jira v1.14 — Dashboard Activity Feed Filters
+
+- [x] Thêm lọc hoạt động theo loại sự kiện trong Dashboard
+- [x] Thêm tìm kiếm theo `taskTitle` / `actorName` ở activity feed
+- [x] Thêm đếm kết quả sau lọc và empty state khi không khớp
+- [x] Thêm nút đặt lại bộ lọc activity để thao tác nhanh
+
+## Jira v1.15 — Dashboard Priority Focus (Projects Needing Attention)
+
+- [x] Thêm block `Dự án cần chú ý` để ưu tiên project có tỷ lệ hoàn thành thấp
+- [x] Xếp hạng theo completion rate tăng dần, tie-break theo số task còn lại
+- [x] Hiển thị tiến độ %, số task còn lại và link nhanh vào project tương ứng
+
+## Jira v1.16 — Dashboard Quick Actions from Priority Focus
+
+- [x] Thêm quick action `Xem task chưa xong` (view list + filter `todo,in_progress`) từ block dự án cần chú ý
+- [x] Thêm quick action `Mở board` để điều hướng thẳng vào board của project cần xử lý
+
+## Jira v1.17 — Project Detail Shareable Filter Link
+
+- [x] Thêm nút `Sao chép link` ở header project detail
+- [x] Sao chép URL hiện tại kèm query filter/view/sort để chia sẻ đúng ngữ cảnh
+- [x] Thêm trạng thái phản hồi nhanh `Đã sao chép` sau khi copy thành công
+
+## Jira v1.18 — Project Detail Open in New Tab
+
+- [x] Thêm nút `Mở tab mới` cạnh `Sao chép link` trong header project detail
+- [x] Mở đúng URL hiện tại kèm toàn bộ query filter/view/sort để giữ ngữ cảnh
+
+## Jira v1.19 — Dashboard API Mock Fallback
+
+- [x] Thêm mock data typed cho `DashboardStatsDTO` ở FE
+- [x] Bổ sung fallback trong `getDashboardStats()` khi endpoint BE chưa sẵn sàng (404/501/502/503 hoặc lỗi mạng)
+- [x] Cho phép tắt fallback bằng biến `NEXT_PUBLIC_ENABLE_API_MOCK_FALLBACK=false`

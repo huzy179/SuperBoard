@@ -217,6 +217,7 @@ export default function ProjectDetailPage() {
   const [pendingDeleteSecondsLeft, setPendingDeleteSecondsLeft] = useState(0);
   const [pendingDeleteProgress, setPendingDeleteProgress] = useState(0);
   const [viewerCount, setViewerCount] = useState(1);
+  const [isCopyLinkSuccess, setIsCopyLinkSuccess] = useState(false);
 
   const hasActiveFilters =
     filterQuery.trim() !== '' ||
@@ -246,6 +247,41 @@ export default function ProjectDetailPage() {
 
   function toggleFilterType(t: string) {
     setFilterTypes((prev) => toggleSetFilterValue(prev, t));
+  }
+
+  function buildCurrentFilterUrl(): string {
+    const query = searchParams.toString();
+    return `${window.location.origin}${pathname}${query ? `?${query}` : ''}`;
+  }
+
+  async function handleCopyCurrentFilterLink() {
+    const url = buildCurrentFilterUrl();
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const tempInput = document.createElement('textarea');
+        tempInput.value = url;
+        tempInput.setAttribute('readonly', 'true');
+        tempInput.style.position = 'absolute';
+        tempInput.style.left = '-9999px';
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+      }
+
+      setIsCopyLinkSuccess(true);
+      window.setTimeout(() => setIsCopyLinkSuccess(false), 1800);
+    } catch {
+      setIsCopyLinkSuccess(false);
+    }
+  }
+
+  function handleOpenCurrentFilterInNewTab() {
+    const url = buildCurrentFilterUrl();
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
   const filteredTasks = useMemo(() => {
@@ -1137,6 +1173,26 @@ export default function ProjectDetailPage() {
               }`}
             >
               Lịch
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                void handleCopyCurrentFilterLink();
+              }}
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                isCopyLinkSuccess
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              {isCopyLinkSuccess ? 'Đã sao chép' : 'Sao chép link'}
+            </button>
+            <button
+              type="button"
+              onClick={handleOpenCurrentFilterInNewTab}
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+            >
+              Mở tab mới
             </button>
           </div>
         </div>

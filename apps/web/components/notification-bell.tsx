@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import {
   useNotifications,
   useMarkNotificationRead,
@@ -20,12 +20,33 @@ const BellIcon: ReactNode = (
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'unread'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const { data } = useNotifications();
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
 
   const unreadCount = data?.unreadCount ?? 0;
   const notifications = data?.notifications ?? [];
+
+  const filteredNotifications = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+
+    return notifications.filter((notification) => {
+      if (activeFilter === 'unread' && notification.readAt) {
+        return false;
+      }
+
+      if (!normalizedQuery) {
+        return true;
+      }
+
+      const payloadMessage =
+        (notification.payload as Record<string, string> | null)?.message ?? notification.type;
+      return payloadMessage.toLowerCase().includes(normalizedQuery);
+    });
+  }, [activeFilter, notifications, searchQuery]);
+
   return (
     <div className="relative">
       <button
@@ -57,11 +78,52 @@ export function NotificationBell() {
               </button>
             ) : null}
           </div>
+
+          <div className="space-y-2 border-b border-surface-border px-3 py-2">
+            <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-1">
+              <button
+                type="button"
+                onClick={() => setActiveFilter('all')}
+                className={`flex-1 rounded-md px-2 py-1 text-[11px] font-medium transition-colors ${
+                  activeFilter === 'all'
+                    ? 'bg-white text-slate-700 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Tất cả ({notifications.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveFilter('unread')}
+                className={`flex-1 rounded-md px-2 py-1 text-[11px] font-medium transition-colors ${
+                  activeFilter === 'unread'
+                    ? 'bg-white text-slate-700 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Chưa đọc ({unreadCount})
+              </button>
+            </div>
+
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Tìm trong thông báo..."
+              className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-700"
+              aria-label="Tìm kiếm thông báo"
+            />
+
+            <p className="text-[11px] text-slate-500">
+              Hiển thị {filteredNotifications.length} / {notifications.length} thông báo
+            </p>
+          </div>
+
           <div className="max-h-64 overflow-y-auto">
-            {notifications.length === 0 ? (
+            {filteredNotifications.length === 0 ? (
               <p className="px-3 py-6 text-center text-xs text-slate-500">Không có thông báo</p>
             ) : (
-              notifications.map((n) => (
+              filteredNotifications.map((n) => (
                 <button
                   key={n.id}
                   type="button"

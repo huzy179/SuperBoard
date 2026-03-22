@@ -12,8 +12,21 @@ import type {
   UpdateTaskRequestDTO,
   UpdateTaskStatusRequestDTO,
 } from '@superboard/shared';
-import { apiGet, apiPost, apiRequest } from '@/lib/api-client';
+import { ApiClientError, apiGet, apiPost, apiRequest } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
+import { getMockDashboardStats } from '@/lib/mocks/dashboard-stats.mock';
+
+function shouldUseMockFallback(error: unknown): boolean {
+  if (process.env.NEXT_PUBLIC_ENABLE_API_MOCK_FALLBACK === 'false') {
+    return false;
+  }
+
+  if (error instanceof ApiClientError) {
+    return [404, 501, 502, 503].includes(error.status);
+  }
+
+  return error instanceof TypeError;
+}
 
 export async function getProjects(): Promise<ProjectItemDTO[]> {
   return apiGet<ProjectItemDTO[]>(API_ENDPOINTS.projects.list, { auth: true });
@@ -100,7 +113,14 @@ export async function deleteProjectTask(projectId: string, taskId: string): Prom
 }
 
 export async function getDashboardStats(): Promise<DashboardStatsDTO> {
-  return apiGet<DashboardStatsDTO>(API_ENDPOINTS.projects.dashboard, { auth: true });
+  try {
+    return await apiGet<DashboardStatsDTO>(API_ENDPOINTS.projects.dashboard, { auth: true });
+  } catch (error) {
+    if (shouldUseMockFallback(error)) {
+      return getMockDashboardStats();
+    }
+    throw error;
+  }
 }
 
 export async function getTaskHistory(

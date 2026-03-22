@@ -22,7 +22,7 @@ Mục tiêu: hoàn thiện Jira MVP đủ dùng thật, không còn thiếu gì 
 - [x] ~~Filter/sort UI cho board + list~~ (done v0.9)
 - [x] ~~Bulk actions + undo UX cho board/list~~ (done v1.1)
 - [x] ~~Persist filter/search/viewMode vào URL query params~~ (done v1.2)
-- [ ] Mock fallback cho endpoint BE chưa xong
+- [x] ~~Mock fallback cho endpoint BE chưa xong~~ (done v1.19)
 - [ ] Task ordering thực sự cho board (fractional index) + drag reorder cùng cột
 
 ### Integration

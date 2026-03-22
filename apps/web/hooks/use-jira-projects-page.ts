@@ -6,15 +6,16 @@ import {
   useUpdateProject,
   useDeleteProject,
 } from '@/hooks/use-project-mutations';
+import {
+  FAVORITE_PROJECT_IDS_KEY,
+  LAST_PROJECT_QUERY_KEY,
+  LAST_PROJECT_VIEW_KEY,
+} from '@/lib/constants/project';
+import type { ViewMode } from '@/stores/jira-project-ui-store';
 
 export type JiraProjectSortKey = 'updated_desc' | 'updated_asc' | 'name_asc' | 'name_desc';
-type ProjectViewMode = 'board' | 'list' | 'calendar';
 
 export function useJiraProjectsPage() {
-  const FAVORITE_PROJECT_IDS_KEY = 'superboard.favorite-project-ids';
-  const LAST_PROJECT_VIEW_KEY = 'superboard.project-last-views';
-  const LAST_PROJECT_QUERY_KEY = 'superboard.project-last-queries';
-
   const {
     data: projects = [],
     isLoading: projectsLoading,
@@ -45,7 +46,7 @@ export function useJiraProjectsPage() {
   const [favoriteProjectIds, setFavoriteProjectIds] = useState<Set<string>>(new Set());
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const [sortKey, setSortKey] = useState<JiraProjectSortKey>('updated_desc');
-  const [projectLastViews, setProjectLastViews] = useState<Record<string, ProjectViewMode>>({});
+  const [projectLastViews, setProjectLastViews] = useState<Record<string, ViewMode>>({});
   const [projectLastQueries, setProjectLastQueries] = useState<Record<string, string>>({});
 
   const normalizedProjectName = useMemo(() => projectName.trim(), [projectName]);
@@ -89,7 +90,7 @@ export function useJiraProjectsPage() {
     }
 
     try {
-      const parsed = JSON.parse(raw) as Record<string, ProjectViewMode>;
+      const parsed = JSON.parse(raw) as Record<string, ViewMode>;
       if (parsed && typeof parsed === 'object') {
         setProjectLastViews(parsed);
       }

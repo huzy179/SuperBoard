@@ -6,7 +6,7 @@ import type { AuthUserDTO } from '@superboard/shared';
 import type { NavItem } from '@/lib/navigation';
 import { isNavItemActive } from '@/lib/navigation';
 import { AppBrand } from './app-brand';
-import { NotificationBell } from '@/components/notification-bell';
+import { NotificationBell } from '@/components/notifications/notification-bell';
 import { getInitials } from '@/lib/helpers';
 
 type PrivateShellProps = {

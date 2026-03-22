@@ -7,7 +7,7 @@ import {
   getTaskComments,
   updateTaskComment,
 } from '@/lib/services/comment-service';
-import { getTaskHistory } from '@/lib/services/project-service';
+import { getTaskHistory } from '@/lib/services/task-service';
 import {
   publishTaskCommentsUpdated,
   subscribeTaskCommentsUpdated,

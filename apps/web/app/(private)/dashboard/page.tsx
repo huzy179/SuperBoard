@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { FullPageError } from '@/components/ui/page-states';
-import { AssigneeAvatar } from '@/components/ui/task-badges';
+import { AssigneeAvatar } from '@/components/jira/task-badges';
 import { useDashboardStats } from '@/hooks/use-dashboard';
 import { EVENT_LABELS, PRIORITY_LABELS, STATUS_LABELS } from '@/lib/constants/task';
 import { formatRelativeTime } from '@/lib/format-date';

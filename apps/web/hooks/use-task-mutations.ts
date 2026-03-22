@@ -12,7 +12,7 @@ import {
   deleteProjectTask,
   updateProjectTask,
   updateProjectTaskStatus,
-} from '@/lib/services/project-service';
+} from '@/lib/services/task-service';
 import { publishProjectDetailUpdated } from '@/lib/realtime/project-sync';
 
 export function useCreateTask(projectId: string) {

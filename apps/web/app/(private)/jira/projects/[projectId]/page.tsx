@@ -12,8 +12,8 @@ import {
   AssigneeAvatar,
   LabelDots,
   TaskIdBadge,
-} from '@/components/ui/task-badges';
-import { TaskCommentSection } from '@/components/task-comment-section';
+} from '@/components/jira/task-badges';
+import { TaskCommentSection } from '@/components/jira/task-comment-section';
 import { TaskCreateForm } from '@/components/jira/task-create-form';
 import { TaskFilterBar } from '@/components/jira/task-filter-bar';
 import { TaskBulkActionBar } from '@/components/jira/task-bulk-action-bar';
@@ -45,12 +45,9 @@ import {
   type SortDirection,
   type TaskSortBy,
 } from '@/lib/helpers/task-view';
-import { useJiraProjectUiStore } from '@/stores/jira-project-ui-store';
+import { useJiraProjectUiStore, type ViewMode } from '@/stores/jira-project-ui-store';
 import { subscribeProjectPresence } from '@/lib/realtime/project-socket';
-
-type ViewMode = 'board' | 'list' | 'calendar';
-const LAST_PROJECT_VIEW_KEY = 'superboard.project-last-views';
-const LAST_PROJECT_QUERY_KEY = 'superboard.project-last-queries';
+import { LAST_PROJECT_QUERY_KEY, LAST_PROJECT_VIEW_KEY } from '@/lib/constants/project';
 
 function parseCsvSet(value: string | null, allowed: ReadonlySet<string>): Set<string> {
   if (!value) {

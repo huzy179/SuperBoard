@@ -48,6 +48,7 @@ export interface ProjectTaskItemDTO {
   id: string;
   title: string;
   description?: string | null;
+  parentTaskId?: string | null;
   status: TaskStatusDTO;
   priority: TaskPriorityDTO;
   type: TaskTypeDTO;
@@ -59,6 +60,11 @@ export interface ProjectTaskItemDTO {
   assigneeId?: string | null;
   assigneeName?: string | null;
   assigneeAvatarColor?: string | null;
+  subtaskProgress?: {
+    total: number;
+    done: number;
+    percent: number;
+  } | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -73,6 +79,7 @@ export type ProjectDetailResponseDTO = ApiResponse<ProjectDetailDTO>;
 export interface CreateTaskRequestDTO {
   title: string;
   description?: string;
+  parentTaskId?: string | null;
   status?: TaskStatusDTO;
   priority?: TaskPriorityDTO;
   type?: TaskTypeDTO;
@@ -94,6 +101,7 @@ export type UpdateTaskStatusResponseDTO = ApiResponse<ProjectTaskItemDTO>;
 export interface UpdateTaskRequestDTO {
   title?: string;
   description?: string;
+  parentTaskId?: string | null;
   status?: TaskStatusDTO;
   priority?: TaskPriorityDTO;
   type?: TaskTypeDTO;
@@ -193,6 +201,7 @@ export interface TaskHistoryPayloadDTO {
     | 'storyPoints'
     | 'dueDate'
     | 'assigneeId'
+    | 'parentTaskId'
     | 'labelIds'
   >;
   status?: TaskStatusDTO;

@@ -285,7 +285,8 @@ export default function ProjectDetailPage() {
   }
 
   const filteredTasks = useMemo(() => {
-    return filterAndSortProjectTasks(project?.tasks ?? [], {
+    const rootTasks = (project?.tasks ?? []).filter((task) => !task.parentTaskId);
+    return filterAndSortProjectTasks(rootTasks, {
       query: filterQuery,
       assigneeId: filterAssignee,
       statuses: filterStatuses,
@@ -318,6 +319,9 @@ export default function ProjectDetailPage() {
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
 
   const [taskUpdateError, setTaskUpdateError] = useState<string | null>(null);
+  const [subtaskTitle, setSubtaskTitle] = useState('');
+  const [subtaskError, setSubtaskError] = useState<string | null>(null);
+  const [subtaskPendingTaskId, setSubtaskPendingTaskId] = useState<string | null>(null);
 
   const dialogRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
@@ -333,6 +337,33 @@ export default function ProjectDetailPage() {
     () => filteredTasks.filter((task) => !pendingDeleteTaskIds.has(task.id)),
     [filteredTasks, pendingDeleteTaskIds],
   );
+
+  const subtaskMap = useMemo(() => {
+    const map = new Map<string, ProjectTaskItemDTO[]>();
+    for (const task of project?.tasks ?? []) {
+      if (!task.parentTaskId) {
+        continue;
+      }
+      const current = map.get(task.parentTaskId) ?? [];
+      map.set(task.parentTaskId, [...current, task]);
+    }
+    return map;
+  }, [project?.tasks]);
+
+  const editingTaskSubtasks = useMemo(() => {
+    if (!editingTask) {
+      return [];
+    }
+    const subtasks = subtaskMap.get(editingTask.id) ?? [];
+    return [...subtasks].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  }, [editingTask, subtaskMap]);
+
+  const editingParentTask = useMemo(() => {
+    if (!editingTask?.parentTaskId) {
+      return null;
+    }
+    return (project?.tasks ?? []).find((task) => task.id === editingTask.parentTaskId) ?? null;
+  }, [editingTask, project?.tasks]);
 
   const tasksWithoutDueDate = useMemo(
     () => visibleTasks.filter((task) => !task.dueDate),
@@ -888,6 +919,9 @@ export default function ProjectDetailPage() {
     setEditDueDate(toDateInputValue(task.dueDate));
     setEditAssigneeId(task.assigneeId ?? '');
     setTaskUpdateError(null);
+    setSubtaskTitle('');
+    setSubtaskError(null);
+    setSubtaskPendingTaskId(null);
   }
 
   function handleCloseEdit() {
@@ -900,6 +934,9 @@ export default function ProjectDetailPage() {
     setEditStoryPoints('');
     setEditDueDate('');
     setEditAssigneeId('');
+    setSubtaskTitle('');
+    setSubtaskError(null);
+    setSubtaskPendingTaskId(null);
     triggerRef.current?.focus();
     triggerRef.current = null;
   }
@@ -978,6 +1015,71 @@ export default function ProjectDetailPage() {
       handleCloseEdit();
     } catch (caughtError) {
       setTaskUpdateError(caughtError instanceof Error ? caughtError.message : 'Không thể xoá task');
+    }
+  }
+
+  async function handleCreateSubtask(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!editingTask || editingTask.parentTaskId) {
+      return;
+    }
+
+    const normalizedTitle = subtaskTitle.trim();
+    if (!normalizedTitle) {
+      setSubtaskError('Tên subtask là bắt buộc');
+      return;
+    }
+
+    setSubtaskError(null);
+    setSubtaskPendingTaskId(editingTask.id);
+
+    try {
+      await createTaskMutation.mutateAsync({
+        title: normalizedTitle,
+        status: 'todo',
+        priority: 'medium',
+        type: 'task',
+        parentTaskId: editingTask.id,
+      });
+      setSubtaskTitle('');
+    } catch (caughtError) {
+      setSubtaskError(caughtError instanceof Error ? caughtError.message : 'Không thể tạo subtask');
+    } finally {
+      setSubtaskPendingTaskId(null);
+    }
+  }
+
+  async function handleToggleSubtaskDone(subtask: ProjectTaskItemDTO) {
+    setSubtaskError(null);
+    setSubtaskPendingTaskId(subtask.id);
+    try {
+      await updateTaskStatusMutation.mutateAsync({
+        taskId: subtask.id,
+        status: subtask.status === 'done' ? 'todo' : 'done',
+      });
+    } catch (caughtError) {
+      setSubtaskError(
+        caughtError instanceof Error ? caughtError.message : 'Không thể cập nhật subtask',
+      );
+    } finally {
+      setSubtaskPendingTaskId(null);
+    }
+  }
+
+  async function handleDeleteSubtask(subtaskId: string) {
+    if (!confirm('Bạn có chắc chắn muốn xoá subtask này?')) {
+      return;
+    }
+
+    setSubtaskError(null);
+    setSubtaskPendingTaskId(subtaskId);
+    try {
+      await deleteTaskMutation.mutateAsync(subtaskId);
+    } catch (caughtError) {
+      setSubtaskError(caughtError instanceof Error ? caughtError.message : 'Không thể xoá subtask');
+    } finally {
+      setSubtaskPendingTaskId(null);
     }
   }
 
@@ -1888,6 +1990,87 @@ export default function ProjectDetailPage() {
                         <LabelDots labels={editingTask.labels} />
                       </div>
                     ) : null}
+
+                    {editingTask.parentTaskId ? (
+                      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                        <p className="text-xs font-semibold text-slate-500 uppercase">Task cha</p>
+                        <p className="mt-1 text-sm font-medium text-slate-800">
+                          {editingParentTask?.title ?? 'Task cha đã bị xoá hoặc không tồn tại'}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-semibold text-slate-800">Subtasks</p>
+                          <span className="text-xs text-slate-600">
+                            {editingTask.subtaskProgress?.done ?? 0}/
+                            {editingTask.subtaskProgress?.total ?? 0} hoàn thành (
+                            {editingTask.subtaskProgress?.percent ?? 0}%)
+                          </span>
+                        </div>
+
+                        {editingTaskSubtasks.length === 0 ? (
+                          <p className="text-xs text-slate-500">Chưa có subtask</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {editingTaskSubtasks.map((subtask) => (
+                              <div
+                                key={subtask.id}
+                                className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2.5 py-2"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={subtask.status === 'done'}
+                                  onChange={() => {
+                                    void handleToggleSubtaskDone(subtask);
+                                  }}
+                                  disabled={subtaskPendingTaskId === subtask.id}
+                                  className="h-4 w-4 rounded border-slate-300 text-brand-600"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEdit(subtask)}
+                                  className={`flex-1 text-left text-sm ${subtask.status === 'done' ? 'text-slate-400 line-through' : 'text-slate-800 hover:text-brand-700'}`}
+                                >
+                                  {subtask.title}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    void handleDeleteSubtask(subtask.id);
+                                  }}
+                                  disabled={subtaskPendingTaskId === subtask.id}
+                                  className="rounded px-2 py-1 text-xs font-medium text-rose-600 hover:bg-rose-50 disabled:opacity-50"
+                                >
+                                  Xoá
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        <form onSubmit={handleCreateSubtask} className="flex gap-2">
+                          <input
+                            type="text"
+                            value={subtaskTitle}
+                            onChange={(event) => setSubtaskTitle(event.target.value)}
+                            placeholder="Thêm subtask mới..."
+                            className="flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                          />
+                          <button
+                            type="submit"
+                            disabled={subtaskPendingTaskId === editingTask.id}
+                            className="rounded-md bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
+                          >
+                            {subtaskPendingTaskId === editingTask.id ? 'Đang thêm...' : 'Thêm'}
+                          </button>
+                        </form>
+
+                        {subtaskError ? (
+                          <p className="text-xs text-rose-600">{subtaskError}</p>
+                        ) : null}
+                      </div>
+                    )}
 
                     <label className="block text-sm font-medium text-slate-700">
                       Mô tả

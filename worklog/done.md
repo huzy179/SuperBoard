@@ -271,3 +271,12 @@
 - [x] Nhóm danh sách project theo `Cập nhật hôm nay` và `Cũ hơn`
 - [x] Hiển thị số lượng dự án cho từng nhóm để quét nhanh
 - [x] Điều chỉnh grid để tránh lặp card `Dự án mới` khi render nhiều nhóm
+
+## Jira v1.25 — Subtasks MVP (Nested 1 Level)
+
+- [x] Prisma schema + migration thêm quan hệ `Task.parentTaskId` self-reference 1 cấp
+- [x] Mở rộng shared DTO (`parentTaskId`, `subtaskProgress`) đồng bộ FE ↔ BE
+- [x] API tạo/cập nhật task hỗ trợ `parentTaskId` + validate không cho nested > 1 cấp
+- [x] Project detail chỉ render root tasks ở board/list/calendar để tránh lẫn subtask
+- [x] Task detail panel thêm khu vực Subtasks: quick add, toggle done, xoá, mở chi tiết subtask
+- [x] Parent task hiển thị progress subtasks `done/total (%)`

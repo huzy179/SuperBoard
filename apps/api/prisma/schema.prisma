@@ -162,6 +162,9 @@ model Task {
   position    String?
   dueDate     DateTime?
   deletedAt   DateTime?
+  parentTaskId String?
+  parentTask  Task?        @relation("TaskSubtasks", fields: [parentTaskId], references: [id], onDelete: SetNull)
+  subtasks    Task[]       @relation("TaskSubtasks")
   assigneeId  String?
   assignee    User?        @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
   projectId   String
@@ -175,6 +178,7 @@ model Task {
 
   @@unique([projectId, number])
   @@index([projectId, status, deletedAt])
+  @@index([parentTaskId])
   @@index([assigneeId])
 }
 

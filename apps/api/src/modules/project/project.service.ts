@@ -92,6 +92,7 @@ export class ProjectService {
             id: true,
             title: true,
             description: true,
+            parentTaskId: true,
             status: true,
             priority: true,
             type: true,
@@ -127,6 +128,27 @@ export class ProjectService {
       avatarColor: m.user.avatarColor ?? null,
     }));
 
+    const subtaskStatsByParent = new Map<
+      string,
+      { total: number; done: number; percent: number }
+    >();
+    for (const task of project.tasks) {
+      if (!task.parentTaskId) {
+        continue;
+      }
+      const current = subtaskStatsByParent.get(task.parentTaskId) ?? {
+        total: 0,
+        done: 0,
+        percent: 0,
+      };
+      current.total += 1;
+      if (task.status === 'done') {
+        current.done += 1;
+      }
+      current.percent = current.total === 0 ? 0 : Math.round((current.done / current.total) * 100);
+      subtaskStatsByParent.set(task.parentTaskId, current);
+    }
+
     return {
       ...this.toProjectItemDTO(project),
       taskCount: project.tasks.length,
@@ -136,6 +158,7 @@ export class ProjectService {
         id: task.id,
         title: task.title,
         description: task.description,
+        parentTaskId: task.parentTaskId,
         status: task.status as ProjectTaskItemDTO['status'],
         priority: task.priority,
         type: (task.type ?? 'task') as ProjectTaskItemDTO['type'],
@@ -147,6 +170,7 @@ export class ProjectService {
         assigneeId: task.assigneeId,
         assigneeName: task.assignee?.fullName ?? null,
         assigneeAvatarColor: task.assignee?.avatarColor ?? null,
+        subtaskProgress: subtaskStatsByParent.get(task.id) ?? null,
         createdAt: task.createdAt.toISOString(),
         updatedAt: task.updatedAt.toISOString(),
       })),
@@ -273,6 +297,7 @@ export class ProjectService {
     actorId?: string;
     title: string;
     description?: string;
+    parentTaskId?: string | null;
     status: NonNullable<CreateTaskRequestDTO['status']>;
     priority: NonNullable<CreateTaskRequestDTO['priority']>;
     type?: CreateTaskRequestDTO['type'];
@@ -300,6 +325,13 @@ export class ProjectService {
       await this.validateAssignee(input.workspaceId, input.assigneeId);
     }
 
+    if (input.parentTaskId) {
+      await this.validateParentTask({
+        projectId: input.projectId,
+        parentTaskId: input.parentTaskId,
+      });
+    }
+
     // Auto-generate task number
     const maxNumberResult = await this.prisma.task.aggregate({
       where: { projectId: input.projectId },
@@ -320,6 +352,7 @@ export class ProjectService {
         storyPoints: input.storyPoints ?? null,
         dueDate: input.dueDate ?? null,
         assigneeId: input.assigneeId ?? null,
+        parentTaskId: input.parentTaskId ?? null,
         ...(input.labelIds?.length
           ? { labels: { create: input.labelIds.map((labelId) => ({ labelId })) } }
           : {}),
@@ -579,6 +612,7 @@ export class ProjectService {
       select: {
         id: true,
         assigneeId: true,
+        parentTaskId: true,
         title: true,
         status: true,
         priority: true,
@@ -595,6 +629,19 @@ export class ProjectService {
 
     if (input.data.assigneeId) {
       await this.validateAssignee(input.workspaceId, input.data.assigneeId);
+    }
+
+    if (input.data.parentTaskId !== undefined) {
+      if (input.data.parentTaskId === input.taskId) {
+        throw new BadRequestException('Task cannot be parent of itself');
+      }
+
+      if (input.data.parentTaskId) {
+        await this.validateParentTask({
+          projectId: input.projectId,
+          parentTaskId: input.data.parentTaskId,
+        });
+      }
     }
 
     // Handle label updates via deleteMany + create
@@ -620,6 +667,7 @@ export class ProjectService {
         ...(input.data.storyPoints !== undefined ? { storyPoints: input.data.storyPoints } : {}),
         ...(input.data.dueDate !== undefined ? { dueDate: input.data.dueDate } : {}),
         ...(input.data.assigneeId !== undefined ? { assigneeId: input.data.assigneeId } : {}),
+        ...(input.data.parentTaskId !== undefined ? { parentTaskId: input.data.parentTaskId } : {}),
       },
       select: this.taskSelect,
     });
@@ -686,6 +734,13 @@ export class ProjectService {
 
     if (input.data.labelIds !== undefined) {
       changedFields.push('labelIds');
+    }
+
+    if (
+      input.data.parentTaskId !== undefined &&
+      input.data.parentTaskId !== existingTask.parentTaskId
+    ) {
+      changedFields.push('parentTaskId');
     }
 
     if (changedFields.length > 0) {
@@ -961,6 +1016,7 @@ export class ProjectService {
     id: true,
     title: true,
     description: true,
+    parentTaskId: true,
     status: true,
     priority: true,
     type: true,
@@ -979,6 +1035,7 @@ export class ProjectService {
     id: string;
     title: string;
     description: string | null;
+    parentTaskId?: string | null;
     status: string;
     priority: string;
     type?: string;
@@ -996,6 +1053,7 @@ export class ProjectService {
       id: task.id,
       title: task.title,
       description: task.description,
+      parentTaskId: task.parentTaskId ?? null,
       status: task.status as ProjectTaskItemDTO['status'],
       priority: task.priority as ProjectTaskItemDTO['priority'],
       type: (task.type ?? 'task') as ProjectTaskItemDTO['type'],
@@ -1007,9 +1065,35 @@ export class ProjectService {
       assigneeId: task.assigneeId,
       assigneeName: task.assignee?.fullName ?? null,
       assigneeAvatarColor: task.assignee?.avatarColor ?? null,
+      subtaskProgress: null,
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
     };
+  }
+
+  private async validateParentTask(input: {
+    projectId: string;
+    parentTaskId: string;
+  }): Promise<void> {
+    const parentTask = await this.prisma.task.findFirst({
+      where: {
+        id: input.parentTaskId,
+        projectId: input.projectId,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        parentTaskId: true,
+      },
+    });
+
+    if (!parentTask) {
+      throw new NotFoundException('Parent task not found');
+    }
+
+    if (parentTask.parentTaskId) {
+      throw new BadRequestException('Only one-level subtask is supported');
+    }
   }
 
   private async verifyProjectAndTask(input: {

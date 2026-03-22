@@ -195,6 +195,8 @@ export class ProjectController {
     const status = body.status ?? 'todo';
     const priority = body.priority ?? 'medium';
     const assigneeId = body.assigneeId?.trim();
+    const hasParentTaskId = Object.prototype.hasOwnProperty.call(body, 'parentTaskId');
+    const normalizedParentTaskId = body.parentTaskId?.trim();
     const dueDate = this.parseOptionalDate(body.dueDate);
 
     const task = await this.projectService.createTaskForProject({
@@ -209,6 +211,7 @@ export class ProjectController {
       ...(body.storyPoints !== undefined ? { storyPoints: body.storyPoints } : {}),
       ...(body.labelIds ? { labelIds: body.labelIds } : {}),
       ...(assigneeId ? { assigneeId } : {}),
+      ...(hasParentTaskId ? { parentTaskId: normalizedParentTaskId || null } : {}),
       ...(dueDate !== undefined ? { dueDate } : {}),
     });
 
@@ -314,6 +317,8 @@ export class ProjectController {
 
     const normalizedDescription = body.description?.trim();
     const normalizedAssigneeId = body.assigneeId?.trim();
+    const hasParentTaskId = Object.prototype.hasOwnProperty.call(body, 'parentTaskId');
+    const normalizedParentTaskId = body.parentTaskId?.trim();
     const dueDate = this.parseOptionalDate(body.dueDate);
 
     const task = await this.projectService.updateTaskForProject({
@@ -331,6 +336,7 @@ export class ProjectController {
         ...(body.position !== undefined ? { position: body.position } : {}),
         ...(body.labelIds !== undefined ? { labelIds: body.labelIds } : {}),
         ...(body.assigneeId !== undefined ? { assigneeId: normalizedAssigneeId || null } : {}),
+        ...(hasParentTaskId ? { parentTaskId: normalizedParentTaskId || null } : {}),
         ...(dueDate !== undefined ? { dueDate } : {}),
       },
     });

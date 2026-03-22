@@ -17,7 +17,7 @@ export function getMockDashboardStats(): DashboardStatsDTO {
     tasksByStatus: [
       { status: 'todo', count: 12 },
       { status: 'in_progress', count: 8 },
-      { status: 'review', count: 4 },
+      { status: 'in_review', count: 4 },
       { status: 'done', count: 17 },
     ],
     tasksByPriority: [

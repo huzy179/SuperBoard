@@ -1006,7 +1006,7 @@ export default function ProjectDetailPage() {
     status: ProjectTaskItemDTO['status'],
     draggedTaskId: string,
     targetTaskId?: string,
-  ): string {
+  ): { position: string; requiresRebalance: boolean } {
     const tasksInTargetColumn = (boardData.get(status) ?? []).filter(
       (task) => task.id !== draggedTaskId,
     );
@@ -1034,6 +1034,52 @@ export default function ProjectDetailPage() {
     });
   }
 
+  async function rebalanceColumnAfterDrop(input: {
+    status: ProjectTaskItemDTO['status'];
+    draggedTaskId: string;
+    targetTaskId?: string;
+  }) {
+    const tasksInTargetColumn = (boardData.get(input.status) ?? []).filter(
+      (task) => task.id !== input.draggedTaskId,
+    );
+
+    const targetIndex = input.targetTaskId
+      ? tasksInTargetColumn.findIndex((task) => task.id === input.targetTaskId)
+      : -1;
+
+    const insertIndex = targetIndex === -1 ? tasksInTargetColumn.length : targetIndex;
+    const reorderedTaskIds = [
+      ...tasksInTargetColumn.slice(0, insertIndex).map((task) => task.id),
+      input.draggedTaskId,
+      ...tasksInTargetColumn.slice(insertIndex).map((task) => task.id),
+    ];
+
+    if (!project) {
+      return;
+    }
+
+    const taskMap = new Map(project.tasks.map((task) => [task.id, task]));
+
+    for (let index = 0; index < reorderedTaskIds.length; index += 1) {
+      const taskId = reorderedTaskIds[index]!;
+      const task = taskMap.get(taskId);
+      if (!task) {
+        continue;
+      }
+
+      const nextPosition = String((index + 1) * 1000);
+      if (task.status === input.status && task.position === nextPosition) {
+        continue;
+      }
+
+      await updateTaskStatusMutation.mutateAsync({
+        taskId,
+        status: input.status,
+        position: nextPosition,
+      });
+    }
+  }
+
   function handleDropByPosition(
     event: React.DragEvent<HTMLElement>,
     status: ProjectTaskItemDTO['status'],
@@ -1054,13 +1100,28 @@ export default function ProjectDetailPage() {
     const current = project.tasks.find((task) => task.id === taskId);
     if (!current) return;
 
-    const nextPosition = buildDropPosition(status, taskId, targetTaskId);
-    const samePosition = current.position === nextPosition;
+    const nextDropPosition = buildDropPosition(status, taskId, targetTaskId);
+    const samePosition = current.position === nextDropPosition.position;
     if (current.status === status && samePosition) {
       return;
     }
 
-    handleUpdateTaskStatus(taskId, status, nextPosition);
+    if (nextDropPosition.requiresRebalance) {
+      void rebalanceColumnAfterDrop({
+        status,
+        draggedTaskId: taskId,
+        ...(targetTaskId ? { targetTaskId } : {}),
+      }).catch((caughtError) => {
+        setTaskUpdateError(
+          caughtError instanceof Error
+            ? caughtError.message
+            : 'Không thể sắp xếp lại thứ tự task trong cột',
+        );
+      });
+      return;
+    }
+
+    handleUpdateTaskStatus(taskId, status, nextDropPosition.position);
   }
 
   if (loading) {

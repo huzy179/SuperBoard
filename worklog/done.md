@@ -240,3 +240,9 @@
 - [x] Thêm mock data typed cho `DashboardStatsDTO` ở FE
 - [x] Bổ sung fallback trong `getDashboardStats()` khi endpoint BE chưa sẵn sàng (404/501/502/503 hoặc lỗi mạng)
 - [x] Cho phép tắt fallback bằng biến `NEXT_PUBLIC_ENABLE_API_MOCK_FALLBACK=false`
+
+## Jira v1.20 — Robust Board Ordering (Fractional + Rebalance)
+
+- [x] Nâng cấp `buildFractionalTaskPosition` để phát hiện khoảng cách position quá nhỏ
+- [x] Thêm luồng `rebalance` tự động sắp xếp lại toàn cột khi drag-drop cùng cột có nguy cơ trùng/thấp độ chính xác
+- [x] Giữ drag-drop mượt cho cả đổi cột và reorder trong cùng cột, đồng thời tránh drift position sau nhiều lần kéo

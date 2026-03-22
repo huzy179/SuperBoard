@@ -118,7 +118,9 @@ export function parseTaskPosition(position?: string | null): number {
 export function buildFractionalTaskPosition(input: {
   previousPosition?: string | null | undefined;
   nextPosition?: string | null | undefined;
-}): string {
+}): { position: string; requiresRebalance: boolean } {
+  const MIN_POSITION_GAP = 0.0001;
+
   const previous =
     input.previousPosition != null && Number.isFinite(Number(input.previousPosition))
       ? Number(input.previousPosition)
@@ -129,15 +131,27 @@ export function buildFractionalTaskPosition(input: {
       : null;
 
   let result = 1000;
+  let requiresRebalance = false;
+
   if (previous != null && next != null) {
-    result = next > previous ? previous + (next - previous) / 2 : previous + 1;
+    const gap = next - previous;
+
+    if (gap <= MIN_POSITION_GAP) {
+      requiresRebalance = true;
+      result = previous + MIN_POSITION_GAP / 2;
+    } else {
+      result = previous + gap / 2;
+    }
   } else if (previous != null) {
     result = previous + 1000;
   } else if (next != null) {
     result = next - 1000;
   }
 
-  return Number.isFinite(result) ? String(result) : '1000';
+  return {
+    position: Number.isFinite(result) ? String(result) : '1000',
+    requiresRebalance,
+  };
 }
 
 export function isTaskOverdue(dueDate?: string | null): boolean {

@@ -16,6 +16,8 @@ export default function JiraHomePage() {
     showOnlyFavorites,
     setShowOnlyFavorites,
     favoriteCount,
+    projectsUpdatedToday,
+    projectsUpdatedEarlier,
     showCreatePanel,
     setShowCreatePanel,
     projectName,
@@ -176,17 +178,53 @@ export default function JiraHomePage() {
             }}
           />
         ) : (
-          <ProjectCardsGrid
-            projects={filteredProjects}
-            onOpenCreate={() => setShowCreatePanel(true)}
-            onOpenEdit={openEditProject}
-            onArchive={(projectId) => {
-              void handleArchiveProject(projectId);
-            }}
-            isArchivingProject={isArchivingProject}
-            onToggleFavorite={toggleFavoriteProject}
-            isFavorite={isFavoriteProject}
-          />
+          <div className="space-y-6">
+            {projectsUpdatedToday.length > 0 ? (
+              <div>
+                <div className="mb-3 flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-slate-900">Cập nhật hôm nay</h3>
+                  <span className="text-xs text-slate-500">
+                    {projectsUpdatedToday.length} dự án
+                  </span>
+                </div>
+                <ProjectCardsGrid
+                  projects={projectsUpdatedToday}
+                  onOpenCreate={() => setShowCreatePanel(true)}
+                  onOpenEdit={openEditProject}
+                  onArchive={(projectId) => {
+                    void handleArchiveProject(projectId);
+                  }}
+                  isArchivingProject={isArchivingProject}
+                  onToggleFavorite={toggleFavoriteProject}
+                  isFavorite={isFavoriteProject}
+                  showCreateCard={projectsUpdatedEarlier.length === 0}
+                />
+              </div>
+            ) : null}
+
+            {projectsUpdatedEarlier.length > 0 ? (
+              <div>
+                <div className="mb-3 flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-slate-900">Cũ hơn</h3>
+                  <span className="text-xs text-slate-500">
+                    {projectsUpdatedEarlier.length} dự án
+                  </span>
+                </div>
+                <ProjectCardsGrid
+                  projects={projectsUpdatedEarlier}
+                  onOpenCreate={() => setShowCreatePanel(true)}
+                  onOpenEdit={openEditProject}
+                  onArchive={(projectId) => {
+                    void handleArchiveProject(projectId);
+                  }}
+                  isArchivingProject={isArchivingProject}
+                  onToggleFavorite={toggleFavoriteProject}
+                  isFavorite={isFavoriteProject}
+                  showCreateCard
+                />
+              </div>
+            ) : null}
+          </div>
         )}
       </div>
     </section>

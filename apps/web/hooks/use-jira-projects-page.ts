@@ -220,6 +220,19 @@ export function useJiraProjectsPage() {
     return projects.filter((project) => favoriteProjectIds.has(project.id)).length;
   }, [favoriteProjectIds, projects]);
 
+  const projectsUpdatedToday = useMemo(() => {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    return sortedProjects.filter(
+      (project) => new Date(project.updatedAt).getTime() >= startOfToday,
+    );
+  }, [sortedProjects]);
+
+  const projectsUpdatedEarlier = useMemo(() => {
+    const todayIds = new Set(projectsUpdatedToday.map((project) => project.id));
+    return sortedProjects.filter((project) => !todayIds.has(project.id));
+  }, [projectsUpdatedToday, sortedProjects]);
+
   return {
     projectsLoading,
     projectsError,
@@ -230,6 +243,8 @@ export function useJiraProjectsPage() {
     showOnlyFavorites,
     setShowOnlyFavorites,
     favoriteCount,
+    projectsUpdatedToday,
+    projectsUpdatedEarlier,
     showCreatePanel,
     setShowCreatePanel,
     projectName,

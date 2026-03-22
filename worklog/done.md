@@ -265,3 +265,9 @@
 - [x] Thêm toggle `Dự án ghim` ở Jira Home để lọc nhanh chỉ project đã ghim
 - [x] Hiển thị badge số lượng project đã ghim ngay trên nút toggle
 - [x] Empty state chuyên biệt khi đang bật chế độ chỉ xem project ghim
+
+## Jira v1.24 — Jira Home Group by Recency
+
+- [x] Nhóm danh sách project theo `Cập nhật hôm nay` và `Cũ hơn`
+- [x] Hiển thị số lượng dự án cho từng nhóm để quét nhanh
+- [x] Điều chỉnh grid để tránh lặp card `Dự án mới` khi render nhiều nhóm

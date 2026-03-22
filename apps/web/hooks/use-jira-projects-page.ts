@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import type { ProjectItemDTO } from '@superboard/shared';
 import { useProjects } from '@/hooks/use-projects';
 import {
@@ -8,6 +8,8 @@ import {
 } from '@/hooks/use-project-mutations';
 
 export function useJiraProjectsPage() {
+  const FAVORITE_PROJECT_IDS_KEY = 'superboard.favorite-project-ids';
+
   const {
     data: projects = [],
     isLoading: projectsLoading,
@@ -35,8 +37,38 @@ export function useJiraProjectsPage() {
   const [editDescription, setEditDescription] = useState('');
   const [editIcon, setEditIcon] = useState('');
   const [editColor, setEditColor] = useState('');
+  const [favoriteProjectIds, setFavoriteProjectIds] = useState<Set<string>>(new Set());
+  const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
 
   const normalizedProjectName = useMemo(() => projectName.trim(), [projectName]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const raw = window.localStorage.getItem(FAVORITE_PROJECT_IDS_KEY);
+    if (!raw) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as string[];
+      if (Array.isArray(parsed)) {
+        setFavoriteProjectIds(new Set(parsed.filter((item) => typeof item === 'string')));
+      }
+    } catch {
+      setFavoriteProjectIds(new Set());
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.localStorage.setItem(FAVORITE_PROJECT_IDS_KEY, JSON.stringify([...favoriteProjectIds]));
+  }, [favoriteProjectIds]);
 
   const filteredProjects = useMemo(() => {
     if (!searchQuery.trim()) return projects;
@@ -48,6 +80,27 @@ export function useJiraProjectsPage() {
         (p.description && p.description.toLowerCase().includes(q)),
     );
   }, [projects, searchQuery]);
+
+  const favoriteFilteredProjects = useMemo(() => {
+    if (!showOnlyFavorites) {
+      return filteredProjects;
+    }
+
+    return filteredProjects.filter((project) => favoriteProjectIds.has(project.id));
+  }, [favoriteProjectIds, filteredProjects, showOnlyFavorites]);
+
+  const sortedProjects = useMemo(() => {
+    return [...favoriteFilteredProjects].sort((first, second) => {
+      const firstFavorite = favoriteProjectIds.has(first.id);
+      const secondFavorite = favoriteProjectIds.has(second.id);
+
+      if (firstFavorite !== secondFavorite) {
+        return firstFavorite ? -1 : 1;
+      }
+
+      return new Date(second.updatedAt).getTime() - new Date(first.updatedAt).getTime();
+    });
+  }, [favoriteFilteredProjects, favoriteProjectIds]);
 
   function reloadProjects() {
     void refetch();
@@ -147,13 +200,36 @@ export function useJiraProjectsPage() {
     return deleteProjectMutation.isPending && deleteProjectMutation.variables === projectId;
   }
 
+  function toggleFavoriteProject(projectId: string) {
+    setFavoriteProjectIds((previous) => {
+      const next = new Set(previous);
+      if (next.has(projectId)) {
+        next.delete(projectId);
+      } else {
+        next.add(projectId);
+      }
+      return next;
+    });
+  }
+
+  function isFavoriteProject(projectId: string): boolean {
+    return favoriteProjectIds.has(projectId);
+  }
+
+  const favoriteCount = useMemo(() => {
+    return projects.filter((project) => favoriteProjectIds.has(project.id)).length;
+  }, [favoriteProjectIds, projects]);
+
   return {
     projectsLoading,
     projectsError,
-    filteredProjects,
+    filteredProjects: sortedProjects,
     reloadProjects,
     searchQuery,
     setSearchQuery,
+    showOnlyFavorites,
+    setShowOnlyFavorites,
+    favoriteCount,
     showCreatePanel,
     setShowCreatePanel,
     projectName,
@@ -184,5 +260,7 @@ export function useJiraProjectsPage() {
     archiveError,
     handleArchiveProject,
     isArchivingProject,
+    toggleFavoriteProject,
+    isFavoriteProject,
   };
 }

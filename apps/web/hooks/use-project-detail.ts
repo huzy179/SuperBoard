@@ -3,7 +3,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ProjectDetailDTO } from '@superboard/shared';
 import { getProjectDetail } from '@/lib/services/project-service';
 import { subscribeProjectDetailUpdated } from '@/lib/realtime/project-sync';
-import { subscribeProjectSocketUpdated } from '@/lib/realtime/project-socket';
+import {
+  subscribeProjectSocketUpdated,
+  subscribeProjectTaskPatched,
+} from '@/lib/realtime/project-socket';
 
 export function useProjectDetail(projectId: string) {
   const queryClient = useQueryClient();
@@ -53,6 +56,32 @@ export function useProjectDetail(projectId: string) {
 
     const unsubscribeBroadcast = subscribeProjectDetailUpdated(projectId, scheduleInvalidate);
     const unsubscribeSocket = subscribeProjectSocketUpdated(projectId, scheduleInvalidate);
+    const unsubscribeTaskPatched = subscribeProjectTaskPatched(projectId, (payload) => {
+      queryClient.setQueryData<ProjectDetailDTO>(['projects', projectId], (current) => {
+        if (!current) {
+          return current;
+        }
+
+        const nextTasks = current.tasks.map((task) => {
+          if (task.id !== payload.taskId) {
+            return task;
+          }
+
+          return {
+            ...task,
+            status: payload.status as ProjectDetailDTO['tasks'][number]['status'],
+            ...(payload.position !== undefined ? { position: payload.position } : {}),
+            updatedAt: payload.updatedAt,
+          };
+        });
+
+        return {
+          ...current,
+          tasks: nextTasks,
+        };
+      });
+    });
+
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', handleVisibilityChange);
     }
@@ -60,6 +89,7 @@ export function useProjectDetail(projectId: string) {
     return () => {
       unsubscribeBroadcast();
       unsubscribeSocket();
+      unsubscribeTaskPatched();
       if (typeof document !== 'undefined') {
         document.removeEventListener('visibilitychange', handleVisibilityChange);
       }

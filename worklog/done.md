@@ -246,3 +246,22 @@
 - [x] Nâng cấp `buildFractionalTaskPosition` để phát hiện khoảng cách position quá nhỏ
 - [x] Thêm luồng `rebalance` tự động sắp xếp lại toàn cột khi drag-drop cùng cột có nguy cơ trùng/thấp độ chính xác
 - [x] Giữ drag-drop mượt cho cả đổi cột và reorder trong cùng cột, đồng thời tránh drift position sau nhiều lần kéo
+
+## Jira v1.21 — Realtime Multi-user Task Drag Sync
+
+- [x] Mở rộng websocket gateway với event granular `project:task-patched`
+- [x] Emit event task patch ngay sau `PATCH /tasks/:taskId/status` để đồng bộ drag-drop theo task-level
+- [x] FE subscribe `project:task-patched` và patch React Query cache trực tiếp (không chờ refetch)
+- [x] Giữ cơ chế `project:updated` hiện có làm fallback invalidate để đảm bảo tính nhất quán
+
+## Jira v1.22 — Favorite Projects on Jira Home
+
+- [x] Thêm tính năng ghim/bỏ ghim dự án ngay trên project card
+- [x] Ưu tiên hiển thị dự án ghim lên đầu danh sách
+- [x] Lưu trạng thái ghim ở localStorage để giữ preference theo trình duyệt
+
+## Jira v1.23 — Favorites-only Filter on Jira Home
+
+- [x] Thêm toggle `Dự án ghim` ở Jira Home để lọc nhanh chỉ project đã ghim
+- [x] Hiển thị badge số lượng project đã ghim ngay trên nút toggle
+- [x] Empty state chuyên biệt khi đang bật chế độ chỉ xem project ghim

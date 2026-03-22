@@ -213,6 +213,13 @@ export class ProjectController {
     });
 
     this.projectGateway.emitProjectUpdated(projectId);
+    this.projectGateway.emitProjectTaskPatched({
+      projectId,
+      taskId: task.id,
+      status: task.status,
+      ...(task.position !== undefined ? { position: task.position } : {}),
+      updatedAt: task.updatedAt,
+    });
 
     return apiSuccess(task);
   }

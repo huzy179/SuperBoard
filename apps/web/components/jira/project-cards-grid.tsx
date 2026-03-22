@@ -9,6 +9,8 @@ type ProjectCardsGridProps = {
   onOpenEdit: (project: ProjectItemDTO) => void;
   onArchive: (projectId: string) => void;
   isArchivingProject: (projectId: string) => boolean;
+  onToggleFavorite: (projectId: string) => void;
+  isFavorite: (projectId: string) => boolean;
 };
 
 export function ProjectCardsGrid({
@@ -17,6 +19,8 @@ export function ProjectCardsGrid({
   onOpenEdit,
   onArchive,
   isArchivingProject,
+  onToggleFavorite,
+  isFavorite,
 }: ProjectCardsGridProps) {
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -39,6 +43,11 @@ export function ProjectCardsGrid({
                   <h3 className="truncate font-semibold text-slate-900 transition-colors group-hover:text-brand-600">
                     {project.name}
                   </h3>
+                  {isFavorite(project.id) ? (
+                    <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+                      ⭐ Ưu tiên
+                    </span>
+                  ) : null}
                 </div>
 
                 {project.key ? (
@@ -91,6 +100,14 @@ export function ProjectCardsGrid({
                   Hoạt động
                 </span>
                 <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => onToggleFavorite(project.id)}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 hover:text-amber-700"
+                  >
+                    <span>{isFavorite(project.id) ? '★' : '☆'}</span>
+                    {isFavorite(project.id) ? 'Bỏ ghim' : 'Ghim'}
+                  </button>
                   <button
                     type="button"
                     onClick={() => onOpenEdit(project)}

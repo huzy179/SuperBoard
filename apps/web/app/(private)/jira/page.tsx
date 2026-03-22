@@ -13,6 +13,9 @@ export default function JiraHomePage() {
     reloadProjects,
     searchQuery,
     setSearchQuery,
+    showOnlyFavorites,
+    setShowOnlyFavorites,
+    favoriteCount,
     showCreatePanel,
     setShowCreatePanel,
     projectName,
@@ -43,6 +46,8 @@ export default function JiraHomePage() {
     archiveError,
     handleArchiveProject,
     isArchivingProject,
+    toggleFavoriteProject,
+    isFavoriteProject,
   } = useJiraProjectsPage();
 
   return (
@@ -65,8 +70,8 @@ export default function JiraHomePage() {
         </button>
       </div>
 
-      {/* Search bar */}
-      <div className="mb-6">
+      {/* Search + quick filters */}
+      <div className="mb-6 flex flex-wrap items-center gap-2">
         <input
           type="text"
           value={searchQuery}
@@ -74,6 +79,19 @@ export default function JiraHomePage() {
           placeholder="Tìm kiếm dự án theo tên, mã hoặc mô tả..."
           className="w-full max-w-md rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400"
         />
+
+        <button
+          type="button"
+          onClick={() => setShowOnlyFavorites((value) => !value)}
+          className={`inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+            showOnlyFavorites
+              ? 'bg-amber-100 text-amber-700'
+              : 'border border-slate-300 bg-white text-slate-600 hover:bg-slate-50'
+          }`}
+        >
+          <span>{showOnlyFavorites ? '★' : '☆'}</span>
+          Dự án ghim ({favoriteCount})
+        </button>
       </div>
 
       {showCreatePanel ? (
@@ -142,10 +160,20 @@ export default function JiraHomePage() {
           />
         ) : filteredProjects.length === 0 ? (
           <EmptyStateCard
-            title="Chưa có dự án nào"
-            description="Hãy tạo dự án mới để bắt đầu"
-            actionLabel="Tạo dự án"
-            onAction={() => setShowCreatePanel(true)}
+            title={showOnlyFavorites ? 'Chưa có dự án ghim' : 'Chưa có dự án nào'}
+            description={
+              showOnlyFavorites
+                ? 'Hãy bấm Ghim ở một dự án để ưu tiên hiển thị tại đây'
+                : 'Hãy tạo dự án mới để bắt đầu'
+            }
+            actionLabel={showOnlyFavorites ? 'Hiện tất cả dự án' : 'Tạo dự án'}
+            onAction={() => {
+              if (showOnlyFavorites) {
+                setShowOnlyFavorites(false);
+                return;
+              }
+              setShowCreatePanel(true);
+            }}
           />
         ) : (
           <ProjectCardsGrid
@@ -156,6 +184,8 @@ export default function JiraHomePage() {
               void handleArchiveProject(projectId);
             }}
             isArchivingProject={isArchivingProject}
+            onToggleFavorite={toggleFavoriteProject}
+            isFavorite={isFavoriteProject}
           />
         )}
       </div>

@@ -80,6 +80,23 @@ export class ProjectGateway implements OnGatewayConnection {
     });
   }
 
+  emitProjectTaskPatched(payload: {
+    projectId: string;
+    taskId: string;
+    status: string;
+    position?: string | null;
+    updatedAt: string;
+  }) {
+    this.server.to(toProjectRoom(payload.projectId)).emit('project:task-patched', {
+      projectId: payload.projectId,
+      taskId: payload.taskId,
+      status: payload.status,
+      position: payload.position ?? null,
+      updatedAt: payload.updatedAt,
+      at: Date.now(),
+    });
+  }
+
   private emitProjectPresence(projectId: string) {
     const room = this.server.sockets.adapter.rooms.get(toProjectRoom(projectId));
     const viewerCount = room?.size ?? 0;

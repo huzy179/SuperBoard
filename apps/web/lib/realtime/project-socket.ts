@@ -99,3 +99,55 @@ export function subscribeProjectPresence(
     socket.off('project:presence', listener);
   };
 }
+
+export function subscribeProjectTaskPatched(
+  projectId: string,
+  onTaskPatched: (payload: {
+    projectId: string;
+    taskId: string;
+    status: string;
+    position?: string | null;
+    updatedAt: string;
+    at: number;
+  }) => void,
+): () => void {
+  const socket = getProjectSocket(projectId);
+
+  if (!socket) {
+    return () => {};
+  }
+
+  const listener = (payload: {
+    projectId?: string;
+    taskId?: string;
+    status?: string;
+    position?: string | null;
+    updatedAt?: string;
+    at?: number;
+  }) => {
+    if (
+      payload?.projectId !== projectId ||
+      !payload.taskId ||
+      !payload.status ||
+      !payload.updatedAt
+    ) {
+      return;
+    }
+
+    onTaskPatched({
+      projectId,
+      taskId: payload.taskId,
+      status: payload.status,
+      ...(payload.position !== undefined ? { position: payload.position } : {}),
+      updatedAt: payload.updatedAt,
+      at: typeof payload.at === 'number' ? payload.at : Date.now(),
+    });
+  };
+
+  socket.on('project:task-patched', listener);
+  socket.emit('project:join', { projectId });
+
+  return () => {
+    socket.off('project:task-patched', listener);
+  };
+}

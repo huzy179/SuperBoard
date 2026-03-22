@@ -38,7 +38,7 @@ Mục tiêu: từ "chạy được" lên "dùng được nghiêm túc".
 
 ### Real-time
 
-- [ ] Socket.io task update đa user — kéo task → tất cả người xem board thấy ngay
+- [x] ~~Socket.io task update đa user — kéo task → tất cả người xem board thấy ngay~~ (done v1.21)
 - [x] ~~Presence trên board — avatar ai đang xem~~ (done v1.9)
 - [x] ~~Đồng bộ realtime multi-tab cho bulk actions + project/comments~~ (done v1.2)
 

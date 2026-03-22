@@ -7,8 +7,13 @@ import {
   useDeleteProject,
 } from '@/hooks/use-project-mutations';
 
+export type JiraProjectSortKey = 'updated_desc' | 'updated_asc' | 'name_asc' | 'name_desc';
+type ProjectViewMode = 'board' | 'list' | 'calendar';
+
 export function useJiraProjectsPage() {
   const FAVORITE_PROJECT_IDS_KEY = 'superboard.favorite-project-ids';
+  const LAST_PROJECT_VIEW_KEY = 'superboard.project-last-views';
+  const LAST_PROJECT_QUERY_KEY = 'superboard.project-last-queries';
 
   const {
     data: projects = [],
@@ -39,6 +44,9 @@ export function useJiraProjectsPage() {
   const [editColor, setEditColor] = useState('');
   const [favoriteProjectIds, setFavoriteProjectIds] = useState<Set<string>>(new Set());
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+  const [sortKey, setSortKey] = useState<JiraProjectSortKey>('updated_desc');
+  const [projectLastViews, setProjectLastViews] = useState<Record<string, ProjectViewMode>>({});
+  const [projectLastQueries, setProjectLastQueries] = useState<Record<string, string>>({});
 
   const normalizedProjectName = useMemo(() => projectName.trim(), [projectName]);
 
@@ -70,6 +78,46 @@ export function useJiraProjectsPage() {
     window.localStorage.setItem(FAVORITE_PROJECT_IDS_KEY, JSON.stringify([...favoriteProjectIds]));
   }, [favoriteProjectIds]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const raw = window.localStorage.getItem(LAST_PROJECT_VIEW_KEY);
+    if (!raw) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as Record<string, ProjectViewMode>;
+      if (parsed && typeof parsed === 'object') {
+        setProjectLastViews(parsed);
+      }
+    } catch {
+      setProjectLastViews({});
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const raw = window.localStorage.getItem(LAST_PROJECT_QUERY_KEY);
+    if (!raw) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as Record<string, string>;
+      if (parsed && typeof parsed === 'object') {
+        setProjectLastQueries(parsed);
+      }
+    } catch {
+      setProjectLastQueries({});
+    }
+  }, []);
+
   const filteredProjects = useMemo(() => {
     if (!searchQuery.trim()) return projects;
     const q = searchQuery.toLowerCase();
@@ -98,9 +146,21 @@ export function useJiraProjectsPage() {
         return firstFavorite ? -1 : 1;
       }
 
+      if (sortKey === 'updated_asc') {
+        return new Date(first.updatedAt).getTime() - new Date(second.updatedAt).getTime();
+      }
+
+      if (sortKey === 'name_asc') {
+        return first.name.localeCompare(second.name, 'vi');
+      }
+
+      if (sortKey === 'name_desc') {
+        return second.name.localeCompare(first.name, 'vi');
+      }
+
       return new Date(second.updatedAt).getTime() - new Date(first.updatedAt).getTime();
     });
-  }, [favoriteFilteredProjects, favoriteProjectIds]);
+  }, [favoriteFilteredProjects, favoriteProjectIds, sortKey]);
 
   function reloadProjects() {
     void refetch();
@@ -233,6 +293,87 @@ export function useJiraProjectsPage() {
     return sortedProjects.filter((project) => !todayIds.has(project.id));
   }, [projectsUpdatedToday, sortedProjects]);
 
+  const rememberedContextCount = useMemo(() => {
+    const projectIds = new Set([
+      ...Object.keys(projectLastViews),
+      ...Object.keys(projectLastQueries),
+    ]);
+    let count = 0;
+
+    projectIds.forEach((projectId) => {
+      if (
+        Boolean(projectLastQueries[projectId]?.trim()) ||
+        Boolean(projectLastViews[projectId] && projectLastViews[projectId] !== 'board')
+      ) {
+        count += 1;
+      }
+    });
+
+    return count;
+  }, [projectLastQueries, projectLastViews]);
+
+  function getProjectOpenHref(projectId: string): string {
+    const lastQuery = projectLastQueries[projectId]?.trim();
+    if (lastQuery) {
+      return `/jira/projects/${projectId}?${lastQuery}`;
+    }
+
+    const lastView = projectLastViews[projectId];
+    if (lastView && lastView !== 'board') {
+      return `/jira/projects/${projectId}?view=${lastView}`;
+    }
+
+    return `/jira/projects/${projectId}`;
+  }
+
+  function hasRememberedContext(projectId: string): boolean {
+    const hasQuery = Boolean(projectLastQueries[projectId]?.trim());
+    const hasView = Boolean(projectLastViews[projectId] && projectLastViews[projectId] !== 'board');
+    return hasQuery || hasView;
+  }
+
+  function clearProjectRememberedContext(projectId: string) {
+    setProjectLastQueries((previous) => {
+      if (!(projectId in previous)) {
+        return previous;
+      }
+
+      const next = { ...previous };
+      delete next[projectId];
+
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(LAST_PROJECT_QUERY_KEY, JSON.stringify(next));
+      }
+
+      return next;
+    });
+
+    setProjectLastViews((previous) => {
+      if (!(projectId in previous)) {
+        return previous;
+      }
+
+      const next = { ...previous };
+      delete next[projectId];
+
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(LAST_PROJECT_VIEW_KEY, JSON.stringify(next));
+      }
+
+      return next;
+    });
+  }
+
+  function clearAllRememberedContexts() {
+    setProjectLastQueries({});
+    setProjectLastViews({});
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(LAST_PROJECT_QUERY_KEY);
+      window.localStorage.removeItem(LAST_PROJECT_VIEW_KEY);
+    }
+  }
+
   return {
     projectsLoading,
     projectsError,
@@ -242,9 +383,16 @@ export function useJiraProjectsPage() {
     setSearchQuery,
     showOnlyFavorites,
     setShowOnlyFavorites,
+    sortKey,
+    setSortKey,
     favoriteCount,
+    rememberedContextCount,
     projectsUpdatedToday,
     projectsUpdatedEarlier,
+    getProjectOpenHref,
+    hasRememberedContext,
+    clearProjectRememberedContext,
+    clearAllRememberedContexts,
     showCreatePanel,
     setShowCreatePanel,
     projectName,

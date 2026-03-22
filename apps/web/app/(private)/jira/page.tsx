@@ -15,9 +15,16 @@ export default function JiraHomePage() {
     setSearchQuery,
     showOnlyFavorites,
     setShowOnlyFavorites,
+    sortKey,
+    setSortKey,
     favoriteCount,
+    rememberedContextCount,
     projectsUpdatedToday,
     projectsUpdatedEarlier,
+    getProjectOpenHref,
+    hasRememberedContext,
+    clearProjectRememberedContext,
+    clearAllRememberedContexts,
     showCreatePanel,
     setShowCreatePanel,
     projectName,
@@ -93,6 +100,31 @@ export default function JiraHomePage() {
         >
           <span>{showOnlyFavorites ? '★' : '☆'}</span>
           Dự án ghim ({favoriteCount})
+        </button>
+
+        <select
+          value={sortKey}
+          onChange={(event) => setSortKey(event.target.value as typeof sortKey)}
+          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700"
+          aria-label="Sắp xếp dự án"
+        >
+          <option value="updated_desc">Mới cập nhật trước</option>
+          <option value="updated_asc">Cập nhật cũ trước</option>
+          <option value="name_asc">Tên A-Z</option>
+          <option value="name_desc">Tên Z-A</option>
+        </select>
+
+        <button
+          type="button"
+          onClick={() => {
+            if (confirm('Xóa toàn bộ ngữ cảnh đã nhớ (view/filter/sort) của các project?')) {
+              clearAllRememberedContexts();
+            }
+          }}
+          disabled={rememberedContextCount === 0}
+          className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Reset ngữ cảnh ({rememberedContextCount})
         </button>
       </div>
 
@@ -197,6 +229,9 @@ export default function JiraHomePage() {
                   isArchivingProject={isArchivingProject}
                   onToggleFavorite={toggleFavoriteProject}
                   isFavorite={isFavoriteProject}
+                  getProjectOpenHref={getProjectOpenHref}
+                  onClearRememberedContext={clearProjectRememberedContext}
+                  hasRememberedContext={hasRememberedContext}
                   showCreateCard={projectsUpdatedEarlier.length === 0}
                 />
               </div>
@@ -220,6 +255,9 @@ export default function JiraHomePage() {
                   isArchivingProject={isArchivingProject}
                   onToggleFavorite={toggleFavoriteProject}
                   isFavorite={isFavoriteProject}
+                  getProjectOpenHref={getProjectOpenHref}
+                  onClearRememberedContext={clearProjectRememberedContext}
+                  hasRememberedContext={hasRememberedContext}
                   showCreateCard
                 />
               </div>

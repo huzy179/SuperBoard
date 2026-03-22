@@ -4,15 +4,13 @@
 
 ---
 
-## Sprint hiện tại — Jira v1.25: Subtasks MVP (nested 1 level)
+## Sprint hiện tại — Jira v1.36: Dashboard Chart Tooltip Polish
 
-- [x] Chốt contract shared DTO cho subtask (FE/BE đồng bộ)
-- [x] Mở rộng schema + migration cho quan hệ parent-child 1 cấp (Task ↔ Task)
-- [x] API subtask trong project detail: create/update/delete/status
-- [x] FE task detail: danh sách subtasks + quick add + toggle done
-- [x] Parent task hiển thị progress subtasks (x/y và %)
-- [x] Realtime sync subtask update trong room project (reuse socket flow hiện có)
-- [x] Kiểm tra typecheck/lint scope file thay đổi và cập nhật worklog `done.md`
+- [x] Thêm tooltip `count + percent` khi hover donut segments (trạng thái)
+- [x] Thêm tooltip `count + percent` cho stacked priority bar
+- [x] Thêm tooltip `count + percent` cho cột loại task
+- [x] Sửa layout stacked priority bar dùng `flex` để hiển thị composition chính xác
+- [x] Kiểm tra typecheck web và diagnostics sau polish
 
 ## Blockers
 

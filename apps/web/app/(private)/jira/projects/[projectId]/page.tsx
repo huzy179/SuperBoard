@@ -49,6 +49,8 @@ import { useJiraProjectUiStore } from '@/stores/jira-project-ui-store';
 import { subscribeProjectPresence } from '@/lib/realtime/project-socket';
 
 type ViewMode = 'board' | 'list' | 'calendar';
+const LAST_PROJECT_VIEW_KEY = 'superboard.project-last-views';
+const LAST_PROJECT_QUERY_KEY = 'superboard.project-last-queries';
 
 function parseCsvSet(value: string | null, allowed: ReadonlySet<string>): Set<string> {
   if (!value) {
@@ -563,6 +565,34 @@ export default function ProjectDetailPage() {
     router,
     searchParams,
   ]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !projectId) {
+      return;
+    }
+
+    try {
+      const currentQuery = searchParams.toString();
+
+      const raw = window.localStorage.getItem(LAST_PROJECT_VIEW_KEY);
+      const current = raw ? (JSON.parse(raw) as Record<string, ViewMode>) : {};
+      const nextViews = {
+        ...current,
+        [projectId]: viewMode,
+      };
+      window.localStorage.setItem(LAST_PROJECT_VIEW_KEY, JSON.stringify(nextViews));
+
+      const rawQueries = window.localStorage.getItem(LAST_PROJECT_QUERY_KEY);
+      const currentQueries = rawQueries ? (JSON.parse(rawQueries) as Record<string, string>) : {};
+      const nextQueries = {
+        ...currentQueries,
+        [projectId]: currentQuery,
+      };
+      window.localStorage.setItem(LAST_PROJECT_QUERY_KEY, JSON.stringify(nextQueries));
+    } catch {
+      // ignore localStorage parse/write errors
+    }
+  }, [projectId, viewMode, searchParams]);
 
   useEffect(() => {
     const currentTaskIds = new Set((project?.tasks ?? []).map((task) => task.id));

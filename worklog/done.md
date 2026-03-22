@@ -4,6 +4,45 @@
 
 ---
 
+## Jira v1.36 — Dashboard Chart Tooltip Polish
+
+- [x] Thêm hover tooltip cho donut chart trạng thái (`count + percent`)
+- [x] Thêm hover tooltip cho stacked chart độ ưu tiên (`count + percent`)
+- [x] Thêm hover tooltip cho cột chart loại task (`count + percent`)
+- [x] Sửa layout stacked priority bar để hiển thị thành phần ngang đúng kỳ vọng
+
+## Jira v1.35 — Dashboard Visualization Refresh
+
+- [x] Refactor `Tasks theo trạng thái` từ progress list sang donut chart có legend phần trăm
+- [x] Refactor `Tasks theo độ ưu tiên` sang stacked composition bar để nhìn cơ cấu nhanh
+- [x] Refactor `Tasks theo loại` sang biểu đồ cột dọc để so sánh tương quan tốt hơn
+
+## Jira v1.34 — Dashboard Loading Skeleton
+
+- [x] Thay loading toàn trang bằng skeleton theo cấu trúc dashboard (stats + chart blocks)
+- [x] Cải thiện UX khi tải dữ liệu: không còn trạng thái trống/nhảy layout mạnh
+
+## Jira v1.33 — Dashboard Runtime Fix + Chart Expansion
+
+- [x] Sửa lỗi hook-order runtime ở Dashboard page (tránh lỗi render khi chuyển loading -> loaded)
+- [x] Chuẩn hóa dữ liệu dashboard trong service để chịu được payload thiếu trường từ API
+- [x] Thêm biểu đồ `Tasks theo độ ưu tiên` để tăng mật độ insight
+- [x] Thêm khối `Tổng quan hoàn thành` hiển thị completion/overdue ratio
+
+## Jira v1.32 — Jira Project Card UI Cleanup
+
+- [x] Refactor lại bố cục project card để hierarchy rõ ràng hơn (header/progress/quick access/actions)
+- [x] Đổi `Mở project` thành CTA chính full-width để tăng độ nhận diện thao tác quan trọng
+- [x] Chuẩn hóa quick view links theo layout 3 cột để card ít vỡ khi responsive
+- [x] Gom thao tác phụ về footer và chỉnh lại icon `Lưu trữ` đúng ngữ nghĩa
+
+## Jira v1.31 — Reset Remembered Context (Jira Home)
+
+- [x] Thêm utility trong hook để xóa ngữ cảnh đã lưu theo project (`last query` + `last view`)
+- [x] Thêm utility xóa toàn bộ ngữ cảnh đã nhớ từ localStorage
+- [x] Thêm action `Reset ngữ cảnh` ngay trên project card, chỉ bật khi project có context đã nhớ
+- [x] Thêm nút `Reset ngữ cảnh (N)` trong thanh filter Jira Home để dọn trạng thái đã lưu hàng loạt
+
 ## Foundation
 
 - [x] Monorepo Turborepo + TS strict config
@@ -280,3 +319,33 @@
 - [x] Project detail chỉ render root tasks ở board/list/calendar để tránh lẫn subtask
 - [x] Task detail panel thêm khu vực Subtasks: quick add, toggle done, xoá, mở chi tiết subtask
 - [x] Parent task hiển thị progress subtasks `done/total (%)`
+
+## Jira v1.26 — Jira Home Sorting Controls
+
+- [x] Thêm sort key cho Jira Home: `updated_desc`, `updated_asc`, `name_asc`, `name_desc`
+- [x] Bảo toàn ưu tiên project ghim, sau đó áp dụng sort theo lựa chọn người dùng
+- [x] Thêm dropdown `Sắp xếp dự án` trên Jira Home để đổi thứ tự hiển thị tức thì
+
+## Jira v1.27 — Jira Home Project Card Quick Actions
+
+- [x] Thêm quick action `Board` trên card dự án để mở thẳng Kanban view
+- [x] Thêm quick action `Danh sách` trên card dự án để mở thẳng List view
+- [x] Tối ưu thao tác vào project thường dùng mà không thay đổi hành vi cũ của card
+
+## Jira v1.28 — Jira Home Calendar Quick Action
+
+- [x] Thêm quick action `Lịch` trên card dự án để mở thẳng Calendar view
+- [x] Đồng bộ nhóm quick actions để chuyển view nhanh từ Jira Home (Board/List/Calendar)
+
+## Jira v1.29 — Remember Last View per Project
+
+- [x] Lưu view gần nhất theo từng project ở localStorage khi user thao tác ở project detail
+- [x] Nút `Mở project` trên Jira Home tự điều hướng vào view gần nhất đã dùng
+- [x] Giữ URL gọn cho view mặc định `board`, chỉ thêm query khi cần (`list`/`calendar`)
+
+## Jira v1.30 — Remember Last Context + Jira Home UI Repair
+
+- [x] Mở rộng lưu ngữ cảnh theo project từ chỉ `view` sang toàn bộ query params (view/filter/sort/search)
+- [x] Nút `Mở project` trên Jira Home khôi phục đúng URL ngữ cảnh cuối cùng nếu có
+- [x] Sửa vỡ layout card actions bằng cấu trúc 2 hàng có `flex-wrap` (truy cập nhanh tách riêng thao tác quản trị)
+- [x] Làm gọn giao diện actions để tránh rối khi số nút tăng

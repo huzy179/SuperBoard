@@ -61,10 +61,10 @@ export default function JiraHomePage() {
 
   return (
     <section>
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900">Các dự án của bạn</h2>
-          <p className="mt-2 text-slate-600">
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900">Các dự án của bạn</h2>
+          <p className="mt-1.5 text-sm text-slate-500">
             Quản lý và theo dõi tiến độ các dự án đang triển khai
           </p>
         </div>
@@ -72,7 +72,7 @@ export default function JiraHomePage() {
         <button
           type="button"
           onClick={() => setShowCreatePanel((value) => !value)}
-          className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+          className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-px hover:bg-brand-700 hover:shadow-md"
         >
           <span>+</span>
           {showCreatePanel ? 'Đóng form' : 'Tạo dự án'}
@@ -81,21 +81,36 @@ export default function JiraHomePage() {
 
       {/* Search + quick filters */}
       <div className="mb-6 flex flex-wrap items-center gap-2">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Tìm kiếm dự án theo tên, mã hoặc mô tả..."
-          className="w-full max-w-md rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400"
-        />
+        <div className="relative w-full max-w-md">
+          <svg
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+            />
+          </svg>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Tìm kiếm dự án theo tên, mã hoặc mô tả..."
+            className="w-full rounded-lg border border-surface-border bg-surface-card py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm"
+          />
+        </div>
 
         <button
           type="button"
           onClick={() => setShowOnlyFavorites((value) => !value)}
-          className={`inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+          className={`inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium shadow-sm transition-all ${
             showOnlyFavorites
               ? 'bg-amber-100 text-amber-700'
-              : 'border border-slate-300 bg-white text-slate-600 hover:bg-slate-50'
+              : 'border border-surface-border bg-surface-card text-slate-600 hover:bg-slate-50'
           }`}
         >
           <span>{showOnlyFavorites ? '★' : '☆'}</span>
@@ -105,7 +120,7 @@ export default function JiraHomePage() {
         <select
           value={sortKey}
           onChange={(event) => setSortKey(event.target.value as typeof sortKey)}
-          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700"
+          className="rounded-lg border border-surface-border bg-surface-card px-3 py-2 text-sm text-slate-700 shadow-sm"
           aria-label="Sắp xếp dự án"
         >
           <option value="updated_desc">Mới cập nhật trước</option>
@@ -122,7 +137,7 @@ export default function JiraHomePage() {
             }
           }}
           disabled={rememberedContextCount === 0}
-          className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-1 rounded-lg border border-surface-border bg-surface-card px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition-all hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Reset ngữ cảnh ({rememberedContextCount})
         </button>

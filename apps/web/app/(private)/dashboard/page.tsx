@@ -143,7 +143,7 @@ export default function DashboardPage() {
 
   return (
     <section className="animate-fade-in">
-      <h1 className="mb-6 text-2xl font-bold text-slate-900">Dashboard</h1>
+      <h1 className="mb-6 text-2xl font-bold tracking-tight text-slate-900">Dashboard</h1>
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
@@ -177,7 +177,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-surface-border bg-surface-card p-5">
+        <div className="rounded-xl bg-surface-card p-5" style={{ boxShadow: 'var(--shadow-card)' }}>
           <h2 className="mb-4 text-sm font-semibold text-slate-900">Tasks theo trạng thái</h2>
           <DonutDistributionChart
             items={statusChartData}
@@ -185,7 +185,7 @@ export default function DashboardPage() {
           />
         </div>
 
-        <div className="rounded-xl border border-surface-border bg-surface-card p-5">
+        <div className="rounded-xl bg-surface-card p-5" style={{ boxShadow: 'var(--shadow-card)' }}>
           <h2 className="mb-4 text-sm font-semibold text-slate-900">Tasks theo dự án</h2>
           <div className="space-y-3">
             {safeStats.tasksByProject.map((project) => (
@@ -215,7 +215,12 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-amber-200 bg-amber-50/40 p-5">
+        <div
+          className="rounded-xl bg-amber-50/40 p-5"
+          style={{
+            boxShadow: '0 1px 3px oklch(0.3 0.01 255 / 0.06), 0 0 0 1px oklch(0.8 0.06 75 / 0.3)',
+          }}
+        >
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-slate-900">Dự án cần chú ý</h2>
             <span className="rounded bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
@@ -276,7 +281,7 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="rounded-xl border border-surface-border bg-surface-card p-5">
+        <div className="rounded-xl bg-surface-card p-5" style={{ boxShadow: 'var(--shadow-card)' }}>
           <h2 className="mb-4 text-sm font-semibold text-slate-900">Workload theo thành viên</h2>
           {safeStats.tasksByAssignee.length === 0 ? (
             <p className="text-xs text-slate-500">Chưa có task được gán</p>
@@ -303,7 +308,7 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="rounded-xl border border-surface-border bg-surface-card p-5">
+        <div className="rounded-xl bg-surface-card p-5" style={{ boxShadow: 'var(--shadow-card)' }}>
           <h2 className="mb-4 text-sm font-semibold text-slate-900">Tasks theo loại</h2>
           {typeChartData.length === 0 ? (
             <p className="text-xs text-slate-500">Chưa có dữ liệu loại task</p>
@@ -332,7 +337,7 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="rounded-xl border border-surface-border bg-surface-card p-5">
+        <div className="rounded-xl bg-surface-card p-5" style={{ boxShadow: 'var(--shadow-card)' }}>
           <h2 className="mb-4 text-sm font-semibold text-slate-900">Tasks theo độ ưu tiên</h2>
           {priorityChartData.length === 0 ? (
             <p className="text-xs text-slate-500">Chưa có dữ liệu độ ưu tiên</p>
@@ -369,7 +374,7 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="rounded-xl border border-surface-border bg-surface-card p-5">
+        <div className="rounded-xl bg-surface-card p-5" style={{ boxShadow: 'var(--shadow-card)' }}>
           <h2 className="mb-4 text-sm font-semibold text-slate-900">Tổng quan hoàn thành</h2>
           <div className="space-y-3">
             <div>
@@ -404,7 +409,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-surface-border bg-surface-card p-5">
+        <div className="rounded-xl bg-surface-card p-5" style={{ boxShadow: 'var(--shadow-card)' }}>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-sm font-semibold text-slate-900">Hoạt động gần đây</h2>
             <button
@@ -456,7 +461,7 @@ export default function DashboardPage() {
               {filteredRecentActivity.map((event) => (
                 <div
                   key={event.id}
-                  className="flex items-start gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-slate-50"
+                  className="flex items-start gap-2 rounded-lg px-2.5 py-2 transition-all hover:bg-slate-50/80"
                 >
                   <span className="mt-0.5 text-sm">{EVENT_ICONS[event.type] ?? '📝'}</span>
                   <div className="min-w-0 flex-1">
@@ -487,7 +492,11 @@ function DashboardSkeleton() {
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
-          <div key={index} className="rounded-xl border border-surface-border bg-surface-card p-4">
+          <div
+            key={index}
+            className="rounded-xl bg-surface-card p-4"
+            style={{ boxShadow: 'var(--shadow-card)' }}
+          >
             <div className="h-3 w-24 animate-pulse rounded bg-slate-200" />
             <div className="mt-3 h-7 w-16 animate-pulse rounded bg-slate-200" />
           </div>
@@ -498,7 +507,8 @@ function DashboardSkeleton() {
         {Array.from({ length: 8 }, (_, blockIndex) => (
           <div
             key={blockIndex}
-            className="rounded-xl border border-surface-border bg-surface-card p-5"
+            className="rounded-xl bg-surface-card p-5"
+            style={{ boxShadow: 'var(--shadow-card)' }}
           >
             <div className="mb-4 h-4 w-40 animate-pulse rounded bg-slate-200" />
             <div className="space-y-3">
@@ -573,7 +583,7 @@ function DonutDistributionChart({
           })}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-lg font-bold text-slate-900">{total}</span>
+          <span className="tabular-nums text-lg font-bold text-slate-900">{total}</span>
           <span className="text-[10px] text-slate-500">tasks</span>
         </div>
       </div>
@@ -615,14 +625,22 @@ function StatCard({
 }) {
   return (
     <div
-      className={`animate-slide-up rounded-xl border border-surface-border p-4 ${color}`}
-      style={{ animationDelay: `${delay * 75}ms`, animationFillMode: 'both' }}
+      className={`animate-slide-up relative overflow-hidden rounded-xl p-4 ${color} transition-all hover:-translate-y-px`}
+      style={{
+        animationDelay: `${delay * 75}ms`,
+        animationFillMode: 'both',
+        boxShadow: 'var(--shadow-card)',
+      }}
     >
+      <div
+        className="pointer-events-none absolute -right-3 -top-3 h-16 w-16 rounded-full opacity-[0.15] blur-xl"
+        style={{ background: 'currentColor' }}
+      />
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium opacity-80">{label}</p>
+        <p className="text-xs font-medium opacity-70">{label}</p>
         <span className="text-lg">{icon}</span>
       </div>
-      <p className="mt-1 text-2xl font-bold">{value}</p>
+      <p className="tabular-nums mt-1 text-2xl font-bold">{value}</p>
     </div>
   );
 }

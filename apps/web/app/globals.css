@@ -6,7 +6,7 @@
 }
 
 body {
-  @apply bg-slate-100 text-slate-900 antialiased;
+  @apply bg-surface-bg text-slate-900 antialiased;
 }
 
 input,
@@ -29,7 +29,12 @@ a,
 select,
 input,
 textarea {
-  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+  transition: background-color 150ms var(--ease-spring), border-color 150ms ease, color 150ms ease, box-shadow 200ms var(--ease-spring), transform 200ms var(--ease-spring);
+}
+
+/* Tabular nums for dashboard numbers */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Custom scrollbar */
@@ -43,7 +48,7 @@ textarea {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: oklch(0.75 0.01 255);
+  background: oklch(0.78 0.005 255);
   border-radius: 3px;
 }
 
@@ -68,13 +73,24 @@ textarea {
 }
 
 .animate-fade-in {
-  animation: fade-in 200ms ease-out;
+  animation: fade-in 250ms var(--ease-spring);
 }
 
 .animate-slide-up {
-  animation: slide-up 250ms ease-out;
+  animation: slide-up 350ms var(--ease-spring);
 }
 
 .animate-slide-in-left {
-  animation: slide-in-left 200ms ease-out;
+  animation: slide-in-left 250ms var(--ease-spring);
+}
+
+/* Accessibility: reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

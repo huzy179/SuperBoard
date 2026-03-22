@@ -56,11 +56,22 @@ export function ProjectCardsGrid({
                 router.push(getProjectOpenHref(project.id));
               }
             }}
-            className="animate-slide-up group relative cursor-pointer overflow-hidden rounded-xl border border-surface-border bg-surface-card text-left transition-all hover:border-brand-300 hover:shadow-lg hover:shadow-brand-100"
-            style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
+            className="animate-slide-up group relative cursor-pointer overflow-hidden rounded-xl bg-surface-card text-left transition-all hover:-translate-y-px"
+            style={{
+              animationDelay: `${index * 50}ms`,
+              animationFillMode: 'both',
+              boxShadow: 'var(--shadow-card)',
+              transition: 'transform 350ms var(--ease-spring), box-shadow 350ms var(--ease-spring)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = 'var(--shadow-card-hover)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = 'var(--shadow-card)';
+            }}
           >
             <div
-              className="absolute left-0 top-0 h-1 w-full transition-colors group-hover:bg-brand-500"
+              className="absolute left-0 top-0 h-1 w-full opacity-60 transition-opacity group-hover:opacity-100"
               style={{ backgroundColor: project.color || 'var(--color-brand-500)' }}
             />
 
@@ -208,16 +219,18 @@ export function ProjectCardsGrid({
                 </div>
               </div>
 
-              <div className="mt-4 rounded-lg border border-slate-100 bg-slate-50 p-3">
+              <div className="mt-4 rounded-lg bg-slate-50/80 p-3">
                 <div className="flex items-center justify-between text-xs text-slate-600">
                   <span>
                     {project.doneTaskCount}/{project.taskCount} hoàn thành
                   </span>
-                  <span className="font-semibold text-slate-700">{completionPercent}%</span>
+                  <span className="tabular-nums font-semibold text-slate-700">
+                    {completionPercent}%
+                  </span>
                 </div>
-                <div className="mt-1.5 h-1.5 w-full rounded-full bg-slate-200">
+                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
                   <div
-                    className="h-1.5 rounded-full bg-brand-500 transition-all"
+                    className="h-1.5 rounded-full bg-gradient-to-r from-brand-400 to-brand-600 transition-all duration-500"
                     style={{ width: `${completionPercent}%` }}
                   />
                 </div>
@@ -225,13 +238,7 @@ export function ProjectCardsGrid({
                   Cập nhật: <time>{formatDate(project.updatedAt)}</time>
                 </div>
               </div>
-
-              <div className="mt-3 rounded-md bg-slate-50 px-2.5 py-2 text-[11px] text-slate-500">
-                Nhấn vào card để mở project
-              </div>
             </div>
-
-            <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-brand-500/0 to-brand-500/0 transition-colors group-hover:from-brand-500/5 group-hover:to-brand-500/10" />
           </div>
         );
       })}
@@ -240,7 +247,7 @@ export function ProjectCardsGrid({
         <button
           type="button"
           onClick={onOpenCreate}
-          className="group relative rounded-xl border-2 border-dashed border-surface-border bg-surface-bg p-6 text-center transition-all hover:border-brand-300 hover:bg-brand-50"
+          className="group relative rounded-xl border-2 border-dashed border-surface-border bg-surface-bg p-6 text-center transition-all hover:border-brand-300 hover:bg-brand-50/50"
         >
           <div className="space-y-2">
             <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-white transition-colors group-hover:bg-brand-100">

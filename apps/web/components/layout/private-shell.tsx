@@ -87,27 +87,27 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
   const userInitials = getInitials(user.fullName);
 
   const sidebar = (
-    <div className="flex h-full flex-col">
-      <div className="flex h-14 shrink-0 items-center gap-3 border-b border-surface-border px-4">
-        <AppBrand subtitle="Workspace" />
+    <div className="flex h-full flex-col bg-sidebar-bg">
+      <div className="flex h-12 shrink-0 items-center gap-3 border-b border-white/[0.06] px-4">
+        <AppBrand subtitle="Workspace" variant="dark" />
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+      <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
         {navItems.map((item) => {
           const isActive = !item.disabled && isNavItemActive(pathname, item.href);
           const baseClasses =
-            'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors';
+            'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-all';
 
           if (item.disabled) {
             return (
               <span
                 key={item.label}
-                className={`${baseClasses} cursor-not-allowed text-slate-400`}
+                className={`${baseClasses} cursor-not-allowed text-white/30`}
                 title="Sắp ra mắt"
               >
                 {NAV_ICONS[item.icon]}
                 {item.label}
-                <span className="ml-auto rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-400">
+                <span className="ml-auto rounded bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-semibold text-white/30">
                   Sắp có
                 </span>
               </span>
@@ -121,8 +121,8 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
               onClick={() => setSidebarOpen(false)}
               className={`${baseClasses} ${
                 isActive
-                  ? 'border-l-2 border-brand-600 bg-brand-50 text-brand-700'
-                  : 'border-l-2 border-transparent text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-sidebar-active text-white/95'
+                  : 'text-white/55 hover:bg-sidebar-hover hover:text-white/85'
               }`}
             >
               {NAV_ICONS[item.icon]}
@@ -132,24 +132,24 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
         })}
       </nav>
 
-      <div className="shrink-0 border-t border-surface-border p-3">
-        <div className="flex items-center gap-2.5 rounded-lg px-2 py-2">
-          <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-[11px] font-semibold text-brand-700">
+      <div className="shrink-0 border-t border-white/[0.06] p-2">
+        <div className="flex items-center gap-2 rounded-md px-2 py-1.5">
+          <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-[10px] font-semibold text-white">
             {userInitials || 'SB'}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-slate-900">{user.fullName}</p>
-            <p className="truncate text-[11px] text-slate-500">{user.email}</p>
+            <p className="truncate text-[13px] font-medium text-white/85">{user.fullName}</p>
+            <p className="truncate text-[10px] text-white/40">{user.email}</p>
           </div>
           <NotificationBell />
           <button
             type="button"
             onClick={onLogout}
-            className="shrink-0 flex items-center gap-1.5 rounded-md px-2 py-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            className="shrink-0 flex items-center gap-1 rounded-md px-1.5 py-1 text-white/40 transition-colors hover:bg-white/[0.07] hover:text-white/70"
             title="Đăng xuất"
           >
             <svg
-              className="h-4 w-4"
+              className="h-3.5 w-3.5"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
@@ -161,7 +161,6 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
                 d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
               />
             </svg>
-            <span className="text-[11px] font-medium">Đăng xuất</span>
           </button>
         </div>
       </div>
@@ -171,21 +170,19 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
   return (
     <div className="flex h-screen overflow-hidden bg-surface-bg">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex lg:w-60 lg:shrink-0 lg:flex-col lg:border-r lg:border-surface-border lg:bg-surface-card">
-        {sidebar}
-      </aside>
+      <aside className="hidden lg:flex lg:w-56 lg:shrink-0 lg:flex-col">{sidebar}</aside>
 
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div
-            className="absolute inset-0 bg-slate-900/40"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
             aria-hidden
           />
           <aside
             id="mobile-sidebar"
-            className="relative z-50 h-full w-60 bg-surface-card shadow-xl animate-slide-in-left"
+            className="relative z-50 h-full w-56 shadow-2xl animate-slide-in-left"
           >
             {sidebar}
           </aside>
@@ -195,7 +192,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Mobile top bar */}
-        <header className="flex h-14 shrink-0 items-center gap-3 border-b border-surface-border bg-surface-card px-4 lg:hidden">
+        <header className="flex h-12 shrink-0 items-center gap-3 border-b border-surface-border bg-surface-card px-4 lg:hidden">
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}

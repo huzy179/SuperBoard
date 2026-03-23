@@ -125,10 +125,8 @@
 
 ### Empty State
 
-- [ ] If project has no tasks, shows "Chưa có task nào"
-- [ ] Board: empty columns
-- [ ] List: empty table
-- [ ] Calendar: empty month
+- [x] If project has no tasks, shows empty state card "Project chưa có task" (dashed card + hướng dẫn bấm "Tạo task")
+- [ ] Empty state is shown consistently across Board/List/Calendar until the project has at least 1 task
 
 ### Task Loading
 
@@ -332,9 +330,9 @@
 
 ### API Errors
 
-- [ ] Try accessing invalid project: `/jira/projects/invalid-id`
-- [ ] Shows 404 page: "Không tìm thấy trang" + link to go back
-- [ ] No infinite loop or blank page
+- [x] Try accessing invalid project: `/jira/projects/invalid-id`
+- [x] Shows full-page error: title "Không thể tải project" + action button "Quay lại danh sách"
+- [x] No infinite loop or blank page
 
 ### Network Errors
 

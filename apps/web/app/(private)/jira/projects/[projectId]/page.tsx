@@ -43,37 +43,16 @@ import {
   isTaskOverdue,
   toggleSetFilterValue,
 } from '@/lib/helpers/task-view';
+import {
+  buildCurrentFilterUrl,
+  getCalendarCells,
+  toLocalDayKey,
+} from '@/lib/helpers/project-detail-calendar';
 import { useJiraProjectUiStore } from '@/stores/jira-project-ui-store';
 import { subscribeProjectPresence } from '@/lib/realtime/project-socket';
 import { useProjectUrlState } from '@/hooks/use-project-url-state';
 import { useTaskSelection } from '@/hooks/use-task-selection';
-
-function toLocalDayKey(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-function getCalendarCells(
-  currentMonth: Date,
-): Array<{ date: Date; inMonth: boolean; key: string }> {
-  const year = currentMonth.getFullYear();
-  const month = currentMonth.getMonth();
-  const firstOfMonth = new Date(year, month, 1);
-  const firstWeekday = (firstOfMonth.getDay() + 6) % 7;
-  const startDate = new Date(year, month, 1 - firstWeekday);
-
-  return Array.from({ length: 42 }, (_, index) => {
-    const date = new Date(startDate);
-    date.setDate(startDate.getDate() + index);
-    return {
-      date,
-      inMonth: date.getMonth() === month,
-      key: toLocalDayKey(date),
-    };
-  });
-}
+import { useTaskBulkActions } from '@/hooks/use-task-bulk-actions';
 
 export default function ProjectDetailPage() {
   const params = useParams<{ projectId: string }>();
@@ -138,22 +117,6 @@ export default function ProjectDetailPage() {
   const [taskDueDate, setTaskDueDate] = useState('');
   const [taskAssigneeId, setTaskAssigneeId] = useState('');
   const [createTaskError, setCreateTaskError] = useState<string | null>(null);
-
-  // Filter & Sort state
-  const [bulkStatus, setBulkStatus] = useState<ProjectTaskItemDTO['status']>('todo');
-  const [bulkPriority, setBulkPriority] = useState<TaskPriority>('medium');
-  const [bulkType, setBulkType] = useState<TaskTypeDTO>('task');
-  const [bulkDueDate, setBulkDueDate] = useState('');
-  const [bulkAssigneeId, setBulkAssigneeId] = useState('');
-  const [bulkUpdatePending, setBulkUpdatePending] = useState(false);
-  const [bulkPriorityPending, setBulkPriorityPending] = useState(false);
-  const [bulkTypePending, setBulkTypePending] = useState(false);
-  const [bulkDueDatePending, setBulkDueDatePending] = useState(false);
-  const [bulkAssignPending, setBulkAssignPending] = useState(false);
-  const [bulkDeletePending, setBulkDeletePending] = useState(false);
-  const [pendingDeleteTaskIds, setPendingDeleteTaskIds] = useState<Set<string>>(new Set());
-  const [pendingDeleteSecondsLeft, setPendingDeleteSecondsLeft] = useState(0);
-  const [pendingDeleteProgress, setPendingDeleteProgress] = useState(0);
   const [viewerCount, setViewerCount] = useState(1);
   const [isCopyLinkSuccess, setIsCopyLinkSuccess] = useState(false);
 
@@ -187,13 +150,8 @@ export default function ProjectDetailPage() {
     setFilterTypes((prev) => toggleSetFilterValue(prev, t));
   }
 
-  function buildCurrentFilterUrl(): string {
-    const query = searchParams.toString();
-    return `${window.location.origin}${pathname}${query ? `?${query}` : ''}`;
-  }
-
   async function handleCopyCurrentFilterLink() {
-    const url = buildCurrentFilterUrl();
+    const url = buildCurrentFilterUrl(pathname, searchParams.toString());
 
     try {
       if (navigator.clipboard?.writeText) {
@@ -218,7 +176,7 @@ export default function ProjectDetailPage() {
   }
 
   function handleOpenCurrentFilterInNewTab() {
-    const url = buildCurrentFilterUrl();
+    const url = buildCurrentFilterUrl(pathname, searchParams.toString());
     window.open(url, '_blank', 'noopener,noreferrer');
   }
 
@@ -263,17 +221,46 @@ export default function ProjectDetailPage() {
 
   const dialogRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
-  const bulkDeleteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const bulkDeleteCountdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [calendarMonth, setCalendarMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
 
-  const visibleTasks = useMemo(
-    () => filteredTasks.filter((task) => !pendingDeleteTaskIds.has(task.id)),
-    [filteredTasks, pendingDeleteTaskIds],
-  );
+  const {
+    bulkStatus,
+    setBulkStatus,
+    bulkPriority,
+    setBulkPriority,
+    bulkType,
+    setBulkType,
+    bulkDueDate,
+    setBulkDueDate,
+    bulkAssigneeId,
+    setBulkAssigneeId,
+    bulkUpdatePending,
+    bulkPriorityPending,
+    bulkTypePending,
+    bulkDueDatePending,
+    bulkAssignPending,
+    bulkDeletePending,
+    pendingDeleteTaskIds,
+    pendingDeleteSecondsLeft,
+    pendingDeleteProgress,
+    visibleTasks,
+    isDragDropLocked,
+    handleUndoBulkDelete,
+    handleBulkUpdateStatus,
+    handleBulkAssignAssignee,
+    handleBulkUpdatePriority,
+    handleBulkUpdateType,
+    handleBulkUpdateDueDate,
+    handleBulkDeleteTasks,
+  } = useTaskBulkActions({
+    filteredTasks,
+    runBulkTaskOperation: (input) => bulkTaskMutation.mutateAsync(input),
+    clearTaskSelection: () => clearTaskSelection(),
+    setTaskUpdateError,
+  });
 
   const subtaskMap = useMemo(() => {
     const map = new Map<string, ProjectTaskItemDTO[]>();
@@ -360,13 +347,6 @@ export default function ProjectDetailPage() {
     );
   }, [visibleTasks]);
 
-  const isDragDropLocked = pendingDeleteTaskIds.size > 0 || bulkDeletePending;
-  const statusSelectLockReason = isDragDropLocked
-    ? 'Đang chờ xác nhận xoá, tạm khoá chỉnh sửa'
-    : updateTaskStatusMutation.isPending
-      ? 'Đang cập nhật trạng thái task'
-      : undefined;
-
   useEffect(() => {
     resetUiState();
   }, [projectId, resetUiState]);
@@ -405,255 +385,11 @@ export default function ProjectDetailPage() {
     selectedVisibleCount,
   } = useTaskSelection(project?.tasks, visibleTasks);
 
-  function clearBulkDeleteTimer() {
-    if (bulkDeleteTimerRef.current) {
-      clearTimeout(bulkDeleteTimerRef.current);
-      bulkDeleteTimerRef.current = null;
-    }
-    if (bulkDeleteCountdownRef.current) {
-      clearInterval(bulkDeleteCountdownRef.current);
-      bulkDeleteCountdownRef.current = null;
-    }
-  }
-
-  async function commitPendingBulkDelete(taskIds: string[]) {
-    if (taskIds.length === 0) {
-      return;
-    }
-    setTaskUpdateError(null);
-    setBulkDeletePending(true);
-    try {
-      await bulkTaskMutation.mutateAsync({
-        taskIds,
-        delete: true,
-      });
-    } catch (caughtError) {
-      setTaskUpdateError(
-        caughtError instanceof Error ? caughtError.message : 'Không thể xoá task hàng loạt',
-      );
-    } finally {
-      setBulkDeletePending(false);
-      setPendingDeleteTaskIds(new Set());
-      setPendingDeleteSecondsLeft(0);
-      setPendingDeleteProgress(0);
-      clearBulkDeleteTimer();
-    }
-  }
-
-  function handleUndoBulkDelete() {
-    clearBulkDeleteTimer();
-    setPendingDeleteTaskIds(new Set());
-    setPendingDeleteSecondsLeft(0);
-    setPendingDeleteProgress(0);
-  }
-
-  async function handleBulkUpdateStatus() {
-    const targetTaskIds = visibleTasks
-      .filter((task) => selectedTaskIds.has(task.id) && task.status !== bulkStatus)
-      .map((task) => task.id);
-
-    if (targetTaskIds.length === 0) {
-      return;
-    }
-
-    setTaskUpdateError(null);
-    setBulkUpdatePending(true);
-    try {
-      await bulkTaskMutation.mutateAsync({
-        taskIds: targetTaskIds,
-        status: bulkStatus,
-      });
-      clearTaskSelection();
-    } catch (caughtError) {
-      setTaskUpdateError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : 'Không thể cập nhật trạng thái hàng loạt',
-      );
-    } finally {
-      setBulkUpdatePending(false);
-    }
-  }
-
-  async function handleBulkAssignAssignee() {
-    if (pendingDeleteTaskIds.size > 0 || bulkDeletePending) {
-      return;
-    }
-
-    const targetTaskIds = visibleTasks
-      .filter((task) => selectedTaskIds.has(task.id) && (task.assigneeId ?? '') !== bulkAssigneeId)
-      .map((task) => task.id);
-
-    if (targetTaskIds.length === 0) {
-      return;
-    }
-
-    setTaskUpdateError(null);
-    setBulkAssignPending(true);
-    try {
-      await bulkTaskMutation.mutateAsync({
-        taskIds: targetTaskIds,
-        assigneeId: bulkAssigneeId || null,
-      });
-      clearTaskSelection();
-    } catch (caughtError) {
-      setTaskUpdateError(
-        caughtError instanceof Error ? caughtError.message : 'Không thể cập nhật người thực hiện',
-      );
-    } finally {
-      setBulkAssignPending(false);
-    }
-  }
-
-  async function handleBulkUpdatePriority() {
-    if (pendingDeleteTaskIds.size > 0 || bulkDeletePending) {
-      return;
-    }
-
-    const targetTaskIds = visibleTasks
-      .filter((task) => selectedTaskIds.has(task.id) && task.priority !== bulkPriority)
-      .map((task) => task.id);
-
-    if (targetTaskIds.length === 0) {
-      return;
-    }
-
-    setTaskUpdateError(null);
-    setBulkPriorityPending(true);
-    try {
-      await bulkTaskMutation.mutateAsync({
-        taskIds: targetTaskIds,
-        priority: bulkPriority,
-      });
-      clearTaskSelection();
-    } catch (caughtError) {
-      setTaskUpdateError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : 'Không thể cập nhật độ ưu tiên hàng loạt',
-      );
-    } finally {
-      setBulkPriorityPending(false);
-    }
-  }
-
-  async function handleBulkUpdateType() {
-    if (pendingDeleteTaskIds.size > 0 || bulkDeletePending) {
-      return;
-    }
-
-    const targetTaskIds = visibleTasks
-      .filter((task) => selectedTaskIds.has(task.id) && (task.type ?? 'task') !== bulkType)
-      .map((task) => task.id);
-
-    if (targetTaskIds.length === 0) {
-      return;
-    }
-
-    setTaskUpdateError(null);
-    setBulkTypePending(true);
-    try {
-      await bulkTaskMutation.mutateAsync({
-        taskIds: targetTaskIds,
-        type: bulkType,
-      });
-      clearTaskSelection();
-    } catch (caughtError) {
-      setTaskUpdateError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : 'Không thể cập nhật loại task hàng loạt',
-      );
-    } finally {
-      setBulkTypePending(false);
-    }
-  }
-
-  async function handleBulkUpdateDueDate() {
-    if (pendingDeleteTaskIds.size > 0 || bulkDeletePending) {
-      return;
-    }
-
-    const targetTaskIds = visibleTasks
-      .filter((task) => {
-        if (!selectedTaskIds.has(task.id)) {
-          return false;
-        }
-        const currentDueDate = toDateInputValue(task.dueDate);
-        return currentDueDate !== bulkDueDate;
-      })
-      .map((task) => task.id);
-
-    if (targetTaskIds.length === 0) {
-      return;
-    }
-
-    setTaskUpdateError(null);
-    setBulkDueDatePending(true);
-    try {
-      await bulkTaskMutation.mutateAsync({
-        taskIds: targetTaskIds,
-        dueDate: bulkDueDate || null,
-      });
-      clearTaskSelection();
-    } catch (caughtError) {
-      setTaskUpdateError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : 'Không thể cập nhật hạn hoàn thành hàng loạt',
-      );
-    } finally {
-      setBulkDueDatePending(false);
-    }
-  }
-
-  async function handleBulkDeleteTasks() {
-    if (pendingDeleteTaskIds.size > 0 || bulkDeletePending) {
-      return;
-    }
-
-    const targetTaskIds = [...selectedTaskIds];
-    if (targetTaskIds.length === 0) {
-      return;
-    }
-    if (!confirm(`Bạn có chắc chắn muốn xoá ${targetTaskIds.length} task đã chọn?`)) {
-      return;
-    }
-
-    setTaskUpdateError(null);
-    if (editingTask && selectedTaskIds.has(editingTask.id)) {
-      handleCloseEdit();
-    }
-    clearTaskSelection();
-    setPendingDeleteTaskIds(new Set(targetTaskIds));
-    setPendingDeleteSecondsLeft(5);
-    setPendingDeleteProgress(100);
-    clearBulkDeleteTimer();
-    requestAnimationFrame(() => {
-      setPendingDeleteProgress(0);
-    });
-    bulkDeleteCountdownRef.current = setInterval(() => {
-      setPendingDeleteSecondsLeft((prev) => {
-        if (prev <= 1) {
-          if (bulkDeleteCountdownRef.current) {
-            clearInterval(bulkDeleteCountdownRef.current);
-            bulkDeleteCountdownRef.current = null;
-          }
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    bulkDeleteTimerRef.current = setTimeout(() => {
-      void commitPendingBulkDelete(targetTaskIds);
-    }, 5000);
-  }
-
-  useEffect(() => {
-    return () => {
-      clearBulkDeleteTimer();
-    };
-  }, []);
+  const statusSelectLockReason = isDragDropLocked
+    ? 'Đang chờ xác nhận xoá, tạm khoá chỉnh sửa'
+    : updateTaskStatusMutation.isPending
+      ? 'Đang cập nhật trạng thái task'
+      : undefined;
 
   async function handleCreateTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -1235,22 +971,25 @@ export default function ProjectDetailPage() {
         onToggleSelectAllVisible={toggleSelectAllVisible}
         onClearSelection={clearTaskSelection}
         onApplyStatus={() => {
-          void handleBulkUpdateStatus();
+          void handleBulkUpdateStatus({ selectedTaskIds });
         }}
         onApplyPriority={() => {
-          void handleBulkUpdatePriority();
+          void handleBulkUpdatePriority({ selectedTaskIds });
         }}
         onApplyType={() => {
-          void handleBulkUpdateType();
+          void handleBulkUpdateType({ selectedTaskIds });
         }}
         onApplyDueDate={() => {
-          void handleBulkUpdateDueDate();
+          void handleBulkUpdateDueDate({ selectedTaskIds });
         }}
         onApplyAssignee={() => {
-          void handleBulkAssignAssignee();
+          void handleBulkAssignAssignee({ selectedTaskIds });
         }}
         onDeleteSelected={() => {
-          void handleBulkDeleteTasks();
+          if (editingTask && selectedTaskIds.has(editingTask.id)) {
+            handleCloseEdit();
+          }
+          void handleBulkDeleteTasks({ selectedTaskIds });
         }}
       />
 

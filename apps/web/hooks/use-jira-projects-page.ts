@@ -3,6 +3,11 @@ import { useProjects } from '@/hooks/use-projects';
 import { useProjectContextMemory } from '@/hooks/use-project-context-memory';
 import { useProjectCrudForm } from '@/hooks/use-project-crud-form';
 import { useProjectFavorites } from '@/hooks/use-project-favorites';
+import {
+  filterProjectsByQuery,
+  sortProjectsWithFavorites,
+  splitProjectsByUpdatedToday,
+} from '@/lib/helpers/jira-projects-page';
 
 export type JiraProjectSortKey = 'updated_desc' | 'updated_asc' | 'name_asc' | 'name_desc';
 
@@ -70,17 +75,7 @@ export function useJiraProjectsPage() {
   } = useProjectCrudForm();
 
   const searchedProjects = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return projects;
-    }
-
-    const q = searchQuery.toLowerCase();
-    return projects.filter(
-      (project) =>
-        project.name.toLowerCase().includes(q) ||
-        (project.key && project.key.toLowerCase().includes(q)) ||
-        (project.description && project.description.toLowerCase().includes(q)),
-    );
+    return filterProjectsByQuery(projects, searchQuery);
   }, [projects, searchQuery]);
 
   const visibleProjects = useMemo(() => {
@@ -92,42 +87,13 @@ export function useJiraProjectsPage() {
   }, [favoriteProjectIds, searchedProjects, showOnlyFavorites]);
 
   const sortedProjects = useMemo(() => {
-    return [...visibleProjects].sort((first, second) => {
-      const firstFavorite = favoriteProjectIds.has(first.id);
-      const secondFavorite = favoriteProjectIds.has(second.id);
-
-      if (firstFavorite !== secondFavorite) {
-        return firstFavorite ? -1 : 1;
-      }
-
-      if (sortKey === 'updated_asc') {
-        return new Date(first.updatedAt).getTime() - new Date(second.updatedAt).getTime();
-      }
-
-      if (sortKey === 'name_asc') {
-        return first.name.localeCompare(second.name, 'vi');
-      }
-
-      if (sortKey === 'name_desc') {
-        return second.name.localeCompare(first.name, 'vi');
-      }
-
-      return new Date(second.updatedAt).getTime() - new Date(first.updatedAt).getTime();
-    });
+    return sortProjectsWithFavorites(visibleProjects, favoriteProjectIds, sortKey);
   }, [favoriteProjectIds, sortKey, visibleProjects]);
 
-  const projectsUpdatedToday = useMemo(() => {
-    const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    return sortedProjects.filter(
-      (project) => new Date(project.updatedAt).getTime() >= startOfToday,
-    );
-  }, [sortedProjects]);
-
-  const projectsUpdatedEarlier = useMemo(() => {
-    const todayIds = new Set(projectsUpdatedToday.map((project) => project.id));
-    return sortedProjects.filter((project) => !todayIds.has(project.id));
-  }, [projectsUpdatedToday, sortedProjects]);
+  const { projectsUpdatedToday, projectsUpdatedEarlier } = useMemo(
+    () => splitProjectsByUpdatedToday(sortedProjects),
+    [sortedProjects],
+  );
 
   function reloadProjects() {
     void refetch();

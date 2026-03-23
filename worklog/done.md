@@ -4,6 +4,18 @@
 
 ---
 
+## Jira v1.38 — Worklog Structure Alignment
+
+- [x] Cập nhật lại `worklog/PROJECT_STRUCTURE.md` theo đúng cấu trúc repo hiện tại (web/api/ai-service/packages/docker/openspec/worklog)
+- [x] Loại bỏ các mô tả cũ không còn đúng (ví dụ `apps/web` dạng tối giản, tài liệu `ambition/`)
+- [x] Bổ sung lại quy tắc migration Prisma trong tài liệu cấu trúc để tránh schema drift
+
+## Jira v1.39 — FE Maintainability Refactor (Wave 1)
+
+- [x] Tách logic lọc/sắp xếp/chia nhóm project khỏi `use-jira-projects-page` sang `lib/helpers/jira-projects-page.ts`
+- [x] Tách utility calendar + tạo URL filter hiện tại khỏi page detail sang `lib/helpers/project-detail-calendar.ts`
+- [x] Giữ nguyên behavior UI, xác nhận pass `npm run typecheck --workspace @superboard/web`
+
 ## Jira v1.37 — Frontend Structure Foundation Cleanup
 
 - [x] Tách `project constants` dùng chung để tránh lặp localStorage keys và `ViewMode`

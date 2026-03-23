@@ -4,6 +4,18 @@
 
 ---
 
+## Jira v1.42 — E2E Testing Foundation + Smoke Test Checklist
+
+- [x] E2E flow exploration qua codebase: Login → Jira Home → Create Project → Create Task → Drag-drop → Comments/History
+  - All flows implemented, no critical gaps
+  - Known limitations documented: no toast on create, no real-time board sync, drag-drop not on mobile
+- [x] Tạo `worklog/SMOKE_TEST_CHECKLIST.md` — comprehensive manual testing guide
+  - 15 sections: login, home, projects, create task, drag-drop, comments, bulk ops, responsive, errors, security, logout
+  - 150+ chi tiết test cases, ready for manual testing hoặc automation
+  - Covers: empty states, loading states, error handling, mobile responsive (3 breakpoints)
+- [x] Chạy `prettier --write .` format toàn project (all clean ✅)
+- [x] Update `worklog/doing.md` để đánh dấu E2E exploration + checklist hoàn tất
+
 ## Jira v1.38 — Worklog Structure Alignment
 
 - [x] Cập nhật lại `worklog/PROJECT_STRUCTURE.md` theo đúng cấu trúc repo hiện tại (web/api/ai-service/packages/docker/openspec/worklog)

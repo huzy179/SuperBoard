@@ -8,27 +8,35 @@
 
 Mục tiêu: đưa SuperBoard từ mức “feature demo rất mạnh” sang mức “Jira MVP dùng thật, dễ maintain, dễ verify, dễ ship”.
 
-### Chất lượng sản phẩm
+### Chất lượng sản phẩm (Sprint v1.38)
 
-- [x] Hoàn thiện E2E flow cốt lõi: đăng nhập → vào Jira Home → tạo project → tạo task → kéo task → xem lịch sử
-  - Codebase exploration: Login → Home → Create Project → Create Task → Drag-drop → Comments/History
-  - All flows implemented, no critical gaps
-  - Known limitations documented: no toast on create, no real-time board sync, drag-drop not on mobile
-- [x] Viết smoke test checklist cho toàn bộ Jira flow hiện có (Home / Project Detail / Dashboard / Settings / Notifications)
-  - Created `worklog/SMOKE_TEST_CHECKLIST.md` (15 sections, 150+ test cases)
-  - Covers: login, home, create project, project detail, create task, drag-drop, comments, bulk ops, responsive, errors, security
-  - Ready for manual testing or automation
+**Hoàn tất (Commit: 600cb85):**
+
+- [x] E2E flow cốt lõi: Login → Home → Create Project → Create Task → Drag-drop → Comments/History
+- [x] Smoke test checklist: 15 sections, 150+ test cases, ready for manual/automation testing
+
+**Tiếp theo (Priority P0):**
+
 - [ ] Rà lại các lỗi UX mức P0/P1: empty state, loading state, error state, responsive breakpoints
+  - Run SMOKE_TEST_CHECKLIST.md manually hoặc tự động với Playwright
+  - Capture lỗi + fix trước PR review
 
-### Kỹ thuật / maintainability
+### Kỹ thuật / maintainability (Sprint v1.38)
 
-- [ ] Tiếp tục refactor FE theo hướng layer-based an toàn: tách `god hook` và `god page` ở Jira detail thành các phần nhỏ hơn
-  - [x] Wave 1: tách pure helpers khỏi `use-jira-projects-page` (filter/sort/group theo ngày)
-  - [x] Wave 1: tách calendar/link utility khỏi `app/(private)/jira/projects/[projectId]/page.tsx`
-  - [x] Wave 2a: tách bulk actions + undo delete timer khỏi page sang `use-task-bulk-actions`
-  - [x] Wave 2b: tách tiếp task detail/edit/subtask handlers ra hook `use-task-edit-panel`
-- [x] Cập nhật `worklog/PROJECT_STRUCTURE.md` để phản ánh đúng cấu trúc hiện tại của FE/BE, tránh tài liệu cũ gây nhiễu
-- [ ] Chốt roadmap thực tế theo hướng Jira-first: chưa mở rộng Slack / Notion / AI platform cho tới khi Jira đủ ổn định
+**Hoàn tất:**
+
+- [x] Wave 1: Tách pure helpers + calendar utility
+- [x] Wave 2a: Tách bulk actions + undo delete timer
+- [x] Wave 2b: Tách task detail/edit/subtask handlers → `use-task-edit-panel`
+- [x] Cập nhật `worklog/PROJECT_STRUCTURE.md`
+
+**Tiếp theo (Wave 2c — optional):**
+
+- [ ] Tách drag-drop + rebalance logic sang hook riêng `use-task-drag-drop` (nếu cần giảm complexity thêm)
+
+**Roadmap (Sprint v1.39+):**
+
+- [ ] Chốt roadmap thực tế theo hướng Jira-first: tránh mở rộng sang Slack / Notion / AI platform cho tới khi Jira đủ ổn định
 
 ## Blockers
 

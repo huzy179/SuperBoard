@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { ProjectTaskItemDTO, TaskTypeDTO, ProjectMemberDTO } from '@superboard/shared';
@@ -35,7 +35,7 @@ import {
   TASK_TYPE_ICONS,
   type TaskPriority,
 } from '@/lib/constants/task';
-import { getInitials, toDateInputValue } from '@/lib/helpers';
+import { getInitials } from '@/lib/helpers';
 import {
   buildFractionalTaskPosition,
   buildBoardData,
@@ -53,6 +53,7 @@ import { subscribeProjectPresence } from '@/lib/realtime/project-socket';
 import { useProjectUrlState } from '@/hooks/use-project-url-state';
 import { useTaskSelection } from '@/hooks/use-task-selection';
 import { useTaskBulkActions } from '@/hooks/use-task-bulk-actions';
+import { useTaskEditPanel } from '@/hooks/use-task-edit-panel';
 
 export default function ProjectDetailPage() {
   const params = useParams<{ projectId: string }>();
@@ -202,28 +203,54 @@ export default function ProjectDetailPage() {
     sortDir,
   ]);
 
-  // Edit Task State
-  const [editingTask, setEditingTask] = useState<ProjectTaskItemDTO | null>(null);
-  const [editTitle, setEditTitle] = useState('');
-  const [editDescription, setEditDescription] = useState('');
-  const [editStatus, setEditStatus] = useState<ProjectTaskItemDTO['status']>('todo');
-  const [editPriority, setEditPriority] = useState<TaskPriority>('medium');
-  const [editType, setEditType] = useState<TaskTypeDTO>('task');
-  const [editStoryPoints, setEditStoryPoints] = useState('');
-  const [editDueDate, setEditDueDate] = useState('');
-  const [editAssigneeId, setEditAssigneeId] = useState('');
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
-
-  const [taskUpdateError, setTaskUpdateError] = useState<string | null>(null);
-  const [subtaskTitle, setSubtaskTitle] = useState('');
-  const [subtaskError, setSubtaskError] = useState<string | null>(null);
-  const [subtaskPendingTaskId, setSubtaskPendingTaskId] = useState<string | null>(null);
-
-  const dialogRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLElement | null>(null);
   const [calendarMonth, setCalendarMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
+
+  const {
+    editingTask,
+    editTitle,
+    setEditTitle,
+    editDescription,
+    setEditDescription,
+    editStatus,
+    setEditStatus,
+    editPriority,
+    setEditPriority,
+    editType,
+    setEditType,
+    editStoryPoints,
+    setEditStoryPoints,
+    editDueDate,
+    setEditDueDate,
+    editAssigneeId,
+    setEditAssigneeId,
+    taskUpdateError,
+    setTaskUpdateError,
+    subtaskTitle,
+    setSubtaskTitle,
+    subtaskError,
+    subtaskPendingTaskId,
+    editingTaskSubtasks,
+    editingParentTask,
+    dialogRef,
+    handleDialogKeyDown,
+    handleOpenEdit,
+    handleCloseEdit,
+    handleUpdateTask,
+    handleDeleteTask,
+    handleCreateSubtask,
+    handleToggleSubtaskDone,
+    handleDeleteSubtask,
+  } = useTaskEditPanel({
+    projectId,
+    projectTasks: project?.tasks,
+    createTask: (payload) => createTaskMutation.mutateAsync(payload),
+    updateTask: (input) => updateTaskMutation.mutateAsync(input),
+    updateTaskStatus: (input) => updateTaskStatusMutation.mutateAsync(input),
+    deleteTask: (taskId) => deleteTaskMutation.mutateAsync(taskId),
   });
 
   const {
@@ -260,33 +287,6 @@ export default function ProjectDetailPage() {
     runBulkTaskOperation: (input) => bulkTaskMutation.mutateAsync(input),
     setTaskUpdateError,
   });
-
-  const subtaskMap = useMemo(() => {
-    const map = new Map<string, ProjectTaskItemDTO[]>();
-    for (const task of project?.tasks ?? []) {
-      if (!task.parentTaskId) {
-        continue;
-      }
-      const current = map.get(task.parentTaskId) ?? [];
-      map.set(task.parentTaskId, [...current, task]);
-    }
-    return map;
-  }, [project?.tasks]);
-
-  const editingTaskSubtasks = useMemo(() => {
-    if (!editingTask) {
-      return [];
-    }
-    const subtasks = subtaskMap.get(editingTask.id) ?? [];
-    return [...subtasks].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-  }, [editingTask, subtaskMap]);
-
-  const editingParentTask = useMemo(() => {
-    if (!editingTask?.parentTaskId) {
-      return null;
-    }
-    return (project?.tasks ?? []).find((task) => task.id === editingTask.parentTaskId) ?? null;
-  }, [editingTask, project?.tasks]);
 
   const tasksWithoutDueDate = useMemo(
     () => visibleTasks.filter((task) => !task.dueDate),
@@ -446,182 +446,6 @@ export default function ProjectDetailPage() {
         },
       },
     );
-  }
-
-  function handleOpenEdit(task: ProjectTaskItemDTO) {
-    triggerRef.current = document.activeElement as HTMLElement;
-    setEditingTask(task);
-    setEditTitle(task.title);
-    setEditDescription(task.description || '');
-    setEditStatus(task.status);
-    setEditPriority(task.priority);
-    setEditType(task.type ?? 'task');
-    setEditStoryPoints(task.storyPoints != null ? String(task.storyPoints) : '');
-    setEditDueDate(toDateInputValue(task.dueDate));
-    setEditAssigneeId(task.assigneeId ?? '');
-    setTaskUpdateError(null);
-    setSubtaskTitle('');
-    setSubtaskError(null);
-    setSubtaskPendingTaskId(null);
-  }
-
-  function handleCloseEdit() {
-    setEditingTask(null);
-    setEditTitle('');
-    setEditDescription('');
-    setEditStatus('todo');
-    setEditPriority('medium');
-    setEditType('task');
-    setEditStoryPoints('');
-    setEditDueDate('');
-    setEditAssigneeId('');
-    setSubtaskTitle('');
-    setSubtaskError(null);
-    setSubtaskPendingTaskId(null);
-    triggerRef.current?.focus();
-    triggerRef.current = null;
-  }
-
-  useEffect(() => {
-    if (editingTask && dialogRef.current) {
-      dialogRef.current.focus();
-    }
-  }, [editingTask]);
-
-  const handleDialogKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Escape') {
-      handleCloseEdit();
-      return;
-    }
-    if (e.key !== 'Tab') return;
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    const focusable = dialog.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
-    );
-    if (focusable.length === 0) return;
-    const first = focusable[0]!;
-    const last = focusable[focusable.length - 1]!;
-    if (e.shiftKey) {
-      if (document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      }
-    } else {
-      if (document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    }
-  }, []);
-
-  async function handleUpdateTask(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!editingTask || !projectId) return;
-    const normalizedTitle = editTitle.trim();
-    if (!normalizedTitle) {
-      setTaskUpdateError('Tên task không được để trống');
-      return;
-    }
-    setTaskUpdateError(null);
-    try {
-      const assigneeId = editAssigneeId.trim();
-      const sp = editStoryPoints.trim();
-      await updateTaskMutation.mutateAsync({
-        taskId: editingTask.id,
-        data: {
-          title: normalizedTitle,
-          description: editDescription.trim(),
-          status: editStatus,
-          priority: editPriority,
-          type: editType,
-          storyPoints: sp ? parseInt(sp, 10) : null,
-          dueDate: editDueDate || null,
-          assigneeId: assigneeId || null,
-        },
-      });
-      handleCloseEdit();
-    } catch (caughtError) {
-      setTaskUpdateError(
-        caughtError instanceof Error ? caughtError.message : 'Không thể cập nhật task',
-      );
-    }
-  }
-
-  async function handleDeleteTask() {
-    if (!editingTask || !projectId || !confirm('Bạn có chắc chắn muốn xoá task này?')) return;
-    setTaskUpdateError(null);
-    try {
-      await deleteTaskMutation.mutateAsync(editingTask.id);
-      handleCloseEdit();
-    } catch (caughtError) {
-      setTaskUpdateError(caughtError instanceof Error ? caughtError.message : 'Không thể xoá task');
-    }
-  }
-
-  async function handleCreateSubtask(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (!editingTask || editingTask.parentTaskId) {
-      return;
-    }
-
-    const normalizedTitle = subtaskTitle.trim();
-    if (!normalizedTitle) {
-      setSubtaskError('Tên subtask là bắt buộc');
-      return;
-    }
-
-    setSubtaskError(null);
-    setSubtaskPendingTaskId(editingTask.id);
-
-    try {
-      await createTaskMutation.mutateAsync({
-        title: normalizedTitle,
-        status: 'todo',
-        priority: 'medium',
-        type: 'task',
-        parentTaskId: editingTask.id,
-      });
-      setSubtaskTitle('');
-    } catch (caughtError) {
-      setSubtaskError(caughtError instanceof Error ? caughtError.message : 'Không thể tạo subtask');
-    } finally {
-      setSubtaskPendingTaskId(null);
-    }
-  }
-
-  async function handleToggleSubtaskDone(subtask: ProjectTaskItemDTO) {
-    setSubtaskError(null);
-    setSubtaskPendingTaskId(subtask.id);
-    try {
-      await updateTaskStatusMutation.mutateAsync({
-        taskId: subtask.id,
-        status: subtask.status === 'done' ? 'todo' : 'done',
-      });
-    } catch (caughtError) {
-      setSubtaskError(
-        caughtError instanceof Error ? caughtError.message : 'Không thể cập nhật subtask',
-      );
-    } finally {
-      setSubtaskPendingTaskId(null);
-    }
-  }
-
-  async function handleDeleteSubtask(subtaskId: string) {
-    if (!confirm('Bạn có chắc chắn muốn xoá subtask này?')) {
-      return;
-    }
-
-    setSubtaskError(null);
-    setSubtaskPendingTaskId(subtaskId);
-    try {
-      await deleteTaskMutation.mutateAsync(subtaskId);
-    } catch (caughtError) {
-      setSubtaskError(caughtError instanceof Error ? caughtError.message : 'Không thể xoá subtask');
-    } finally {
-      setSubtaskPendingTaskId(null);
-    }
   }
 
   function handleDragStart(event: React.DragEvent<HTMLElement>, taskId: string) {

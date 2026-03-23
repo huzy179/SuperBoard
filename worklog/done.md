@@ -22,6 +22,12 @@
 - [x] Giữ nguyên flow bulk update/delete và lock drag-drop trong project detail
 - [x] Xác nhận pass `npm run typecheck --workspace @superboard/web`
 
+## Jira v1.41 — FE Maintainability Refactor (Wave 2b)
+
+- [x] Tách task detail/edit/subtask state + handlers khỏi `page.tsx` sang hook `use-task-edit-panel`
+- [x] Giữ nguyên luồng UX của edit panel: focus trap, ESC close, reset form state, subtask create/toggle/delete
+- [x] Xác nhận pass `npm run typecheck --workspace @superboard/web`
+
 ## Jira v1.37 — Frontend Structure Foundation Cleanup
 
 - [x] Tách `project constants` dùng chung để tránh lặp localStorage keys và `ViewMode`

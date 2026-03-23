@@ -10,9 +10,9 @@ Mục tiêu: đóng nốt các khoảng trống còn lại để Jira MVP đủ 
 
 ### P0 — Chất lượng và độ tin cậy
 
-- [ ] E2E flow hoàn chỉnh cho Jira core: login → project → task lifecycle → comments/history
-- [ ] Smoke test manual checklist cho tất cả màn hình chính
-- [ ] Chuẩn hoá lại worklog + tài liệu cấu trúc dự án để bám đúng trạng thái codebase hiện tại
+- [x] E2E flow hoàn chỉnh cho Jira core: login → project → task lifecycle → comments/history
+- [x] Smoke test manual checklist cho tất cả màn hình chính
+- [x] Chuẩn hoá lại worklog + tài liệu cấu trúc dự án để bám đúng trạng thái codebase hiện tại
 - [ ] Refactor các điểm FE đang quá lớn/khó maintain:
   - `apps/web/hooks/use-jira-projects-page.ts`
   - `apps/web/app/(private)/jira/projects/[projectId]/page.tsx`

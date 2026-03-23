@@ -131,7 +131,7 @@
 ### Task Loading
 
 - [ ] Tasks load without error
-- [ ] No hugging spinners after load complete
+- [ ] No lingering spinners after load complete
 
 ---
 

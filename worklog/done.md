@@ -4,6 +4,12 @@
 
 ---
 
+## Jira v1.43 — Worklog Sync + UX P0/P1 Scan Alignment
+
+- [x] Đồng bộ trạng thái `doing.md` / `todo.md` theo tiến độ sprint hiện tại (E2E + smoke checklist đã hoàn tất)
+- [x] Cập nhật checklist smoke test theo UI thực tế (empty state ở Project Detail)
+- [x] Chốt kết quả rà nhanh UX P0/P1 theo code paths chính: empty/loading/error/responsive không có blocker nghiêm trọng
+
 ## Jira v1.42 — E2E Testing Foundation + Smoke Test Checklist
 
 - [x] E2E flow exploration qua codebase: Login → Jira Home → Create Project → Create Task → Drag-drop → Comments/History

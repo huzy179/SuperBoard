@@ -258,7 +258,6 @@ export default function ProjectDetailPage() {
   } = useTaskBulkActions({
     filteredTasks,
     runBulkTaskOperation: (input) => bulkTaskMutation.mutateAsync(input),
-    clearTaskSelection: () => clearTaskSelection(),
     setTaskUpdateError,
   });
 
@@ -971,25 +970,25 @@ export default function ProjectDetailPage() {
         onToggleSelectAllVisible={toggleSelectAllVisible}
         onClearSelection={clearTaskSelection}
         onApplyStatus={() => {
-          void handleBulkUpdateStatus({ selectedTaskIds });
+          void handleBulkUpdateStatus({ selectedTaskIds, clearTaskSelection });
         }}
         onApplyPriority={() => {
-          void handleBulkUpdatePriority({ selectedTaskIds });
+          void handleBulkUpdatePriority({ selectedTaskIds, clearTaskSelection });
         }}
         onApplyType={() => {
-          void handleBulkUpdateType({ selectedTaskIds });
+          void handleBulkUpdateType({ selectedTaskIds, clearTaskSelection });
         }}
         onApplyDueDate={() => {
-          void handleBulkUpdateDueDate({ selectedTaskIds });
+          void handleBulkUpdateDueDate({ selectedTaskIds, clearTaskSelection });
         }}
         onApplyAssignee={() => {
-          void handleBulkAssignAssignee({ selectedTaskIds });
+          void handleBulkAssignAssignee({ selectedTaskIds, clearTaskSelection });
         }}
         onDeleteSelected={() => {
           if (editingTask && selectedTaskIds.has(editingTask.id)) {
             handleCloseEdit();
           }
-          void handleBulkDeleteTasks({ selectedTaskIds });
+          void handleBulkDeleteTasks({ selectedTaskIds, clearTaskSelection });
         }}
       />
 

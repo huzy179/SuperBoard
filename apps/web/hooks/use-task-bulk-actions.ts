@@ -16,22 +16,22 @@ type BulkTaskInput = {
 type UseTaskBulkActionsParams = {
   filteredTasks: ProjectTaskItemDTO[];
   runBulkTaskOperation: (input: BulkTaskInput) => Promise<unknown>;
-  clearTaskSelection: () => void;
   setTaskUpdateError: Dispatch<SetStateAction<string | null>>;
 };
 
 type TaskSelectionInput = {
   selectedTaskIds: Set<string>;
+  clearTaskSelection: () => void;
 };
 
 type DeleteSelectionInput = {
   selectedTaskIds: Set<string>;
+  clearTaskSelection: () => void;
 };
 
 export function useTaskBulkActions({
   filteredTasks,
   runBulkTaskOperation,
-  clearTaskSelection,
   setTaskUpdateError,
 }: UseTaskBulkActionsParams) {
   const [bulkStatus, setBulkStatus] = useState<ProjectTaskItemDTO['status']>('todo');
@@ -104,7 +104,10 @@ export function useTaskBulkActions({
     setPendingDeleteProgress(0);
   }
 
-  async function handleBulkUpdateStatus({ selectedTaskIds }: TaskSelectionInput) {
+  async function handleBulkUpdateStatus({
+    selectedTaskIds,
+    clearTaskSelection,
+  }: TaskSelectionInput) {
     const targetTaskIds = visibleTasks
       .filter((task) => selectedTaskIds.has(task.id) && task.status !== bulkStatus)
       .map((task) => task.id);
@@ -132,7 +135,10 @@ export function useTaskBulkActions({
     }
   }
 
-  async function handleBulkAssignAssignee({ selectedTaskIds }: TaskSelectionInput) {
+  async function handleBulkAssignAssignee({
+    selectedTaskIds,
+    clearTaskSelection,
+  }: TaskSelectionInput) {
     if (pendingDeleteTaskIds.size > 0 || bulkDeletePending) {
       return;
     }
@@ -162,7 +168,10 @@ export function useTaskBulkActions({
     }
   }
 
-  async function handleBulkUpdatePriority({ selectedTaskIds }: TaskSelectionInput) {
+  async function handleBulkUpdatePriority({
+    selectedTaskIds,
+    clearTaskSelection,
+  }: TaskSelectionInput) {
     if (pendingDeleteTaskIds.size > 0 || bulkDeletePending) {
       return;
     }
@@ -194,7 +203,7 @@ export function useTaskBulkActions({
     }
   }
 
-  async function handleBulkUpdateType({ selectedTaskIds }: TaskSelectionInput) {
+  async function handleBulkUpdateType({ selectedTaskIds, clearTaskSelection }: TaskSelectionInput) {
     if (pendingDeleteTaskIds.size > 0 || bulkDeletePending) {
       return;
     }
@@ -226,7 +235,10 @@ export function useTaskBulkActions({
     }
   }
 
-  async function handleBulkUpdateDueDate({ selectedTaskIds }: TaskSelectionInput) {
+  async function handleBulkUpdateDueDate({
+    selectedTaskIds,
+    clearTaskSelection,
+  }: TaskSelectionInput) {
     if (pendingDeleteTaskIds.size > 0 || bulkDeletePending) {
       return;
     }
@@ -264,7 +276,10 @@ export function useTaskBulkActions({
     }
   }
 
-  async function handleBulkDeleteTasks({ selectedTaskIds }: DeleteSelectionInput) {
+  async function handleBulkDeleteTasks({
+    selectedTaskIds,
+    clearTaskSelection,
+  }: DeleteSelectionInput) {
     if (pendingDeleteTaskIds.size > 0 || bulkDeletePending) {
       return;
     }

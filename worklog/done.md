@@ -16,6 +16,12 @@
 - [x] Tách utility calendar + tạo URL filter hiện tại khỏi page detail sang `lib/helpers/project-detail-calendar.ts`
 - [x] Giữ nguyên behavior UI, xác nhận pass `npm run typecheck --workspace @superboard/web`
 
+## Jira v1.40 — FE Maintainability Refactor (Wave 2a)
+
+- [x] Tách toàn bộ bulk action state/handlers + undo delete timer khỏi page sang hook `use-task-bulk-actions`
+- [x] Giữ nguyên flow bulk update/delete và lock drag-drop trong project detail
+- [x] Xác nhận pass `npm run typecheck --workspace @superboard/web`
+
 ## Jira v1.37 — Frontend Structure Foundation Cleanup
 
 - [x] Tách `project constants` dùng chung để tránh lặp localStorage keys và `ViewMode`

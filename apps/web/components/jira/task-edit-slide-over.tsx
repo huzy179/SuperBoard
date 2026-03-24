@@ -5,13 +5,9 @@ import type { ProjectTaskItemDTO, ProjectMemberDTO, TaskTypeDTO } from '@superbo
 import { TaskTypeIcon } from '@/components/jira/task-badges';
 import { TaskCommentSection } from '@/components/jira/task-comment-section';
 import { formatDate } from '@/lib/format-date';
-import {
-  BOARD_COLUMNS,
-  PRIORITY_OPTIONS,
-  TASK_TYPE_OPTIONS,
-  TASK_TYPE_ICONS,
-  type TaskPriority,
-} from '@/lib/constants/task';
+import { type TaskPriority } from '@/lib/constants/task';
+import { TaskSubtaskManager } from '@/components/jira/task-subtask-manager';
+import { TaskPropertiesForm } from '@/components/jira/task-properties-form';
 
 interface TaskEditSlideOverProps {
   editingTask: ProjectTaskItemDTO;
@@ -140,213 +136,39 @@ export function TaskEditSlideOver({
 
           <form id="task-edit-form" onSubmit={onSave} className="flex-1 overflow-y-auto">
             <div className="p-6">
-              <div className="space-y-5">
-                <label className="block text-sm font-medium text-slate-700">
-                  Tiêu đề
-                  <input
-                    type="text"
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
-                    required
-                  />
-                </label>
+              <div className="space-y-6">
+                <TaskPropertiesForm
+                  editTitle={editTitle}
+                  setEditTitle={setEditTitle}
+                  editType={editType}
+                  setEditType={setEditType}
+                  editStatus={editStatus}
+                  setEditStatus={setEditStatus}
+                  editPriority={editPriority}
+                  setEditPriority={setEditPriority}
+                  editStoryPoints={editStoryPoints}
+                  setEditStoryPoints={setEditStoryPoints}
+                  editDueDate={editDueDate}
+                  setEditDueDate={setEditDueDate}
+                  editAssigneeId={editAssigneeId}
+                  setEditAssigneeId={setEditAssigneeId}
+                  members={members}
+                  labels={editingTask.labels}
+                />
 
-                <div>
-                  <p className="text-sm font-medium text-slate-700 mb-2">Loại task</p>
-                  <div className="flex gap-1">
-                    {TASK_TYPE_OPTIONS.map((t) => (
-                      <button
-                        key={t.key}
-                        type="button"
-                        onClick={() => setEditType(t.key)}
-                        className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                          editType === t.key
-                            ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-300'
-                            : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
-                        }`}
-                      >
-                        <span className="text-sm">{TASK_TYPE_ICONS[t.key].icon}</span>
-                        {t.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <label className="block text-sm font-medium text-slate-700">
-                    Trạng thái
-                    <select
-                      value={editStatus}
-                      onChange={(e) =>
-                        setEditStatus(e.target.value as ProjectTaskItemDTO['status'])
-                      }
-                      className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
-                    >
-                      {BOARD_COLUMNS.map((col) => (
-                        <option key={col.key} value={col.key}>
-                          {col.label}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="block text-sm font-medium text-slate-700">
-                    Độ ưu tiên
-                    <select
-                      value={editPriority}
-                      onChange={(e) => setEditPriority(e.target.value as TaskPriority)}
-                      className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
-                    >
-                      {PRIORITY_OPTIONS.map((priority) => (
-                        <option key={priority.key} value={priority.key}>
-                          {priority.label}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <label className="block text-sm font-medium text-slate-700">
-                    Story Points
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={editStoryPoints}
-                      onChange={(e) => setEditStoryPoints(e.target.value)}
-                      placeholder="—"
-                      className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
-                    />
-                  </label>
-                  <label className="block text-sm font-medium text-slate-700">
-                    Hạn hoàn thành
-                    <input
-                      type="date"
-                      value={editDueDate}
-                      onChange={(e) => setEditDueDate(e.target.value)}
-                      className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
-                    />
-                  </label>
-                </div>
-
-                <label className="block text-sm font-medium text-slate-700">
-                  Người thực hiện
-                  <select
-                    value={editAssigneeId}
-                    onChange={(e) => setEditAssigneeId(e.target.value)}
-                    className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
-                  >
-                    <option value="">-- Chưa gán --</option>
-                    {members.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.fullName}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                {editingTask.labels && editingTask.labels.length > 0 ? (
-                  <div>
-                    <p className="text-sm font-medium text-slate-700 mb-2">Nhãn</p>
-                    {/* Assuming LabelDots is extracted too or keep here */}
-                    <div className="flex gap-1 flex-wrap">
-                      {editingTask.labels.map((label) => (
-                        <span
-                          key={label.id}
-                          className="inline-flex h-2 w-2 rounded-full bg-slate-300"
-                          title={label.name}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-
-                {editingTask.parentTaskId ? (
-                  <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                    <p className="text-xs font-semibold text-slate-500 uppercase">Task cha</p>
-                    <p className="mt-1 text-sm font-medium text-slate-800">
-                      {editingParentTask?.title ?? 'Task cha đã bị xoá hoặc không tồn tại'}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold text-slate-800">Subtasks</p>
-                      <span className="text-xs text-slate-600">
-                        {editingTask.subtaskProgress?.done ?? 0}/
-                        {editingTask.subtaskProgress?.total ?? 0} hoàn thành (
-                        {editingTask.subtaskProgress?.percent ?? 0}%)
-                      </span>
-                    </div>
-
-                    {editingTaskSubtasks.length === 0 ? (
-                      <p className="text-xs text-slate-500">Chưa có subtask</p>
-                    ) : (
-                      <div className="space-y-2">
-                        {editingTaskSubtasks.map((subtask) => (
-                          <div
-                            key={subtask.id}
-                            className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2.5 py-2"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={subtask.status === 'done'}
-                              onChange={() => {
-                                handleToggleSubtaskDone(subtask);
-                              }}
-                              disabled={subtaskPendingTaskId === subtask.id}
-                              className="h-4 w-4 rounded border-slate-300 text-brand-600"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => handleOpenEdit(subtask)}
-                              className={`flex-1 text-left text-sm ${subtask.status === 'done' ? 'text-slate-400 line-through' : 'text-slate-800 hover:text-brand-700'}`}
-                            >
-                              {subtask.title}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                handleDeleteSubtask(subtask.id);
-                              }}
-                              disabled={subtaskPendingTaskId === subtask.id}
-                              className="rounded px-2 py-1 text-xs font-medium text-rose-600 hover:bg-rose-50 disabled:opacity-50"
-                            >
-                              Xoá
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={subtaskTitle}
-                        onChange={(event) => setSubtaskTitle(event.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            handleCreateSubtask(e);
-                          }
-                        }}
-                        placeholder="Thêm subtask mới..."
-                        className="flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleCreateSubtask}
-                        disabled={subtaskPendingTaskId === editingTask.id}
-                        className="rounded-md bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
-                      >
-                        {subtaskPendingTaskId === editingTask.id ? 'Đang thêm...' : 'Thêm'}
-                      </button>
-                    </div>
-
-                    {subtaskError ? <p className="text-xs text-rose-600">{subtaskError}</p> : null}
-                  </div>
-                )}
+                <TaskSubtaskManager
+                  editingTask={editingTask}
+                  subtasks={editingTaskSubtasks}
+                  subtaskTitle={subtaskTitle}
+                  setSubtaskTitle={setSubtaskTitle}
+                  subtaskError={subtaskError}
+                  subtaskPendingTaskId={subtaskPendingTaskId}
+                  onCreateSubtask={handleCreateSubtask}
+                  onToggleSubtaskDone={handleToggleSubtaskDone}
+                  onDeleteSubtask={handleDeleteSubtask}
+                  onOpenEdit={handleOpenEdit}
+                  parentTask={editingParentTask}
+                />
 
                 <label className="block text-sm font-medium text-slate-700">
                   Mô tả

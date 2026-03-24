@@ -2,6 +2,7 @@
 
 import { Dispatch, SetStateAction } from 'react';
 import type { ProjectTaskItemDTO, ProjectMemberDTO, TaskTypeDTO } from '@superboard/shared';
+import { LabelDots } from '@/components/jira/task-badges';
 import {
   BOARD_COLUMNS,
   PRIORITY_OPTIONS,
@@ -153,17 +154,9 @@ export function TaskPropertiesForm({
       </label>
 
       {labels && labels.length > 0 ? (
-        <div>
-          <p className="text-sm font-medium text-slate-700 mb-2">Nhãn</p>
-          <div className="flex gap-1 flex-wrap">
-            {labels.map((label) => (
-              <span
-                key={label.id}
-                className="inline-flex h-2 w-2 rounded-full bg-slate-300"
-                title={label.name}
-              />
-            ))}
-          </div>
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-slate-700">Nhãn</p>
+          <LabelDots labels={labels} />
         </div>
       ) : null}
     </div>

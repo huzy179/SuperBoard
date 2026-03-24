@@ -1,0 +1,228 @@
+'use client';
+
+import { useState } from 'react';
+import type { ProjectItemDTO } from '@superboard/shared';
+import { formatDate } from '@/lib/format-date';
+import { percentOf } from '@/lib/helpers';
+
+interface ProjectCardProps {
+  project: ProjectItemDTO;
+  index: number;
+  onOpen: (href: string) => void;
+  onOpenEdit: (project: ProjectItemDTO) => void;
+  onArchive: (projectId: string) => void;
+  isArchivingProject: (projectId: string) => boolean;
+  onToggleFavorite: (projectId: string) => void;
+  isFavorite: (projectId: string) => boolean;
+  getProjectOpenHref: (projectId: string) => string;
+  onClearRememberedContext: (projectId: string) => void;
+  hasRememberedContext: (projectId: string) => boolean;
+}
+
+export function ProjectCard({
+  project,
+  index,
+  onOpen,
+  onOpenEdit,
+  onArchive,
+  isArchivingProject,
+  onToggleFavorite,
+  isFavorite,
+  getProjectOpenHref,
+  onClearRememberedContext,
+  hasRememberedContext,
+}: ProjectCardProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const completionPercent =
+    project.taskCount > 0 ? percentOf(project.doneTaskCount, project.taskCount) : 0;
+  const openHref = getProjectOpenHref(project.id);
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpen(openHref)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onOpen(openHref);
+        }
+      }}
+      className="animate-slide-up group relative cursor-pointer overflow-hidden rounded-xl bg-surface-card text-left transition-all hover:-translate-y-px"
+      style={{
+        animationDelay: `${index * 50}ms`,
+        animationFillMode: 'both',
+        boxShadow: 'var(--shadow-card)',
+        transition: 'transform 350ms var(--ease-spring), box-shadow 350ms var(--ease-spring)',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = 'var(--shadow-card-hover)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = 'var(--shadow-card)';
+      }}
+    >
+      <div
+        className="absolute left-0 top-0 h-1 w-full opacity-60 transition-opacity group-hover:opacity-100"
+        style={{ backgroundColor: project.color || 'var(--color-brand-500)' }}
+      />
+
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-base">
+                {project.icon || '📊'}
+              </span>
+              <div className="min-w-0">
+                <h3 className="truncate text-sm font-semibold text-slate-900 transition-colors group-hover:text-brand-600">
+                  {project.name}
+                </h3>
+                {project.key ? (
+                  <span className="inline-block font-mono text-[11px] font-medium text-slate-500">
+                    {project.key}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+
+            {project.description ? (
+              <p className="mt-2 line-clamp-2 text-sm text-slate-600">{project.description}</p>
+            ) : null}
+          </div>
+
+          <div className="relative z-10 flex shrink-0 items-center gap-2">
+            {isFavorite(project.id) ? (
+              <span className="rounded-full bg-amber-100 px-2 py-1 text-[10px] font-semibold text-amber-700">
+                ⭐ Ưu tiên
+              </span>
+            ) : null}
+
+            <div
+              className="relative"
+              onClick={(event) => {
+                event.stopPropagation();
+              }}
+            >
+              <button
+                type="button"
+                aria-label="Mở menu thao tác"
+                aria-expanded={isMenuOpen}
+                onClick={() => setIsMenuOpen((prev) => !prev)}
+                className="flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-700"
+              >
+                <span className="text-sm">⋯</span>
+              </button>
+
+              {isMenuOpen ? (
+                <div className="absolute right-0 top-10 w-44 rounded-lg border border-slate-200 bg-white p-1 shadow-lg z-50">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onOpen(`${openHref}?view=board`);
+                      setIsMenuOpen(false);
+                    }}
+                    className="block w-full rounded-md px-2.5 py-1.5 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                  >
+                    Mở Board
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onOpen(`${openHref}?view=list`);
+                      setIsMenuOpen(false);
+                    }}
+                    className="block w-full rounded-md px-2.5 py-1.5 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                  >
+                    Mở Danh sách
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onOpen(`${openHref}?view=calendar`);
+                      setIsMenuOpen(false);
+                    }}
+                    className="block w-full rounded-md px-2.5 py-1.5 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                  >
+                    Mở Lịch
+                  </button>
+
+                  <div className="my-1 h-px bg-slate-200" />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onToggleFavorite(project.id);
+                      setIsMenuOpen(false);
+                    }}
+                    className="block w-full rounded-md px-2.5 py-1.5 text-left text-xs font-medium text-amber-700 hover:bg-amber-50"
+                  >
+                    {isFavorite(project.id) ? 'Bỏ ghim' : 'Ghim dự án'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onOpenEdit(project);
+                      setIsMenuOpen(false);
+                    }}
+                    className="block w-full rounded-md px-2.5 py-1.5 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                  >
+                    Sửa dự án
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClearRememberedContext(project.id);
+                      setIsMenuOpen(false);
+                    }}
+                    disabled={!hasRememberedContext(project.id)}
+                    className="block w-full rounded-md px-2.5 py-1.5 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Reset ngữ cảnh
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isArchivingProject(project.id)}
+                    onClick={() => {
+                      onArchive(project.id);
+                      setIsMenuOpen(false);
+                    }}
+                    className="block w-full rounded-md px-2.5 py-1.5 text-left text-xs font-medium text-rose-700 hover:bg-rose-50 disabled:opacity-50"
+                  >
+                    {isArchivingProject(project.id) ? 'Đang lưu trữ...' : 'Lưu trữ'}
+                  </button>
+                </div>
+              ) : null}
+            </div>
+
+            {project.color ? (
+              <div
+                className="h-6 w-6 rounded-md border border-surface-border"
+                style={{ backgroundColor: project.color }}
+                title={project.color}
+              />
+            ) : null}
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-lg bg-slate-50/80 p-3">
+          <div className="flex items-center justify-between text-xs text-slate-600">
+            <span>
+              {project.doneTaskCount}/{project.taskCount} hoàn thành
+            </span>
+            <span className="tabular-nums font-semibold text-slate-700">{completionPercent}%</span>
+          </div>
+          <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+            <div
+              className="h-1.5 rounded-full bg-linear-to-r from-brand-400 to-brand-600 transition-all duration-500"
+              style={{ width: `${completionPercent}%` }}
+            />
+          </div>
+          <div className="mt-2 text-[11px] text-slate-500">
+            Cập nhật: <time>{formatDate(project.updatedAt)}</time>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

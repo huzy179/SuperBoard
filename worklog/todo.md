@@ -13,9 +13,7 @@ Mục tiêu: đóng nốt các khoảng trống còn lại để Jira MVP đủ 
 - [x] E2E flow hoàn chỉnh cho Jira core: login → project → task lifecycle → comments/history
 - [x] Smoke test manual checklist cho tất cả màn hình chính
 - [x] Chuẩn hoá lại worklog + tài liệu cấu trúc dự án để bám đúng trạng thái codebase hiện tại
-- [ ] Refactor các điểm FE đang quá lớn/khó maintain:
-  - `apps/web/hooks/use-jira-projects-page.ts`
-  - `apps/web/app/(private)/jira/projects/[projectId]/page.tsx`
+- [x] Refactor các điểm FE đang quá lớn/khó maintain (Wave 2a: bulk actions, Wave 2b: task edit panel, Wave 2c: calendar + header actions)
 - [ ] Rà lỗi giao diện mức dùng thật: loading/error/empty/disabled states, mobile layout, keyboard flow cơ bản
 
 ### P1 — Productization thực tế

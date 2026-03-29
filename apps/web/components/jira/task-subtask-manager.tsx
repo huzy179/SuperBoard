@@ -1,6 +1,5 @@
 'use client';
 
-import { FormEvent } from 'react';
 import type { ProjectTaskItemDTO } from '@superboard/shared';
 
 interface TaskSubtaskManagerProps {
@@ -10,7 +9,7 @@ interface TaskSubtaskManagerProps {
   setSubtaskTitle: (val: string) => void;
   subtaskError: string | null;
   subtaskPendingTaskId: string | null;
-  onCreateSubtask: (e: FormEvent) => void;
+  onCreateSubtask: () => void;
   onToggleSubtaskDone: (subtask: ProjectTaskItemDTO) => void;
   onDeleteSubtask: (id: string) => void;
   onOpenEdit: (task: ProjectTaskItemDTO) => void;
@@ -99,7 +98,7 @@ export function TaskSubtaskManager({
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
-              onCreateSubtask(e);
+              onCreateSubtask();
             }
           }}
           placeholder="Thêm subtask mới..."

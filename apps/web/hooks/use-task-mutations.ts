@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import type {
   BulkTaskOperationRequestDTO,
   CreateTaskRequestDTO,
@@ -21,8 +22,12 @@ export function useCreateTask(projectId: string) {
   return useMutation({
     mutationFn: (payload: CreateTaskRequestDTO) => createProjectTask(projectId, payload),
     onSuccess: () => {
+      toast.success('Tạo task thành công!');
       void queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
       publishProjectDetailUpdated(projectId);
+    },
+    onError: () => {
+      toast.error('Không thể tạo task');
     },
   });
 }
@@ -34,11 +39,15 @@ export function useUpdateTask(projectId: string) {
     mutationFn: ({ taskId, data }: { taskId: string; data: UpdateTaskRequestDTO }) =>
       updateProjectTask(projectId, taskId, data),
     onSuccess: (_data, variables) => {
+      toast.success('Cập nhật task thành công!');
       void queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
       void queryClient.invalidateQueries({
         queryKey: ['projects', projectId, 'tasks', variables.taskId, 'history'],
       });
       publishProjectDetailUpdated(projectId);
+    },
+    onError: () => {
+      toast.error('Không thể cập nhật task');
     },
   });
 }
@@ -83,6 +92,7 @@ export function useUpdateTaskStatus(projectId: string) {
       return { previous };
     },
     onError: (_error, _variables, context) => {
+      toast.error('Không thể cập nhật trạng thái task');
       if (context?.previous) {
         queryClient.setQueryData(['projects', projectId], context.previous);
       }
@@ -110,6 +120,9 @@ export function useDeleteTask(projectId: string) {
         queryKey: ['projects', projectId, 'tasks', taskId, 'history'],
       });
       publishProjectDetailUpdated(projectId);
+    },
+    onError: () => {
+      toast.error('Không thể xoá task');
     },
   });
 }
@@ -178,11 +191,14 @@ export function useBulkTaskOperation(projectId: string) {
       return { previous };
     },
     onError: (_error, _variables, context) => {
+      toast.error('Không thể thực hiện thao tác hàng loạt');
       if (context?.previous) {
         queryClient.setQueryData(['projects', projectId], context.previous);
       }
     },
     onSuccess: (_data, variables) => {
+      const count = variables.taskIds.length;
+      toast.success(`Đã cập nhật ${count} task thành công!`);
       for (const taskId of variables.taskIds) {
         void queryClient.invalidateQueries({
           queryKey: ['projects', projectId, 'tasks', taskId, 'history'],

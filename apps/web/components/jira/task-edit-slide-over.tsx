@@ -163,7 +163,7 @@ export function TaskEditSlideOver({
                   setSubtaskTitle={setSubtaskTitle}
                   subtaskError={subtaskError}
                   subtaskPendingTaskId={subtaskPendingTaskId}
-                  onCreateSubtask={handleCreateSubtask}
+                  onCreateSubtask={handleCreateSubtask as () => void}
                   onToggleSubtaskDone={handleToggleSubtaskDone}
                   onDeleteSubtask={handleDeleteSubtask}
                   onOpenEdit={handleOpenEdit}

@@ -4,6 +4,36 @@
 
 ---
 
+## Jira v1.46 — Success Toast Notifications
+
+- [x] Thêm `sonner` vào `@superboard/web` dependencies
+- [x] Mount `<Toaster position="bottom-right">` trong `app/layout.tsx`
+- [x] Toast cho project CRUD (`use-project-crud-form.ts`): tạo / cập nhật / lưu trữ ✅ / error
+- [x] Toast cho task mutations (`use-task-mutations.ts`): tạo / cập nhật / cập nhật status / xoá / bulk ✅ / error
+- [x] Toast cho subtask operations (`use-task-edit-panel.ts`): tạo / toggle / xoá ✅ / error
+- [x] Toast cho comment operations (`use-task-comments.ts`): gửi / cập nhật / xoá ✅ / error
+- [x] Xác nhận `npm run typecheck --workspace @superboard/web` pass ✅
+- [x] Xác nhận `npx turbo lint --filter=@superboard/web` pass ✅
+
+## Jira v1.45 — Typecheck Clean Pass
+
+- [x] Fix pre-existing lỗi `FormEvent<HTMLFormElement>` trong `use-task-edit-panel`
+  - Đổi `handleCreateSubtask` signature từ `(event: FormEvent<HTMLFormElement>)` → `()`
+  - Đổi prop `TaskSubtaskManager.onCreateSubtask` type từ `(e: FormEvent) => void` → `() => void`
+  - Cast `handleCreateSubtask as () => void` tại call site trong `TaskEditSlideOver`
+  - Xoá `FormEvent` import không dùng trong `task-subtask-manager.tsx`
+- [x] Xác nhận `npm run typecheck --workspace @superboard/web` pass ✅
+- [x] Xác nhận `npx turbo lint --filter=@superboard/web` pass ✅
+
+## Jira v1.44 — Wave 2c: Calendar + Header Actions Extraction
+
+- [x] Tách calendar state/handlers khỏi `page.tsx` sang `use-project-calendar.ts`
+  - `calendarMonth`, `setCalendarMonth`, `dueTasksByDate`, `tasksWithoutDueDate`, `calendarCells`, `calendarMonthLabel`, `prevMonth`, `nextMonth`
+- [x] Tách realtime presence + copy-link khỏi `page.tsx` sang `use-project-header-actions.ts`
+  - `viewerCount` (subscribeProjectPresence), `isCopyLinkSuccess`, `onCopyFilterLink`, `onOpenFilterInNewTab`
+- [x] Dọn duplicate code trong `page.tsx`, giảm ~460 lines (từ 538 lines)
+- [x] Lưu ý: typecheck có 1 lỗi pre-existing `FormEvent<HTMLFormElement>` trong `use-task-edit-panel` (không do refactor)
+
 ## Jira v1.43 — Worklog Sync + UX P0/P1 Scan Alignment
 
 - [x] Đồng bộ trạng thái `doing.md` / `todo.md` theo tiến độ sprint hiện tại (E2E + smoke checklist đã hoàn tất)

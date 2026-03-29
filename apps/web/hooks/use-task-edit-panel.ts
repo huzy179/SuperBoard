@@ -7,6 +7,7 @@ import {
   type FormEvent,
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
+import { toast } from 'sonner';
 import type {
   CreateTaskRequestDTO,
   ProjectTaskItemDTO,
@@ -195,9 +196,7 @@ export function useTaskEditPanel({
     }
   }
 
-  async function handleCreateSubtask(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
+  async function handleCreateSubtask() {
     if (!editingTask || editingTask.parentTaskId) {
       return;
     }
@@ -219,9 +218,11 @@ export function useTaskEditPanel({
         type: 'task',
         parentTaskId: editingTask.id,
       });
+      toast.success('Tạo subtask thành công!');
       setSubtaskTitle('');
     } catch (caughtError) {
       setSubtaskError(caughtError instanceof Error ? caughtError.message : 'Không thể tạo subtask');
+      toast.error('Không thể tạo subtask');
     } finally {
       setSubtaskPendingTaskId(null);
     }
@@ -239,6 +240,7 @@ export function useTaskEditPanel({
       setSubtaskError(
         caughtError instanceof Error ? caughtError.message : 'Không thể cập nhật subtask',
       );
+      toast.error('Không thể cập nhật subtask');
     } finally {
       setSubtaskPendingTaskId(null);
     }
@@ -253,8 +255,10 @@ export function useTaskEditPanel({
     setSubtaskPendingTaskId(subtaskId);
     try {
       await deleteTask(subtaskId);
+      toast.success('Đã xoá subtask');
     } catch (caughtError) {
       setSubtaskError(caughtError instanceof Error ? caughtError.message : 'Không thể xoá subtask');
+      toast.error('Không thể xoá subtask');
     } finally {
       setSubtaskPendingTaskId(null);
     }

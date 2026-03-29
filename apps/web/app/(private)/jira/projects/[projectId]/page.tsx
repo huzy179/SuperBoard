@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type {
   CreateTaskRequestDTO,
@@ -20,6 +20,8 @@ import { TaskBulkActionBar } from '@/components/jira/task-bulk-action-bar';
 
 import { useAuthSession } from '@/hooks/use-auth-session';
 import { useProjectDetail } from '@/hooks/use-project-detail';
+import { useProjectCalendar } from '@/hooks/use-project-calendar';
+import { useProjectHeaderActions } from '@/hooks/use-project-header-actions';
 import {
   useBulkTaskOperation,
   useCreateTask,
@@ -35,8 +37,6 @@ import {
   type SortDirection,
   buildBoardData,
 } from '@/lib/helpers/task-view';
-import { getCalendarCells, toLocalDayKey } from '@/lib/helpers/project-detail-calendar';
-import { subscribeProjectPresence } from '@/lib/realtime/project-socket';
 import { useProjectUrlState } from '@/hooks/use-project-url-state';
 import { useTaskSelection } from '@/hooks/use-task-selection';
 import { useTaskBulkActions } from '@/hooks/use-task-bulk-actions';
@@ -223,9 +223,18 @@ export default function ProjectDetailPage() {
   });
 
   const [taskStatus, setTaskStatus] = useState<ProjectTaskItemDTO['status'] | undefined>();
-  const [calendarMonth, setCalendarMonth] = useState(() => new Date());
-  const [viewerCount, setViewerCount] = useState(1);
-  const [isCopyLinkSuccess, setIsCopyLinkSuccess] = useState(false);
+
+  const { viewerCount, isCopyLinkSuccess, onCopyFilterLink, onOpenFilterInNewTab } =
+    useProjectHeaderActions(projectId);
+
+  const {
+    dueTasksByDate,
+    tasksWithoutDueDate,
+    calendarCells,
+    calendarMonthLabel,
+    prevMonth,
+    nextMonth,
+  } = useProjectCalendar(tasks);
 
   const boardDataStatuses = useMemo(() => BOARD_COLUMNS.map((col) => col.key), []);
   const boardData = useMemo(
@@ -255,37 +264,6 @@ export default function ProjectDetailPage() {
     isUpdatePending: updateTaskStatusMutation.isPending,
   });
 
-  const dueTasksByDate = useMemo(() => {
-    const map = new Map<string, ProjectTaskItemDTO[]>();
-    tasks.forEach((task) => {
-      if (task.dueDate) {
-        const key = toLocalDayKey(new Date(task.dueDate));
-        if (!map.has(key)) map.set(key, []);
-        map.get(key)!.push(task);
-      }
-    });
-    return map;
-  }, [tasks]);
-
-  const tasksWithoutDueDate = useMemo(() => tasks.filter((t) => !t.dueDate), [tasks]);
-
-  const calendarCells = useMemo(() => getCalendarCells(calendarMonth), [calendarMonth]);
-  const calendarMonthLabel = calendarMonth.toLocaleString('vi-VN', {
-    month: 'long',
-    year: 'numeric',
-  });
-
-  useEffect(() => {
-    if (projectId) {
-      const unsubscribe = subscribeProjectPresence(projectId, (presence) => {
-        setViewerCount(presence.viewerCount);
-      });
-      return () => {
-        unsubscribe();
-      };
-    }
-  }, [projectId]);
-
   const handleUpdateTaskStatusDirect = async (
     taskId: string,
     status: ProjectTaskItemDTO['status'],
@@ -312,18 +290,6 @@ export default function ProjectDetailPage() {
     if (viewMode === 'calendar') return 'Lịch';
     return 'Board';
   }, [viewMode]);
-
-  const onCopyFilterLink = useCallback(() => {
-    const url = window.location.href;
-    void navigator.clipboard.writeText(url).then(() => {
-      setIsCopyLinkSuccess(true);
-      setTimeout(() => setIsCopyLinkSuccess(false), 2000);
-    });
-  }, []);
-
-  const onOpenFilterInNewTab = useCallback(() => {
-    window.open(window.location.href, '_blank');
-  }, []);
 
   const statusSelectLockReason = isDragDropLocked
     ? 'Đang chờ xác nhận xoá, tạm khoá chỉnh sửa'
@@ -478,12 +444,8 @@ export default function ProjectDetailPage() {
           calendarCells={calendarCells}
           dueTasksByDate={dueTasksByDate}
           tasksWithoutDueDate={tasksWithoutDueDate}
-          onPrevMonth={() =>
-            setCalendarMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))
-          }
-          onNextMonth={() =>
-            setCalendarMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))
-          }
+          onPrevMonth={prevMonth}
+          onNextMonth={nextMonth}
           onOpenEdit={handleOpenEdit}
         />
       )}

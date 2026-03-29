@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import type { CommentItemDTO, TaskHistoryItemDTO } from '@superboard/shared';
 import {
   createTaskComment,
@@ -106,9 +107,13 @@ export function useCreateComment(projectId: string, taskId: string) {
   return useMutation({
     mutationFn: (content: string) => createTaskComment(projectId, taskId, { content }),
     onSuccess: () => {
+      toast.success('Đã gửi bình luận');
       void queryClient.invalidateQueries({ queryKey: commentQueryKey(projectId, taskId) });
       void queryClient.invalidateQueries({ queryKey: taskHistoryQueryKey(projectId, taskId) });
       publishTaskCommentsUpdated(projectId, taskId);
+    },
+    onError: () => {
+      toast.error('Không thể gửi bình luận');
     },
   });
 }
@@ -120,9 +125,13 @@ export function useUpdateComment(projectId: string, taskId: string) {
     mutationFn: ({ commentId, content }: { commentId: string; content: string }) =>
       updateTaskComment(projectId, taskId, commentId, { content }),
     onSuccess: () => {
+      toast.success('Đã cập nhật bình luận');
       void queryClient.invalidateQueries({ queryKey: commentQueryKey(projectId, taskId) });
       void queryClient.invalidateQueries({ queryKey: taskHistoryQueryKey(projectId, taskId) });
       publishTaskCommentsUpdated(projectId, taskId);
+    },
+    onError: () => {
+      toast.error('Không thể cập nhật bình luận');
     },
   });
 }
@@ -133,9 +142,13 @@ export function useDeleteComment(projectId: string, taskId: string) {
   return useMutation({
     mutationFn: (commentId: string) => deleteTaskComment(projectId, taskId, commentId),
     onSuccess: () => {
+      toast.success('Đã xoá bình luận');
       void queryClient.invalidateQueries({ queryKey: commentQueryKey(projectId, taskId) });
       void queryClient.invalidateQueries({ queryKey: taskHistoryQueryKey(projectId, taskId) });
       publishTaskCommentsUpdated(projectId, taskId);
+    },
+    onError: () => {
+      toast.error('Không thể xoá bình luận');
     },
   });
 }

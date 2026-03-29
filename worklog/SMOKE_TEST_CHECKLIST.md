@@ -462,7 +462,6 @@
 
 ## **Known Limitations (NOT bugs)**
 
-- ⚠️ **No success toast** — create project/task fails silently (just refreshes UI)
 - ⚠️ **No real-time board sync** — multiple users editing same project need manual refresh
 - ⚠️ **Drag-drop mobile** — not supported on touch devices (fallback: edit status in task detail)
 - ⚠️ **30s undo timer** — after timeout, delete is permanent

@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react';
+import { toast } from 'sonner';
 import type { ProjectItemDTO } from '@superboard/shared';
 import {
   useCreateProject,
@@ -48,6 +49,7 @@ export function useProjectCrudForm() {
         ...(color ? { color } : {}),
       });
 
+      toast.success('Tạo dự án thành công!');
       setProjectName('');
       setProjectDescription('');
       setProjectIcon('📌');
@@ -55,6 +57,7 @@ export function useProjectCrudForm() {
       setShowCreatePanel(false);
     } catch (caughtError) {
       setCreateError(caughtError instanceof Error ? caughtError.message : 'Không thể tạo dự án');
+      toast.error('Không thể tạo dự án');
     }
   }
 
@@ -97,9 +100,11 @@ export function useProjectCrudForm() {
           color: editColor.trim(),
         },
       });
+      toast.success('Cập nhật dự án thành công!');
       closeEditProject();
     } catch (caughtError) {
       setEditError(caughtError instanceof Error ? caughtError.message : 'Không thể cập nhật dự án');
+      toast.error('Không thể cập nhật dự án');
     }
   }
 
@@ -110,10 +115,12 @@ export function useProjectCrudForm() {
 
     try {
       await deleteProjectMutation.mutateAsync(projectId);
+      toast.success('Lưu trữ dự án thành công!');
     } catch (caughtError) {
       setArchiveError(
         caughtError instanceof Error ? caughtError.message : 'Không thể lưu trữ dự án',
       );
+      toast.error('Không thể lưu trữ dự án');
     }
   }
 

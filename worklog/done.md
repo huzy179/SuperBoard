@@ -4,6 +4,12 @@
 
 ---
 
+## Jira v1.49 — Prisma db:fresh Fix + CI/CD Polish
+
+- [x] Fix `db:fresh` script: `prisma db push --force-reset` → `prisma migrate reset --force` (tuân thủ migration-first)
+- [x] Verify CI workflow: lint + typecheck + test (all present)
+- [x] Verify CD workflow: paths-filter per app, migration step cho api, placeholder deploy steps
+
 ## Jira v1.48 — Infra Dev Cleanup + Dockerfile Web Fixes
 
 - [x] Fix `Dockerfile.web`: thêm `ENV NODE_ENV=production PORT=3000`, fix WORKDIR, copy `.env.production` cho Next.js build

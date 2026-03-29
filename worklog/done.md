@@ -4,6 +4,24 @@
 
 ---
 
+## Jira v1.48 — Infra Dev Cleanup + Dockerfile Web Fixes
+
+- [x] Fix `Dockerfile.web`: thêm `ENV NODE_ENV=production PORT=3000`, fix WORKDIR, copy `.env.production` cho Next.js build
+- [x] Tách `docker-compose.yml` thành minimal (postgres + redis) và `docker-compose.full.yml` (giữ đầy đủ)
+- [x] Loại bỏ dead services khỏi compose minimal: keycloak, elasticsearch, minio, mailhog, ai-service (không có integration thật)
+- [x] Update `package.json` scripts: `dev:infra` chạy compose minimal, `dev:infra:full` chạy compose full
+- [x] Update Makefile comments mô tả rõ minimal vs full infra
+- [x] `npx turbo typecheck` + `lint` pass ✅
+
+## Jira v1.47 — Docker Deploy Readiness Fixes
+
+- [x] Fix `Dockerfile.api`: `EXPOSE 3000` → `EXPOSE 4000` (khớp `PORT=4000` trong app)
+- [x] Fix `Dockerfile.web`: thêm `ENV NODE_ENV=production` + `ENV PORT=3000`, sửa `EXPOSE 3001` → `EXPOSE 3000`
+- [x] Fix `docker-compose.yml`: api port `3000:3000` → `4000:4000`, web port `3001:3001` → `3000:3000`
+- [x] Fix `NEXT_PUBLIC_API_URL` trong compose: `http://api:3000` → `http://api:4000`
+- [x] Loại bỏ `keycloak` khỏi `depends_on` của api service (app dùng JWT local, không cần Keycloak)
+- [x] Xác nhận `npx turbo typecheck` + `npx turbo lint` pass ✅
+
 ## Jira v1.46 — Success Toast Notifications
 
 - [x] Thêm `sonner` vào `@superboard/web` dependencies

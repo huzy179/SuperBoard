@@ -36,6 +36,6 @@ COPY --from=builder /app/apps/api/package.json apps/api/
 
 WORKDIR /app/apps/api
 
-EXPOSE 3000
+EXPOSE 4000
 
 CMD ["node", "dist/main"]

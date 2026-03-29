@@ -19,10 +19,10 @@ up: dev-infra db-push db-seed dev ## Start infra + sync DB + seed + dev servers
 
 # ─── Docker infrastructure ─────────────────────────────────
 
-dev-infra: ## Start postgres only
+dev-infra: ## Start minimal infra (postgres + redis — all Jira MVP needs)
 	npm run dev:infra
 
-dev-infra-full: ## Start full infra (postgres, redis, minio, keycloak, mailhog, elasticsearch)
+dev-infra-full: ## Start full infra (includes unused: keycloak, elasticsearch, minio, mailhog, ai-service)
 	npm run dev:infra:full
 
 dev-infra-down: ## Stop all Docker services

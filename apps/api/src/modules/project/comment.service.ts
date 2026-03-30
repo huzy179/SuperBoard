@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
+import { logger } from '../../common/logger';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationService } from '../notification/notification.service';
 import type { CommentItemDTO } from '@superboard/shared';
@@ -93,9 +94,13 @@ export class CommentService {
             message: `Bình luận mới trên task: ${task.title}`,
           },
         })
-        .catch((err: unknown) => console.error('Notification failed:', err));
+        .catch((err: unknown) => logger.error({ err }, 'Notification failed'));
     }
 
+    logger.info(
+      { commentId: comment.id, taskId: input.taskId, authorId: input.authorId },
+      'Comment created',
+    );
     return this.toCommentItemDTO(comment);
   }
 
@@ -153,8 +158,13 @@ export class CommentService {
       },
     });
 
+    logger.info(
+      { commentId: updated.id, taskId: input.taskId, currentUserId: input.currentUserId },
+      'Comment updated',
+    );
     return this.toCommentItemDTO(updated);
   }
+
   async deleteComment(input: {
     projectId: string;
     taskId: string;
@@ -198,6 +208,10 @@ export class CommentService {
       },
     });
 
+    logger.info(
+      { commentId: input.commentId, taskId: input.taskId, currentUserId: input.currentUserId },
+      'Comment deleted',
+    );
     return { deleted: true };
   }
 

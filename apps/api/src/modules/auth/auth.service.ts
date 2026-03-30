@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import type { AuthUserDTO } from '@superboard/shared';
 import type { User } from '@prisma/client';
 import jwt from 'jsonwebtoken';
+import { logger } from '../../common/logger';
 import { PrismaService } from '../../prisma/prisma.service';
 
 type JwtPayload = {
@@ -27,11 +28,13 @@ export class AuthService {
     });
 
     if (!user || !user.isActive) {
+      logger.warn({ email }, 'Login failed: user not found or inactive');
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const isValidPassword = this.verifyPassword(password, user.passwordHash);
     if (!isValidPassword) {
+      logger.warn({ userId: user.id }, 'Login failed: invalid password');
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -40,6 +43,7 @@ export class AuthService {
       data: { lastLoginAt: new Date() },
     });
 
+    logger.info({ userId: user.id, email: user.email }, 'Login success');
     const accessToken = this.signAccessToken({ sub: user.id, email: user.email });
 
     return {

@@ -268,11 +268,7 @@ export default function ProjectDetailPage() {
     taskId: string,
     status: ProjectTaskItemDTO['status'],
   ) => {
-    try {
-      await updateTaskStatusMutation.mutateAsync({ taskId, status });
-    } catch (err) {
-      console.error('Failed to update status:', err);
-    }
+    await updateTaskStatusMutation.mutateAsync({ taskId, status });
   };
 
   const handleToggleFilter = (key: 'status' | 'priority' | 'type', value: string) => {

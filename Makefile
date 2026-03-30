@@ -12,10 +12,10 @@
 
 # ─── Dev servers ───────────────────────────────────────────
 
-dev: ## Start all apps in parallel (web + api + ai-service)
+dev: ## Start all apps in parallel (web + api)
 	npm run dev
 
-up: dev-infra db-push db-seed dev ## Start infra + sync DB + seed + dev servers
+up: dev-infra db-push db-seed dev ## Start infra + sync DB (dev) + seed + dev servers
 
 # ─── Docker infrastructure ─────────────────────────────────
 

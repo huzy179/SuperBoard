@@ -1,5 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import type { ApiResponse } from '@superboard/shared';
+import { logger } from '../logger';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -16,6 +17,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
       exception instanceof HttpException
         ? this.getHttpExceptionMessage(exception)
         : 'Internal server error';
+
+    // Log non-HTTP errors (5xx) for observability
+    if (status >= 500) {
+      const error =
+        exception instanceof Error
+          ? { name: exception.name, message: exception.message, stack: exception.stack }
+          : { exception };
+      logger.error({ status, message, error }, 'Unhandled server error');
+    } else {
+      logger.warn({ status, message }, 'Client request error');
+    }
 
     const payload: ApiResponse<never> = {
       success: false,

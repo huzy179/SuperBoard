@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
+import { logger } from '../../common/logger';
 import { PrismaService } from '../../prisma/prisma.service';
 import { findOrThrow } from '../../common/helpers';
 import { NotificationService } from '../notification/notification.service';
@@ -391,10 +392,14 @@ export class ProjectService {
               message: `Bạn được gán task: ${input.title}`,
             },
           })
-          .catch((err: unknown) => console.error('Notification failed:', err));
+          .catch((err: unknown) => logger.error({ err }, 'Notification failed'));
       }
     }
 
+    logger.info(
+      { taskId: task.id, projectId: input.projectId, actorId: input.actorId },
+      'Task created',
+    );
     return this.toTaskDTO(task);
   }
 
@@ -770,7 +775,7 @@ export class ProjectService {
             message: `Bạn được gán task: ${task.title}`,
           },
         })
-        .catch((err: unknown) => console.error('Notification failed:', err));
+        .catch((err: unknown) => logger.error({ err }, 'Notification failed'));
     }
 
     return this.toTaskDTO(task);
@@ -806,6 +811,11 @@ export class ProjectService {
         },
       },
     });
+
+    logger.info(
+      { taskId: input.taskId, projectId: input.projectId, actorId: input.actorId },
+      'Task deleted',
+    );
   }
 
   async getTaskHistoryForProject(input: {

@@ -14,14 +14,14 @@ Mục tiêu: đóng nốt các khoảng trống còn lại để Jira MVP đủ 
 - [x] Smoke test manual checklist cho tất cả màn hình chính
 - [x] Chuẩn hoá lại worklog + tài liệu cấu trúc dự án để bám đúng trạng thái codebase hiện tại
 - [x] Refactor các điểm FE đang quá lớn/khó maintain (Wave 2a: bulk actions, Wave 2b: task edit panel, Wave 2c: calendar + header actions)
-- [ ] Rà lỗi giao diện mức dùng thật: loading/error/empty/disabled states, mobile layout, keyboard flow cơ bản
+- [x] Rà lỗi giao diện mức dùng thật: loading/error/empty/disabled states, mobile layout, keyboard flow cơ bản
 
 ### P1 — Productization thực tế
 
-- [ ] Chuẩn bị deploy tối thiểu cho môi trường thật (web + api + postgres + redis trước)
-- [ ] Bổ sung error tracking / logging review ở các flow quan trọng
-- [ ] Kiểm tra và tinh gọn infra dev: giữ thứ gì đang thật sự dùng, tránh mang quá nhiều service chưa tích hợp
-- [ ] Tăng test coverage cho các service/hook quan trọng của Jira
+- [x] Chuẩn bị deploy tối thiểu cho môi trường thật (web + api + postgres + redis trước)
+- [x] Bổ sung error tracking / logging review ở các flow quan trọng
+- [x] Kiểm tra và tinh gọn infra dev: giữ thứ gì đang thật sự dùng, tránh mang quá nhiều service chưa tích hợp
+- [x] Tăng test coverage cho các service/hook quan trọng của Jira
 
 ---
 

@@ -4,6 +4,27 @@
 
 ---
 
+## Jira v1.51 — Test Coverage Expansion
+
+- [x] Tạo `auth.service.test.ts` — 3 test cases: login user not found, inactive user, wrong password
+- [x] Tạo `task-view.test.ts` (FE) — 24 test cases cho filter/sort/board/fractional position helpers
+  - `filterAndSortProjectTasks`: query search (title + number), assignee, statuses, sort by dueDate asc/desc
+  - `buildBoardData`: grouping by status, sorting by position
+  - `buildFractionalTaskPosition`: midpoint, edge cases (gap too small, invalid positions)
+  - `toggleSetFilterValue`, `isTaskOverdue`
+- [x] Thêm `test` script vào web `package.json` + update `turbo.json` với `"test": { "cache": false }`
+- [x] Xác nhận `npx turbo typecheck lint test` — api: 13 pass, web: 24 pass, 0 fail ✅
+
+## Jira v1.50 — Structured Logging for Critical API Flows
+
+- [x] `HttpExceptionFilter`: thêm structured logging cho 5xx (error) và 4xx (warn), dùng pino logger
+- [x] `AuthService`: log login success + failed attempts (không log password/token)
+- [x] `ProjectService`: log task create/delete với taskId/projectId/actorId
+- [x] `CommentService`: log comment create/update/delete
+- [x] Thay `console.error` → `logger.error` ở tất cả notification failure handlers
+- [x] Xoá `console.error` thừa trong `page.tsx` (`handleUpdateTaskStatusDirect`)
+- [x] `npx turbo typecheck` + `lint` pass ✅
+
 ## Jira v1.49 — Prisma db:fresh Fix + CI/CD Polish
 
 - [x] Fix `db:fresh` script: `prisma db push --force-reset` → `prisma migrate reset --force` (tuân thủ migration-first)

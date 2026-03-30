@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type {
   CreateTaskRequestDTO,
@@ -8,6 +8,8 @@ import type {
   ProjectMemberDTO,
 } from '@superboard/shared';
 import { FullPageError, FullPageLoader } from '@/components/ui/page-states';
+import { QuickSearchDialog } from '@/components/jira/quick-search-dialog';
+import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 
 import { ProjectDetailHeader } from '@/components/jira/project-detail-header';
 import { TaskBoardView } from '@/components/jira/task-board-view';
@@ -223,6 +225,7 @@ export default function ProjectDetailPage() {
   });
 
   const [taskStatus, setTaskStatus] = useState<ProjectTaskItemDTO['status'] | undefined>();
+  const [showQuickSearch, setShowQuickSearch] = useState(false);
 
   const { viewerCount, isCopyLinkSuccess, onCopyFilterLink, onOpenFilterInNewTab } =
     useProjectHeaderActions(projectId);
@@ -235,6 +238,14 @@ export default function ProjectDetailPage() {
     prevMonth,
     nextMonth,
   } = useProjectCalendar(tasks);
+
+  const handleOpenQuickSearch = useCallback(() => setShowQuickSearch(true), []);
+  const handleCloseQuickSearch = useCallback(() => setShowQuickSearch(false), []);
+
+  useKeyboardShortcuts([
+    { key: 'k', metaKey: true, handler: handleOpenQuickSearch },
+    { key: '/', handler: handleOpenQuickSearch },
+  ]);
 
   const boardDataStatuses = useMemo(() => BOARD_COLUMNS.map((col) => col.key), []);
   const boardData = useMemo(
@@ -489,6 +500,19 @@ export default function ProjectDetailPage() {
           handleOpenEdit={handleOpenEdit}
           dialogRef={dialogRef}
           handleDialogKeyDown={handleDialogKeyDown}
+        />
+      ) : null}
+
+      {showQuickSearch ? (
+        <QuickSearchDialog
+          tasks={tasks}
+          projectId={projectId}
+          onClose={handleCloseQuickSearch}
+          onSelectTask={(taskId) => {
+            setShowQuickSearch(false);
+            const task = tasks.find((t) => t.id === taskId);
+            if (task) handleOpenEdit(task);
+          }}
         />
       ) : null}
     </section>

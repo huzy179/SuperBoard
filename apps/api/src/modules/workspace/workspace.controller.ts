@@ -153,6 +153,27 @@ export class WorkspaceController {
     return apiSuccess({ updated: true });
   }
 
+  @Post(':workspaceId/members')
+  async addWorkspaceMember(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('workspaceId') workspaceId: string,
+    @Body() body: { email?: string; role?: string },
+  ) {
+    const email = body.email?.trim();
+    if (!email) {
+      throw new BadRequestException('Email is required');
+    }
+
+    await this.workspaceService.addMemberToWorkspace({
+      workspaceId,
+      currentUserId: user.id,
+      email,
+      ...(body.role !== undefined ? { role: body.role } : {}),
+    });
+
+    return apiSuccess({ added: true });
+  }
+
   @Delete(':workspaceId/members/:memberId')
   @HttpCode(HttpStatus.OK)
   async removeWorkspaceMember(
@@ -167,5 +188,35 @@ export class WorkspaceController {
     });
 
     return apiSuccess({ removed: true });
+  }
+
+  @Patch(':workspaceId/members/:memberId/transfer-owner')
+  @HttpCode(HttpStatus.OK)
+  async transferWorkspaceOwner(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('workspaceId') workspaceId: string,
+    @Param('memberId') memberId: string,
+  ) {
+    await this.workspaceService.transferWorkspaceOwnership({
+      workspaceId,
+      memberId,
+      currentUserId: user.id,
+    });
+
+    return apiSuccess({ transferred: true });
+  }
+
+  @Patch(':workspaceId/default')
+  @HttpCode(HttpStatus.OK)
+  async setDefaultWorkspace(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('workspaceId') workspaceId: string,
+  ) {
+    await this.workspaceService.setDefaultWorkspaceForUser({
+      workspaceId,
+      userId: user.id,
+    });
+
+    return apiSuccess({ updated: true });
   }
 }

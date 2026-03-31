@@ -92,6 +92,22 @@ export async function verifyWorkspaceAdminOrOwner(
   }
 }
 
+export async function findWorkspaceOwnerMembershipOrThrow(
+  prisma: PrismaService,
+  input: WorkspaceUserScope,
+): Promise<{ id: string }> {
+  const currentMember = await prisma.workspaceMember.findFirst({
+    where: buildActiveMembershipWhere(input),
+    select: { id: true, role: true },
+  });
+
+  if (!currentMember || currentMember.role !== 'owner') {
+    throw new ForbiddenException('Chỉ owner mới được chuyển quyền sở hữu workspace');
+  }
+
+  return { id: currentMember.id };
+}
+
 export async function findMutableWorkspaceMemberOrThrow(
   prisma: PrismaService,
   input: WorkspaceMemberScope,

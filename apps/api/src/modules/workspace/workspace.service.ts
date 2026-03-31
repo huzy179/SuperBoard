@@ -1,6 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import {
+  findWorkspaceOwnerMembershipOrThrow,
   findMutableWorkspaceMemberOrThrow,
   parseWorkspaceMemberRoleOrThrow,
   verifyActiveWorkspaceForUser,
@@ -277,6 +278,76 @@ export class WorkspaceService {
     });
   }
 
+  async addMemberToWorkspace(input: {
+    workspaceId: string;
+    currentUserId: string;
+    email: string;
+    role?: string;
+  }): Promise<void> {
+    await verifyWorkspaceAdminOrOwner(this.prisma, {
+      workspaceId: input.workspaceId,
+      userId: input.currentUserId,
+    });
+
+    const normalizedEmail = input.email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      throw new BadRequestException('Email is required');
+    }
+
+    const nextRole = parseWorkspaceMemberRoleOrThrow(input.role ?? 'member');
+    if (nextRole === 'owner') {
+      throw new BadRequestException('Không thể thêm member với role owner');
+    }
+
+    const user = await this.prisma.user.findFirst({
+      where: {
+        email: normalizedEmail,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const existingMember = await this.prisma.workspaceMember.findFirst({
+      where: {
+        workspaceId: input.workspaceId,
+        userId: user.id,
+      },
+      select: {
+        id: true,
+        deletedAt: true,
+      },
+    });
+
+    if (!existingMember) {
+      await this.prisma.workspaceMember.create({
+        data: {
+          workspaceId: input.workspaceId,
+          userId: user.id,
+          role: nextRole,
+        },
+      });
+      return;
+    }
+
+    if (!existingMember.deletedAt) {
+      throw new BadRequestException('User is already a workspace member');
+    }
+
+    await this.prisma.workspaceMember.update({
+      where: { id: existingMember.id },
+      data: {
+        role: nextRole,
+        deletedAt: null,
+      },
+    });
+  }
+
   async removeMemberFromWorkspace(input: {
     workspaceId: string;
     memberId: string;
@@ -315,6 +386,66 @@ export class WorkspaceService {
           defaultWorkspaceId: null,
         },
       });
+    });
+  }
+
+  async transferWorkspaceOwnership(input: {
+    workspaceId: string;
+    memberId: string;
+    currentUserId: string;
+  }): Promise<void> {
+    const currentOwner = await findWorkspaceOwnerMembershipOrThrow(this.prisma, {
+      workspaceId: input.workspaceId,
+      userId: input.currentUserId,
+    });
+
+    const targetMember = await this.prisma.workspaceMember.findFirst({
+      where: {
+        id: input.memberId,
+        workspaceId: input.workspaceId,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        userId: true,
+      },
+    });
+
+    if (!targetMember) {
+      throw new NotFoundException('Member not found');
+    }
+
+    if (targetMember.userId === input.currentUserId) {
+      throw new BadRequestException('Bạn đã là owner của workspace này');
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.workspaceMember.update({
+        where: { id: currentOwner.id },
+        data: { role: 'admin' },
+      });
+
+      await tx.workspaceMember.update({
+        where: { id: targetMember.id },
+        data: { role: 'owner' },
+      });
+    });
+  }
+
+  async setDefaultWorkspaceForUser(input: { workspaceId: string; userId: string }): Promise<void> {
+    await verifyActiveWorkspaceForUser(this.prisma, {
+      workspaceId: input.workspaceId,
+      userId: input.userId,
+    });
+
+    await this.prisma.user.updateMany({
+      where: {
+        id: input.userId,
+        deletedAt: null,
+      },
+      data: {
+        defaultWorkspaceId: input.workspaceId,
+      },
     });
   }
 

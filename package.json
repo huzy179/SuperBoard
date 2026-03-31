@@ -24,8 +24,6 @@
     "db:generate": "npm --workspace @superboard/api run db:generate",
     "db:migrate": "npm --workspace @superboard/api run db:migrate",
     "db:deploy": "npm --workspace @superboard/api run db:deploy",
-    "db:push": "npm --workspace @superboard/api run db:push",
-    "db:push:force": "npm --workspace @superboard/api run db:push:force",
     "db:seed": "npm --workspace @superboard/api run db:seed",
     "db:status": "npm --workspace @superboard/api run db:status",
     "db:fresh": "npm --workspace @superboard/api run db:fresh",

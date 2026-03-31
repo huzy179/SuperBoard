@@ -7,7 +7,7 @@
 #   make dev       → start dev servers (web + api)
 
 .PHONY: dev dev-infra dev-infra-full dev-infra-down \
-        db-generate db-migrate db-deploy db-push db-push-force db-seed db-fresh db-reset db-status db-studio \
+	db-generate db-migrate db-deploy db-seed db-fresh db-reset db-status db-studio \
         typecheck lint test setup health up help
 
 # ─── Dev servers ───────────────────────────────────────────
@@ -15,7 +15,7 @@
 dev: ## Start all apps in parallel (web + api)
 	npm run dev
 
-up: dev-infra db-push db-seed dev ## Start infra + sync DB (dev) + seed + dev servers
+up: dev-infra db-deploy db-seed dev ## Start infra + apply migrations + seed + dev servers
 
 # ─── Docker infrastructure ─────────────────────────────────
 
@@ -42,16 +42,10 @@ db-migrate: ## Create + apply migration (interactive, dev only)
 db-deploy: ## Apply pending migrations (non-interactive, CI/prod)
 	npm run db:deploy
 
-db-push: ## Sync schema to DB without migration files (dev)
-	npm run db:push
-
-db-push-force: ## Force reset DB + sync schema (destroys all data!)
-	npm run db:push:force
-
 db-seed: ## Seed development data
 	npm run db:seed
 
-db-fresh: ## Reset DB + sync schema + seed (one command)
+db-fresh: ## Reset DB + apply all migrations + seed (one command)
 	npm run db:fresh
 
 db-reset: ## Reset via prisma migrate reset + seed
@@ -89,7 +83,7 @@ help: ## Show this help message
 	@echo ""
 	@echo "  Common workflows:"
 	@echo "    make up          Start everything from scratch"
-	@echo "    make fresh       Reset DB + seed (khi schema thay đổi)"
-	@echo "    make db-push     Sync schema changes nhanh (không mất data nếu được)"
+	@echo "    make db-fresh    Reset DB + seed (khi schema thay đổi)"
+	@echo "    make db-migrate  Tạo + apply migration mới khi đổi schema"
 	@echo "    make db-seed     Chỉ seed lại data"
 	@echo ""

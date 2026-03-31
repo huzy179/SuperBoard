@@ -84,7 +84,7 @@ npm run dev:infra:down  # Stop Docker containers
 ### Database
 
 ```bash
-npm run db:reset     # Reset DB: drop + sync schema + seed data
+npm run db:reset     # Reset DB: apply all migrations lại từ đầu + seed data
 npm run db:seed      # Seed development data
 npm run db:migrate   # Create/run Prisma migrations
 ```

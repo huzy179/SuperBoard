@@ -4,6 +4,14 @@
 
 ---
 
+## Jira v1.52 — Migration Guardrail Cleanup + OpenSpec Archive
+
+- [x] Gỡ hoàn toàn script `db:push` / `db:push:force` khỏi `package.json` root và `apps/api/package.json`
+- [x] Cập nhật `Makefile`: bỏ targets `db-push`, `db-push-force`; đổi `make up` sang `db-deploy` theo migration-first
+- [x] Cập nhật mô tả lệnh DB trong `README.md` để phản ánh đúng flow `migrate reset` + `seed`
+- [x] Chạy lại `npm run typecheck` + `npm run lint` và xác nhận pass toàn monorepo
+- [x] Archive OpenSpec change `react-query-and-comments` vào `openspec/changes/archive/2026-03-31-react-query-and-comments`
+
 ## Jira v1.51 — Test Coverage Expansion
 
 - [x] Tạo `auth.service.test.ts` — 3 test cases: login user not found, inactive user, wrong password

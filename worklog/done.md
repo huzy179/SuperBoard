@@ -4,6 +4,14 @@
 
 ---
 
+## Jira v1.53 — Auth Roadmap Review (JWT-first)
+
+- [x] Rà soát auth runtime hiện tại: đang dùng local JWT end-to-end, chưa có Keycloak/OIDC integration trong flow đăng nhập
+- [x] Gỡ các biến Keycloak không dùng khỏi `apps/api/src/config/env.ts`
+- [x] Dọn `.env.example` (root/api/web) để tránh hiểu nhầm có sẵn Keycloak flow
+- [x] Cập nhật `README.md` phần env + tech stack để phản ánh đúng hướng JWT-first
+- [x] Đánh dấu hoàn tất item review auth roadmap trong `worklog/todo.md`
+
 ## Jira v1.52 — Migration Guardrail Cleanup + OpenSpec Archive
 
 - [x] Gỡ hoàn toàn script `db:push` / `db:push:force` khỏi `package.json` root và `apps/api/package.json`

@@ -19,10 +19,6 @@ const envSchema = z.object({
   AI_SERVICE_URL: z.string().url(),
   JWT_SECRET: z.string().min(16),
   JWT_EXPIRES_IN: z.string().default('1d'),
-  KEYCLOAK_URL: z.string().url().optional(),
-  KEYCLOAK_REALM: z.string().optional(),
-  KEYCLOAK_CLIENT_ID: z.string().optional(),
-  KEYCLOAK_CLIENT_SECRET: z.string().optional(),
 });
 
 export type AppEnv = z.infer<typeof envSchema>;

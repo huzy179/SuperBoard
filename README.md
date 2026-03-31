@@ -197,7 +197,7 @@ API (apps/api):
 ```
 DATABASE_URL=postgresql://dev:devpassword@localhost:5433/superboard
 REDIS_URL=redis://localhost:6379
-KEYCLOAK_URL=http://localhost:8080
+JWT_SECRET=superboard-local-jwt-secret-change-me
 ```
 
 Web (apps/web):
@@ -310,7 +310,7 @@ npm --workspace @superboard/shared run build
 | **Frontend**       | Next.js 14 (App Router), TypeScript, React Query, Tailwind CSS |
 | **Backend**        | NestJS, Prisma ORM, PostgreSQL, Redis, Socket.io               |
 | **AI/ML**          | Python 3.11+, gRPC, Elasticsearch                              |
-| **Auth**           | Keycloak                                                       |
+| **Auth**           | Local JWT (Keycloak/OIDC để sau khi có nhu cầu thật)           |
 | **Storage**        | MinIO (S3-compatible)                                          |
 | **Infrastructure** | Docker, Docker Compose                                         |
 | **Monorepo**       | Turborepo                                                      |

@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import { logger } from '../../common/logger';
+import { verifyProjectAndTaskInWorkspace } from '../../common/project-scope.helper';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationService } from '../notification/notification.service';
-import { verifyProjectAndTaskInWorkspace } from './project-scope.helper';
 import type { CommentItemDTO } from '@superboard/shared';
 
 @Injectable()

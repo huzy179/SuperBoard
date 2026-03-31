@@ -4,6 +4,30 @@
 
 ---
 
+## Jira v1.59 — API Helper Consolidation To Common Layer
+
+- [x] Di chuyển project scope helpers từ module-local sang common: `apps/api/src/common/project-scope.helper.ts`
+- [x] Di chuyển workspace member helpers từ module-local sang common: `apps/api/src/common/workspace-member.helper.ts`
+- [x] Cập nhật imports trong `ProjectService`, `CommentService`, `WorkspaceService` dùng common helpers
+- [x] Xoá helper files cũ trong `modules/project` và `modules/workspace` để tránh duplicate source of truth
+- [x] Xác nhận `npm run typecheck --workspace @superboard/api` và `npm run lint --workspace @superboard/api` pass
+
+## Jira v1.58 — Backend Common Extraction (Task Module Cleanup)
+
+- [x] Refactor `TaskController` dùng helper chung `requireWorkspace` thay cho check thủ công `defaultWorkspaceId`
+- [x] Tách logic lookup task theo workspace trong `TaskService` thành private helpers để giảm lặp
+- [x] Giữ nguyên behavior archive/restore task, chỉ dọn cấu trúc nội bộ
+- [x] Xác nhận `npm run typecheck --workspace @superboard/api` và `npm run lint --workspace @superboard/api` pass
+
+## Jira v1.57 — Backend Common Extraction (Workspace Member Helper)
+
+- [x] Tách helper membership cho workspace: `apps/api/src/modules/workspace/workspace-member.helper.ts`
+- [x] Refactor `WorkspaceService.getWorkspaceMembers` dùng helper `verifyWorkspaceMembership`
+- [x] Refactor `WorkspaceService.updateMemberRole` dùng helper `verifyWorkspaceAdminOrOwner`
+- [x] Tách thêm helper verify workspace active/archived theo user: `verifyActiveWorkspaceForUser`, `verifyArchivedWorkspaceForUser`
+- [x] Refactor `updateWorkspaceForUser`, `archiveWorkspaceForUser`, `restoreWorkspaceForUser` dùng helper mới
+- [x] Xác nhận `npm run typecheck --workspace @superboard/api` và `npm run lint --workspace @superboard/api` pass
+
 ## Jira v1.56 — Backend Common Extraction (Project Scope Helper)
 
 - [x] Tách logic kiểm tra scope `projectId/taskId/workspaceId` thành helper dùng chung: `apps/api/src/modules/project/project-scope.helper.ts`
@@ -11,6 +35,7 @@
 - [x] Refactor `ProjectService` dùng helper chung cho các điểm check project/task lặp lại
 - [x] Loại bỏ query `project.findUnique` dư trong `createTaskForProject` (dùng trực tiếp `input.workspaceId` sau khi đã verify scope)
 - [x] Refactor `bulkOperateTasksForProject` dùng helper `verifyActiveProjectInWorkspace`
+- [x] Tách thêm logic validate assignee membership thành helper `verifyAssigneeInWorkspace` và bỏ hàm private tương ứng trong `ProjectService`
 - [x] Xác nhận `npm run typecheck --workspace @superboard/api` và `npm run lint --workspace @superboard/api` pass
 
 ## Jira v1.55 — Master Plan Alignment (JWT-first + Minimal Infra)

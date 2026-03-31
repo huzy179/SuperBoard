@@ -6,6 +6,12 @@ import {
 } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import { WorkspaceMemberRole } from '@prisma/client';
+import {
+  verifyActiveWorkspaceForUser,
+  verifyArchivedWorkspaceForUser,
+  verifyWorkspaceAdminOrOwner,
+  verifyWorkspaceMembership,
+} from '../../common/workspace-member.helper';
 import { PrismaService } from '../../prisma/prisma.service';
 
 type WorkspaceItemDTO = {
@@ -149,25 +155,7 @@ export class WorkspaceService {
     name?: string;
     slug?: string;
   }): Promise<WorkspaceItemDTO> {
-    const existingWorkspace = await this.prisma.workspace.findFirst({
-      where: {
-        id: input.workspaceId,
-        deletedAt: null,
-        members: {
-          some: {
-            userId: input.userId,
-            deletedAt: null,
-          },
-        },
-      } as Prisma.WorkspaceWhereInput,
-      select: {
-        id: true,
-      },
-    });
-
-    if (!existingWorkspace) {
-      throw new NotFoundException('Workspace not found');
-    }
+    await verifyActiveWorkspaceForUser(this.prisma, input);
 
     const normalizedName = input.name?.trim();
     const normalizedSlug = input.slug ? this.normalizeSlug(input.slug) : undefined;
@@ -216,25 +204,7 @@ export class WorkspaceService {
     userId: string;
     archivedAt?: Date;
   }): Promise<void> {
-    const workspace = await this.prisma.workspace.findFirst({
-      where: {
-        id: input.workspaceId,
-        deletedAt: null,
-        members: {
-          some: {
-            userId: input.userId,
-            deletedAt: null,
-          },
-        },
-      } as Prisma.WorkspaceWhereInput,
-      select: {
-        id: true,
-      },
-    });
-
-    if (!workspace) {
-      throw new NotFoundException('Workspace not found');
-    }
+    await verifyActiveWorkspaceForUser(this.prisma, input);
 
     await this.prisma.workspace.update({
       where: { id: input.workspaceId },
@@ -249,27 +219,7 @@ export class WorkspaceService {
     userId: string;
     restoredAt?: Date;
   }): Promise<void> {
-    const workspace = await this.prisma.workspace.findFirst({
-      where: {
-        id: input.workspaceId,
-        deletedAt: {
-          not: null,
-        },
-        members: {
-          some: {
-            userId: input.userId,
-            deletedAt: null,
-          },
-        },
-      } as Prisma.WorkspaceWhereInput,
-      select: {
-        id: true,
-      },
-    });
-
-    if (!workspace) {
-      throw new NotFoundException('Workspace not found');
-    }
+    await verifyArchivedWorkspaceForUser(this.prisma, input);
 
     await this.prisma.workspace.update({
       where: { id: input.workspaceId },
@@ -282,14 +232,7 @@ export class WorkspaceService {
   }
 
   async getWorkspaceMembers(workspaceId: string, userId: string) {
-    // Verify user is a member
-    const membership = await this.prisma.workspaceMember.findFirst({
-      where: { workspaceId, userId, deletedAt: null },
-      select: { id: true },
-    });
-    if (!membership) {
-      throw new NotFoundException('Workspace not found');
-    }
+    await verifyWorkspaceMembership(this.prisma, { workspaceId, userId });
 
     const members = await this.prisma.workspaceMember.findMany({
       where: { workspaceId, deletedAt: null },
@@ -320,14 +263,10 @@ export class WorkspaceService {
     role: string;
     currentUserId: string;
   }) {
-    // Verify current user is owner or admin
-    const currentMember = await this.prisma.workspaceMember.findFirst({
-      where: { workspaceId: input.workspaceId, userId: input.currentUserId, deletedAt: null },
-      select: { role: true },
+    await verifyWorkspaceAdminOrOwner(this.prisma, {
+      workspaceId: input.workspaceId,
+      userId: input.currentUserId,
     });
-    if (!currentMember || (currentMember.role !== 'owner' && currentMember.role !== 'admin')) {
-      throw new ForbiddenException('Chỉ owner hoặc admin mới được thay đổi role');
-    }
 
     const targetMember = await this.prisma.workspaceMember.findFirst({
       where: { id: input.memberId, workspaceId: input.workspaceId, deletedAt: null },

@@ -1,12 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import { logger } from '../../common/logger';
-import { PrismaService } from '../../prisma/prisma.service';
-import { NotificationService } from '../notification/notification.service';
 import {
   verifyActiveProjectInWorkspace,
+  verifyAssigneeInWorkspace,
   verifyProjectAndTaskInWorkspace,
-} from './project-scope.helper';
+} from '../../common/project-scope.helper';
+import { PrismaService } from '../../prisma/prisma.service';
+import { NotificationService } from '../notification/notification.service';
 import type {
   BulkTaskOperationResultDTO,
   CreateProjectRequestDTO,
@@ -291,7 +292,10 @@ export class ProjectService {
     await verifyActiveProjectInWorkspace(this.prisma, input);
 
     if (input.assigneeId) {
-      await this.validateAssignee(input.workspaceId, input.assigneeId);
+      await verifyAssigneeInWorkspace(this.prisma, {
+        workspaceId: input.workspaceId,
+        assigneeId: input.assigneeId,
+      });
     }
 
     if (input.parentTaskId) {
@@ -444,7 +448,10 @@ export class ProjectService {
     }
 
     if (input.assigneeId) {
-      await this.validateAssignee(input.workspaceId, input.assigneeId);
+      await verifyAssigneeInWorkspace(this.prisma, {
+        workspaceId: input.workspaceId,
+        assigneeId: input.assigneeId,
+      });
     }
 
     if (input.delete) {
@@ -585,7 +592,10 @@ export class ProjectService {
     }
 
     if (input.data.assigneeId) {
-      await this.validateAssignee(input.workspaceId, input.data.assigneeId);
+      await verifyAssigneeInWorkspace(this.prisma, {
+        workspaceId: input.workspaceId,
+        assigneeId: input.data.assigneeId,
+      });
     }
 
     if (input.data.parentTaskId !== undefined) {
@@ -1064,22 +1074,5 @@ export class ProjectService {
     workspaceId: string;
   }): Promise<void> {
     await verifyProjectAndTaskInWorkspace(this.prisma, input);
-  }
-
-  private async validateAssignee(workspaceId: string, assigneeId: string): Promise<void> {
-    const userInWorkspace = await this.prisma.workspaceMember.findFirst({
-      where: {
-        workspaceId,
-        userId: assigneeId,
-        deletedAt: null,
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    if (!userInWorkspace) {
-      throw new BadRequestException('Assignee is not a workspace member');
-    }
   }
 }

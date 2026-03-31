@@ -1,6 +1,7 @@
+import { BadRequestException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
-import { findOrThrow } from '../../common/helpers';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { findOrThrow } from './helpers';
 
 export async function verifyActiveProjectInWorkspace(
   prisma: PrismaService,
@@ -39,4 +40,24 @@ export async function verifyProjectAndTaskInWorkspace(
     }),
     'Task',
   );
+}
+
+export async function verifyAssigneeInWorkspace(
+  prisma: PrismaService,
+  input: { workspaceId: string; assigneeId: string },
+): Promise<void> {
+  const userInWorkspace = await prisma.workspaceMember.findFirst({
+    where: {
+      workspaceId: input.workspaceId,
+      userId: input.assigneeId,
+      deletedAt: null,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!userInWorkspace) {
+    throw new BadRequestException('Assignee is not a workspace member');
+  }
 }

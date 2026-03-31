@@ -1,13 +1,7 @@
-import {
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Patch,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Controller, HttpCode, HttpStatus, Param, Patch } from '@nestjs/common';
 import type { AuthUserDTO } from '@superboard/shared';
 import { apiSuccess } from '../../common/api-response';
+import { requireWorkspace } from '../../common/helpers';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { TaskService } from './task.service';
 
@@ -18,13 +12,11 @@ export class TaskController {
   @Patch(':taskId/archive')
   @HttpCode(HttpStatus.OK)
   async archiveTask(@CurrentUser() user: AuthUserDTO, @Param('taskId') taskId: string) {
-    if (!user.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
     await this.taskService.archiveTaskForWorkspace({
       taskId,
-      workspaceId: user.defaultWorkspaceId,
+      workspaceId,
     });
 
     return apiSuccess({ archived: true });
@@ -33,13 +25,11 @@ export class TaskController {
   @Patch(':taskId/restore')
   @HttpCode(HttpStatus.OK)
   async restoreTask(@CurrentUser() user: AuthUserDTO, @Param('taskId') taskId: string) {
-    if (!user.defaultWorkspaceId) {
-      throw new UnauthorizedException('Workspace not found');
-    }
+    const workspaceId = requireWorkspace(user);
 
     await this.taskService.restoreTaskForWorkspace({
       taskId,
-      workspaceId: user.defaultWorkspaceId,
+      workspaceId,
     });
 
     return apiSuccess({ archived: false });

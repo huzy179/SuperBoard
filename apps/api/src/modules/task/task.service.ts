@@ -11,26 +11,7 @@ export class TaskService {
     workspaceId: string;
     archivedAt?: Date;
   }): Promise<void> {
-    const task = await this.prisma.task.findFirst({
-      where: {
-        id: input.taskId,
-        deletedAt: null,
-        project: {
-          workspaceId: input.workspaceId,
-          deletedAt: null,
-          workspace: {
-            deletedAt: null,
-          },
-        },
-      } as Prisma.TaskWhereInput,
-      select: {
-        id: true,
-      },
-    });
-
-    if (!task) {
-      throw new NotFoundException('Task not found');
-    }
+    await this.verifyActiveTaskForWorkspace(input);
 
     await this.prisma.task.update({
       where: {
@@ -47,33 +28,7 @@ export class TaskService {
     workspaceId: string;
     restoredAt?: Date;
   }): Promise<void> {
-    const task = await this.prisma.task.findFirst({
-      where: {
-        id: input.taskId,
-        project: {
-          workspaceId: input.workspaceId,
-        },
-      } as Prisma.TaskWhereInput,
-      select: {
-        id: true,
-        project: {
-          select: {
-            id: true,
-            deletedAt: true,
-            workspace: {
-              select: {
-                id: true,
-                deletedAt: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (!task) {
-      throw new NotFoundException('Task not found');
-    }
+    const task = await this.findTaskWithProjectForWorkspace(input);
 
     if (task.project.workspace.deletedAt) {
       throw new BadRequestException(
@@ -97,5 +52,70 @@ export class TaskService {
     });
 
     void input.restoredAt;
+  }
+
+  private async verifyActiveTaskForWorkspace(input: {
+    taskId: string;
+    workspaceId: string;
+  }): Promise<void> {
+    const task = await this.prisma.task.findFirst({
+      where: {
+        id: input.taskId,
+        deletedAt: null,
+        project: {
+          workspaceId: input.workspaceId,
+          deletedAt: null,
+          workspace: {
+            deletedAt: null,
+          },
+        },
+      } as Prisma.TaskWhereInput,
+      select: {
+        id: true,
+      },
+    });
+
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+  }
+
+  private async findTaskWithProjectForWorkspace(input: {
+    taskId: string;
+    workspaceId: string;
+  }): Promise<{
+    project: {
+      deletedAt: Date | null;
+      workspace: {
+        deletedAt: Date | null;
+      };
+    };
+  }> {
+    const task = await this.prisma.task.findFirst({
+      where: {
+        id: input.taskId,
+        project: {
+          workspaceId: input.workspaceId,
+        },
+      } as Prisma.TaskWhereInput,
+      select: {
+        project: {
+          select: {
+            deletedAt: true,
+            workspace: {
+              select: {
+                deletedAt: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+
+    return task;
   }
 }

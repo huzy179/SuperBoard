@@ -2,8 +2,11 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import type { Prisma } from '@prisma/client';
 import { logger } from '../../common/logger';
 import { PrismaService } from '../../prisma/prisma.service';
-import { findOrThrow } from '../../common/helpers';
 import { NotificationService } from '../notification/notification.service';
+import {
+  verifyActiveProjectInWorkspace,
+  verifyProjectAndTaskInWorkspace,
+} from './project-scope.helper';
 import type {
   BulkTaskOperationResultDTO,
   CreateProjectRequestDTO,
@@ -196,18 +199,7 @@ export class ProjectService {
     workspaceId: string;
     data: UpdateProjectRequestDTO;
   }): Promise<ProjectItemDTO> {
-    const existingProject = await this.prisma.project.findFirst({
-      where: {
-        id: input.projectId,
-        workspaceId: input.workspaceId,
-        deletedAt: null,
-      } as Prisma.ProjectWhereInput,
-      select: { id: true },
-    });
-
-    if (!existingProject) {
-      throw new NotFoundException('Project not found');
-    }
+    await verifyActiveProjectInWorkspace(this.prisma, input);
 
     const project = await this.prisma.project.update({
       where: { id: input.projectId },
@@ -227,18 +219,7 @@ export class ProjectService {
     workspaceId: string;
     archivedAt?: Date;
   }): Promise<void> {
-    const existingProject = await this.prisma.project.findFirst({
-      where: {
-        id: input.projectId,
-        workspaceId: input.workspaceId,
-        deletedAt: null,
-      } as Prisma.ProjectWhereInput,
-      select: { id: true },
-    });
-
-    if (!existingProject) {
-      throw new NotFoundException('Project not found');
-    }
+    await verifyActiveProjectInWorkspace(this.prisma, input);
 
     await this.prisma.project.update({
       where: { id: input.projectId },
@@ -307,20 +288,7 @@ export class ProjectService {
     dueDate?: Date | null;
     assigneeId?: string | null;
   }): Promise<ProjectTaskItemDTO> {
-    const project = await this.prisma.project.findFirst({
-      where: {
-        id: input.projectId,
-        workspaceId: input.workspaceId,
-        deletedAt: null,
-      } as Prisma.ProjectWhereInput,
-      select: {
-        id: true,
-      },
-    });
-
-    if (!project) {
-      throw new NotFoundException('Project not found');
-    }
+    await verifyActiveProjectInWorkspace(this.prisma, input);
 
     if (input.assigneeId) {
       await this.validateAssignee(input.workspaceId, input.assigneeId);
@@ -376,24 +344,18 @@ export class ProjectService {
 
     // Notify assignee
     if (input.assigneeId) {
-      const project = await this.prisma.project.findUnique({
-        where: { id: input.projectId },
-        select: { workspaceId: true },
-      });
-      if (project) {
-        void this.notificationService
-          .createNotification({
-            userId: input.assigneeId,
-            workspaceId: project.workspaceId,
-            type: 'task_assigned',
-            payload: {
-              taskId: task.id,
-              taskTitle: input.title,
-              message: `Bạn được gán task: ${input.title}`,
-            },
-          })
-          .catch((err: unknown) => logger.error({ err }, 'Notification failed'));
-      }
+      void this.notificationService
+        .createNotification({
+          userId: input.assigneeId,
+          workspaceId: input.workspaceId,
+          type: 'task_assigned',
+          payload: {
+            taskId: task.id,
+            taskTitle: input.title,
+            message: `Bạn được gán task: ${input.title}`,
+          },
+        })
+        .catch((err: unknown) => logger.error({ err }, 'Notification failed'));
     }
 
     logger.info(
@@ -466,17 +428,7 @@ export class ProjectService {
     assigneeId?: string | null;
     delete?: boolean;
   }): Promise<BulkTaskOperationResultDTO> {
-    await findOrThrow(
-      this.prisma.project.findFirst({
-        where: {
-          id: input.projectId,
-          workspaceId: input.workspaceId,
-          deletedAt: null,
-        } as Prisma.ProjectWhereInput,
-        select: { id: true },
-      }),
-      'Project',
-    );
+    await verifyActiveProjectInWorkspace(this.prisma, input);
 
     const tasks = await this.prisma.task.findMany({
       where: {
@@ -1111,29 +1063,7 @@ export class ProjectService {
     taskId: string;
     workspaceId: string;
   }): Promise<void> {
-    await findOrThrow(
-      this.prisma.project.findFirst({
-        where: {
-          id: input.projectId,
-          workspaceId: input.workspaceId,
-          deletedAt: null,
-        } as Prisma.ProjectWhereInput,
-        select: { id: true },
-      }),
-      'Project',
-    );
-
-    await findOrThrow(
-      this.prisma.task.findFirst({
-        where: {
-          id: input.taskId,
-          projectId: input.projectId,
-          deletedAt: null,
-        } as Prisma.TaskWhereInput,
-        select: { id: true },
-      }),
-      'Task',
-    );
+    await verifyProjectAndTaskInWorkspace(this.prisma, input);
   }
 
   private async validateAssignee(workspaceId: string, assigneeId: string): Promise<void> {

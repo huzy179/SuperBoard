@@ -8,6 +8,7 @@ import type { Prisma } from '@prisma/client';
 import { logger } from '../../common/logger';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationService } from '../notification/notification.service';
+import { verifyProjectAndTaskInWorkspace } from './project-scope.helper';
 import type { CommentItemDTO } from '@superboard/shared';
 
 @Injectable()
@@ -22,7 +23,7 @@ export class CommentService {
     taskId: string;
     workspaceId: string;
   }): Promise<CommentItemDTO[]> {
-    await this.verifyProjectAndTask(input);
+    await verifyProjectAndTaskInWorkspace(this.prisma, input);
 
     const comments = await this.prisma.comment.findMany({
       where: {
@@ -52,7 +53,7 @@ export class CommentService {
       throw new BadRequestException('Comment content is required');
     }
 
-    await this.verifyProjectAndTask(input);
+    await verifyProjectAndTaskInWorkspace(this.prisma, input);
     const comment = await this.prisma.comment.create({
       data: {
         taskId: input.taskId,
@@ -117,7 +118,7 @@ export class CommentService {
       throw new BadRequestException('Comment content is required');
     }
 
-    await this.verifyProjectAndTask(input);
+    await verifyProjectAndTaskInWorkspace(this.prisma, input);
 
     const comment = await this.prisma.comment.findFirst({
       where: {
@@ -172,7 +173,7 @@ export class CommentService {
     workspaceId: string;
     currentUserId: string;
   }): Promise<{ deleted: boolean }> {
-    await this.verifyProjectAndTask(input);
+    await verifyProjectAndTaskInWorkspace(this.prisma, input);
 
     const comment = await this.prisma.comment.findFirst({
       where: {
@@ -213,38 +214,6 @@ export class CommentService {
       'Comment deleted',
     );
     return { deleted: true };
-  }
-
-  private async verifyProjectAndTask(input: {
-    projectId: string;
-    taskId: string;
-    workspaceId: string;
-  }): Promise<void> {
-    const project = await this.prisma.project.findFirst({
-      where: {
-        id: input.projectId,
-        workspaceId: input.workspaceId,
-        deletedAt: null,
-      } as Prisma.ProjectWhereInput,
-      select: { id: true },
-    });
-
-    if (!project) {
-      throw new NotFoundException('Project not found');
-    }
-
-    const task = await this.prisma.task.findFirst({
-      where: {
-        id: input.taskId,
-        projectId: input.projectId,
-        deletedAt: null,
-      } as Prisma.TaskWhereInput,
-      select: { id: true },
-    });
-
-    if (!task) {
-      throw new NotFoundException('Task not found');
-    }
   }
 
   private toCommentItemDTO(comment: {

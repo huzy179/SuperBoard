@@ -75,7 +75,7 @@ Kết quả mong đợi:
 
 ```bash
 npm run dev           # Chạy web + api + ai-service song song
-npm run dev:infra    # Start infrastructure containers (postgres only)
+npm run dev:infra    # Start infrastructure containers (postgres + redis)
 npm run dev:infra:full # Start full infrastructure containers
 npm run dev:infra:down  # Stop Docker containers
 ```

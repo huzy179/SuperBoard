@@ -61,17 +61,17 @@
 
 ### Infrastructure
 
-| Công nghệ      | Mục đích                                   |
-| -------------- | ------------------------------------------ |
-| PostgreSQL 16  | Primary database                           |
-| Redis 7        | Cache, Session, Pub/Sub, Rate limit, Queue |
-| Keycloak       | SSO, OAuth2/OIDC, RBAC                     |
-| MinIO → AWS S3 | Object storage                             |
-| Elasticsearch  | Full-text search                           |
-| ClickHouse     | OLAP analytics                             |
-| Kafka          | Event streaming (microservices)            |
-| BullMQ         | Job queue — email, notifications, AI jobs  |
-| Nginx          | API Gateway, SSL                           |
+| Công nghệ                                 | Mục đích                                     |
+| ----------------------------------------- | -------------------------------------------- |
+| PostgreSQL 16                             | Primary database                             |
+| Redis 7                                   | Cache, Session, Pub/Sub, Rate limit, Queue   |
+| JWT local (hiện tại), Keycloak/OIDC (sau) | Auth theo giai đoạn, ưu tiên ship Jira-first |
+| MinIO → AWS S3                            | Object storage                               |
+| Elasticsearch                             | Full-text search                             |
+| ClickHouse                                | OLAP analytics                               |
+| Kafka                                     | Event streaming (microservices)              |
+| BullMQ                                    | Job queue — email, notifications, AI jobs    |
+| Nginx                                     | API Gateway, SSL                             |
 
 ### DevOps
 
@@ -135,6 +135,8 @@ Pha 10 — Production & Scale      Tuần 34–36
 - Hướng ưu tiên hiện tại: **P1 UX Polish** để nâng trải nghiệm sử dụng hàng ngày.
 - Tính năng chuẩn bị triển khai tiếp theo: **Jira v1.25 — Subtasks MVP (nested 1 level + parent progress)**.
 - Test integration/E2E vẫn còn trong TODO, nhưng đang ưu tiên nhịp ship feature trước theo định hướng hiện tại.
+- Auth runtime hiện tại dùng local JWT; Keycloak/OIDC là hướng mở rộng khi có nhu cầu enterprise rõ ràng.
+- `dev:infra` mặc định tập trung Postgres + Redis; các services khác là tuỳ chọn theo integration thật.
 
 ---
 
@@ -154,7 +156,7 @@ Pha 10 — Production & Scale      Tuần 34–36
 
 ## 1.2 Docker Dev Environment
 
-- [ ] 🔴 P0 `[INFRA]` Docker Compose: PostgreSQL 16, Redis 7, MinIO, Keycloak, MailHog, Elasticsearch
+- [ ] 🔴 P0 `[INFRA]` Docker Compose: PostgreSQL 16 + Redis 7 (mặc định), full stack mở rộng khi có integration thật
 - [ ] 🔴 P0 `[INFRA]` Health check cho tất cả containers
 - [ ] 🟠 P1 `[INFRA]` Seed script: tạo data mẫu cho development
 - [ ] 🟠 P1 `[INFRA]` Makefile hoặc scripts: `make dev`, `make db-reset`, `make seed`
@@ -180,28 +182,25 @@ Pha 10 — Production & Scale      Tuần 34–36
 
 > Cổng vào của toàn bộ hệ thống.
 
-## 2.1 Keycloak Setup
+## 2.1 JWT-first Setup
 
-- [ ] 🔴 P0 Cấu hình Realm `superboard`, Client `superboard-app` (confidential)
+- [ ] 🔴 P0 Login nội bộ bằng JWT (email/password), giữ flow đơn giản để ship Jira nhanh
 - [ ] 🔴 P0 Roles cơ bản: `workspace-owner`, `workspace-admin`, `workspace-member`, `workspace-viewer`
-- [ ] 🔴 P0 Valid Redirect URIs, Web Origins, Client Secret
+- [ ] 🟠 P1 Tách rõ auth config cho current (`JWT_*`) và future (`OIDC_*`) để tránh nhầm lẫn
 
 ## 2.2 Login / Register
 
-- [ ] 🔴 P0 OAuth2 Authorization Code + PKCE flow qua Keycloak
-- [ ] 🔴 P0 NestJS exchange `code` → `access_token` + `refresh_token`
 - [ ] 🔴 P0 Lưu Refresh Token trong HTTP-only cookie (`Secure; SameSite=Strict`)
-- [ ] 🔴 P0 JWT validation bằng Keycloak JWKS endpoint (không gọi server mỗi request)
 - [ ] 🟠 P1 Đăng ký tài khoản → email verify → active
-- [ ] 🟠 P1 Quên mật khẩu → Keycloak built-in reset flow
-- [ ] 🟠 P1 OAuth Social Login — Google
-- [ ] 🟡 P2 OAuth Social Login — GitHub
+- [ ] 🟠 P1 Quên mật khẩu → reset flow nội bộ (hoặc provider khi cần)
+- [ ] 🟡 P2 OIDC/SSO (Keycloak hoặc provider tương đương) khi có nhu cầu enterprise
+- [ ] 🟡 P2 OAuth Social Login — Google/GitHub
 
 ## 2.3 Token Management
 
 - [ ] 🟠 P1 Access Token 15 phút, Refresh Token 7 ngày
 - [ ] 🟠 P1 Silent Token Renewal — Axios interceptor tự refresh khi 401 rồi retry
-- [ ] 🟠 P1 Đăng xuất — xóa cookie, revoke Keycloak session, xóa Redis session
+- [ ] 🟠 P1 Đăng xuất — xóa cookie + invalidate session/refresh token
 - [ ] 🟡 P2 Session management UI — xem danh sách device đang active, revoke từng phiên
 
 ## 2.4 Authorization
@@ -214,7 +213,7 @@ Pha 10 — Production & Scale      Tuần 34–36
 ## 2.5 Security
 
 - [ ] 🟠 P1 Rate limiting — Redis sliding window: login 10/min, API 100/15min
-- [ ] 🟡 P2 MFA / TOTP qua Keycloak — Google Authenticator
+- [ ] 🟡 P2 MFA / TOTP (provider-agnostic)
 - [ ] 🟡 P2 Brute force protection — block IP sau 10 fail/15min
 - [ ] 🟢 P3 API Keys — long-lived key cho external integration, hash SHA-256 trước khi lưu
 
@@ -222,7 +221,7 @@ Pha 10 — Production & Scale      Tuần 34–36
 
 - [ ] 🟠 P1 Ghi `audit_logs` cho mọi auth event: login, logout, failed login, token refresh
 
-**Deliverable:** Login SSO, OAuth Google, RBAC guard 403 đúng chỗ, silent refresh hoạt động.
+**Deliverable:** Login JWT-first ổn định, RBAC guard 403 đúng chỗ, silent refresh hoạt động; OIDC/SSO để pha sau.
 
 ---
 
@@ -234,7 +233,7 @@ Pha 10 — Production & Scale      Tuần 34–36
 
 ## 3.1 Prisma Schema — Toàn Bộ
 
-- [ ] 🔴 P0 `User` — keycloakId, name, email, avatarUrl, preferences
+- [ ] 🔴 P0 `User` — externalAuthId (optional), name, email, avatarUrl, preferences
 - [ ] 🔴 P0 `Workspace` — slug, plan, storageUsed, storageQuota
 - [ ] 🔴 P0 `WorkspaceMember` — userId, workspaceId, role
 - [ ] 🔴 P0 `Project` — workspaceId, name, color, isArchived

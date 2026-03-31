@@ -4,6 +4,22 @@
 
 ---
 
+## Jira v1.56 — Backend Common Extraction (Project Scope Helper)
+
+- [x] Tách logic kiểm tra scope `projectId/taskId/workspaceId` thành helper dùng chung: `apps/api/src/modules/project/project-scope.helper.ts`
+- [x] Refactor `CommentService` dùng helper chung thay cho hàm verify riêng
+- [x] Refactor `ProjectService` dùng helper chung cho các điểm check project/task lặp lại
+- [x] Loại bỏ query `project.findUnique` dư trong `createTaskForProject` (dùng trực tiếp `input.workspaceId` sau khi đã verify scope)
+- [x] Refactor `bulkOperateTasksForProject` dùng helper `verifyActiveProjectInWorkspace`
+- [x] Xác nhận `npm run typecheck --workspace @superboard/api` và `npm run lint --workspace @superboard/api` pass
+
+## Jira v1.55 — Master Plan Alignment (JWT-first + Minimal Infra)
+
+- [x] Đồng bộ `worklog/superboard-master-plan.md` theo hướng thực thi hiện tại: auth JWT-first, OIDC/SSO là phase sau
+- [x] Chuyển các hạng mục auth từ Keycloak-coupled sang provider-agnostic ở mức roadmap
+- [x] Cập nhật mô tả infra roadmap: ưu tiên Postgres + Redis mặc định, full stack chỉ khi có integration thật
+- [x] Sửa `README.md` phần lệnh `dev:infra` để khớp thực tế (postgres + redis)
+
 ## Jira v1.54 — Infra Roadmap Scope Tightening
 
 - [x] Rà soát lại trạng thái integration thực tế: runtime Jira hiện dùng Postgres + Redis là chính

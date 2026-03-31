@@ -4,6 +4,12 @@
 
 ---
 
+## Jira v1.54 — Infra Roadmap Scope Tightening
+
+- [x] Rà soát lại trạng thái integration thực tế: runtime Jira hiện dùng Postgres + Redis là chính
+- [x] Đồng bộ hướng tài liệu theo minimal infra mặc định và full infra chỉ là tuỳ chọn
+- [x] Đánh dấu hoàn tất task roadmap: chỉ đưa Elasticsearch/MinIO/Mailhog/AI service vào kế hoạch gần khi có integration thật
+
 ## Jira v1.53 — Auth Roadmap Review (JWT-first)
 
 - [x] Rà soát auth runtime hiện tại: đang dùng local JWT end-to-end, chưa có Keycloak/OIDC integration trong flow đăng nhập

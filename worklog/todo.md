@@ -32,7 +32,7 @@ Mục tiêu: chỉ thêm hạ tầng khi có nhu cầu thật từ Jira hiện t
 ### Infra / Backend
 
 - [x] Review lại auth roadmap: tiếp tục dùng JWT hiện tại trước, chưa nhảy sang Keycloak/OIDC nếu chưa có nhu cầu rõ ràng
-- [ ] Chỉ giữ Elasticsearch / MinIO / Mailhog / AI service trong roadmap gần nếu có integration thật trong codebase
+- [x] Chỉ giữ Elasticsearch / MinIO / Mailhog / AI service trong roadmap gần nếu có integration thật trong codebase
 - [ ] Tách dần các phần backend/common chưa hợp lý khi Jira domain lớn lên
 
 ### Frontend

@@ -31,7 +31,7 @@ npm run setup
 ## 3) Chạy dự án local
 
 ```bash
-# 1. Start infrastructure tối thiểu (postgres)
+# 1. Start infrastructure tối thiểu (postgres + redis)
 npm run dev:infra
 
 # 2. Trong terminal khác, chạy đồng thời web + api + ai-service
@@ -46,9 +46,8 @@ npm run dev:infra:full
 
 **Infrastructure services:**
 
-- **Postgres** (port 5433) - Main database
-- **Mặc định khi chạy `dev:infra`: chỉ bật Postgres**
-- **Tuỳ chọn khi chạy `dev:infra:full`:** Redis, Elasticsearch, MinIO, Keycloak, MailHog
+- **Mặc định khi chạy `dev:infra`:** Postgres (5433) + Redis (6379)
+- **Tuỳ chọn khi chạy `dev:infra:full`:** Elasticsearch, MinIO, Keycloak, MailHog
 
 **Application services (npm run dev):**
 

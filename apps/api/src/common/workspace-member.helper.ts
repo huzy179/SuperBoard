@@ -1,14 +1,36 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { WorkspaceMemberRole } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
-export async function verifyActiveWorkspaceForUser(
+type WorkspaceUserScope = {
+  workspaceId: string;
+  userId: string;
+};
+
+type WorkspaceMemberScope = {
+  workspaceId: string;
+  memberId: string;
+};
+
+type WorkspaceVisibility = 'active' | 'archived';
+
+function buildActiveMembershipWhere(input: WorkspaceUserScope) {
+  return {
+    workspaceId: input.workspaceId,
+    userId: input.userId,
+    deletedAt: null,
+  };
+}
+
+async function findWorkspaceForUserByVisibility(
   prisma: PrismaService,
-  input: { workspaceId: string; userId: string },
-): Promise<void> {
-  const workspace = await prisma.workspace.findFirst({
+  input: WorkspaceUserScope,
+  visibility: WorkspaceVisibility,
+): Promise<{ id: string } | null> {
+  return prisma.workspace.findFirst({
     where: {
       id: input.workspaceId,
-      deletedAt: null,
+      deletedAt: visibility === 'active' ? null : { not: null },
       members: {
         some: {
           userId: input.userId,
@@ -18,6 +40,13 @@ export async function verifyActiveWorkspaceForUser(
     },
     select: { id: true },
   });
+}
+
+export async function verifyActiveWorkspaceForUser(
+  prisma: PrismaService,
+  input: WorkspaceUserScope,
+): Promise<void> {
+  const workspace = await findWorkspaceForUserByVisibility(prisma, input, 'active');
 
   if (!workspace) {
     throw new NotFoundException('Workspace not found');
@@ -26,23 +55,9 @@ export async function verifyActiveWorkspaceForUser(
 
 export async function verifyArchivedWorkspaceForUser(
   prisma: PrismaService,
-  input: { workspaceId: string; userId: string },
+  input: WorkspaceUserScope,
 ): Promise<void> {
-  const workspace = await prisma.workspace.findFirst({
-    where: {
-      id: input.workspaceId,
-      deletedAt: {
-        not: null,
-      },
-      members: {
-        some: {
-          userId: input.userId,
-          deletedAt: null,
-        },
-      },
-    },
-    select: { id: true },
-  });
+  const workspace = await findWorkspaceForUserByVisibility(prisma, input, 'archived');
 
   if (!workspace) {
     throw new NotFoundException('Workspace not found');
@@ -51,14 +66,10 @@ export async function verifyArchivedWorkspaceForUser(
 
 export async function verifyWorkspaceMembership(
   prisma: PrismaService,
-  input: { workspaceId: string; userId: string },
+  input: WorkspaceUserScope,
 ): Promise<void> {
   const membership = await prisma.workspaceMember.findFirst({
-    where: {
-      workspaceId: input.workspaceId,
-      userId: input.userId,
-      deletedAt: null,
-    },
+    where: buildActiveMembershipWhere(input),
     select: { id: true },
   });
 
@@ -69,18 +80,46 @@ export async function verifyWorkspaceMembership(
 
 export async function verifyWorkspaceAdminOrOwner(
   prisma: PrismaService,
-  input: { workspaceId: string; userId: string },
+  input: WorkspaceUserScope,
 ): Promise<void> {
   const currentMember = await prisma.workspaceMember.findFirst({
-    where: {
-      workspaceId: input.workspaceId,
-      userId: input.userId,
-      deletedAt: null,
-    },
+    where: buildActiveMembershipWhere(input),
     select: { role: true },
   });
 
   if (!currentMember || (currentMember.role !== 'owner' && currentMember.role !== 'admin')) {
     throw new ForbiddenException('Chỉ owner hoặc admin mới được thay đổi role');
   }
+}
+
+export async function findMutableWorkspaceMemberOrThrow(
+  prisma: PrismaService,
+  input: WorkspaceMemberScope,
+): Promise<{ id: string; userId: string }> {
+  const targetMember = await prisma.workspaceMember.findFirst({
+    where: {
+      id: input.memberId,
+      workspaceId: input.workspaceId,
+      deletedAt: null,
+    },
+    select: { id: true, userId: true, role: true },
+  });
+
+  if (!targetMember) {
+    throw new NotFoundException('Member not found');
+  }
+
+  if (targetMember.role === 'owner') {
+    throw new ForbiddenException('Không thể thay đổi role của owner');
+  }
+
+  return { id: targetMember.id, userId: targetMember.userId };
+}
+
+export function parseWorkspaceMemberRoleOrThrow(role: string): WorkspaceMemberRole {
+  if (role === 'owner' || role === 'admin' || role === 'member' || role === 'viewer') {
+    return role;
+  }
+
+  throw new BadRequestException('Invalid role');
 }

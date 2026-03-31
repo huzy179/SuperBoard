@@ -4,12 +4,74 @@
 
 ---
 
+## Jira v1.62 — TaskService Guard Test Expansion
+
+- [x] Mở rộng `apps/api/test/services/task.service.test.ts` thêm guard cases cho archive/restore
+- [x] Bổ sung test `NotFound` khi archive task không tồn tại
+- [x] Bổ sung test `BadRequest` khi restore task dưới workspace đã archive
+- [x] Xác nhận `npm run test --workspace @superboard/api -- test/services/task.service.test.ts` pass (5 tests)
+- [x] Xác nhận `npm run typecheck --workspace @superboard/api` và `npm run lint --workspace @superboard/api` pass
+
+## Jira v1.63 — Workspace Role Change Guard Extraction
+
+- [x] Tách logic validate member mục tiêu khi đổi role sang helper `findMutableWorkspaceMemberOrThrow`
+- [x] Refactor `WorkspaceService.updateMemberRole` bỏ check inline `Member not found` và `owner` guard
+- [x] Giảm lặp exception logic trong workspace module, chuẩn hóa qua common helper
+- [x] Xác nhận `npm run typecheck --workspace @superboard/api` và `npm run lint --workspace @superboard/api` pass
+
+## Jira v1.64 — Helper Naming Consistency Cleanup
+
+- [x] Chuẩn hoá tên helper task lookup theo pattern rõ nghĩa: `findTaskWithProjectInWorkspace` → `findTaskWithProjectInWorkspaceOrThrow`
+- [x] Cập nhật toàn bộ call sites liên quan trong `TaskService` và helper tests
+- [x] Xác nhận `npm run typecheck --workspace @superboard/api` và `npm run lint --workspace @superboard/api` pass
+
+## Jira v1.65 — Workspace Helper Duplication Cleanup
+
+- [x] Gom where-clause membership active vào helper nội bộ `buildActiveMembershipWhere` trong `workspace-member.helper.ts`
+- [x] Refactor `verifyWorkspaceMembership` và `verifyWorkspaceAdminOrOwner` dùng chung cấu trúc query
+- [x] Giữ nguyên behavior lỗi hiện tại, chỉ giảm duplication logic
+- [x] Xác nhận `npm run typecheck --workspace @superboard/api` và `npm run lint --workspace @superboard/api` pass
+
+## Jira v1.66 — Common Helper Input Type Standardization
+
+- [x] Chuẩn hóa type alias input trong `project-scope.helper.ts` (`ProjectWorkspaceScope`, `ProjectTaskWorkspaceScope`, `WorkspaceAssigneeScope`, `TaskWorkspaceScope`)
+- [x] Chuẩn hóa type alias input trong `workspace-member.helper.ts` (`WorkspaceUserScope`, `WorkspaceMemberScope`)
+- [x] Giữ nguyên behavior runtime, chỉ cải thiện readability và tính nhất quán chữ ký hàm
+- [x] Xác nhận `npm run typecheck --workspace @superboard/api` và `npm run lint --workspace @superboard/api` pass
+
+## Jira v1.67 — Workspace Visibility Lookup Deduplication
+
+- [x] Tách helper nội bộ `findWorkspaceForUserByVisibility` trong `workspace-member.helper.ts` để gom logic lookup active/archived workspace
+- [x] Refactor `verifyActiveWorkspaceForUser` và `verifyArchivedWorkspaceForUser` dùng chung helper mới
+- [x] Giữ nguyên thông điệp lỗi và behavior runtime, chỉ giảm duplication query
+- [x] Xác nhận `npm run typecheck --workspace @superboard/api` và `npm run lint --workspace @superboard/api` pass
+
+## Jira v1.68 — Strict Workspace Role Validation
+
+- [x] Thêm helper `parseWorkspaceMemberRoleOrThrow` trong `workspace-member.helper.ts` để validate role đầu vào
+- [x] Refactor `WorkspaceService.updateMemberRole` bỏ cast trực tiếp `as WorkspaceMemberRole`, dùng parsed role an toàn
+- [x] Chặn sớm role không hợp lệ với lỗi rõ ràng `Invalid role`
+- [x] Xác nhận `npm run typecheck --workspace @superboard/api` và `npm run lint --workspace @superboard/api` pass
+
+## Jira v1.61 — Unit Tests For Common Scope Helpers
+
+- [x] Thêm test file `apps/api/test/services/common-helpers.test.ts` cho `project-scope.helper` và `workspace-member.helper`
+- [x] Bao phủ các case chính: not found, forbidden/bad-request và happy path trả dữ liệu
+- [x] Xác nhận `npm run test --workspace @superboard/api -- test/services/common-helpers.test.ts` pass (9 tests)
+
 ## Jira v1.59 — API Helper Consolidation To Common Layer
 
 - [x] Di chuyển project scope helpers từ module-local sang common: `apps/api/src/common/project-scope.helper.ts`
 - [x] Di chuyển workspace member helpers từ module-local sang common: `apps/api/src/common/workspace-member.helper.ts`
 - [x] Cập nhật imports trong `ProjectService`, `CommentService`, `WorkspaceService` dùng common helpers
 - [x] Xoá helper files cũ trong `modules/project` và `modules/workspace` để tránh duplicate source of truth
+- [x] Xác nhận `npm run typecheck --workspace @superboard/api` và `npm run lint --workspace @superboard/api` pass
+
+## Jira v1.60 — Task Scope Consolidation To Common Helper
+
+- [x] Thêm helpers task scope vào `apps/api/src/common/project-scope.helper.ts`: `verifyActiveTaskInWorkspace`, `findTaskWithProjectInWorkspaceOrThrow`
+- [x] Refactor `TaskService` bỏ helper private, dùng common helpers cho flow archive/restore
+- [x] Giảm duplication logic query task/project/workspace trong module task
 - [x] Xác nhận `npm run typecheck --workspace @superboard/api` và `npm run lint --workspace @superboard/api` pass
 
 ## Jira v1.58 — Backend Common Extraction (Task Module Cleanup)

@@ -3,9 +3,30 @@ import type { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { findOrThrow } from './helpers';
 
+type ProjectWorkspaceScope = {
+  projectId: string;
+  workspaceId: string;
+};
+
+type ProjectTaskWorkspaceScope = {
+  projectId: string;
+  taskId: string;
+  workspaceId: string;
+};
+
+type WorkspaceAssigneeScope = {
+  workspaceId: string;
+  assigneeId: string;
+};
+
+type TaskWorkspaceScope = {
+  taskId: string;
+  workspaceId: string;
+};
+
 export async function verifyActiveProjectInWorkspace(
   prisma: PrismaService,
-  input: { projectId: string; workspaceId: string },
+  input: ProjectWorkspaceScope,
 ): Promise<void> {
   await findOrThrow(
     prisma.project.findFirst({
@@ -22,7 +43,7 @@ export async function verifyActiveProjectInWorkspace(
 
 export async function verifyProjectAndTaskInWorkspace(
   prisma: PrismaService,
-  input: { projectId: string; taskId: string; workspaceId: string },
+  input: ProjectTaskWorkspaceScope,
 ): Promise<void> {
   await verifyActiveProjectInWorkspace(prisma, {
     projectId: input.projectId,
@@ -44,7 +65,7 @@ export async function verifyProjectAndTaskInWorkspace(
 
 export async function verifyAssigneeInWorkspace(
   prisma: PrismaService,
-  input: { workspaceId: string; assigneeId: string },
+  input: WorkspaceAssigneeScope,
 ): Promise<void> {
   const userInWorkspace = await prisma.workspaceMember.findFirst({
     where: {
@@ -60,4 +81,67 @@ export async function verifyAssigneeInWorkspace(
   if (!userInWorkspace) {
     throw new BadRequestException('Assignee is not a workspace member');
   }
+}
+
+export async function verifyActiveTaskInWorkspace(
+  prisma: PrismaService,
+  input: TaskWorkspaceScope,
+): Promise<void> {
+  await findOrThrow(
+    prisma.task.findFirst({
+      where: {
+        id: input.taskId,
+        deletedAt: null,
+        project: {
+          workspaceId: input.workspaceId,
+          deletedAt: null,
+          workspace: {
+            deletedAt: null,
+          },
+        },
+      } as Prisma.TaskWhereInput,
+      select: {
+        id: true,
+      },
+    }),
+    'Task',
+  );
+}
+
+export async function findTaskWithProjectInWorkspaceOrThrow(
+  prisma: PrismaService,
+  input: TaskWorkspaceScope,
+): Promise<{
+  project: {
+    deletedAt: Date | null;
+    workspace: {
+      deletedAt: Date | null;
+    };
+  };
+}> {
+  const task = await findOrThrow(
+    prisma.task.findFirst({
+      where: {
+        id: input.taskId,
+        project: {
+          workspaceId: input.workspaceId,
+        },
+      } as Prisma.TaskWhereInput,
+      select: {
+        project: {
+          select: {
+            deletedAt: true,
+            workspace: {
+              select: {
+                deletedAt: true,
+              },
+            },
+          },
+        },
+      },
+    }),
+    'Task',
+  );
+
+  return task;
 }

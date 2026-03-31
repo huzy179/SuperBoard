@@ -152,4 +152,20 @@ export class WorkspaceController {
     });
     return apiSuccess({ updated: true });
   }
+
+  @Delete(':workspaceId/members/:memberId')
+  @HttpCode(HttpStatus.OK)
+  async removeWorkspaceMember(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('workspaceId') workspaceId: string,
+    @Param('memberId') memberId: string,
+  ) {
+    await this.workspaceService.removeMemberFromWorkspace({
+      workspaceId,
+      memberId,
+      currentUserId: user.id,
+    });
+
+    return apiSuccess({ removed: true });
+  }
 }

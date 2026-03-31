@@ -1,12 +1,8 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
-import { WorkspaceMemberRole } from '@prisma/client';
 import {
+  findMutableWorkspaceMemberOrThrow,
+  parseWorkspaceMemberRoleOrThrow,
   verifyActiveWorkspaceForUser,
   verifyArchivedWorkspaceForUser,
   verifyWorkspaceAdminOrOwner,
@@ -268,22 +264,57 @@ export class WorkspaceService {
       userId: input.currentUserId,
     });
 
-    const targetMember = await this.prisma.workspaceMember.findFirst({
-      where: { id: input.memberId, workspaceId: input.workspaceId, deletedAt: null },
-      select: { id: true, role: true },
+    await findMutableWorkspaceMemberOrThrow(this.prisma, {
+      workspaceId: input.workspaceId,
+      memberId: input.memberId,
     });
-    if (!targetMember) {
-      throw new NotFoundException('Member not found');
-    }
 
-    // Cannot change owner role
-    if (targetMember.role === 'owner') {
-      throw new ForbiddenException('Không thể thay đổi role của owner');
-    }
+    const nextRole = parseWorkspaceMemberRoleOrThrow(input.role);
 
     await this.prisma.workspaceMember.update({
       where: { id: input.memberId },
-      data: { role: input.role as WorkspaceMemberRole },
+      data: { role: nextRole },
+    });
+  }
+
+  async removeMemberFromWorkspace(input: {
+    workspaceId: string;
+    memberId: string;
+    currentUserId: string;
+    removedAt?: Date;
+  }): Promise<void> {
+    await verifyWorkspaceAdminOrOwner(this.prisma, {
+      workspaceId: input.workspaceId,
+      userId: input.currentUserId,
+    });
+
+    const targetMember = await findMutableWorkspaceMemberOrThrow(this.prisma, {
+      workspaceId: input.workspaceId,
+      memberId: input.memberId,
+    });
+
+    if (targetMember.userId === input.currentUserId) {
+      throw new BadRequestException('Không thể tự xóa chính mình khỏi workspace');
+    }
+
+    const removedAt = input.removedAt ?? new Date();
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.workspaceMember.update({
+        where: { id: targetMember.id },
+        data: { deletedAt: removedAt },
+      });
+
+      await tx.user.updateMany({
+        where: {
+          id: targetMember.userId,
+          defaultWorkspaceId: input.workspaceId,
+          deletedAt: null,
+        },
+        data: {
+          defaultWorkspaceId: null,
+        },
+      });
     });
   }
 

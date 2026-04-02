@@ -434,4 +434,209 @@ describe('WorkspaceService', () => {
       },
     );
   });
+
+  it('leaveWorkspaceForUser soft-deletes self membership and clears default workspace', async () => {
+    const leftAt = new Date();
+    const calls: string[] = [];
+    let membershipUpdateData: Record<string, unknown> | null = null;
+    let userUpdateData: Record<string, unknown> | null = null;
+
+    const prisma = {
+      workspaceMember: {
+        findFirst: async () => ({ id: 'member-2', role: 'member' }),
+      },
+      $transaction: async (fn: (tx: Record<string, unknown>) => Promise<void>) =>
+        fn({
+          workspaceMember: {
+            update: async ({ data }: { data: Record<string, unknown> }) => {
+              calls.push('membership.update');
+              membershipUpdateData = data;
+              return { id: 'member-2' };
+            },
+          },
+          user: {
+            updateMany: async ({ data }: { data: Record<string, unknown> }) => {
+              calls.push('user.updateMany');
+              userUpdateData = data;
+              return { count: 1 };
+            },
+          },
+        }),
+    } satisfies PrismaMock;
+
+    const service = new WorkspaceService(prisma as never);
+
+    await service.leaveWorkspaceForUser({
+      workspaceId: 'workspace-1',
+      userId: 'user-2',
+      leftAt,
+    });
+
+    assert.deepEqual(calls, ['membership.update', 'user.updateMany']);
+    assert.equal(membershipUpdateData?.['deletedAt'], leftAt);
+    assert.equal(userUpdateData?.['defaultWorkspaceId'], null);
+  });
+
+  it('leaveWorkspaceForUser blocks owner from leaving', async () => {
+    const prisma = {
+      workspaceMember: {
+        findFirst: async () => ({ id: 'member-1', role: 'owner' }),
+      },
+    } satisfies PrismaMock;
+
+    const service = new WorkspaceService(prisma as never);
+
+    await assert.rejects(
+      () =>
+        service.leaveWorkspaceForUser({
+          workspaceId: 'workspace-1',
+          userId: 'user-1',
+        }),
+      (error: unknown) => {
+        assert.ok(error instanceof BadRequestException);
+        return true;
+      },
+    );
+  });
+
+  it('createWorkspaceInvitation creates pending invitation and returns token', async () => {
+    let invitationData: Record<string, unknown> | null = null;
+
+    const prisma = {
+      workspaceMember: {
+        findFirst: async ({ select }: { select: Record<string, boolean> }) => {
+          if (select['role']) {
+            return { role: 'admin' };
+          }
+
+          return null;
+        },
+      },
+      user: {
+        findFirst: async () => null,
+      },
+      workspaceInvitation: {
+        findFirst: async () => null,
+        create: async ({ data }: { data: Record<string, unknown> }) => {
+          invitationData = data;
+          return { id: 'inv-1' };
+        },
+      },
+    } satisfies PrismaMock;
+
+    const service = new WorkspaceService(prisma as never);
+
+    const result = await service.createWorkspaceInvitation({
+      workspaceId: 'workspace-1',
+      currentUserId: 'user-1',
+      email: 'invite.user@TechViet.local',
+      role: 'viewer',
+      expiresInHours: 24,
+    });
+
+    assert.equal(result.email, 'invite.user@techviet.local');
+    assert.equal(result.role, 'viewer');
+    assert.ok(result.token.length > 0);
+    assert.equal(invitationData?.['email'], 'invite.user@techviet.local');
+    assert.equal(invitationData?.['status'], 'pending');
+    assert.equal(invitationData?.['role'], 'viewer');
+  });
+
+  it('acceptWorkspaceInvitation creates membership and marks invitation accepted', async () => {
+    const calls: string[] = [];
+    let invitationUpdateData: Record<string, unknown> | null = null;
+    let userUpdateData: Record<string, unknown> | null = null;
+
+    const prisma = {
+      user: {
+        findFirst: async () => ({ id: 'user-2', email: 'invite.user@techviet.local' }),
+      },
+      workspaceInvitation: {
+        findUnique: async () => ({
+          id: 'inv-1',
+          workspaceId: 'workspace-1',
+          email: 'invite.user@techviet.local',
+          role: 'member',
+          status: 'pending',
+          expiresAt: new Date(Date.now() + 60_000),
+        }),
+      },
+      $transaction: async (fn: (tx: Record<string, unknown>) => Promise<void>) =>
+        fn({
+          workspaceMember: {
+            findFirst: async () => null,
+            create: async () => {
+              calls.push('membership.create');
+              return { id: 'member-2' };
+            },
+          },
+          workspaceInvitation: {
+            update: async ({ data }: { data: Record<string, unknown> }) => {
+              calls.push('invitation.update');
+              invitationUpdateData = data;
+              return { id: 'inv-1' };
+            },
+          },
+          user: {
+            updateMany: async ({ data }: { data: Record<string, unknown> }) => {
+              calls.push('user.updateMany');
+              userUpdateData = data;
+              return { count: 1 };
+            },
+          },
+        }),
+    } satisfies PrismaMock;
+
+    const service = new WorkspaceService(prisma as never);
+
+    await service.acceptWorkspaceInvitation({
+      token: 'raw-token',
+      userId: 'user-2',
+    });
+
+    assert.deepEqual(calls, ['membership.create', 'invitation.update', 'user.updateMany']);
+    assert.equal(invitationUpdateData?.['status'], 'accepted');
+    assert.ok(invitationUpdateData?.['acceptedAt'] instanceof Date);
+    assert.equal(userUpdateData?.['defaultWorkspaceId'], 'workspace-1');
+  });
+
+  it('acceptWorkspaceInvitation marks expired invitation and throws', async () => {
+    let invitationUpdateData: Record<string, unknown> | null = null;
+
+    const prisma = {
+      user: {
+        findFirst: async () => ({ id: 'user-2', email: 'invite.user@techviet.local' }),
+      },
+      workspaceInvitation: {
+        findUnique: async () => ({
+          id: 'inv-1',
+          workspaceId: 'workspace-1',
+          email: 'invite.user@techviet.local',
+          role: 'member',
+          status: 'pending',
+          expiresAt: new Date(Date.now() - 60_000),
+        }),
+        update: async ({ data }: { data: Record<string, unknown> }) => {
+          invitationUpdateData = data;
+          return { id: 'inv-1' };
+        },
+      },
+    } satisfies PrismaMock;
+
+    const service = new WorkspaceService(prisma as never);
+
+    await assert.rejects(
+      () =>
+        service.acceptWorkspaceInvitation({
+          token: 'raw-token',
+          userId: 'user-2',
+        }),
+      (error: unknown) => {
+        assert.ok(error instanceof BadRequestException);
+        return true;
+      },
+    );
+
+    assert.equal(invitationUpdateData?.['status'], 'expired');
+  });
 });

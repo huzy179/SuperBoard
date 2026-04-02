@@ -1,3 +1,4 @@
+import { createHash, randomBytes } from 'node:crypto';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import {
@@ -18,6 +19,13 @@ type WorkspaceItemDTO = {
   deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
+};
+
+type WorkspaceInvitationTokenDTO = {
+  token: string;
+  email: string;
+  role: string;
+  expiresAt: string;
 };
 
 @Injectable()
@@ -348,6 +356,210 @@ export class WorkspaceService {
     });
   }
 
+  async createWorkspaceInvitation(input: {
+    workspaceId: string;
+    currentUserId: string;
+    email: string;
+    role?: string;
+    expiresInHours?: number;
+  }): Promise<WorkspaceInvitationTokenDTO> {
+    await verifyWorkspaceAdminOrOwner(this.prisma, {
+      workspaceId: input.workspaceId,
+      userId: input.currentUserId,
+    });
+
+    const normalizedEmail = input.email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      throw new BadRequestException('Email is required');
+    }
+
+    const nextRole = parseWorkspaceMemberRoleOrThrow(input.role ?? 'member');
+    if (nextRole === 'owner') {
+      throw new BadRequestException('Không thể mời member với role owner');
+    }
+
+    const expiresInHours = input.expiresInHours ?? 72;
+    if (!Number.isInteger(expiresInHours) || expiresInHours <= 0 || expiresInHours > 24 * 30) {
+      throw new BadRequestException('expiresInHours must be an integer between 1 and 720');
+    }
+
+    const existingUser = await this.prisma.user.findFirst({
+      where: {
+        email: normalizedEmail,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (existingUser) {
+      const existingMembership = await this.prisma.workspaceMember.findFirst({
+        where: {
+          workspaceId: input.workspaceId,
+          userId: existingUser.id,
+          deletedAt: null,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (existingMembership) {
+        throw new BadRequestException('User is already a workspace member');
+      }
+    }
+
+    const now = new Date();
+    const activePendingInvitation = await this.prisma.workspaceInvitation.findFirst({
+      where: {
+        workspaceId: input.workspaceId,
+        email: normalizedEmail,
+        status: 'pending',
+        expiresAt: {
+          gt: now,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (activePendingInvitation) {
+      throw new BadRequestException('An active invitation already exists for this email');
+    }
+
+    const token = randomBytes(24).toString('hex');
+    const tokenHash = this.hashInvitationToken(token);
+    const expiresAt = new Date(now.getTime() + expiresInHours * 60 * 60 * 1000);
+
+    await this.prisma.workspaceInvitation.create({
+      data: {
+        workspaceId: input.workspaceId,
+        inviterId: input.currentUserId,
+        email: normalizedEmail,
+        tokenHash,
+        role: nextRole,
+        status: 'pending',
+        expiresAt,
+      },
+    });
+
+    return {
+      token,
+      email: normalizedEmail,
+      role: nextRole,
+      expiresAt: expiresAt.toISOString(),
+    };
+  }
+
+  async acceptWorkspaceInvitation(input: { token: string; userId: string }): Promise<void> {
+    const normalizedToken = input.token.trim();
+    if (!normalizedToken) {
+      throw new BadRequestException('Invitation token is required');
+    }
+
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: input.userId,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        email: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const invitation = await this.prisma.workspaceInvitation.findUnique({
+      where: {
+        tokenHash: this.hashInvitationToken(normalizedToken),
+      },
+      select: {
+        id: true,
+        workspaceId: true,
+        email: true,
+        role: true,
+        status: true,
+        expiresAt: true,
+      },
+    });
+
+    if (!invitation || invitation.status !== 'pending') {
+      throw new NotFoundException('Invitation not found');
+    }
+
+    const now = new Date();
+    if (invitation.expiresAt <= now) {
+      await this.prisma.workspaceInvitation.update({
+        where: { id: invitation.id },
+        data: {
+          status: 'expired',
+        },
+      });
+      throw new BadRequestException('Invitation has expired');
+    }
+
+    if (user.email.toLowerCase() !== invitation.email.toLowerCase()) {
+      throw new BadRequestException('Invitation email does not match current user');
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      const existingMembership = await tx.workspaceMember.findFirst({
+        where: {
+          workspaceId: invitation.workspaceId,
+          userId: user.id,
+        },
+        select: {
+          id: true,
+          deletedAt: true,
+        },
+      });
+
+      if (!existingMembership) {
+        await tx.workspaceMember.create({
+          data: {
+            workspaceId: invitation.workspaceId,
+            userId: user.id,
+            role: invitation.role,
+          },
+        });
+      } else if (existingMembership.deletedAt) {
+        await tx.workspaceMember.update({
+          where: { id: existingMembership.id },
+          data: {
+            role: invitation.role,
+            deletedAt: null,
+          },
+        });
+      } else {
+        throw new BadRequestException('User is already a workspace member');
+      }
+
+      await tx.workspaceInvitation.update({
+        where: { id: invitation.id },
+        data: {
+          status: 'accepted',
+          acceptedAt: now,
+        },
+      });
+
+      await tx.user.updateMany({
+        where: {
+          id: user.id,
+          deletedAt: null,
+          defaultWorkspaceId: null,
+        },
+        data: {
+          defaultWorkspaceId: invitation.workspaceId,
+        },
+      });
+    });
+  }
+
   async removeMemberFromWorkspace(input: {
     workspaceId: string;
     memberId: string;
@@ -379,6 +591,52 @@ export class WorkspaceService {
       await tx.user.updateMany({
         where: {
           id: targetMember.userId,
+          defaultWorkspaceId: input.workspaceId,
+          deletedAt: null,
+        },
+        data: {
+          defaultWorkspaceId: null,
+        },
+      });
+    });
+  }
+
+  async leaveWorkspaceForUser(input: {
+    workspaceId: string;
+    userId: string;
+    leftAt?: Date;
+  }): Promise<void> {
+    const membership = await this.prisma.workspaceMember.findFirst({
+      where: {
+        workspaceId: input.workspaceId,
+        userId: input.userId,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        role: true,
+      },
+    });
+
+    if (!membership) {
+      throw new NotFoundException('Workspace not found');
+    }
+
+    if (membership.role === 'owner') {
+      throw new BadRequestException('Owner không thể tự rời workspace');
+    }
+
+    const leftAt = input.leftAt ?? new Date();
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.workspaceMember.update({
+        where: { id: membership.id },
+        data: { deletedAt: leftAt },
+      });
+
+      await tx.user.updateMany({
+        where: {
+          id: input.userId,
           defaultWorkspaceId: input.workspaceId,
           deletedAt: null,
         },
@@ -479,5 +737,9 @@ export class WorkspaceService {
       createdAt: workspace.createdAt.toISOString(),
       updatedAt: workspace.updatedAt.toISOString(),
     };
+  }
+
+  private hashInvitationToken(token: string): string {
+    return createHash('sha256').update(token).digest('hex');
   }
 }

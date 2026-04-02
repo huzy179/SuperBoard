@@ -174,6 +174,39 @@ export class WorkspaceController {
     return apiSuccess({ added: true });
   }
 
+  @Post(':workspaceId/invitations')
+  async createWorkspaceInvitation(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('workspaceId') workspaceId: string,
+    @Body() body: { email?: string; role?: string; expiresInHours?: number },
+  ) {
+    const email = body.email?.trim();
+    if (!email) {
+      throw new BadRequestException('Email is required');
+    }
+
+    const invitation = await this.workspaceService.createWorkspaceInvitation({
+      workspaceId,
+      currentUserId: user.id,
+      email,
+      ...(body.role !== undefined ? { role: body.role } : {}),
+      ...(body.expiresInHours !== undefined ? { expiresInHours: body.expiresInHours } : {}),
+    });
+
+    return apiSuccess(invitation);
+  }
+
+  @Post('invitations/:token/accept')
+  @HttpCode(HttpStatus.OK)
+  async acceptWorkspaceInvitation(@CurrentUser() user: AuthUserDTO, @Param('token') token: string) {
+    await this.workspaceService.acceptWorkspaceInvitation({
+      token,
+      userId: user.id,
+    });
+
+    return apiSuccess({ accepted: true });
+  }
+
   @Delete(':workspaceId/members/:memberId')
   @HttpCode(HttpStatus.OK)
   async removeWorkspaceMember(
@@ -188,6 +221,20 @@ export class WorkspaceController {
     });
 
     return apiSuccess({ removed: true });
+  }
+
+  @Delete(':workspaceId/members/me')
+  @HttpCode(HttpStatus.OK)
+  async leaveWorkspace(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('workspaceId') workspaceId: string,
+  ) {
+    await this.workspaceService.leaveWorkspaceForUser({
+      workspaceId,
+      userId: user.id,
+    });
+
+    return apiSuccess({ left: true });
   }
 
   @Patch(':workspaceId/members/:memberId/transfer-owner')

@@ -11,6 +11,7 @@ Tai lieu nay tong hop cac tinh nang nang cao ban co the hoc va tu implement tron
   - Invite by email co token het han.
   - Trang thai pending/accepted/revoked.
   - Audit log cho add/remove/change role.
+  - Leave workspace flow cho user (co owner guard + cleanup default workspace).
 - Scope guard architecture:
   - Tach helper verify scope theo module (workspace/project/task).
   - Viet test matrix cho owner/admin/member/viewer.

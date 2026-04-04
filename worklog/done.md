@@ -43,6 +43,15 @@
 - [x] Mở rộng `apps/web/hooks/jira/index.ts` re-export project-core hooks để đồng nhất access point
 - [x] Xác nhận `npm run typecheck --workspace @superboard/web` pass
 
+## Jira v1.72 — Jira Hook Internal Decoupling (Task + Comment Core)
+
+- [x] Thêm internal entrypoints:
+  - `apps/web/hooks/jira/task-core.ts`
+  - `apps/web/hooks/jira/comment-core.ts`
+- [x] Refactor `apps/web/hooks/jira/index.ts` re-export task/comment hooks thông qua core entrypoints mới
+- [x] Giữ nguyên API public `@/hooks/jira`, chỉ giảm coupling nội bộ và chuẩn hoá cấu trúc
+- [x] Xác nhận `npm run typecheck --workspace @superboard/web` pass
+
 ## Jira v1.63 — Workspace Role Change Guard Extraction
 
 - [x] Tách logic validate member mục tiêu khi đổi role sang helper `findMutableWorkspaceMemberOrThrow`

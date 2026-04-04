@@ -397,6 +397,13 @@ export class ProjectService {
       throw new NotFoundException('Task not found');
     }
 
+    // Validate transition
+    await this.workflowService.validateTransition(
+      input.projectId,
+      existingTask.status,
+      input.status,
+    );
+
     const task = await this.prisma.task.update({
       where: {
         id: input.taskId,

@@ -466,6 +466,13 @@ export class ProjectService {
       });
     }
 
+    // Validate status transitions for bulk update
+    if (input.status) {
+      for (const task of tasks) {
+        await this.workflowService.validateTransition(input.projectId, task.status, input.status);
+      }
+    }
+
     if (input.delete) {
       const deletedAt = new Date();
       const deleteResult = await this.prisma.task.updateMany({
@@ -608,6 +615,14 @@ export class ProjectService {
         workspaceId: input.workspaceId,
         assigneeId: input.data.assigneeId,
       });
+    }
+
+    if (input.data.status) {
+      await this.workflowService.validateTransition(
+        input.projectId,
+        existingTask.status,
+        input.data.status,
+      );
     }
 
     if (input.data.parentTaskId !== undefined) {

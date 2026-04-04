@@ -3,5 +3,6 @@ export {
   useCreateTask,
   useUpdateTask,
   useUpdateTaskStatus,
-  useDeleteTask,
+  useArchiveTask,
+  useRestoreTask,
 } from '../use-task-mutations';

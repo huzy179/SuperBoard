@@ -996,6 +996,7 @@ export class ProjectService {
     key?: string | null;
     createdAt: Date;
     updatedAt: Date;
+    deletedAt?: Date | null;
   }): ProjectItemDTO {
     return {
       id: project.id,
@@ -1008,6 +1009,7 @@ export class ProjectService {
       updatedAt: project.updatedAt.toISOString(),
       taskCount: 0,
       doneTaskCount: 0,
+      deletedAt: project.deletedAt ? project.deletedAt.toISOString() : null,
     };
   }
 
@@ -1028,6 +1030,7 @@ export class ProjectService {
     labels: { select: { label: { select: { id: true, name: true, color: true } } } },
     createdAt: true,
     updatedAt: true,
+    deletedAt: true,
   } as const;
 
   private toTaskDTO(task: {
@@ -1047,6 +1050,7 @@ export class ProjectService {
     labels?: Array<{ label: { id: string; name: string; color: string } }>;
     createdAt: Date;
     updatedAt: Date;
+    deletedAt?: Date | null;
   }): ProjectTaskItemDTO {
     return {
       id: task.id,
@@ -1067,6 +1071,7 @@ export class ProjectService {
       subtaskProgress: null,
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
+      deletedAt: task.deletedAt ? task.deletedAt.toISOString() : null,
     };
   }
 

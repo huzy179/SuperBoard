@@ -29,7 +29,8 @@ import {
   useCreateTask,
   useUpdateTask,
   useUpdateTaskStatus,
-  useDeleteTask,
+  useArchiveTask,
+  useRestoreTask,
   useProjectUrlState,
   useTaskSelection,
   useTaskBulkActions,
@@ -67,7 +68,8 @@ export default function ProjectDetailPage() {
   const bulkTaskMutation = useBulkTaskOperation(projectId);
   const updateTaskMutation = useUpdateTask(projectId);
   const updateTaskStatusMutation = useUpdateTaskStatus(projectId);
-  const deleteTaskMutation = useDeleteTask(projectId);
+  const archiveTaskMutation = useArchiveTask(projectId);
+  const restoreTaskMutation = useRestoreTask(projectId);
 
   const { user: currentUser } = useAuthSession();
 
@@ -189,13 +191,15 @@ export default function ProjectDetailPage() {
     handleDialogKeyDown,
     handleUpdateTask,
     handleDeleteTask,
+    handleRestoreTask,
   } = useTaskEditPanel({
     projectId,
     projectTasks: tasks,
     createTask: createTaskMutation.mutateAsync,
     updateTask: updateTaskMutation.mutateAsync,
     updateTaskStatus: updateTaskStatusMutation.mutateAsync,
-    deleteTask: deleteTaskMutation.mutateAsync,
+    deleteTask: archiveTaskMutation.mutateAsync,
+    restoreTask: restoreTaskMutation.mutateAsync,
   });
 
   const {
@@ -498,11 +502,11 @@ export default function ProjectDetailPage() {
           editingParentTask={editingParentTask}
           onClose={handleCloseEdit}
           onSave={handleUpdateTask}
-          onDelete={() => {
-            void handleDeleteTask();
-          }}
+          onDelete={handleDeleteTask}
+          onRestore={handleRestoreTask}
           isSaving={updateTaskMutation.isPending}
-          isDeleting={deleteTaskMutation.isPending}
+          isDeleting={archiveTaskMutation.isPending}
+          isRestoring={restoreTaskMutation.isPending}
           taskUpdateError={taskUpdateError}
           handleOpenEdit={handleOpenEdit}
           dialogRef={dialogRef}

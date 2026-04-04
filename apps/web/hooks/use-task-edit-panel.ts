@@ -28,6 +28,7 @@ type UseTaskEditPanelParams = {
     position?: string | null;
   }) => Promise<unknown>;
   deleteTask: (taskId: string) => Promise<unknown>;
+  restoreTask: (taskId: string) => Promise<unknown>;
 };
 
 export function useTaskEditPanel({
@@ -37,6 +38,7 @@ export function useTaskEditPanel({
   updateTask,
   updateTaskStatus,
   deleteTask,
+  restoreTask,
 }: UseTaskEditPanelParams) {
   const [editingTask, setEditingTask] = useState<ProjectTaskItemDTO | null>(null);
   const [editTitle, setEditTitle] = useState('');
@@ -184,7 +186,7 @@ export function useTaskEditPanel({
   }
 
   async function handleDeleteTask() {
-    if (!editingTask || !projectId || !window.confirm('Bạn có chắc chắn muốn xoá task này?')) {
+    if (!editingTask || !projectId || !window.confirm('Bạn có chắc chắn muốn lưu trữ task này?')) {
       return;
     }
     setTaskUpdateError(null);
@@ -192,7 +194,22 @@ export function useTaskEditPanel({
       await deleteTask(editingTask.id);
       handleCloseEdit();
     } catch (caughtError) {
-      setTaskUpdateError(caughtError instanceof Error ? caughtError.message : 'Không thể xoá task');
+      setTaskUpdateError(
+        caughtError instanceof Error ? caughtError.message : 'Không thể lưu trữ task',
+      );
+    }
+  }
+
+  async function handleRestoreTask() {
+    if (!editingTask || !projectId) return;
+    setTaskUpdateError(null);
+    try {
+      await restoreTask(editingTask.id);
+      handleCloseEdit();
+    } catch (caughtError) {
+      setTaskUpdateError(
+        caughtError instanceof Error ? caughtError.message : 'Không thể khôi phục task',
+      );
     }
   }
 
@@ -296,6 +313,7 @@ export function useTaskEditPanel({
     handleCloseEdit,
     handleUpdateTask,
     handleDeleteTask,
+    handleRestoreTask,
     handleCreateSubtask,
     handleToggleSubtaskDone,
     handleDeleteSubtask,

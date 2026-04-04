@@ -7,5 +7,6 @@ export {
   useCreateTask,
   useUpdateTask,
   useUpdateTaskStatus,
-  useDeleteTask,
+  useArchiveTask,
+  useRestoreTask,
 } from './task-mutation-core';

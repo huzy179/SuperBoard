@@ -85,7 +85,7 @@ export function TaskListView({
               }}
               className={`cursor-pointer transition-colors hover:bg-brand-50/50 even:bg-slate-50/50 ${
                 selectedTaskIds.has(task.id) ? 'bg-brand-50/40' : ''
-              }`}
+              } ${task.deletedAt ? 'bg-slate-50/80 grayscale opacity-60' : ''}`}
             >
               <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
                 <input
@@ -101,7 +101,13 @@ export function TaskListView({
                   <TaskTypeIcon type={task.type ?? 'task'} />
                   <TaskIdBadge projectKey={projectKey} number={task.number} />
                 </div>
-                <p className="mt-0.5 font-medium text-slate-900">{task.title}</p>
+                <p
+                  className={`mt-0.5 font-medium ${
+                    task.deletedAt ? 'text-slate-400 line-through' : 'text-slate-900'
+                  }`}
+                >
+                  {task.title}
+                </p>
                 {task.labels && task.labels.length > 0 ? (
                   <div className="mt-1">
                     <LabelDots labels={task.labels} />

@@ -131,7 +131,9 @@ export function TaskBoardView({
                         : isDragDropLocked
                           ? 'cursor-not-allowed opacity-80'
                           : 'cursor-pointer hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md'
-                    } ${selectedTaskIds.has(task.id) ? 'ring-1 ring-brand-300' : ''}
+                    } ${selectedTaskIds.has(task.id) ? 'ring-1 ring-brand-300' : ''} ${
+                      task.deletedAt ? 'bg-slate-50 opacity-60 grayscale' : ''
+                    }
                   `}
                   >
                     <div className="mb-1 flex justify-end">
@@ -153,7 +155,13 @@ export function TaskBoardView({
                       {task.storyPoints ? <StoryPointsBadge points={task.storyPoints} /> : null}
                     </div>
                     {/* Title */}
-                    <p className="text-[13px] font-medium text-slate-900 group-hover:text-brand-700">
+                    <p
+                      className={`text-[13px] font-medium transition-colors ${
+                        task.deletedAt
+                          ? 'text-slate-400 line-through'
+                          : 'text-slate-900 group-hover:text-brand-700'
+                      }`}
+                    >
                       {task.title}
                     </p>
                     {/* Labels */}

@@ -12,7 +12,8 @@ export {
   useCreateTask,
   useUpdateTask,
   useUpdateTaskStatus,
-  useDeleteTask,
+  useArchiveTask,
+  useRestoreTask,
 } from './task-core';
 export {
   useTaskComments,

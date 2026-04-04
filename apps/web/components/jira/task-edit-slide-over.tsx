@@ -49,8 +49,10 @@ interface TaskEditSlideOverProps {
   onClose: () => void;
   onSave: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   onDelete: () => void;
+  onRestore: () => void;
   isSaving: boolean;
   isDeleting: boolean;
+  isRestoring: boolean;
   taskUpdateError: string | null;
 
   // D&D and logic
@@ -93,8 +95,10 @@ export function TaskEditSlideOver({
   onClose,
   onSave,
   onDelete,
+  onRestore,
   isSaving,
   isDeleting,
+  isRestoring,
   taskUpdateError,
   handleOpenEdit,
   dialogRef,
@@ -202,14 +206,25 @@ export function TaskEditSlideOver({
           </form>
 
           <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-6 py-4">
-            <button
-              type="button"
-              onClick={onDelete}
-              disabled={isDeleting}
-              className="rounded-lg border border-rose-200 bg-white px-4 py-2 text-sm font-medium text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-50"
-            >
-              {isDeleting ? 'Đang xoá...' : 'Xoá task'}
-            </button>
+            {editingTask.deletedAt ? (
+              <button
+                type="button"
+                onClick={onRestore}
+                disabled={isRestoring}
+                className="rounded-lg border border-brand-200 bg-white px-4 py-2 text-sm font-medium text-brand-600 transition-colors hover:bg-brand-50 disabled:opacity-50"
+              >
+                {isRestoring ? 'Đang khôi phục...' : 'Khôi phục task'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={onDelete}
+                disabled={isDeleting}
+                className="rounded-lg border border-rose-200 bg-white px-4 py-2 text-sm font-medium text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-50"
+              >
+                {isDeleting ? 'Đang lưu trữ...' : 'Lưu trữ task'}
+              </button>
+            )}
             <div className="flex gap-2">
               <button
                 type="button"

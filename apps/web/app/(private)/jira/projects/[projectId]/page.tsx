@@ -53,12 +53,14 @@ export default function ProjectDetailPage() {
   const searchParams = useSearchParams();
   const projectId = params.projectId;
 
+  const [showArchived, setShowArchived] = useState(false);
+
   const {
     data: project,
     isLoading: loading,
     isError,
     error: queryError,
-  } = useProjectDetail(projectId);
+  } = useProjectDetail(projectId, showArchived);
   const error = isError ? (queryError?.message ?? 'Không tải được dự án') : null;
 
   const createTaskMutation = useCreateTask(projectId);
@@ -115,6 +117,8 @@ export default function ProjectDetailPage() {
     setFilterTypes,
     setSortBy,
     setSortDir,
+    showArchived,
+    setShowArchived,
   });
 
   const tasks = useMemo(() => project?.tasks ?? [], [project?.tasks]);
@@ -360,7 +364,10 @@ export default function ProjectDetailPage() {
             setFilterTypes(new Set());
             setFilterAssignee('');
             setFilterQuery('');
+            setShowArchived(false);
           }}
+          showArchived={showArchived}
+          onToggleShowArchived={() => setShowArchived((prev) => !prev)}
         />
 
         <TaskBulkActionBar

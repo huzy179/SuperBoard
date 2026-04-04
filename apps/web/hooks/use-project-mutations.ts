@@ -1,6 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { CreateProjectRequestDTO, UpdateProjectRequestDTO } from '@superboard/shared';
-import { createProject, updateProject, deleteProject } from '@/lib/services/project-service';
+import {
+  createProject,
+  updateProject,
+  archiveProject,
+  restoreProject,
+} from '@/lib/services/project-service';
 import { publishProjectsListUpdated } from '@/lib/realtime/project-sync';
 
 export function useCreateProject() {
@@ -26,10 +31,21 @@ export function useUpdateProject() {
   });
 }
 
-export function useDeleteProject() {
+export function useArchiveProject() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => deleteProject(id),
+    mutationFn: (id: string) => archiveProject(id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['projects'] });
+      publishProjectsListUpdated();
+    },
+  });
+}
+
+export function useRestoreProject() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => restoreProject(id),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['projects'] });
       publishProjectsListUpdated();

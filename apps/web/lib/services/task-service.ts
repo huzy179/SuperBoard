@@ -6,6 +6,7 @@ import type {
   TaskHistoryItemDTO,
   UpdateTaskRequestDTO,
   UpdateTaskStatusRequestDTO,
+  WorkflowStatusDTO,
 } from '@superboard/shared';
 import { apiGet, apiPost, apiRequest } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
@@ -69,6 +70,26 @@ export async function getTaskHistory(
   taskId: string,
 ): Promise<TaskHistoryItemDTO[]> {
   return apiGet<TaskHistoryItemDTO[]>(API_ENDPOINTS.projects.taskHistory(projectId, taskId), {
+    auth: true,
+  });
+}
+
+export async function archiveTask(taskId: string): Promise<void> {
+  return apiRequest<void>(API_ENDPOINTS.projects.archiveTask(taskId), {
+    auth: true,
+    method: 'PATCH',
+  });
+}
+
+export async function restoreTask(taskId: string): Promise<void> {
+  return apiRequest<void>(API_ENDPOINTS.projects.restoreTask(taskId), {
+    auth: true,
+    method: 'PATCH',
+  });
+}
+
+export async function getProjectStatuses(projectId: string): Promise<WorkflowStatusDTO[]> {
+  return apiGet<WorkflowStatusDTO[]>(API_ENDPOINTS.workflow.projectStatuses(projectId), {
     auth: true,
   });
 }

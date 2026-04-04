@@ -28,6 +28,8 @@ type UrlStateOptions = {
   setFilterTypes: (value: Set<string>) => void;
   setSortBy: (value: TaskSortBy) => void;
   setSortDir: (value: SortDirection) => void;
+  showArchived: boolean;
+  setShowArchived: (value: boolean) => void;
 };
 
 function parseCsvSet(value: string | null, allowed: ReadonlySet<string>): Set<string> {
@@ -108,6 +110,7 @@ export function useProjectUrlState(options: UrlStateOptions) {
     const nextTypes = parseCsvSet(options.searchParams.get('types'), options.allowedTypes);
     const nextSortBy = parseTaskSortBy(options.searchParams.get('sortBy'));
     const nextSortDir = parseSortDirection(options.searchParams.get('sortDir'));
+    const nextShowArchived = options.searchParams.get('archived') === 'true';
 
     let changed = false;
 
@@ -143,6 +146,10 @@ export function useProjectUrlState(options: UrlStateOptions) {
       changed = true;
       options.setSortDir(nextSortDir);
     }
+    if (options.showArchived !== nextShowArchived) {
+      changed = true;
+      options.setShowArchived(nextShowArchived);
+    }
 
     if (changed) {
       isApplyingUrlStateRef.current = true;
@@ -168,6 +175,8 @@ export function useProjectUrlState(options: UrlStateOptions) {
     options.setFilterTypes,
     options.setSortBy,
     options.setSortDir,
+    options.showArchived,
+    options.setShowArchived,
   ]);
 
   useEffect(() => {
@@ -226,6 +235,12 @@ export function useProjectUrlState(options: UrlStateOptions) {
       nextParams.set('sortDir', options.sortDir);
     }
 
+    if (!options.showArchived) {
+      nextParams.delete('archived');
+    } else {
+      nextParams.set('archived', 'true');
+    }
+
     const nextQuery = nextParams.toString();
     const currentQuery = options.searchParams.toString();
     if (nextQuery !== currentQuery) {
@@ -241,6 +256,7 @@ export function useProjectUrlState(options: UrlStateOptions) {
     options.filterTypes,
     options.sortBy,
     options.sortDir,
+    options.showArchived,
     options.pathname,
     options.router,
     options.searchParams,

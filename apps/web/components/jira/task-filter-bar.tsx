@@ -11,6 +11,7 @@ type TaskFilterBarProps = {
   filterTypes: Set<string>;
   sortBy: TaskSortBy;
   sortDir: SortDirection;
+  showArchived: boolean;
   hasActiveFilters: boolean;
   onFilterQueryChange: (value: string) => void;
   onFilterAssigneeChange: (value: string) => void;
@@ -19,6 +20,7 @@ type TaskFilterBarProps = {
   onToggleType: (value: string) => void;
   onSortByChange: (value: TaskSortBy) => void;
   onToggleSortDir: () => void;
+  onToggleShowArchived: () => void;
   onClearFilters: () => void;
 };
 
@@ -31,6 +33,7 @@ export function TaskFilterBar({
   filterTypes,
   sortBy,
   sortDir,
+  showArchived,
   hasActiveFilters,
   onFilterQueryChange,
   onFilterAssigneeChange,
@@ -39,6 +42,7 @@ export function TaskFilterBar({
   onToggleType,
   onSortByChange,
   onToggleSortDir,
+  onToggleShowArchived,
   onClearFilters,
 }: TaskFilterBarProps) {
   return (
@@ -171,6 +175,23 @@ export function TaskFilterBar({
             </button>
           ) : null}
         </div>
+
+        <div className="h-5 w-px bg-slate-200" />
+
+        <button
+          type="button"
+          onClick={onToggleShowArchived}
+          className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+            showArchived
+              ? 'border-amber-200 bg-amber-50 text-amber-700'
+              : 'border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <div
+            className={`h-2 w-2 rounded-full ${showArchived ? 'bg-amber-500' : 'bg-slate-300'}`}
+          />
+          {showArchived ? 'Đang hiện mục lưu trữ' : 'Hiện mục lưu trữ'}
+        </button>
       </div>
     </div>
   );

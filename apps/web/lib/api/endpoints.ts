@@ -9,7 +9,8 @@ export const API_ENDPOINTS = {
     dashboard: '/api/v1/projects/dashboard',
     detail: (projectId: string) => `/api/v1/projects/${projectId}`,
     update: (projectId: string) => `/api/v1/projects/${projectId}`,
-    delete: (projectId: string) => `/api/v1/projects/${projectId}`,
+    delete: (projectId: string) => `/api/v1/projects/${projectId}`, // Actually Archive
+    restore: (projectId: string) => `/api/v1/projects/${projectId}/restore`,
     createTask: (projectId: string) => `/api/v1/projects/${projectId}/tasks`,
     bulkTask: (projectId: string) => `/api/v1/projects/${projectId}/tasks/bulk`,
     updateTaskStatus: (projectId: string, taskId: string) =>
@@ -28,6 +29,8 @@ export const API_ENDPOINTS = {
       `/api/v1/projects/${projectId}/tasks/${taskId}/comments/${commentId}`,
     deleteComment: (projectId: string, taskId: string, commentId: string) =>
       `/api/v1/projects/${projectId}/tasks/${taskId}/comments/${commentId}`,
+    archiveTask: (taskId: string) => `/api/v1/tasks/${taskId}/archive`,
+    restoreTask: (taskId: string) => `/api/v1/tasks/${taskId}/restore`,
   },
   notifications: {
     list: '/api/v1/notifications',
@@ -39,4 +42,9 @@ export const API_ENDPOINTS = {
     updateMember: (workspaceId: string, memberId: string) =>
       `/api/v1/workspaces/${workspaceId}/members/${memberId}`,
   },
-} as const;
+  workflow: {
+    workspaceStatuses: (workspaceId: string) =>
+      `/api/v1/workflow/workspace/${workspaceId}/statuses`,
+    projectStatuses: (projectId: string) => `/api/v1/workflow/project/${projectId}/statuses`,
+  },
+};

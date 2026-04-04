@@ -8,7 +8,7 @@ import {
   subscribeProjectTaskPatched,
 } from '@/lib/realtime/project-socket';
 
-export function useProjectDetail(projectId: string) {
+export function useProjectDetail(projectId: string, showArchived = false) {
   const queryClient = useQueryClient();
   const invalidateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasPendingInvalidateRef = useRef(false);
@@ -19,7 +19,7 @@ export function useProjectDetail(projectId: string) {
     }
 
     const runInvalidate = () => {
-      void queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+      void queryClient.invalidateQueries({ queryKey: ['projects', projectId, { showArchived }] });
     };
 
     const scheduleInvalidate = () => {
@@ -102,8 +102,8 @@ export function useProjectDetail(projectId: string) {
   }, [projectId, queryClient]);
 
   return useQuery<ProjectDetailDTO>({
-    queryKey: ['projects', projectId],
-    queryFn: () => getProjectDetail(projectId),
+    queryKey: ['projects', projectId, { showArchived }],
+    queryFn: () => getProjectDetail(projectId, showArchived),
     enabled: !!projectId,
   });
 }

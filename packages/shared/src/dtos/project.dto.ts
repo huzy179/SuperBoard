@@ -7,6 +7,7 @@ export type ProjectItemDTO = Pick<
 > & {
   taskCount: number;
   doneTaskCount: number;
+  deletedAt?: string | null;
 };
 
 export type ProjectsResponseDTO = ApiResponse<ProjectItemDTO[]>;
@@ -67,6 +68,7 @@ export interface ProjectTaskItemDTO {
   } | null;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null;
 }
 
 export interface ProjectDetailDTO extends ProjectItemDTO {

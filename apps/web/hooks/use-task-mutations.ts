@@ -8,9 +8,11 @@ import type {
   UpdateTaskStatusRequestDTO,
 } from '@superboard/shared';
 import {
+  archiveTask,
   bulkProjectTaskOperation,
   createProjectTask,
   deleteProjectTask,
+  restoreTask,
   updateProjectTask,
   updateProjectTaskStatus,
 } from '@/lib/services/task-service';
@@ -91,8 +93,18 @@ export function useUpdateTaskStatus(projectId: string) {
 
       return { previous };
     },
-    onError: (_error, _variables, context) => {
-      toast.error('Không thể cập nhật trạng thái task');
+    onError: (error: Error, variables, context) => {
+      const errorMessage = error instanceof Error ? error.message : 'Không thể cập nhật trạng thái';
+      toast.error(errorMessage, {
+        action: {
+          label: 'Thử lại',
+          onClick: () => {
+            // Trigger same mutation again
+            queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+          },
+        },
+      });
+
       if (context?.previous) {
         queryClient.setQueryData(['projects', projectId], context.previous);
       }
@@ -105,6 +117,56 @@ export function useUpdateTaskStatus(projectId: string) {
     },
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+    },
+  });
+}
+
+export function useArchiveTask(projectId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (taskId: string) => archiveTask(taskId),
+    onMutate: async (taskId) => {
+      await queryClient.cancelQueries({ queryKey: ['projects', projectId] });
+      const previous = queryClient.getQueryData<ProjectDetailDTO>(['projects', projectId]);
+
+      if (previous) {
+        queryClient.setQueryData<ProjectDetailDTO>(['projects', projectId], {
+          ...previous,
+          tasks: previous.tasks.filter((t) => t.id !== taskId),
+        });
+      }
+
+      return { previous };
+    },
+    onSuccess: () => {
+      toast.success('Đã lưu trữ task');
+      publishProjectDetailUpdated(projectId);
+    },
+    onError: (_error, _variables, context) => {
+      toast.error('Không thể lưu trữ task');
+      if (context?.previous) {
+        queryClient.setQueryData(['projects', projectId], context.previous);
+      }
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+    },
+  });
+}
+
+export function useRestoreTask(projectId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (taskId: string) => restoreTask(taskId),
+    onSuccess: () => {
+      toast.success('Đã khôi phục task');
+      void queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+      publishProjectDetailUpdated(projectId);
+    },
+    onError: () => {
+      toast.error('Không thể khôi phục task');
     },
   });
 }

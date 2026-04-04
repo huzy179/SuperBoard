@@ -3,8 +3,8 @@
 import { useMemo, useState } from 'react';
 import { FullPageError, FullPageLoader } from '@/components/ui/page-states';
 import { AssigneeAvatar } from '@/components/jira/task-badges';
-import { useAuthSession } from '@/hooks/use-auth-session';
-import { useWorkspaceMembers, useUpdateMemberRole } from '@/hooks/use-workspace';
+import { useAuthSession } from '@/hooks/auth';
+import { useWorkspaceMembers, useUpdateMemberRole } from '@/hooks/workspace';
 import { formatDate } from '@/lib/format-date';
 import { ROLE_OPTIONS } from '@/lib/constants/task';
 

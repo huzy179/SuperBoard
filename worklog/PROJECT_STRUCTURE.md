@@ -2,7 +2,7 @@
 
 Tài liệu này phản ánh cấu trúc hiện tại của repo `SuperBoard` để dev mới vào có thể định hướng nhanh và tránh nhiễu từ roadmap cũ.
 
-Cập nhật: 2026-03-23
+Cập nhật: 2026-04-04
 
 ---
 
@@ -79,6 +79,9 @@ apps/web/
 ### Ghi chú
 
 - Đã có nhiều hook tách domain (`use-project-detail`, `use-projects`, `use-task-comments`, ...).
+- Bắt đầu chuẩn hoá Jira hooks qua feature entrypoint `hooks/jira/index.ts` để giảm import rải rác và tiến dần sang layer-based structure.
+- Mở rộng pattern entrypoint theo domain: `hooks/auth`, `hooks/dashboard`, `hooks/notifications`, `hooks/workspace`.
+- Với Jira project hooks, đã thêm internal entrypoint `hooks/jira/project-core.ts` để giảm import chéo trực tiếp giữa các hook project-level.
 - Realtime phía client đã có nền `socket.io-client` + sync đa tab qua `lib/realtime`.
 
 ---

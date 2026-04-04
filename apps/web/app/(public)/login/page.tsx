@@ -3,7 +3,7 @@
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FullPageLoader } from '@/components/ui/page-states';
-import { useRedirectAuthenticated } from '@/hooks/use-redirect-authenticated';
+import { useRedirectAuthenticated } from '@/hooks/auth';
 import { setAccessToken } from '@/lib/auth-storage';
 import { login } from '@/lib/services/auth-service';
 

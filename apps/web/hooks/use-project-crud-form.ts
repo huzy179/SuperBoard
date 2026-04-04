@@ -1,11 +1,7 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { toast } from 'sonner';
 import type { ProjectItemDTO } from '@superboard/shared';
-import {
-  useCreateProject,
-  useDeleteProject,
-  useUpdateProject,
-} from '@/hooks/use-project-mutations';
+import { useCreateProject, useDeleteProject, useUpdateProject } from '@/hooks/jira/project-core';
 
 export function useProjectCrudForm() {
   const createProjectMutation = useCreateProject();

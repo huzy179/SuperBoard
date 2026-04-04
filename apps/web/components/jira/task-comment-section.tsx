@@ -8,7 +8,7 @@ import {
   useCreateComment,
   useUpdateComment,
   useDeleteComment,
-} from '@/hooks/use-task-comments';
+} from '@/hooks/jira';
 import { formatRelativeTime } from '@/lib/format-date';
 
 export function TaskCommentSection({

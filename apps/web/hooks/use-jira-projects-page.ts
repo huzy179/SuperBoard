@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react';
-import { useProjects } from '@/hooks/use-projects';
-import { useProjectContextMemory } from '@/hooks/use-project-context-memory';
-import { useProjectCrudForm } from '@/hooks/use-project-crud-form';
-import { useProjectFavorites } from '@/hooks/use-project-favorites';
+import {
+  useProjects,
+  useProjectContextMemory,
+  useProjectCrudForm,
+  useProjectFavorites,
+} from '@/hooks/jira/project-core';
 import {
   filterProjectsByQuery,
   sortProjectsWithFavorites,

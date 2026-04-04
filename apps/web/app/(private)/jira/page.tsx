@@ -3,7 +3,7 @@
 import { EmptyStateCard, SectionError, SectionSkeleton } from '@/components/ui/page-states';
 import { ProjectCardsGrid } from '@/components/jira/project-cards-grid';
 import { ProjectForm } from '@/components/jira/project-form';
-import { useJiraProjectsPage } from '@/hooks/use-jira-projects-page';
+import { useJiraProjectsPage } from '@/hooks/jira';
 
 export default function JiraHomePage() {
   const {

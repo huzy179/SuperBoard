@@ -12,6 +12,37 @@
 - [x] Xác nhận `npm run test --workspace @superboard/api -- test/services/task.service.test.ts` pass (5 tests)
 - [x] Xác nhận `npm run typecheck --workspace @superboard/api` và `npm run lint --workspace @superboard/api` pass
 
+## Jira v1.69 — Frontend Jira Hooks Feature Entrypoint (Step 1)
+
+- [x] Thêm feature entrypoint `apps/web/hooks/jira/index.ts` để re-export các Jira hooks (project/task/comment)
+- [x] Refactor import hooks ở các điểm Jira chính sang `@/hooks/jira`:
+  - `app/(private)/jira/page.tsx`
+  - `app/(private)/jira/projects/[projectId]/page.tsx`
+  - `components/jira/task-comment-section.tsx`
+- [x] Xác nhận `npm run typecheck --workspace @superboard/web` pass
+
+## Jira v1.70 — Frontend Feature Hook Entrypoints (Auth/Dashboard/Notifications/Workspace)
+
+- [x] Thêm feature entrypoints:
+  - `apps/web/hooks/auth/index.ts`
+  - `apps/web/hooks/dashboard/index.ts`
+  - `apps/web/hooks/notifications/index.ts`
+  - `apps/web/hooks/workspace/index.ts`
+- [x] Refactor import callsites sang entrypoints mới:
+  - Login page + private route guard + settings + project detail (`auth`)
+  - Dashboard page (`dashboard`)
+  - Notification bell (`notifications`)
+  - Settings page (`workspace`)
+- [x] Xác nhận `npm run typecheck --workspace @superboard/web` pass
+
+## Jira v1.71 — Jira Hook Internal Decoupling (Project Core)
+
+- [x] Thêm internal entrypoint `apps/web/hooks/jira/project-core.ts` cho nhóm project hooks/mutations
+- [x] Refactor `use-jira-projects-page.ts` dùng import tập trung từ `@/hooks/jira/project-core`
+- [x] Refactor `use-project-crud-form.ts` dùng project mutations từ `@/hooks/jira/project-core`
+- [x] Mở rộng `apps/web/hooks/jira/index.ts` re-export project-core hooks để đồng nhất access point
+- [x] Xác nhận `npm run typecheck --workspace @superboard/web` pass
+
 ## Jira v1.63 — Workspace Role Change Guard Extraction
 
 - [x] Tách logic validate member mục tiêu khi đổi role sang helper `findMutableWorkspaceMemberOrThrow`

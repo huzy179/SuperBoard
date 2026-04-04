@@ -20,17 +20,22 @@ import { TaskCreateForm } from '@/components/jira/task-create-form';
 import { TaskFilterBar } from '@/components/jira/task-filter-bar';
 import { TaskBulkActionBar } from '@/components/jira/task-bulk-action-bar';
 
-import { useAuthSession } from '@/hooks/use-auth-session';
-import { useProjectDetail } from '@/hooks/use-project-detail';
-import { useProjectCalendar } from '@/hooks/use-project-calendar';
-import { useProjectHeaderActions } from '@/hooks/use-project-header-actions';
+import { useAuthSession } from '@/hooks/auth';
 import {
+  useProjectDetail,
+  useProjectCalendar,
+  useProjectHeaderActions,
   useBulkTaskOperation,
   useCreateTask,
   useUpdateTask,
   useUpdateTaskStatus,
   useDeleteTask,
-} from '@/hooks/use-task-mutations';
+  useProjectUrlState,
+  useTaskSelection,
+  useTaskBulkActions,
+  useTaskEditPanel,
+  useTaskDragDrop,
+} from '@/hooks/jira';
 import { BOARD_COLUMNS, PRIORITY_OPTIONS, TASK_TYPE_OPTIONS } from '@/lib/constants/task';
 import {
   filterAndSortProjectTasks,
@@ -39,11 +44,6 @@ import {
   type SortDirection,
   buildBoardData,
 } from '@/lib/helpers/task-view';
-import { useProjectUrlState } from '@/hooks/use-project-url-state';
-import { useTaskSelection } from '@/hooks/use-task-selection';
-import { useTaskBulkActions } from '@/hooks/use-task-bulk-actions';
-import { useTaskEditPanel } from '@/hooks/use-task-edit-panel';
-import { useTaskDragDrop } from '@/hooks/use-task-drag-drop';
 import type { ViewMode } from '@/stores/jira-project-ui-store';
 
 export default function ProjectDetailPage() {

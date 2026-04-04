@@ -5,7 +5,7 @@ import {
   useNotifications,
   useMarkNotificationRead,
   useMarkAllNotificationsRead,
-} from '@/hooks/use-notifications';
+} from '@/hooks/notifications';
 import { formatRelativeTime } from '@/lib/format-date';
 
 const BellIcon: ReactNode = (

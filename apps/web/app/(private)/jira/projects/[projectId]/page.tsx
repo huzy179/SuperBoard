@@ -385,6 +385,7 @@ export default function ProjectDetailPage() {
           }}
           showArchived={showArchived}
           onToggleShowArchived={() => setShowArchived((prev) => !prev)}
+          workflow={workflow}
         />
 
         <TaskBulkActionBar
@@ -416,6 +417,7 @@ export default function ProjectDetailPage() {
           onApplyDueDate={() => handleBulkUpdateDueDate({ selectedTaskIds, clearTaskSelection })}
           onApplyAssignee={() => handleBulkAssignAssignee({ selectedTaskIds, clearTaskSelection })}
           onDeleteSelected={() => handleBulkDeleteTasks({ selectedTaskIds, clearTaskSelection })}
+          workflow={workflow}
         />
       </div>
 
@@ -430,6 +432,7 @@ export default function ProjectDetailPage() {
             onCreate={async (data: CreateTaskRequestDTO) => {
               await createTaskMutation.mutateAsync(data);
             }}
+            workflow={workflow}
           />
         </div>
       ) : null}

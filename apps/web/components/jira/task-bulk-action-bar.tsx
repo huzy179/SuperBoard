@@ -3,6 +3,7 @@ import type {
   ProjectTaskItemDTO,
   TaskPriorityDTO,
   TaskTypeDTO,
+  WorkflowStatusTemplateDTO,
 } from '@superboard/shared';
 import { BOARD_COLUMNS, PRIORITY_OPTIONS, TASK_TYPE_OPTIONS } from '@/lib/constants/task';
 
@@ -35,6 +36,7 @@ type TaskBulkActionBarProps = {
   onApplyDueDate: () => void;
   onApplyAssignee: () => void;
   onDeleteSelected: () => void;
+  workflow?: WorkflowStatusTemplateDTO | undefined;
 };
 
 export function TaskBulkActionBar({
@@ -66,6 +68,7 @@ export function TaskBulkActionBar({
   onApplyDueDate,
   onApplyAssignee,
   onDeleteSelected,
+  workflow,
 }: TaskBulkActionBarProps) {
   if (selectedCount === 0) {
     return null;
@@ -106,11 +109,17 @@ export function TaskBulkActionBar({
             }
             className="ml-2 rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1.5 text-[11px] text-slate-700"
           >
-            {BOARD_COLUMNS.map((column) => (
-              <option key={column.key} value={column.key}>
-                {column.label}
-              </option>
-            ))}
+            {workflow?.statuses
+              ? workflow.statuses.map((s) => (
+                  <option key={s.key} value={s.key}>
+                    {s.name}
+                  </option>
+                ))
+              : BOARD_COLUMNS.map((column) => (
+                  <option key={column.key} value={column.key}>
+                    {column.label}
+                  </option>
+                ))}
           </select>
         </label>
 

@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { FormEvent } from 'react';
 import type {
   ProjectMemberDTO,
   ProjectTaskItemDTO,
   TaskTypeDTO,
   CreateTaskRequestDTO,
+  WorkflowStatusTemplateDTO,
 } from '@superboard/shared';
 import {
   BOARD_COLUMNS,
@@ -22,19 +23,30 @@ type TaskCreateFormProps = {
   onCreate: (data: CreateTaskRequestDTO) => Promise<void>;
   onSuccess: () => void;
   onCancel: () => void;
+  workflow?: WorkflowStatusTemplateDTO | undefined;
 };
 
 export function TaskCreateForm({
-  initialStatus = 'todo',
+  initialStatus,
   members,
   isPending,
   onCreate,
   onSuccess,
   onCancel,
+  workflow,
 }: TaskCreateFormProps) {
+  const defaultStatus = useMemo(() => {
+    if (workflow?.statuses && workflow.statuses.length > 0) {
+      return workflow.statuses[0].key;
+    }
+    return 'todo';
+  }, [workflow?.statuses]);
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<ProjectTaskItemDTO['status']>(initialStatus);
+  const [status, setStatus] = useState<ProjectTaskItemDTO['status']>(
+    initialStatus || defaultStatus,
+  );
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [type, setType] = useState<TaskTypeDTO>('task');
   const [dueDate, setDueDate] = useState('');
@@ -92,14 +104,20 @@ export function TaskCreateForm({
           Trạng thái
           <select
             value={status}
-            onChange={(event) => setStatus(event.target.value as ProjectTaskItemDTO['status'])}
+            onChange={(event) => setStatus(event.target.value)}
             className="mt-1.5 w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
           >
-            {BOARD_COLUMNS.map((column) => (
-              <option key={column.key} value={column.key}>
-                {column.label}
-              </option>
-            ))}
+            {workflow?.statuses
+              ? workflow.statuses.map((s) => (
+                  <option key={s.key} value={s.key}>
+                    {s.name}
+                  </option>
+                ))
+              : BOARD_COLUMNS.map((column) => (
+                  <option key={column.key} value={column.key}>
+                    {column.label}
+                  </option>
+                ))}
           </select>
         </label>
         <label className="block text-sm font-medium text-slate-700">

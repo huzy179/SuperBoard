@@ -1,4 +1,4 @@
-import type { ProjectMemberDTO } from '@superboard/shared';
+import type { ProjectMemberDTO, WorkflowStatusTemplateDTO } from '@superboard/shared';
 import { BOARD_COLUMNS, PRIORITY_OPTIONS, TASK_TYPE_OPTIONS } from '@/lib/constants/task';
 import type { SortDirection, TaskSortBy } from '@/lib/helpers/task-view';
 
@@ -22,6 +22,7 @@ type TaskFilterBarProps = {
   onToggleSortDir: () => void;
   onToggleShowArchived: () => void;
   onClearFilters: () => void;
+  workflow?: WorkflowStatusTemplateDTO | undefined;
 };
 
 export function TaskFilterBar({
@@ -44,6 +45,7 @@ export function TaskFilterBar({
   onToggleSortDir,
   onToggleShowArchived,
   onClearFilters,
+  workflow,
 }: TaskFilterBarProps) {
   return (
     <div className="mb-4 rounded-xl border border-slate-200 bg-white p-3 shadow-xs">
@@ -76,20 +78,35 @@ export function TaskFilterBar({
 
         <div className="flex flex-wrap items-center gap-1 rounded-lg bg-slate-50 px-2 py-1">
           <span className="text-[11px] text-slate-500">Trạng thái</span>
-          {BOARD_COLUMNS.map((column) => (
-            <button
-              key={column.key}
-              type="button"
-              onClick={() => onToggleStatus(column.key)}
-              className={`rounded-md px-2 py-1 text-[11px] font-medium transition-colors ${
-                filterStatuses.has(column.key)
-                  ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-300'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              {column.label}
-            </button>
-          ))}
+          {workflow?.statuses
+            ? workflow.statuses.map((s) => (
+                <button
+                  key={s.key}
+                  type="button"
+                  onClick={() => onToggleStatus(s.key)}
+                  className={`rounded-md px-2 py-1 text-[11px] font-medium transition-colors ${
+                    filterStatuses.has(s.key)
+                      ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-300'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {s.name}
+                </button>
+              ))
+            : BOARD_COLUMNS.map((column) => (
+                <button
+                  key={column.key}
+                  type="button"
+                  onClick={() => onToggleStatus(column.key)}
+                  className={`rounded-md px-2 py-1 text-[11px] font-medium transition-colors ${
+                    filterStatuses.has(column.key)
+                      ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-300'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {column.label}
+                </button>
+              ))}
         </div>
 
         <div className="h-5 w-px bg-slate-200" />

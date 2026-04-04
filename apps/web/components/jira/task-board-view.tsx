@@ -1,5 +1,3 @@
-'use client';
-
 import { useMemo } from 'react';
 import { toast } from 'sonner';
 import type { ProjectTaskItemDTO, WorkflowStatusTemplateDTO } from '@superboard/shared';
@@ -60,6 +58,44 @@ export function TaskBoardView({
   workflow,
   draggedTaskId,
 }: TaskBoardViewProps) {
+  const getCategoryColor = (category: string | undefined) => {
+    switch (category) {
+      case 'todo':
+        return 'bg-slate-100 text-slate-600 border-slate-200';
+      case 'in_progress':
+        return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'in_review':
+        return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+      case 'done':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      case 'blocked':
+        return 'bg-rose-50 text-rose-700 border-rose-200';
+      case 'cancelled':
+        return 'bg-slate-100 text-slate-500 border-slate-200';
+      default:
+        return 'bg-slate-100 text-slate-600 border-slate-200';
+    }
+  };
+
+  const getCategoryIndicator = (category: string | undefined) => {
+    switch (category) {
+      case 'todo':
+        return '●';
+      case 'in_progress':
+        return '○';
+      case 'in_review':
+        return '◔';
+      case 'done':
+        return '✔';
+      case 'blocked':
+        return '✘';
+      case 'cancelled':
+        return '◌';
+      default:
+        return '●';
+    }
+  };
+
   const draggedTask = useMemo(() => {
     if (!draggedTaskId) return null;
     for (const tasks of boardData.values()) {
@@ -96,6 +132,9 @@ export function TaskBoardView({
         const isAllowedTarget =
           !draggedTaskId || allowedStatuses.has(column.key) || draggedTask?.status === column.key;
         const isBlocked = draggedTaskId && !isAllowedTarget;
+        const statusInfo = workflow?.statuses.find((s) => s.key === column.key);
+        const categoryStyles = getCategoryColor(statusInfo?.category);
+        const indicator = getCategoryIndicator(statusInfo?.category);
 
         return (
           <div
@@ -128,9 +167,14 @@ export function TaskBoardView({
             }}
           >
             <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-3 py-2.5">
-              <p className="text-xs font-bold tracking-wider text-slate-600 uppercase">
-                {column.label}
-              </p>
+              <div className="flex items-center gap-2">
+                <div
+                  className={`flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${categoryStyles}`}
+                >
+                  <span>{indicator}</span>
+                  <span>{column.label}</span>
+                </div>
+              </div>
               <div className="flex items-center gap-2">
                 <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-200 px-1.5 text-[11px] font-bold text-slate-700">
                   {tasks.length}

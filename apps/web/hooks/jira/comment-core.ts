@@ -1,7 +1,2 @@
-export {
-  useTaskComments,
-  useTaskHistory,
-  useCreateComment,
-  useUpdateComment,
-  useDeleteComment,
-} from '../use-task-comments';
+export { useTaskComments, useTaskHistory } from '../use-task-comments';
+export { useCreateComment, useUpdateComment, useDeleteComment } from './comment-mutation-core';

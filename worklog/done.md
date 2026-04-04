@@ -60,6 +60,13 @@
 - [x] Cập nhật `project-core.ts` re-export mutations qua `project-mutation-core` để giữ API ổn định
 - [x] Xác nhận `npm run typecheck --workspace @superboard/web` pass
 
+## Jira v1.74 — Jira Task/Comment Mutation Core Guardrails
+
+- [x] Thêm `apps/web/hooks/jira/task-mutation-core.ts` để tách task mutation exports khỏi `task-core`
+- [x] Thêm `apps/web/hooks/jira/comment-mutation-core.ts` để tách comment mutation exports khỏi `comment-core`
+- [x] Refactor `task-core.ts` và `comment-core.ts` dùng mutation-core tương ứng, giữ public API của `@/hooks/jira` không đổi
+- [x] Xác nhận `npm run typecheck --workspace @superboard/web` pass
+
 ## Jira v1.63 — Workspace Role Change Guard Extraction
 
 - [x] Tách logic validate member mục tiêu khi đổi role sang helper `findMutableWorkspaceMemberOrThrow`

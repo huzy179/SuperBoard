@@ -84,6 +84,7 @@ apps/web/
 - Với Jira project hooks, đã thêm internal entrypoint `hooks/jira/project-core.ts` để giảm import chéo trực tiếp giữa các hook project-level.
 - Tiếp tục tách nội bộ Jira hooks: `hooks/jira/task-core.ts` và `hooks/jira/comment-core.ts`, giữ `hooks/jira/index.ts` là public access point.
 - Bổ sung guardrail vòng import cho Jira project hooks: `hooks/jira/project-mutation-core.ts` để tách mutation exports khỏi `project-core`.
+- Bổ sung guardrail tương tự cho task/comment hooks: `hooks/jira/task-mutation-core.ts` và `hooks/jira/comment-mutation-core.ts`.
 - Realtime phía client đã có nền `socket.io-client` + sync đa tab qua `lib/realtime`.
 
 ---

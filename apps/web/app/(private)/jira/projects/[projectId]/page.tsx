@@ -485,6 +485,7 @@ export default function ProjectDetailPage() {
           onPrevMonth={prevMonth}
           onNextMonth={nextMonth}
           onOpenEdit={handleOpenEdit}
+          workflow={workflow}
         />
       )}
 

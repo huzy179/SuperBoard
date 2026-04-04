@@ -4,6 +4,24 @@
 
 ---
 
+## Jira v1.80 — Task Attachment Support (Full Stack)
+
+- [x] Triển khai hệ thống quản lý tệp đính kèm (Task Attachments) toàn diện.
+- [x] Cập nhật Prisma schema: thêm trường `name` cho `Attachment` và thiết lập quan hệ 1-n với `Task`.
+- [x] Xây dựng Backend Upload Module:
+  - `UploadService`: Xử lý lưu trữ mock (tạo DB record + sinh URL mock).
+  - `UploadController`: Cung cấp API upload (POST) và xoá (DELETE).
+- [x] Nâng cấp Frontend Core:
+  - `ApiClient`: Hỗ trợ `FormData` cho các yêu cầu multipart/form-data.
+  - `upload-service`: Service chuyên biệt cho thao tác tệp tin.
+- [x] Phát triển UI Components:
+  - `TaskAttachmentManager`: Component quản lý tệp đính kèm với dropzone, danh sách tệp, xem kích thước/ngày tháng, tải xuống và xoá.
+  - Tích hợp vào `TaskEditSlideOver`.
+- [x] Tối ưu hoá & Sửa lỗi:
+  - Khắc phục các lỗi ESLint liên quan đến type `any` và unused variables.
+  - Xử lý triệt để lỗi Git do các tệp tin rác phát sinh trong quá trình phát triển.
+- [x] Xác nhận `npm run typecheck` và `npm run lint` pass toàn dự án.
+
 ## Jira v1.75 — Dynamic Workflow Integration (Full)
 
 - [x] Tích hợp hệ thống quản lý workflow động (Dynamic Workflow) toàn diện vào Jira Project Detail.

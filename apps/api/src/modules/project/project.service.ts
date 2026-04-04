@@ -87,7 +87,17 @@ export class ProjectService {
         workspaceId,
         ...(options?.showArchived ? {} : { deletedAt: null }),
       } as Prisma.ProjectWhereInput,
-      include: {
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        color: true,
+        icon: true,
+        key: true,
+        workspaceId: true,
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true,
         tasks: {
           where: {
             ...(options?.showArchived ? {} : { deletedAt: null }),
@@ -110,6 +120,18 @@ export class ProjectService {
             assigneeId: true,
             assignee: { select: { fullName: true, avatarColor: true } },
             labels: { select: { label: { select: { id: true, name: true, color: true } } } },
+            attachments: {
+              where: { deletedAt: null },
+              select: {
+                id: true,
+                name: true,
+                key: true,
+                url: true,
+                size: true,
+                mimeType: true,
+                createdAt: true,
+              },
+            },
             createdAt: true,
             updatedAt: true,
           },
@@ -178,6 +200,11 @@ export class ProjectService {
         assigneeName: task.assignee?.fullName ?? null,
         assigneeAvatarColor: task.assignee?.avatarColor ?? null,
         subtaskProgress: subtaskStatsByParent.get(task.id) ?? null,
+        attachments: (task.attachments ?? []).map((a) => ({
+          ...a,
+          size: Number(a.size),
+          createdAt: a.createdAt.toISOString(),
+        })),
         createdAt: task.createdAt.toISOString(),
         updatedAt: task.updatedAt.toISOString(),
       })),
@@ -1028,6 +1055,18 @@ export class ProjectService {
     assigneeId: true,
     assignee: { select: { fullName: true, avatarColor: true } },
     labels: { select: { label: { select: { id: true, name: true, color: true } } } },
+    attachments: {
+      where: { deletedAt: null },
+      select: {
+        id: true,
+        name: true,
+        key: true,
+        url: true,
+        size: true,
+        mimeType: true,
+        createdAt: true,
+      },
+    },
     createdAt: true,
     updatedAt: true,
     deletedAt: true,
@@ -1048,6 +1087,15 @@ export class ProjectService {
     assigneeId: string | null;
     assignee: { fullName: string; avatarColor?: string | null } | null;
     labels?: Array<{ label: { id: string; name: string; color: string } }>;
+    attachments?: Array<{
+      id: string;
+      name: string;
+      key: string;
+      url: string;
+      size: bigint;
+      mimeType: string;
+      createdAt: Date;
+    }>;
     createdAt: Date;
     updatedAt: Date;
     deletedAt?: Date | null;
@@ -1064,6 +1112,11 @@ export class ProjectService {
       storyPoints: task.storyPoints ?? null,
       position: task.position ?? null,
       labels: (task.labels ?? []).map((tl) => tl.label),
+      attachments: (task.attachments ?? []).map((a) => ({
+        ...a,
+        size: Number(a.size),
+        createdAt: a.createdAt.toISOString(),
+      })),
       dueDate: task.dueDate ? task.dueDate.toISOString() : null,
       assigneeId: task.assigneeId,
       assigneeName: task.assignee?.fullName ?? null,

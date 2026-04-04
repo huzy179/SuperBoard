@@ -13,6 +13,7 @@ import { formatDate } from '@/lib/format-date';
 import { type TaskPriority } from '@/lib/constants/task';
 import { TaskSubtaskManager } from '@/components/jira/task-subtask-manager';
 import { TaskPropertiesForm } from '@/components/jira/task-properties-form';
+import { TaskAttachmentManager } from '@/components/jira/task-attachment-manager';
 
 interface TaskEditSlideOverProps {
   editingTask: ProjectTaskItemDTO;
@@ -181,6 +182,12 @@ export function TaskEditSlideOver({
                   onDeleteSubtask={handleDeleteSubtask}
                   onOpenEdit={handleOpenEdit}
                   parentTask={editingParentTask}
+                />
+
+                <TaskAttachmentManager
+                  projectId={projectId}
+                  taskId={editingTask.id}
+                  attachments={editingTask.attachments || []}
                 />
 
                 <label className="block text-sm font-medium text-slate-700">

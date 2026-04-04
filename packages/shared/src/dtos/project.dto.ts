@@ -45,6 +45,16 @@ export interface ProjectMemberDTO {
   avatarColor?: string | null;
 }
 
+export interface ProjectTaskAttachmentDTO {
+  id: string;
+  name: string;
+  key: string;
+  url: string;
+  size: number;
+  mimeType: string;
+  createdAt: string;
+}
+
 export interface ProjectTaskItemDTO {
   id: string;
   title: string;
@@ -66,6 +76,7 @@ export interface ProjectTaskItemDTO {
     done: number;
     percent: number;
   } | null;
+  attachments: ProjectTaskAttachmentDTO[];
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;

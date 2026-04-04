@@ -4,6 +4,21 @@
 
 ---
 
+## Jira v1.75 — Dynamic Workflow Integration (Full)
+
+- [x] Tích hợp hệ thống quản lý workflow động (Dynamic Workflow) toàn diện vào Jira Project Detail.
+- [x] Thay thế các hằng số status cứng (hardcoded) bằng cấu trúc `workflow` DTO từ cấu hình dự án.
+- [x] Áp dụng styling dựa trên category (todo, in_progress, done, blocked...) cho:
+  - Board headers & column borders.
+  - Task Calendar (icon + text color).
+  - List View status dropdowns.
+- [x] Tích hợp transition matrix (ma trận chuyển trạng thái) để validate sớm (proactive validation):
+  - Kéo thả trên Board: hiển thị feedback xanh/đỏ dựa trên luật chuyển.
+  - Dropdown trạng thái (Edit form, List view, Bulk): chỉ hiển thị các trạng thái hợp lệ từ trạng thái hiện tại.
+- [x] Cập nhật `TaskCalendarView` hiển thị category indicators (✔, ●, ○, ◔...) đồng bộ với thiết kế Kanban.
+- [x] Đảm bảo logic tạo task mặc định lấy trạng thái đầu tiên trong workflow cấu hình.
+- [x] Xác nhận `npm run typecheck --workspace @superboard/web` pass.
+
 ## Jira v1.62 — TaskService Guard Test Expansion
 
 - [x] Mở rộng `apps/api/test/services/task.service.test.ts` thêm guard cases cho archive/restore

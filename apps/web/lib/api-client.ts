@@ -46,10 +46,12 @@ export async function apiRequest<TData>(
   };
 
   if (body !== undefined) {
-    mergedHeaders = {
-      'Content-Type': 'application/json',
-      ...mergedHeaders,
-    };
+    if (!(body instanceof FormData)) {
+      mergedHeaders = {
+        'Content-Type': 'application/json',
+        ...mergedHeaders,
+      };
+    }
   }
 
   if (auth) {
@@ -71,7 +73,7 @@ export async function apiRequest<TData>(
   };
 
   if (body !== undefined) {
-    requestInit.body = JSON.stringify(body);
+    requestInit.body = (body instanceof FormData ? body : JSON.stringify(body)) as BodyInit;
   }
 
   const response = await fetch(buildUrl(path), requestInit);

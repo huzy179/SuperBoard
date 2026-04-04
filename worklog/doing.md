@@ -22,6 +22,7 @@ Mục tiêu: đưa SuperBoard từ mức "feature demo rất mạnh" sang mức 
 
 **Roadmap (Sprint v1.52+):**
 
+- [ ] Jira v1.80: Task Attachment Support (Productization MVP with Mock Storage)
 - [ ] Tiếp theo: deploy thực tế lên môi trường staging/production
 - [ ] Chốt roadmap thực tế theo hướng Jira-first: tránh mở rộng sang Slack / Notion / AI platform cho tới khi Jira đủ ổn định
 

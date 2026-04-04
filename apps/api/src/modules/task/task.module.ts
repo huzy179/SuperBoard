@@ -4,8 +4,10 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { TaskController } from './task.controller';
 import { TaskService } from './task.service';
 
+import { WorkflowModule } from '../workflow/workflow.module';
+
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, WorkflowModule],
   controllers: [TaskController],
   providers: [TaskService, PrismaService],
   exports: [TaskService],

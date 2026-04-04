@@ -8,6 +8,7 @@ import {
 } from '../../common/project-scope.helper';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationService } from '../notification/notification.service';
+import { WorkflowService } from '../workflow/workflow.service';
 import type {
   BulkTaskOperationResultDTO,
   CreateProjectRequestDTO,
@@ -30,6 +31,7 @@ export class ProjectService {
   constructor(
     private prisma: PrismaService,
     private notificationService: NotificationService,
+    private workflowService: WorkflowService,
   ) {}
 
   async getProjectsByWorkspace(
@@ -191,6 +193,9 @@ export class ProjectService {
         workspaceId,
       },
     });
+
+    // Clone workspace workflow status template into project snapshot
+    await this.workflowService.cloneWorkspaceTemplateToProject(workspaceId, project.id);
 
     return this.toProjectItemDTO(project);
   }

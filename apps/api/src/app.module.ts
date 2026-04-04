@@ -13,6 +13,7 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { ProjectModule } from './modules/project/project.module';
 import { WorkspaceModule } from './modules/workspace/workspace.module';
 import { TaskModule } from './modules/task/task.module';
+import { WorkflowModule } from './modules/workflow/workflow.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { TaskModule } from './modules/task/task.module';
     WorkspaceModule,
     TaskModule,
     NotificationModule,
+    WorkflowModule,
   ],
   controllers: [HealthController],
   providers: [

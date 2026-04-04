@@ -40,3 +40,40 @@ export type RestoreProjectResponseDTO = ApiResponse<LifecycleOperationResultDTO>
 
 export type ArchiveTaskResponseDTO = ApiResponse<LifecycleOperationResultDTO>;
 export type RestoreTaskResponseDTO = ApiResponse<LifecycleOperationResultDTO>;
+
+/**
+ * Status Categories map to canonical workflow stages
+ */
+export type WorkflowStatusCategory = 'todo' | 'in_progress' | 'in_review' | 'done' | 'blocked';
+
+export interface WorkflowStatusDTO {
+  id: string;
+  key: string;
+  name: string;
+  category: WorkflowStatusCategory;
+  position: number;
+  isSystem: boolean;
+}
+
+export interface WorkflowTransitionDTO {
+  fromStatusId: string;
+  toStatusId: string;
+}
+
+export interface CreateWorkflowStatusRequestDTO {
+  key: string;
+  name: string;
+  category: WorkflowStatusCategory;
+  position?: number;
+}
+
+export interface UpdateWorkflowStatusRequestDTO {
+  name?: string;
+  category?: WorkflowStatusCategory;
+  position?: number;
+}
+
+export interface WorkflowStatusTemplateDTO {
+  statuses: WorkflowStatusDTO[];
+  transitions: WorkflowTransitionDTO[];
+}

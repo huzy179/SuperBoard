@@ -52,6 +52,14 @@
 - [x] Giữ nguyên API public `@/hooks/jira`, chỉ giảm coupling nội bộ và chuẩn hoá cấu trúc
 - [x] Xác nhận `npm run typecheck --workspace @superboard/web` pass
 
+## Jira v1.73 — Jira Project Mutation Core (Circular Dependency Guard)
+
+- [x] Phát hiện rủi ro vòng import giữa `project-core` và `use-project-crud-form`
+- [x] Thêm `apps/web/hooks/jira/project-mutation-core.ts` để tách riêng project mutation exports
+- [x] Refactor `use-project-crud-form.ts` import mutations từ `@/hooks/jira/project-mutation-core`
+- [x] Cập nhật `project-core.ts` re-export mutations qua `project-mutation-core` để giữ API ổn định
+- [x] Xác nhận `npm run typecheck --workspace @superboard/web` pass
+
 ## Jira v1.63 — Workspace Role Change Guard Extraction
 
 - [x] Tách logic validate member mục tiêu khi đổi role sang helper `findMutableWorkspaceMemberOrThrow`

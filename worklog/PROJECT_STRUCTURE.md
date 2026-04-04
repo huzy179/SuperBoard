@@ -83,6 +83,7 @@ apps/web/
 - Mở rộng pattern entrypoint theo domain: `hooks/auth`, `hooks/dashboard`, `hooks/notifications`, `hooks/workspace`.
 - Với Jira project hooks, đã thêm internal entrypoint `hooks/jira/project-core.ts` để giảm import chéo trực tiếp giữa các hook project-level.
 - Tiếp tục tách nội bộ Jira hooks: `hooks/jira/task-core.ts` và `hooks/jira/comment-core.ts`, giữ `hooks/jira/index.ts` là public access point.
+- Bổ sung guardrail vòng import cho Jira project hooks: `hooks/jira/project-mutation-core.ts` để tách mutation exports khỏi `project-core`.
 - Realtime phía client đã có nền `socket.io-client` + sync đa tab qua `lib/realtime`.
 
 ---

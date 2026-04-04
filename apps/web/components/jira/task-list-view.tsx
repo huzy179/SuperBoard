@@ -1,6 +1,6 @@
 'use client';
 
-import type { ProjectTaskItemDTO } from '@superboard/shared';
+import type { ProjectTaskItemDTO, WorkflowStatusTemplateDTO } from '@superboard/shared';
 import {
   TaskTypeIcon,
   PriorityBadge,
@@ -8,7 +8,6 @@ import {
   LabelDots,
   TaskIdBadge,
 } from '@/components/jira/task-badges';
-import { BOARD_COLUMNS } from '@/lib/constants/task';
 import { formatDate } from '@/lib/format-date';
 
 interface TaskListViewProps {
@@ -23,6 +22,7 @@ interface TaskListViewProps {
   isUpdatePending: boolean;
   isDragDropLocked: boolean;
   statusSelectLockReason?: string | undefined;
+  workflow?: WorkflowStatusTemplateDTO | undefined;
 }
 
 export function TaskListView({
@@ -37,7 +37,32 @@ export function TaskListView({
   isUpdatePending,
   isDragDropLocked,
   statusSelectLockReason,
+  workflow,
 }: TaskListViewProps) {
+  const getStatusOptionsForTask = (currentStatus: string) => {
+    if (!workflow) {
+      return [
+        { key: 'todo', label: 'Cần làm' },
+        { key: 'in_progress', label: 'Đang làm' },
+        { key: 'in_review', label: 'Đang review' },
+        { key: 'done', label: 'Hoàn thành' },
+        { key: 'cancelled', label: 'Đã huỷ' },
+      ];
+    }
+
+    const currentStatusObj = workflow.statuses.find((s) => s.key === currentStatus);
+    if (!currentStatusObj) return workflow.statuses.map((s) => ({ key: s.key, label: s.name }));
+
+    const allowedToStatusIds = new Set(
+      workflow.transitions
+        .filter((t) => t.fromStatusId === currentStatusObj.id)
+        .map((t) => t.toStatusId),
+    );
+
+    return workflow.statuses
+      .filter((s) => s.key === currentStatus || allowedToStatusIds.has(s.id))
+      .map((s) => ({ key: s.key, label: s.name }));
+  };
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
       <table className="min-w-full divide-y divide-slate-200 text-sm">
@@ -125,9 +150,9 @@ export function TaskListView({
                   onClick={(e) => e.stopPropagation()}
                   className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100"
                 >
-                  {BOARD_COLUMNS.map((column) => (
-                    <option key={column.key} value={column.key}>
-                      {column.label}
+                  {getStatusOptionsForTask(task.status).map((opt) => (
+                    <option key={opt.key} value={opt.key}>
+                      {opt.label}
                     </option>
                   ))}
                 </select>

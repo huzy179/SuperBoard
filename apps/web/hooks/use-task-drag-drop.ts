@@ -24,6 +24,7 @@ export function useTaskDragDrop({
   isUpdatePending,
 }: UseTaskDragDropProps) {
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
   function handleDragStart(event: React.DragEvent<HTMLElement>, taskId: string) {
     if (isDragDropLocked) {
@@ -32,6 +33,7 @@ export function useTaskDragDrop({
     }
     event.dataTransfer.setData('text/task-id', taskId);
     event.dataTransfer.effectAllowed = 'move';
+    setDraggedTaskId(taskId);
   }
 
   function handleDragOver(event: React.DragEvent<HTMLElement>) {
@@ -133,6 +135,7 @@ export function useTaskDragDrop({
     event.preventDefault();
     event.stopPropagation();
     setDragOverColumn(null);
+    setDraggedTaskId(null);
 
     const taskId = event.dataTransfer.getData('text/task-id');
     if (!taskId || isUpdatePending) return;
@@ -182,6 +185,8 @@ export function useTaskDragDrop({
   return {
     dragOverColumn,
     setDragOverColumn,
+    draggedTaskId,
+    setDraggedTaskId,
     handleDragStart,
     handleDragOver,
     handleDrop,

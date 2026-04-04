@@ -1,6 +1,8 @@
 'use client';
 
-import type { ProjectTaskItemDTO } from '@superboard/shared';
+import { useMemo } from 'react';
+import { toast } from 'sonner';
+import type { ProjectTaskItemDTO, WorkflowStatusTemplateDTO } from '@superboard/shared';
 import {
   TaskTypeIcon,
   PriorityBadge,
@@ -9,7 +11,7 @@ import {
   LabelDots,
   TaskIdBadge,
 } from '@/components/jira/task-badges';
-import { BOARD_COLUMNS, COLUMN_BORDER } from '@/lib/constants/task';
+import { COLUMN_BORDER } from '@/lib/constants/task';
 import { formatDate } from '@/lib/format-date';
 import { isTaskOverdue } from '@/lib/helpers/task-view';
 
@@ -33,6 +35,9 @@ interface TaskBoardViewProps {
   isUpdatePending: boolean;
   updatingTaskId: string | undefined;
   onAddTask: (status: ProjectTaskItemDTO['status']) => void;
+  columns: Array<{ key: string; label: string }>;
+  workflow?: WorkflowStatusTemplateDTO | undefined;
+  draggedTaskId: string | null;
 }
 
 export function TaskBoardView({
@@ -51,19 +56,60 @@ export function TaskBoardView({
   isUpdatePending,
   updatingTaskId,
   onAddTask,
+  columns,
+  workflow,
+  draggedTaskId,
 }: TaskBoardViewProps) {
+  const draggedTask = useMemo(() => {
+    if (!draggedTaskId) return null;
+    for (const tasks of boardData.values()) {
+      const found = tasks.find((t) => t.id === draggedTaskId);
+      if (found) return found;
+    }
+    return null;
+  }, [draggedTaskId, boardData]);
+
+  const getAllowedTargetStatuses = (fromStatus: string) => {
+    if (!workflow) return new Set<string>();
+    const allowed = new Set<string>();
+    workflow.transitions.forEach((t) => {
+      if (t.fromStatusId === fromStatus) {
+        const toStatus = workflow.statuses.find((s) => s.id === t.toStatusId);
+        if (toStatus) allowed.add(toStatus.key);
+      }
+    });
+    return allowed;
+  };
+
+  const allowedStatuses = useMemo(() => {
+    if (!draggedTask) return new Set<string>();
+    // Find the status ID of the current task
+    const currentStatus = workflow?.statuses.find((s) => s.key === draggedTask.status);
+    if (!currentStatus) return new Set<string>();
+    return getAllowedTargetStatuses(currentStatus.id);
+  }, [draggedTask, workflow]);
   return (
     <div className="flex gap-4 overflow-x-auto pb-3">
-      {BOARD_COLUMNS.map((column) => {
+      {columns.map((column) => {
         const tasks = boardData.get(column.key) ?? [];
         const isDragOver = dragOverColumn === column.key;
+        const isAllowedTarget =
+          !draggedTaskId || allowedStatuses.has(column.key) || draggedTask?.status === column.key;
+        const isBlocked = draggedTaskId && !isAllowedTarget;
+
         return (
           <div
             key={column.key}
-            className={`w-80 shrink-0 rounded-xl border border-t-2 bg-slate-50 ${COLUMN_BORDER[column.key] ?? ''} ${
+            className={`w-80 shrink-0 rounded-xl border border-t-2 bg-slate-50 transition-all ${
+              COLUMN_BORDER[column.key] ?? 'border-t-slate-400'
+            } ${
               isDragOver
-                ? 'border-dashed border-brand-400 bg-brand-50/30 animate-pulse'
-                : 'border-slate-200'
+                ? isAllowedTarget
+                  ? 'border-dashed border-emerald-400 bg-emerald-50/30 animate-pulse scale-[1.02]'
+                  : 'border-dashed border-rose-400 bg-rose-50/30 opacity-70'
+                : isBlocked
+                  ? 'opacity-40 grayscale-[0.5]'
+                  : 'border-slate-200'
             }`}
             onDragOver={(e) => {
               onDragOver(e);
@@ -72,7 +118,14 @@ export function TaskBoardView({
               }
             }}
             onDragLeave={() => setDragOverColumn(null)}
-            onDrop={(event) => onDrop(event, column.key)}
+            onDrop={(event) => {
+              if (isAllowedTarget) {
+                onDrop(event, column.key);
+              } else {
+                event.preventDefault();
+                toast.error('Giai đoạn này bị chặn bởi quy trình dự án');
+              }
+            }}
           >
             <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-3 py-2.5">
               <p className="text-xs font-bold tracking-wider text-slate-600 uppercase">

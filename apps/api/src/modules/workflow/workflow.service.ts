@@ -207,4 +207,126 @@ export class WorkflowService {
       );
     }
   }
+
+  async getProjectWorkflow(projectId: string): Promise<{
+    statuses: WorkflowStatusDTO[];
+    transitions: { fromStatusId: string; toStatusId: string }[];
+  }> {
+    const statuses = await this.getProjectStatuses(projectId);
+    const transitions = await this.prisma.projectWorkflowTransition.findMany({
+      where: { projectId },
+      select: { fromStatusId: true, toStatusId: true },
+    });
+
+    return { statuses, transitions };
+  }
+
+  async createProjectStatus(
+    projectId: string,
+    data: { key: string; name: string; category: WorkflowStatusCategory; position?: number },
+  ): Promise<WorkflowStatusDTO> {
+    const status = await this.prisma.projectWorkflowStatus.create({
+      data: {
+        projectId,
+        key: data.key,
+        name: data.name,
+        category: data.category,
+        position: data.position ?? 99,
+        isSystem: false,
+      },
+    });
+
+    return {
+      id: status.id,
+      key: status.key,
+      name: status.name,
+      category: status.category as WorkflowStatusCategory,
+      position: status.position,
+      isSystem: status.isSystem,
+    };
+  }
+
+  async updateProjectStatus(
+    projectId: string,
+    statusId: string,
+    data: { name?: string; category?: WorkflowStatusCategory; position?: number },
+  ): Promise<WorkflowStatusDTO> {
+    const updateData: Prisma.ProjectWorkflowStatusUpdateInput = {};
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.category !== undefined) updateData.category = data.category;
+    if (data.position !== undefined) updateData.position = data.position;
+
+    const status = await this.prisma.projectWorkflowStatus.update({
+      where: { id: statusId, projectId },
+      data: updateData,
+    });
+
+    return {
+      id: status.id,
+      key: status.key,
+      name: status.name,
+      category: status.category as WorkflowStatusCategory,
+      position: status.position,
+      isSystem: status.isSystem,
+    };
+  }
+
+  async deleteProjectStatus(
+    projectId: string,
+    statusId: string,
+    migrateToId: string,
+  ): Promise<void> {
+    const status = await this.prisma.projectWorkflowStatus.findUnique({
+      where: { id: statusId, projectId },
+    });
+
+    if (!status) throw new BadRequestException('Trạng thái không tồn tại');
+    if (status.isSystem) throw new BadRequestException('Không thể xoá trạng thái hệ thống');
+
+    const migrateTo = await this.prisma.projectWorkflowStatus.findUnique({
+      where: { id: migrateToId, projectId },
+    });
+    if (!migrateTo) throw new BadRequestException('Trạng thái đích không hợp lệ');
+
+    await this.prisma.$transaction(async (tx) => {
+      // Migrate tasks
+      await tx.task.updateMany({
+        where: { projectId, status: status.key },
+        data: { status: migrateTo.key },
+      });
+
+      // Remove transitions
+      await tx.projectWorkflowTransition.deleteMany({
+        where: { OR: [{ fromStatusId: statusId }, { toStatusId: statusId }] },
+      });
+
+      // Remove status
+      await tx.projectWorkflowStatus.delete({
+        where: { id: statusId },
+      });
+    });
+  }
+
+  async updateProjectTransitions(
+    projectId: string,
+    transitions: { fromStatusId: string; toStatusId: string }[],
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      // Clear existing transitions for this project
+      await tx.projectWorkflowTransition.deleteMany({
+        where: { projectId },
+      });
+
+      // Create new transitions
+      if (transitions.length > 0) {
+        await tx.projectWorkflowTransition.createMany({
+          data: transitions.map((t) => ({
+            projectId,
+            fromStatusId: t.fromStatusId,
+            toStatusId: t.toStatusId,
+          })),
+        });
+      }
+    });
+  }
 }

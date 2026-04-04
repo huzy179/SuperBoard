@@ -77,3 +77,11 @@ export interface WorkflowStatusTemplateDTO {
   statuses: WorkflowStatusDTO[];
   transitions: WorkflowTransitionDTO[];
 }
+
+export interface UpdateTransitionsRequestDTO {
+  transitions: WorkflowTransitionDTO[];
+}
+
+export interface DeleteStatusRequestDTO {
+  migrateToId: string;
+}

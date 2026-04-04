@@ -1,6 +1,13 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { WorkflowService } from './workflow.service';
-import type { WorkflowStatusDTO } from '@superboard/shared';
+import type {
+  WorkflowStatusDTO,
+  CreateWorkflowStatusRequestDTO,
+  UpdateWorkflowStatusRequestDTO,
+  DeleteStatusRequestDTO,
+  UpdateTransitionsRequestDTO,
+  WorkflowStatusTemplateDTO,
+} from '@superboard/shared';
 
 @Controller('workflow')
 export class WorkflowController {
@@ -16,5 +23,46 @@ export class WorkflowController {
   @Get('project/:projectId/statuses')
   async getProjectStatuses(@Param('projectId') projectId: string): Promise<WorkflowStatusDTO[]> {
     return this.workflowService.getProjectStatuses(projectId);
+  }
+
+  @Get('project/:projectId')
+  async getProjectWorkflow(
+    @Param('projectId') projectId: string,
+  ): Promise<WorkflowStatusTemplateDTO> {
+    return this.workflowService.getProjectWorkflow(projectId);
+  }
+
+  @Post('project/:projectId/statuses')
+  async createProjectStatus(
+    @Param('projectId') projectId: string,
+    @Body() body: CreateWorkflowStatusRequestDTO,
+  ): Promise<WorkflowStatusDTO> {
+    return this.workflowService.createProjectStatus(projectId, body);
+  }
+
+  @Patch('project/:projectId/statuses/:statusId')
+  async updateProjectStatus(
+    @Param('projectId') projectId: string,
+    @Param('statusId') statusId: string,
+    @Body() body: UpdateWorkflowStatusRequestDTO,
+  ): Promise<WorkflowStatusDTO> {
+    return this.workflowService.updateProjectStatus(projectId, statusId, body);
+  }
+
+  @Delete('project/:projectId/statuses/:statusId')
+  async deleteProjectStatus(
+    @Param('projectId') projectId: string,
+    @Param('statusId') statusId: string,
+    @Body() body: DeleteStatusRequestDTO,
+  ): Promise<void> {
+    return this.workflowService.deleteProjectStatus(projectId, statusId, body.migrateToId);
+  }
+
+  @Post('project/:projectId/transitions')
+  async updateProjectTransitions(
+    @Param('projectId') projectId: string,
+    @Body() body: UpdateTransitionsRequestDTO,
+  ): Promise<void> {
+    return this.workflowService.updateProjectTransitions(projectId, body.transitions);
   }
 }

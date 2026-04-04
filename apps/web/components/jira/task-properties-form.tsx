@@ -1,15 +1,15 @@
 'use client';
 
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useMemo } from 'react';
 import type { ProjectTaskItemDTO, ProjectMemberDTO, TaskTypeDTO } from '@superboard/shared';
 import { LabelDots } from '@/components/jira/task-badges';
 import {
-  BOARD_COLUMNS,
   PRIORITY_OPTIONS,
   TASK_TYPE_OPTIONS,
   TASK_TYPE_ICONS,
   type TaskPriority,
 } from '@/lib/constants/task';
+import type { WorkflowStatusTemplateDTO } from '@superboard/shared';
 
 interface TaskPropertiesFormProps {
   editTitle: string;
@@ -28,6 +28,8 @@ interface TaskPropertiesFormProps {
   setEditAssigneeId: (val: string) => void;
   members: ProjectMemberDTO[];
   labels?: ProjectTaskItemDTO['labels'];
+  workflow?: WorkflowStatusTemplateDTO | undefined;
+  initialStatus?: string;
 }
 
 export function TaskPropertiesForm({
@@ -47,7 +49,36 @@ export function TaskPropertiesForm({
   setEditAssigneeId,
   members,
   labels,
+  workflow,
+  initialStatus,
 }: TaskPropertiesFormProps) {
+  const statusOptions = useMemo(() => {
+    if (!workflow || !initialStatus) {
+      // Fallback to default columns if no workflow
+      return (
+        workflow?.statuses.map((s) => ({ key: s.key, label: s.name })) || [
+          { key: 'todo', label: 'Cần làm' },
+          { key: 'in_progress', label: 'Đang làm' },
+          { key: 'in_review', label: 'Đang review' },
+          { key: 'done', label: 'Hoàn thành' },
+          { key: 'cancelled', label: 'Đã huỷ' },
+        ]
+      );
+    }
+
+    const currentStatusObj = workflow.statuses.find((s) => s.key === initialStatus);
+    if (!currentStatusObj) return workflow.statuses.map((s) => ({ key: s.key, label: s.name }));
+
+    const allowedToStatusIds = new Set(
+      workflow.transitions
+        .filter((t) => t.fromStatusId === currentStatusObj.id)
+        .map((t) => t.toStatusId),
+    );
+
+    return workflow.statuses
+      .filter((s) => s.key === initialStatus || allowedToStatusIds.has(s.id))
+      .map((s) => ({ key: s.key, label: s.name }));
+  }, [workflow, initialStatus]);
   return (
     <div className="space-y-5">
       <label className="block text-sm font-medium text-slate-700">
@@ -87,12 +118,12 @@ export function TaskPropertiesForm({
           Trạng thái
           <select
             value={editStatus}
-            onChange={(e) => setEditStatus(e.target.value as ProjectTaskItemDTO['status'])}
+            onChange={(e) => setEditStatus(e.target.value)}
             className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
           >
-            {BOARD_COLUMNS.map((col) => (
-              <option key={col.key} value={col.key}>
-                {col.label}
+            {statusOptions.map((opt: { key: string; label: string }) => (
+              <option key={opt.key} value={opt.key}>
+                {opt.label}
               </option>
             ))}
           </select>

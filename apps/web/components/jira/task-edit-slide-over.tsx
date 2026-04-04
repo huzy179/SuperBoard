@@ -1,7 +1,12 @@
 'use client';
 
 import { FormEvent, type Dispatch, type SetStateAction } from 'react';
-import type { ProjectTaskItemDTO, ProjectMemberDTO, TaskTypeDTO } from '@superboard/shared';
+import type {
+  ProjectTaskItemDTO,
+  ProjectMemberDTO,
+  TaskTypeDTO,
+  WorkflowStatusTemplateDTO,
+} from '@superboard/shared';
 import { TaskTypeIcon } from '@/components/jira/task-badges';
 import { TaskCommentSection } from '@/components/jira/task-comment-section';
 import { formatDate } from '@/lib/format-date';
@@ -15,6 +20,7 @@ interface TaskEditSlideOverProps {
   projectId: string;
   currentUserId: string;
   members: ProjectMemberDTO[];
+  workflow?: WorkflowStatusTemplateDTO | undefined;
 
   // States
   editTitle: string;
@@ -103,6 +109,7 @@ export function TaskEditSlideOver({
   handleOpenEdit,
   dialogRef,
   handleDialogKeyDown,
+  workflow,
 }: TaskEditSlideOverProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/20 backdrop-blur-sm">
@@ -158,6 +165,8 @@ export function TaskEditSlideOver({
                   setEditAssigneeId={setEditAssigneeId}
                   members={members}
                   labels={editingTask.labels}
+                  workflow={workflow}
+                  initialStatus={editingTask.status}
                 />
 
                 <TaskSubtaskManager

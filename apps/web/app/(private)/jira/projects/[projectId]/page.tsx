@@ -36,6 +36,7 @@ import {
   useTaskBulkActions,
   useTaskEditPanel,
   useTaskDragDrop,
+  useProjectWorkflow,
 } from '@/hooks/jira';
 import { BOARD_COLUMNS, PRIORITY_OPTIONS, TASK_TYPE_OPTIONS } from '@/lib/constants/task';
 import {
@@ -250,12 +251,23 @@ export default function ProjectDetailPage() {
   const handleOpenQuickSearch = useCallback(() => setShowQuickSearch(true), []);
   const handleCloseQuickSearch = useCallback(() => setShowQuickSearch(false), []);
 
+  const { data: workflow } = useProjectWorkflow(projectId);
+
+  const dynamicColumns = useMemo(() => {
+    if (workflow?.statuses && workflow.statuses.length > 0) {
+      return workflow.statuses
+        .sort((a, b) => a.position - b.position)
+        .map((s) => ({ key: s.key, label: s.name }));
+    }
+    return BOARD_COLUMNS;
+  }, [workflow?.statuses]);
+
   useKeyboardShortcuts([
     { key: 'k', metaKey: true, handler: handleOpenQuickSearch },
     { key: '/', handler: handleOpenQuickSearch },
   ]);
 
-  const boardDataStatuses = useMemo(() => BOARD_COLUMNS.map((col) => col.key), []);
+  const boardDataStatuses = useMemo(() => dynamicColumns.map((col) => col.key), [dynamicColumns]);
   const boardData = useMemo(
     () => buildBoardData(visibleTasks, boardDataStatuses),
     [visibleTasks, boardDataStatuses],
@@ -264,6 +276,7 @@ export default function ProjectDetailPage() {
   const {
     dragOverColumn,
     setDragOverColumn,
+    draggedTaskId,
     handleDragStart,
     handleDragOver,
     handleDrop,
@@ -441,6 +454,9 @@ export default function ProjectDetailPage() {
             setTaskStatus(status);
             setShowCreateTaskPanel(true);
           }}
+          columns={dynamicColumns}
+          workflow={workflow}
+          draggedTaskId={draggedTaskId}
         />
       ) : viewMode === 'list' ? (
         <TaskListView
@@ -455,6 +471,7 @@ export default function ProjectDetailPage() {
           isUpdatePending={updateTaskStatusMutation.isPending}
           isDragDropLocked={isDragDropLocked}
           statusSelectLockReason={statusSelectLockReason}
+          workflow={workflow}
         />
       ) : (
         <TaskCalendarView
@@ -511,6 +528,7 @@ export default function ProjectDetailPage() {
           handleOpenEdit={handleOpenEdit}
           dialogRef={dialogRef}
           handleDialogKeyDown={handleDialogKeyDown}
+          workflow={workflow}
         />
       ) : null}
 

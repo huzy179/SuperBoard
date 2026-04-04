@@ -60,6 +60,13 @@ export function ProjectDetailHeader({
                   {projectKey}
                 </span>
               ) : null}
+              <Link
+                href={`/jira/projects/${project.id}/settings/workflow`}
+                className="ml-1 rounded-full p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                title="Cấu hình quy trình (Workflow)"
+              >
+                ⚙️
+              </Link>
             </div>
             <p className="mt-1 text-sm font-medium text-slate-500">{currentViewLabel}</p>
             <p className="mt-2 text-sm text-slate-600">{project.description || 'Không có mô tả'}</p>

@@ -31,3 +31,11 @@ export {
   useDeleteProject,
   useUpdateProject,
 } from './project-core';
+export {
+  useProjectStatuses,
+  useProjectWorkflow,
+  useCreateProjectStatus,
+  useUpdateProjectStatus,
+  useDeleteProjectStatus,
+  useUpdateProjectTransitions,
+} from './workflow-core';

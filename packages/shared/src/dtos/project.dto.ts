@@ -16,7 +16,7 @@ export type TaskPriorityDTO = 'low' | 'medium' | 'high' | 'urgent';
 
 export type TaskTypeDTO = 'task' | 'bug' | 'story' | 'epic';
 
-export type TaskStatusDTO = 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled';
+export type TaskStatusDTO = string;
 
 export type TaskEventTypeDTO =
   | 'created'

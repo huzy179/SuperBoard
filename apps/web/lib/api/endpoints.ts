@@ -46,5 +46,9 @@ export const API_ENDPOINTS = {
     workspaceStatuses: (workspaceId: string) =>
       `/api/v1/workflow/workspace/${workspaceId}/statuses`,
     projectStatuses: (projectId: string) => `/api/v1/workflow/project/${projectId}/statuses`,
+    projectWorkflow: (projectId: string) => `/api/v1/workflow/project/${projectId}`,
+    statusDetail: (projectId: string, statusId: string) =>
+      `/api/v1/workflow/project/${projectId}/statuses/${statusId}`,
+    transitions: (projectId: string) => `/api/v1/workflow/project/${projectId}/transitions`,
   },
 };

@@ -7,9 +7,9 @@ import type { NavItem } from '@/lib/navigation';
 import { isNavItemActive } from '@/lib/navigation';
 import { AppBrand } from './app-brand';
 import { NotificationBell } from '@/components/notifications/notification-bell';
-import { getInitials } from '@/lib/helpers';
 import { SearchModal } from '@/components/search/SearchModal';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { AssigneeAvatar } from '../jira/task-badges';
 
 type PrivateShellProps = {
   children: ReactNode;
@@ -100,8 +100,6 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
     },
   ]);
 
-  const userInitials = getInitials(user.fullName);
-
   const sidebar = (
     <div className="flex h-full flex-col bg-sidebar-bg">
       <div className="flex h-12 shrink-0 items-center gap-3 border-b border-white/6 px-4">
@@ -164,9 +162,12 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
 
       <div className="shrink-0 border-t border-white/6 p-2">
         <div className="flex items-center gap-2 rounded-md px-2 py-1.5">
-          <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-brand-400 to-brand-600 text-[10px] font-semibold text-white">
-            {userInitials || 'SB'}
-          </span>
+          <AssigneeAvatar
+            name={user.fullName}
+            color={user.avatarColor}
+            src={user.avatarUrl}
+            size="md"
+          />
           <div className="min-w-0 flex-1">
             <p className="truncate text-[13px] font-medium text-white/85">{user.fullName}</p>
             <p className="truncate text-[10px] text-white/40">{user.email}</p>

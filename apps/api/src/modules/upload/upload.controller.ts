@@ -9,11 +9,33 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from './upload.service';
-import { ProjectTaskAttachmentDTO } from '@superboard/shared';
+import { ProjectTaskAttachmentDTO, AuthUserDTO } from '@superboard/shared';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { apiSuccess } from '../../common/api-response';
 
 @Controller('upload')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
+
+  @Post('avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadAvatar(
+    @CurrentUser() user: AuthUserDTO,
+    @UploadedFile()
+    file: {
+      originalname: string;
+      mimetype: string;
+      size: number;
+      buffer: Buffer;
+    },
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    const avatarUrl = await this.uploadService.uploadAvatar(user.id, file);
+    return apiSuccess({ avatarUrl });
+  }
 
   @Post('tasks/:taskId')
   @UseInterceptors(FileInterceptor('file'))

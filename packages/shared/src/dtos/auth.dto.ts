@@ -8,8 +8,13 @@ export interface LoginRequestDTO {
 
 export type AuthUserDTO = Pick<
   User,
-  'id' | 'email' | 'fullName' | 'defaultWorkspaceId' | 'avatarColor'
+  'id' | 'email' | 'fullName' | 'defaultWorkspaceId' | 'avatarColor' | 'avatarUrl'
 >;
+
+export interface UpdateProfileRequestDTO {
+  fullName?: string;
+  avatarUrl?: string | null;
+}
 
 export interface LoginDataDTO {
   accessToken: string;

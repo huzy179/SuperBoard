@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { ProjectTaskAttachmentDTO } from '@superboard/shared';
+import { writeFile, mkdir } from 'node:fs/promises';
+import { join, extname } from 'node:path';
 
 @Injectable()
 export class UploadService {
@@ -53,6 +55,27 @@ export class UploadService {
       mimeType: attachment.mimeType,
       createdAt: attachment.createdAt.toISOString(),
     };
+  }
+
+  async uploadAvatar(
+    userId: string,
+    file: {
+      originalname: string;
+      mimetype: string;
+      size: number;
+      buffer: Buffer;
+    },
+  ): Promise<string> {
+    const uploadDir = join(process.cwd(), 'uploads', 'avatars');
+    await mkdir(uploadDir, { recursive: true });
+
+    const fileName = `${userId}-${Date.now()}${extname(file.originalname)}`;
+    const filePath = join(uploadDir, fileName);
+
+    await writeFile(filePath, file.buffer);
+
+    // This relative URL will be served by ServeStaticModule
+    return `/uploads/avatars/${fileName}`;
   }
 
   /**

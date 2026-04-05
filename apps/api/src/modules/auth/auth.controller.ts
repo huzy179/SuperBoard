@@ -1,9 +1,10 @@
-import { BadRequestException, Body, Controller, Get, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import type {
   AuthResponseDTO,
   AuthUserDTO,
   LoginRequestDTO,
   MeResponseDTO,
+  UpdateProfileRequestDTO,
 } from '@superboard/shared';
 import { apiSuccess } from '../../common/api-response';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -31,5 +32,14 @@ export class AuthController {
   @Get('me')
   me(@CurrentUser() user: AuthUserDTO): MeResponseDTO {
     return apiSuccess({ user });
+  }
+
+  @Patch('me')
+  async updateProfile(
+    @CurrentUser() user: AuthUserDTO,
+    @Body() body: UpdateProfileRequestDTO,
+  ): Promise<MeResponseDTO> {
+    const updatedUser = await this.authService.updateProfile(user.id, body);
+    return apiSuccess({ user: updatedUser });
   }
 }

@@ -1,7 +1,8 @@
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { AuthUserDTO } from '@superboard/shared';
+import { Prisma } from '@prisma/client';
+import type { AuthUserDTO, UpdateProfileRequestDTO } from '@superboard/shared';
 import type { User } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { logger } from '../../common/logger';
@@ -68,6 +69,20 @@ export class AuthService {
     return this.toAuthUser(user);
   }
 
+  async updateProfile(userId: string, data: UpdateProfileRequestDTO): Promise<AuthUserDTO> {
+    const updateData: Prisma.UserUpdateInput = {};
+    if (data.fullName !== undefined) updateData.fullName = data.fullName;
+    if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl;
+
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+    });
+
+    logger.info({ userId }, 'Profile updated');
+    return this.toAuthUser(user);
+  }
+
   hashPassword(rawPassword: string): string {
     const normalized = rawPassword.normalize('NFKC');
     const salt = randomBytes(16).toString('hex');
@@ -124,6 +139,7 @@ export class AuthService {
       id: user.id,
       email: user.email,
       fullName: user.fullName,
+      avatarUrl: user.avatarUrl ?? null,
       avatarColor: user.avatarColor ?? null,
       defaultWorkspaceId: user.defaultWorkspaceId ?? null,
     };

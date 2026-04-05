@@ -38,18 +38,35 @@ export function StoryPointsBadge({ points }: { points: number }) {
 export function AssigneeAvatar({
   name,
   color,
+  src,
+  size = 'md',
 }: {
   name: string;
   color?: string | null | undefined;
+  src?: string | null | undefined;
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 }) {
   const initials = getInitials(name);
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  const fullSrc = src ? (src.startsWith('http') ? src : `${baseUrl}${src}`) : null;
+
+  const sizeClasses = {
+    xs: 'h-4 w-4 text-[8px]',
+    sm: 'h-5 w-5 text-[9px]',
+    md: 'h-6 w-6 text-[10px]',
+    lg: 'h-8 w-8 text-[12px]',
+    xl: 'h-24 w-24 text-[24px]',
+  };
+
+  const currentSize = sizeClasses[size];
+
   return (
     <span
-      className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white shadow-sm"
-      style={{ backgroundColor: color || '#64748b' }}
+      className={`inline-flex items-center justify-center rounded-full font-bold text-white shadow-sm overflow-hidden shrink-0 ${currentSize}`}
+      style={{ backgroundColor: !fullSrc ? color || '#64748b' : 'transparent' }}
       title={name}
     >
-      {initials}
+      {fullSrc ? <img src={fullSrc} alt={name} className="h-full w-full object-cover" /> : initials}
     </span>
   );
 }

@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { BearerAuthGuard } from './common/guards/bearer-auth.guard';
 import { HealthController } from './health.controller';
 import { validateEnv } from './config/env';
@@ -23,6 +25,10 @@ import { SearchModule } from './modules/search/search.module';
       isGlobal: true,
       envFilePath: ['.env.local', '.env', '.env.example'],
       validate: validateEnv,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
     }),
     AuthModule,
     ProjectModule,

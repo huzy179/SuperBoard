@@ -5,6 +5,11 @@ import { useRouter } from 'next/navigation';
 import { FullPageError, FullPageLoader } from '@/components/ui/page-states';
 import { AssigneeAvatar } from '@/components/jira/task-badges';
 import { useAuthSession } from '@/hooks/auth';
+import { useUpdateProfile } from '@/hooks/user-profile';
+import {
+  useNotificationPreferences,
+  useUpdateNotificationPreferences,
+} from '@/hooks/notification-preferences';
 import {
   useWorkspaceMembers,
   useUpdateMemberRole,
@@ -16,7 +21,6 @@ import {
   useWorkspace,
   useUpdateWorkspace,
 } from '@/hooks/workspace';
-import { useUpdateProfile } from '@/hooks/user-profile';
 import { WorkspaceInvitationItemDTO } from '@superboard/shared';
 import { InviteMemberModal } from '@/components/workspace/InviteMemberModal';
 import { AvatarUpload } from '@/components/user/AvatarUpload';
@@ -52,8 +56,10 @@ export default function SettingsPage() {
   const [editName, setEditName] = useState('');
   const [editSlug, setEditSlug] = useState('');
 
-  const [activeTab, setActiveTab] = useState<'workspace' | 'profile'>('profile');
+  const [activeTab, setActiveTab] = useState<'workspace' | 'profile' | 'notifications'>('profile');
   const updateProfile = useUpdateProfile();
+  const { data: preferences, isLoading: isPrefsLoading } = useNotificationPreferences();
+  const updatePrefs = useUpdateNotificationPreferences();
   const [profileName, setProfileName] = useState(user?.fullName || '');
 
   if (isLoading || isWorkspaceLoading) return <FullPageLoader label="Đang tải cài đặt..." />;
@@ -143,6 +149,16 @@ export default function SettingsPage() {
             }`}
           >
             Workspace
+          </button>
+          <button
+            onClick={() => setActiveTab('notifications')}
+            className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+              activeTab === 'notifications'
+                ? 'border-brand-500 text-brand-600'
+                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+            }`}
+          >
+            Thông báo
           </button>
         </nav>
       </div>
@@ -545,6 +561,89 @@ export default function SettingsPage() {
             </div>
           )}
         </>
+      )}
+
+      {activeTab === 'notifications' && (
+        <div className="space-y-6">
+          {/* Email Notifications */}
+          <div className="overflow-hidden rounded-xl border border-surface-border bg-surface-card">
+            <div className="border-b border-surface-border bg-slate-50/50 px-5 py-3">
+              <h2 className="text-sm font-semibold text-slate-900">Email Notifications</h2>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-bold text-slate-900">Cho phép thông báo qua Email</p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Nhận thông báo quan trọng về công việc qua địa chỉ email của bạn.
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={preferences?.emailEnabled ?? true}
+                  onChange={(e) => updatePrefs.mutate({ emailEnabled: e.target.checked })}
+                  disabled={updatePrefs.isPending || isPrefsLoading}
+                  className="h-5 w-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                />
+              </div>
+
+              <div className="border-t border-slate-100 pt-4 space-y-4">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Sự kiện cụ thể
+                </h3>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-slate-700">Khi bạn được giao task</p>
+                    <p className="text-xs text-slate-500">
+                      Thông báo cho tôi khi tôi được gán vào một công việc mới.
+                    </p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={preferences?.taskAssignedEmail ?? true}
+                    onChange={(e) => updatePrefs.mutate({ taskAssignedEmail: e.target.checked })}
+                    disabled={updatePrefs.isPending || isPrefsLoading || !preferences?.emailEnabled}
+                    className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 disabled:opacity-50"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-slate-700">Lời mời workspace</p>
+                    <p className="text-xs text-slate-500">
+                      Thông báo cho tôi khi có lời mời tham gia workspace mới.
+                    </p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={preferences?.workspaceInviteEmail ?? true}
+                    onChange={(e) => updatePrefs.mutate({ workspaceInviteEmail: e.target.checked })}
+                    disabled={updatePrefs.isPending || isPrefsLoading || !preferences?.emailEnabled}
+                    className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 disabled:opacity-50"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* In-App Notifications */}
+          <div className="overflow-hidden rounded-xl border border-surface-border bg-surface-card opacity-50 pointer-events-none">
+            <div className="border-b border-surface-border bg-slate-50/50 px-5 py-3">
+              <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                In-App Notifications{' '}
+                <span className="text-[10px] bg-slate-200 px-1.5 py-0.5 rounded uppercase font-bold text-slate-500">
+                  Sắp có
+                </span>
+              </h2>
+            </div>
+            <div className="p-5">
+              <p className="text-xs text-slate-500 italic">
+                Tính năng này hiện được kích hoạt mặc định cho tất cả người dùng.
+              </p>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Invite Modal */}

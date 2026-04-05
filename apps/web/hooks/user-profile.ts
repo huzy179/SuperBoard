@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiFetch } from '@/lib/api/api-fetch';
+import { apiPatch, apiPost } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
-import { MeResponseDTO, UpdateProfileRequestDTO } from '@superboard/shared';
+import { MeDataDTO, UpdateProfileRequestDTO } from '@superboard/shared';
 import { toast } from 'sonner';
 
 export function useUpdateProfile() {
@@ -9,13 +9,10 @@ export function useUpdateProfile() {
 
   return useMutation({
     mutationFn: async (data: UpdateProfileRequestDTO) => {
-      return apiFetch<MeResponseDTO>(API_ENDPOINTS.auth.me, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      });
+      return apiPatch<MeDataDTO>(API_ENDPOINTS.auth.me, data, { auth: true });
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(['auth', 'session'], data.data);
+      queryClient.setQueryData(['auth', 'session'], data.user);
       toast.success('Hồ sơ đã được cập nhật');
     },
     onError: (error: Error) => {
@@ -33,16 +30,10 @@ export function useUploadAvatar() {
       formData.append('file', file);
 
       // Use the new upload/avatar endpoint
-      const response = await apiFetch<{ data: { avatarUrl: string } }>(
-        `${API_ENDPOINTS.baseUrl}/api/v1/upload/avatar`,
-        {
-          method: 'POST',
-          body: formData,
-          // Content-Type is handled automatically by the browser for FormData
-          headers: {},
-        },
-      );
-      return response.data.avatarUrl;
+      const response = await apiPost<{ avatarUrl: string }>(API_ENDPOINTS.upload.avatar, formData, {
+        auth: true,
+      });
+      return response.avatarUrl;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['auth', 'session'] });

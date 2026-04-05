@@ -2,6 +2,7 @@ export const API_ENDPOINTS = {
   auth: {
     login: '/api/v1/auth/login',
     me: '/api/v1/auth/me',
+    preferences: '/api/v1/auth/me/preferences',
   },
   projects: {
     list: '/api/v1/projects',
@@ -69,5 +70,8 @@ export const API_ENDPOINTS = {
   },
   search: {
     global: (query: string) => `/api/v1/search?q=${encodeURIComponent(query)}`,
+  },
+  upload: {
+    avatar: '/api/v1/upload/avatar',
   },
 };

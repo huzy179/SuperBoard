@@ -18,6 +18,7 @@ Mục tiêu: đưa SuperBoard từ mức "feature demo rất mạnh" sang mức 
 - [x] Wave 2a: Tách bulk actions + undo delete timer → `use-task-bulk-actions`
 - [x] Wave 2b: Tách task detail/edit/subtask handlers → `use-task-edit-panel`
 - [x] Wave 2c: Tách calendar state → `use-project-calendar` + presence/copy-link → `use-project-header-actions`
+- [x] Jira v1.90: Email Notification System (MailHog, Nodemailer, User Preferences)
 - [x] Cập nhật `worklog/PROJECT_STRUCTURE.md`
 
 **Roadmap (Sprint v1.52+):**

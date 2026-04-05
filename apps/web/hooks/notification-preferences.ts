@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiFetch } from '@/lib/api/api-fetch';
+import { apiGet, apiPatch } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 import {
   NotificationPreferenceDTO,
@@ -11,11 +11,7 @@ export function useNotificationPreferences() {
   return useQuery({
     queryKey: ['auth', 'preferences'],
     queryFn: async () => {
-      // Endpoint: /api/v1/auth/me/preferences
-      const response = await apiFetch<NotificationPreferenceDTO>(
-        `${API_ENDPOINTS.baseUrl}/api/v1/auth/me/preferences`,
-      );
-      return response.data;
+      return apiGet<NotificationPreferenceDTO>(API_ENDPOINTS.auth.preferences, { auth: true });
     },
   });
 }
@@ -25,16 +21,12 @@ export function useUpdateNotificationPreferences() {
 
   return useMutation({
     mutationFn: async (data: UpdateNotificationPreferenceRequestDTO) => {
-      return apiFetch<NotificationPreferenceDTO>(
-        `${API_ENDPOINTS.baseUrl}/api/v1/auth/me/preferences`,
-        {
-          method: 'PATCH',
-          body: JSON.stringify(data),
-        },
-      );
+      return apiPatch<NotificationPreferenceDTO>(API_ENDPOINTS.auth.preferences, data, {
+        auth: true,
+      });
     },
     onSuccess: (response) => {
-      queryClient.setQueryData(['auth', 'preferences'], response.data);
+      queryClient.setQueryData(['auth', 'preferences'], response);
       toast.success('Cài đặt thông báo đã được cập nhật');
     },
     onError: (error: Error) => {

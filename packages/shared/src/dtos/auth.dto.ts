@@ -16,6 +16,24 @@ export interface UpdateProfileRequestDTO {
   avatarUrl?: string | null;
 }
 
+export interface NotificationPreferenceDTO {
+  id: string;
+  userId: string;
+  emailEnabled: boolean;
+  inAppEnabled: boolean;
+  taskAssignedEmail: boolean;
+  workspaceInviteEmail: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateNotificationPreferenceRequestDTO {
+  emailEnabled?: boolean;
+  inAppEnabled?: boolean;
+  taskAssignedEmail?: boolean;
+  workspaceInviteEmail?: boolean;
+}
+
 export interface LoginDataDTO {
   accessToken: string;
   user: AuthUserDTO;

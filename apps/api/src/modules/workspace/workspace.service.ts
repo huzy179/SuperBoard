@@ -11,6 +11,8 @@ import {
   verifyWorkspaceMembership,
 } from '../../common/workspace-member.helper';
 import { PrismaService } from '../../prisma/prisma.service';
+import { NotificationService } from '../notification/notification.service';
+import { logger } from '../../common/logger';
 
 type WorkspaceItemDTO = {
   id: string;
@@ -40,7 +42,10 @@ type WorkspaceInvitationItemDTO = {
 
 @Injectable()
 export class WorkspaceService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationService: NotificationService,
+  ) {}
 
   async getWorkspacesByUser(
     userId: string,
@@ -454,6 +459,52 @@ export class WorkspaceService {
         expiresAt,
       },
     });
+
+    // Trigger Notification/Email
+    try {
+      const [inviter, workspace] = await Promise.all([
+        this.prisma.user.findUnique({
+          where: { id: input.currentUserId },
+          select: { fullName: true },
+        }),
+        this.prisma.workspace.findUnique({
+          where: { id: input.workspaceId },
+          select: { name: true },
+        }),
+      ]);
+
+      if (inviter && workspace) {
+        // Find if user already exists to send in-app notification,
+        // otherwise just email will be handled by NotificationService/EmailService based on preferences logic
+        // Actually, for invitations to new users, we just want to send the email directly.
+        // But our NotificationService expects a userId.
+        // If the user doesn't exist, we should handle it separately or create a placeholder.
+        // Recommendation: If user exists, send in-app + email. If not, send email only.
+
+        if (existingUser) {
+          await this.notificationService.createNotification({
+            userId: existingUser.id,
+            workspaceId: input.workspaceId,
+            type: 'workspace_invite',
+            payload: {
+              token,
+              inviterName: inviter.fullName,
+              workspaceName: workspace.name,
+            },
+          });
+        } else {
+          // For non-existing users, we send email directly
+          await this.notificationService.sendWorkspaceInvitation({
+            email: normalizedEmail,
+            inviterName: inviter.fullName,
+            workspaceName: workspace.name,
+            token,
+          });
+        }
+      }
+    } catch (error) {
+      logger.error({ error }, 'Failed to send invitation notification');
+    }
 
     return {
       token,

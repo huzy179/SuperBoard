@@ -49,8 +49,21 @@ model User {
   comments           Comment[]
   notifications      Notification[]
   sentWorkspaceInvitations WorkspaceInvitation[]
+  preferences        NotificationPreference?
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
+}
+
+model NotificationPreference {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailEnabled         Boolean  @default(true)
+  inAppEnabled         Boolean  @default(true)
+  taskAssignedEmail    Boolean  @default(true)
+  workspaceInviteEmail Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 }
 
 model WorkspaceMember {

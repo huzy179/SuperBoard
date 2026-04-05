@@ -194,6 +194,7 @@ export class ProjectService {
         number: task.number ?? null,
         storyPoints: task.storyPoints ?? null,
         position: task.position ?? null,
+        projectId: project.id,
         labels: (task.labels ?? []).map((tl) => tl.label as LabelDTO),
         dueDate: task.dueDate ? task.dueDate.toISOString() : null,
         assigneeId: task.assigneeId,
@@ -787,6 +788,7 @@ export class ProjectService {
           type: 'task_assigned',
           payload: {
             taskId: input.taskId,
+            projectId: task.projectId,
             taskTitle: task.title,
             message: `Bạn được gán task: ${task.title}`,
           },
@@ -1053,6 +1055,7 @@ export class ProjectService {
     position: true,
     dueDate: true,
     assigneeId: true,
+    projectId: true,
     assignee: { select: { fullName: true, avatarColor: true } },
     labels: { select: { label: { select: { id: true, name: true, color: true } } } },
     attachments: {
@@ -1098,6 +1101,7 @@ export class ProjectService {
     }>;
     createdAt: Date;
     updatedAt: Date;
+    projectId: string;
     deletedAt?: Date | null;
   }): ProjectTaskItemDTO {
     return {
@@ -1111,6 +1115,7 @@ export class ProjectService {
       number: task.number ?? null,
       storyPoints: task.storyPoints ?? null,
       position: task.position ?? null,
+      projectId: task.projectId,
       labels: (task.labels ?? []).map((tl) => tl.label),
       attachments: (task.attachments ?? []).map((a) => ({
         ...a,

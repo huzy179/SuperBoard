@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import type { Prisma } from '@prisma/client';
+import type { Prisma, NotificationPreference } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { EmailService } from './email.service';
+import { logger } from '../../common/logger';
 
 @Injectable()
 export class NotificationService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private emailService: EmailService,
+  ) {}
 
   async getNotifications(userId: string, workspaceId: string) {
     const notifications = await this.prisma.notification.findMany({
@@ -64,5 +69,92 @@ export class NotificationService {
         payload: input.payload as Prisma.InputJsonValue,
       },
     });
+
+    // Handle Email Notifications
+    try {
+      const preferences = await this.getUserPreferences(input.userId);
+      if (preferences.emailEnabled) {
+        await this.handleEmailTrigger(input, preferences);
+      }
+    } catch (error) {
+      logger.error({ error, userId: input.userId }, 'Failed to process email notification');
+    }
+  }
+
+  async getUserPreferences(userId: string) {
+    let preferences = await this.prisma.notificationPreference.findUnique({
+      where: { userId },
+    });
+
+    if (!preferences) {
+      preferences = await this.prisma.notificationPreference.create({
+        data: { userId },
+      });
+    }
+
+    return preferences;
+  }
+
+  async updatePreferences(userId: string, data: Partial<Prisma.NotificationPreferenceUpdateInput>) {
+    return this.prisma.notificationPreference.upsert({
+      where: { userId },
+      create: { ...data, userId } as Prisma.NotificationPreferenceCreateInput,
+      update: data,
+    });
+  }
+
+  private async handleEmailTrigger(
+    input: { userId: string; type: string; payload: Record<string, unknown> },
+    preferences: NotificationPreference,
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: input.userId, deletedAt: null },
+      select: { email: true, fullName: true },
+    });
+
+    if (!user) return;
+
+    if (input.type === 'task_assigned' && preferences.taskAssignedEmail) {
+      const payload = input.payload as Record<string, unknown>;
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      const taskUrl = `${baseUrl}/projects/${payload.projectId}/tasks/${payload.taskId}`;
+
+      await this.emailService.sendTaskAssignedEmail(
+        user.email,
+        user.fullName,
+        payload.taskTitle as string,
+        taskUrl,
+      );
+    }
+
+    if (input.type === 'workspace_invite' && preferences.workspaceInviteEmail) {
+      const payload = input.payload as Record<string, unknown>;
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      const inviteUrl = `${baseUrl}/invite/${payload.token}`;
+
+      await this.emailService.sendWorkspaceInviteEmail(
+        user.email,
+        payload.inviterName as string,
+        payload.workspaceName as string,
+        inviteUrl,
+      );
+    }
+  }
+
+  async sendWorkspaceInvitation(input: {
+    email: string;
+    inviterName: string;
+    workspaceName: string;
+    token: string;
+  }) {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const inviteUrl = `${baseUrl}/invite/${input.token}`;
+
+    await this.emailService.sendWorkspaceInviteEmail(
+      input.email,
+      input.inviterName,
+      input.workspaceName,
+      inviteUrl,
+    );
   }
 }

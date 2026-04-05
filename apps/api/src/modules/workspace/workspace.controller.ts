@@ -207,6 +207,36 @@ export class WorkspaceController {
     return apiSuccess({ accepted: true });
   }
 
+  @Get('invitations/:token')
+  async getInvitationByToken(@Param('token') token: string) {
+    const invitation = await this.workspaceService.getInvitationByToken(token);
+    return apiSuccess(invitation);
+  }
+
+  @Get(':workspaceId/invitations')
+  async getWorkspaceInvitations(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('workspaceId') workspaceId: string,
+  ) {
+    const invitations = await this.workspaceService.getWorkspaceInvitations(workspaceId, user.id);
+    return apiSuccess(invitations);
+  }
+
+  @Delete(':workspaceId/invitations/:invitationId')
+  @HttpCode(HttpStatus.OK)
+  async revokeWorkspaceInvitation(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('workspaceId') workspaceId: string,
+    @Param('invitationId') invitationId: string,
+  ) {
+    await this.workspaceService.revokeWorkspaceInvitation({
+      workspaceId,
+      invitationId,
+      userId: user.id,
+    });
+    return apiSuccess({ revoked: true });
+  }
+
   @Delete(':workspaceId/members/:memberId')
   @HttpCode(HttpStatus.OK)
   async removeWorkspaceMember(

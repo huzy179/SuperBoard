@@ -40,9 +40,23 @@ export const API_ENDPOINTS = {
     markAllRead: '/api/v1/notifications/read-all',
   },
   workspaces: {
+    list: '/api/v1/workspaces',
+    detail: (workspaceId: string) => `/api/v1/workspaces/${workspaceId}`,
+    update: (workspaceId: string) => `/api/v1/workspaces/${workspaceId}`,
     members: (workspaceId: string) => `/api/v1/workspaces/${workspaceId}/members`,
     updateMember: (workspaceId: string, memberId: string) =>
       `/api/v1/workspaces/${workspaceId}/members/${memberId}`,
+    removeMember: (workspaceId: string, memberId: string) =>
+      `/api/v1/workspaces/${workspaceId}/members/${memberId}`,
+    leaveWorkspace: (workspaceId: string) => `/api/v1/workspaces/${workspaceId}/members/me`,
+    transferOwnership: (workspaceId: string, memberId: string) =>
+      `/api/v1/workspaces/${workspaceId}/members/${memberId}/transfer-owner`,
+    invitations: (workspaceId: string) => `/api/v1/workspaces/${workspaceId}/invitations`,
+    createInvitation: (workspaceId: string) => `/api/v1/workspaces/${workspaceId}/invitations`,
+    revokeInvitation: (workspaceId: string, invitationId: string) =>
+      `/api/v1/workspaces/${workspaceId}/invitations/${invitationId}`,
+    getInvitation: (token: string) => `/api/v1/workspaces/invitations/${token}`,
+    acceptInvitation: (token: string) => `/api/v1/workspaces/invitations/${token}/accept`,
   },
   workflow: {
     workspaceStatuses: (workspaceId: string) =>
@@ -52,5 +66,8 @@ export const API_ENDPOINTS = {
     statusDetail: (projectId: string, statusId: string) =>
       `/api/v1/workflow/project/${projectId}/statuses/${statusId}`,
     transitions: (projectId: string) => `/api/v1/workflow/project/${projectId}/transitions`,
+  },
+  search: {
+    global: (query: string) => `/api/v1/search?q=${encodeURIComponent(query)}`,
   },
 };

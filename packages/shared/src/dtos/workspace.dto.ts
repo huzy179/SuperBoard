@@ -21,3 +21,21 @@ export interface WorkspaceMemberItemDTO {
 }
 
 export type WorkspaceMembersResponseDTO = ApiResponse<WorkspaceMemberItemDTO[]>;
+
+export interface WorkspaceInvitationItemDTO {
+  id: string;
+  email: string;
+  role: string;
+  status: string;
+  expiresAt: string;
+  createdAt: string;
+  inviterName: string;
+}
+
+export interface InvitationDetailDTO {
+  workspaceId: string;
+  workspaceName: string;
+  inviterName: string;
+  email: string;
+  role: string;
+}

@@ -1,1 +1,1 @@
-export { useWorkspaceMembers, useUpdateMemberRole } from '../use-workspace';
+export * from '../use-workspace';

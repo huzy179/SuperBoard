@@ -1,14 +1,16 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, FormEvent, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { FullPageLoader } from '@/components/ui/page-states';
 import { useRedirectAuthenticated } from '@/hooks/auth';
 import { setAccessToken } from '@/lib/auth-storage';
 import { login } from '@/lib/services/auth-service';
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect');
   const checkingAuth = useRedirectAuthenticated();
   const [email, setEmail] = useState('nguyen.minh.tuan@techviet.local');
   const [password, setPassword] = useState('Passw0rd!');
@@ -27,7 +29,7 @@ export default function LoginPage() {
     try {
       const payload = await login({ email, password });
       setAccessToken(payload.accessToken);
-      router.push('/jira');
+      router.push(redirect || '/jira');
     } catch (caughtError) {
       const message = caughtError instanceof Error ? caughtError.message : 'Đăng nhập thất bại';
       setError(message);
@@ -37,7 +39,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-full items-center justify-center px-4 py-10 bg-gradient-to-br from-brand-50 via-white to-brand-100">
+    <div className="flex min-h-full items-center justify-center px-4 py-10 bg-linear-to-br from-brand-50 via-white to-brand-100">
       <div className="w-full max-w-md rounded-2xl border border-surface-border bg-surface-card p-7 shadow-lg">
         <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
           Đăng nhập SuperBoard
@@ -85,5 +87,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<FullPageLoader label="Đang tải..." />}>
+      <LoginContent />
+    </Suspense>
   );
 }

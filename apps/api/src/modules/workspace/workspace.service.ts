@@ -28,6 +28,16 @@ type WorkspaceInvitationTokenDTO = {
   expiresAt: string;
 };
 
+type WorkspaceInvitationItemDTO = {
+  id: string;
+  email: string;
+  role: string;
+  status: string;
+  expiresAt: string;
+  createdAt: string;
+  inviterName: string;
+};
+
 @Injectable()
 export class WorkspaceService {
   constructor(private prisma: PrismaService) {}
@@ -558,6 +568,95 @@ export class WorkspaceService {
         },
       });
     });
+  }
+
+  async getWorkspaceInvitations(
+    workspaceId: string,
+    userId: string,
+  ): Promise<WorkspaceInvitationItemDTO[]> {
+    await verifyWorkspaceAdminOrOwner(this.prisma, { workspaceId, userId });
+
+    const invitations = await this.prisma.workspaceInvitation.findMany({
+      where: { workspaceId, status: 'pending', expiresAt: { gt: new Date() } },
+      include: {
+        inviter: { select: { fullName: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return invitations.map((inv) => ({
+      id: inv.id,
+      email: inv.email,
+      role: inv.role,
+      status: inv.status,
+      expiresAt: inv.expiresAt.toISOString(),
+      createdAt: inv.createdAt.toISOString(),
+      inviterName: inv.inviter.fullName,
+    }));
+  }
+
+  async revokeWorkspaceInvitation(input: {
+    workspaceId: string;
+    invitationId: string;
+    userId: string;
+  }): Promise<void> {
+    await verifyWorkspaceAdminOrOwner(this.prisma, {
+      workspaceId: input.workspaceId,
+      userId: input.userId,
+    });
+
+    const invitation = await this.prisma.workspaceInvitation.findFirst({
+      where: {
+        id: input.invitationId,
+        workspaceId: input.workspaceId,
+        status: 'pending',
+      },
+    });
+
+    if (!invitation) {
+      throw new NotFoundException('Invitation not found or already processed');
+    }
+
+    await this.prisma.workspaceInvitation.update({
+      where: { id: input.invitationId },
+      data: {
+        status: 'revoked',
+        revokedAt: new Date(),
+      },
+    });
+  }
+
+  async getInvitationByToken(token: string) {
+    const normalizedToken = token.trim();
+    if (!normalizedToken) {
+      throw new BadRequestException('Invitation token is required');
+    }
+
+    const invitation = await this.prisma.workspaceInvitation.findUnique({
+      where: {
+        tokenHash: this.hashInvitationToken(normalizedToken),
+      },
+      include: {
+        workspace: { select: { id: true, name: true } },
+        inviter: { select: { fullName: true } },
+      },
+    });
+
+    if (!invitation || invitation.status !== 'pending') {
+      throw new NotFoundException('Invitation not found or already processed');
+    }
+
+    if (invitation.expiresAt <= new Date()) {
+      throw new BadRequestException('Invitation has expired');
+    }
+
+    return {
+      workspaceId: invitation.workspaceId,
+      workspaceName: invitation.workspace.name,
+      inviterName: invitation.inviter.fullName,
+      email: invitation.email,
+      role: invitation.role,
+    };
   }
 
   async removeMemberFromWorkspace(input: {

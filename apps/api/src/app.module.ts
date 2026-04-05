@@ -9,7 +9,7 @@ import { validateEnv } from './config/env';
 import { HealthService } from './health.service';
 import { QueueService } from './common/queue.service';
 import { RedisService } from './common/redis.service';
-import { PrismaService } from './prisma/prisma.service';
+import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { ProjectModule } from './modules/project/project.module';
@@ -38,11 +38,11 @@ import { SearchModule } from './modules/search/search.module';
     WorkflowModule,
     UploadModule,
     SearchModule,
+    PrismaModule,
   ],
   controllers: [HealthController],
   providers: [
     HealthService,
-    PrismaService,
     RedisService,
     QueueService,
     {

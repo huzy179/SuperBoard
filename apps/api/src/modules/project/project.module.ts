@@ -5,14 +5,13 @@ import { CommentService } from './comment.service';
 import { ProjectService } from './project.service';
 import { ProjectController } from './project.controller';
 import { ProjectGateway } from './project.gateway';
-import { PrismaService } from '../../prisma/prisma.service';
 
 import { WorkflowModule } from '../workflow/workflow.module';
 
 @Module({
   imports: [AuthModule, NotificationModule, WorkflowModule],
   controllers: [ProjectController],
-  providers: [ProjectService, CommentService, ProjectGateway, PrismaService],
+  providers: [ProjectService, CommentService, ProjectGateway],
   exports: [ProjectService],
 })
 export class ProjectModule {}

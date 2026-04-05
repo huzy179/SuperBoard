@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
-import { PrismaService } from '../../prisma/prisma.service';
+import { NotificationModule } from '../notification/notification.module';
 import { WorkspaceController } from './workspace.controller';
 import { WorkspaceService } from './workspace.service';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, NotificationModule],
   controllers: [WorkspaceController],
-  providers: [WorkspaceService, PrismaService],
+  providers: [WorkspaceService],
   exports: [WorkspaceService],
 })
 export class WorkspaceModule {}

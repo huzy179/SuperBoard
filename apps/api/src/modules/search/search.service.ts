@@ -19,6 +19,7 @@ export class SearchService {
     position: true,
     dueDate: true,
     assigneeId: true,
+    projectId: true,
     assignee: { select: { fullName: true, avatarColor: true } },
     labels: { select: { label: { select: { id: true, name: true, color: true } } } },
     attachments: {
@@ -144,9 +145,11 @@ export class SearchService {
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;
+    projectId: string;
   }): ProjectTaskItemDTO {
     return {
       id: task.id,
+      projectId: task.projectId,
       title: task.title,
       description: task.description,
       parentTaskId: task.parentTaskId ?? null,

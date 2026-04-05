@@ -8,6 +8,8 @@ import { isNavItemActive } from '@/lib/navigation';
 import { AppBrand } from './app-brand';
 import { NotificationBell } from '@/components/notifications/notification-bell';
 import { getInitials } from '@/lib/helpers';
+import { SearchModal } from '@/components/search/SearchModal';
+import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 
 type PrivateShellProps = {
   children: ReactNode;
@@ -83,13 +85,41 @@ const NAV_ICONS: Record<NavItem['icon'], ReactNode> = {
 
 export function PrivateShell({ children, user, navItems, pathname, onLogout }: PrivateShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  useKeyboardShortcuts([
+    {
+      key: 'k',
+      metaKey: true,
+      handler: () => setSearchOpen(true),
+    },
+    {
+      key: 'k',
+      ctrlKey: true,
+      handler: () => setSearchOpen(true),
+    },
+  ]);
 
   const userInitials = getInitials(user.fullName);
 
   const sidebar = (
     <div className="flex h-full flex-col bg-sidebar-bg">
-      <div className="flex h-12 shrink-0 items-center gap-3 border-b border-white/[0.06] px-4">
+      <div className="flex h-12 shrink-0 items-center gap-3 border-b border-white/6 px-4">
         <AppBrand subtitle="Workspace" variant="dark" />
+      </div>
+
+      <div className="px-3 pt-3">
+        <button
+          type="button"
+          onClick={() => setSearchOpen(true)}
+          className="flex w-full items-center gap-2.5 rounded-md bg-white/5 px-2.5 py-1.5 text-[13px] text-white/50 transition-colors hover:bg-white/8 hover:text-white/70"
+        >
+          <span className="text-[14px]">🔍</span>
+          <span>Tìm kiếm...</span>
+          <kbd className="ml-auto rounded bg-white/8 px-1.5 py-0.5 text-[10px] font-bold text-white/30">
+            ⌘K
+          </kbd>
+        </button>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
@@ -107,7 +137,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
               >
                 {NAV_ICONS[item.icon]}
                 {item.label}
-                <span className="ml-auto rounded bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-semibold text-white/30">
+                <span className="ml-auto rounded bg-white/6 px-1.5 py-0.5 text-[10px] font-semibold text-white/30">
                   Sắp có
                 </span>
               </span>
@@ -132,9 +162,9 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
         })}
       </nav>
 
-      <div className="shrink-0 border-t border-white/[0.06] p-2">
+      <div className="shrink-0 border-t border-white/6 p-2">
         <div className="flex items-center gap-2 rounded-md px-2 py-1.5">
-          <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-[10px] font-semibold text-white">
+          <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-brand-400 to-brand-600 text-[10px] font-semibold text-white">
             {userInitials || 'SB'}
           </span>
           <div className="min-w-0 flex-1">
@@ -216,10 +246,34 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
             </svg>
           </button>
           <AppBrand subtitle="Workspace" />
+          <div className="ml-auto">
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className="flex h-8 w-8 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100"
+              aria-label="Tìm kiếm"
+            >
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                />
+              </svg>
+            </button>
+          </div>
         </header>
 
         <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">{children}</main>
       </div>
+
+      {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} />}
     </div>
   );
 }

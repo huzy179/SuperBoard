@@ -57,6 +57,7 @@ export interface ProjectTaskAttachmentDTO {
 
 export interface ProjectTaskItemDTO {
   id: string;
+  projectId: string;
   title: string;
   description?: string | null;
   parentTaskId?: string | null;

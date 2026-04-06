@@ -3,14 +3,14 @@ import { toast } from 'sonner';
 import type { ProjectItemDTO } from '@superboard/shared';
 import {
   useCreateProject,
-  useDeleteProject,
+  useArchiveProject,
   useUpdateProject,
 } from '@/hooks/jira/project-mutation-core';
 
 export function useProjectCrudForm() {
   const createProjectMutation = useCreateProject();
   const updateProjectMutation = useUpdateProject();
-  const deleteProjectMutation = useDeleteProject();
+  const archiveProjectMutation = useArchiveProject();
 
   const [showCreatePanel, setShowCreatePanel] = useState(false);
   const [projectName, setProjectName] = useState('');
@@ -114,7 +114,7 @@ export function useProjectCrudForm() {
     setArchiveError(null);
 
     try {
-      await deleteProjectMutation.mutateAsync(projectId);
+      await archiveProjectMutation.mutateAsync(projectId);
       toast.success('Lưu trữ dự án thành công!');
     } catch (caughtError) {
       setArchiveError(
@@ -125,7 +125,7 @@ export function useProjectCrudForm() {
   }
 
   function isArchivingProject(projectId: string): boolean {
-    return deleteProjectMutation.isPending && deleteProjectMutation.variables === projectId;
+    return archiveProjectMutation.isPending && archiveProjectMutation.variables === projectId;
   }
 
   return {

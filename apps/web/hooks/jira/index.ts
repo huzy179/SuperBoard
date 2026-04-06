@@ -28,7 +28,7 @@ export {
   useProjectCrudForm,
   useProjectFavorites,
   useCreateProject,
-  useDeleteProject,
+  useArchiveProject,
   useUpdateProject,
 } from './project-core';
 export {

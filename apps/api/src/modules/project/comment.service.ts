@@ -24,8 +24,12 @@ export class CommentService {
     projectId: string;
     taskId: string;
     workspaceId: string;
+    cursor?: string;
+    limit?: number;
   }): Promise<CommentItemDTO[]> {
     await verifyProjectAndTaskInWorkspace(this.prisma, input);
+
+    const limit = input.limit ?? 50;
 
     const comments = await this.prisma.comment.findMany({
       where: {
@@ -37,7 +41,9 @@ export class CommentService {
           select: { fullName: true },
         },
       },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: 'desc' }, // Latest first usually better for pagination
+      take: limit + 1,
+      ...(input.cursor ? { cursor: { id: input.cursor }, skip: 1 } : {}),
     });
 
     return comments.map((c) => this.toCommentItemDTO(c));

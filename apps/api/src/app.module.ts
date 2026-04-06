@@ -21,6 +21,8 @@ import { SearchModule } from './modules/search/search.module';
 import { MonitoringModule } from './modules/monitoring/monitoring.module';
 import { AiModule } from './modules/ai/ai.module';
 import { AuditModule } from './modules/audit/audit.module';
+import { ChatModule } from './modules/chat/chat.module';
+import { DocModule } from './modules/doc/doc.module';
 
 @Module({
   imports: [
@@ -45,6 +47,8 @@ import { AuditModule } from './modules/audit/audit.module';
     MonitoringModule,
     AiModule,
     AuditModule,
+    ChatModule,
+    DocModule,
   ],
   controllers: [HealthController],
   providers: [

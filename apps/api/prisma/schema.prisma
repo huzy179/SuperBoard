@@ -26,6 +26,8 @@ model Workspace {
   invitations WorkspaceInvitation[]
   labels        Label[]
   auditLogs     AuditLog[]
+  channels      Channel[]
+  docs          Doc[]
 
   @@index([deletedAt])
 }
@@ -54,6 +56,10 @@ model User {
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
   auditLogs          AuditLog[]
+  channelMembers     ChannelMember[]
+  messages           Message[]
+  messageReactions   MessageReaction[]
+  docs               Doc[]                 @relation("DocCreator")
 }
 
 model NotificationPreference {
@@ -422,4 +428,101 @@ model AuditLog {
 
   @@index([workspaceId, createdAt])
   @@index([entityType, entityId])
+}
+
+model Channel {
+  id           String          @id @default(cuid())
+  workspaceId  String
+  workspace    Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name         String
+  description  String?
+  type         ChannelType     @default(public)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  members      ChannelMember[]
+  messages     Message[]
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId])
+}
+
+model ChannelMember {
+  id         String   @id @default(cuid())
+  channelId  String
+  userId     String
+  lastReadAt DateTime @default(now())
+  joinedAt   DateTime @default(now())
+  channel    Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([channelId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id        String            @id @default(cuid())
+  channelId String
+  authorId  String
+  content   String
+  parentId  String? // For threading
+  editedAt  DateTime?
+  deletedAt DateTime?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  channel   Channel           @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  author    User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent    Message?          @relation("MessageThread", fields: [parentId], references: [id], onDelete: SetNull)
+  replies   Message[]         @relation("MessageThread")
+  reactions MessageReaction[]
+
+  @@index([channelId, createdAt])
+  @@index([authorId])
+}
+
+model MessageReaction {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
+}
+
+model Doc {
+  id           String       @id @default(cuid())
+  workspaceId  String
+  workspace    Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  title        String
+  content      Json? // TipTap JSON
+  parentDocId  String?
+  createdById  String
+  lastEditedBy String?
+  deletedAt    DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  parent       Doc?         @relation("DocTree", fields: [parentDocId], references: [id], onDelete: SetNull)
+  children     Doc[]        @relation("DocTree")
+  creator      User         @relation("DocCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  versions     DocVersion[]
+
+  @@index([workspaceId])
+  @@index([parentDocId])
+}
+
+model DocVersion {
+  id        String   @id @default(cuid())
+  docId     String
+  content   Json // Snapshot
+  savedAt   DateTime @default(now())
+  doc       Doc      @relation(fields: [docId], references: [id], onDelete: Cascade)
+
+  @@index([docId, savedAt])
+}
+
+enum ChannelType {
+  public
+  private
 }

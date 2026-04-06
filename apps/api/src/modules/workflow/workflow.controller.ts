@@ -20,6 +20,46 @@ export class WorkflowController {
     return this.workflowService.getWorkspaceStatuses(workspaceId);
   }
 
+  @Get('workspace/:workspaceId')
+  async getWorkspaceWorkflow(
+    @Param('workspaceId') workspaceId: string,
+  ): Promise<WorkflowStatusTemplateDTO> {
+    return this.workflowService.getWorkspaceWorkflow(workspaceId);
+  }
+
+  @Post('workspace/:workspaceId/statuses')
+  async createWorkspaceStatus(
+    @Param('workspaceId') workspaceId: string,
+    @Body() body: CreateWorkflowStatusRequestDTO,
+  ): Promise<WorkflowStatusDTO> {
+    return this.workflowService.createWorkspaceStatus(workspaceId, body);
+  }
+
+  @Patch('workspace/:workspaceId/statuses/:statusId')
+  async updateWorkspaceStatus(
+    @Param('workspaceId') workspaceId: string,
+    @Param('statusId') statusId: string,
+    @Body() body: UpdateWorkflowStatusRequestDTO,
+  ): Promise<WorkflowStatusDTO> {
+    return this.workflowService.updateWorkspaceStatus(workspaceId, statusId, body);
+  }
+
+  @Delete('workspace/:workspaceId/statuses/:statusId')
+  async deleteWorkspaceStatus(
+    @Param('workspaceId') workspaceId: string,
+    @Param('statusId') statusId: string,
+  ): Promise<void> {
+    return this.workflowService.deleteWorkspaceStatus(workspaceId, statusId);
+  }
+
+  @Post('workspace/:workspaceId/transitions')
+  async updateWorkspaceTransitions(
+    @Param('workspaceId') workspaceId: string,
+    @Body() body: UpdateTransitionsRequestDTO,
+  ): Promise<void> {
+    return this.workflowService.updateWorkspaceTransitions(workspaceId, body.transitions);
+  }
+
   @Get('project/:projectId/statuses')
   async getProjectStatuses(@Param('projectId') projectId: string): Promise<WorkflowStatusDTO[]> {
     return this.workflowService.getProjectStatuses(projectId);

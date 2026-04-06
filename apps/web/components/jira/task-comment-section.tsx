@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState, useEffect } from 'react';
 import type { CommentItemDTO, TaskHistoryItemDTO } from '@superboard/shared';
 import {
   useTaskComments,
@@ -10,6 +10,8 @@ import {
   useDeleteComment,
 } from '@/hooks/jira';
 import { formatRelativeTime } from '@/lib/format-date';
+import { subscribeTaskPresence } from '@/lib/realtime/project-socket';
+import { UsersIcon } from 'lucide-react';
 
 export function TaskCommentSection({
   projectId,
@@ -32,6 +34,14 @@ export function TaskCommentSection({
   const [editContent, setEditContent] = useState('');
   const [editError, setEditError] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [viewerCount, setViewerCount] = useState(0);
+
+  useEffect(() => {
+    if (!projectId || !taskId) return;
+    return subscribeTaskPresence(projectId, taskId, (payload) => {
+      setViewerCount(payload.viewerCount);
+    });
+  }, [projectId, taskId]);
 
   async function handleCreateComment(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -82,7 +92,15 @@ export function TaskCommentSection({
 
   return (
     <div className="border-t border-surface-border px-6 py-4">
-      <h3 className="mb-3 text-sm font-semibold text-slate-900">Bình luận</h3>
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-slate-900">Bình luận</h3>
+        {viewerCount > 1 ? (
+          <div className="flex items-center gap-1.5 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-600">
+            <UsersIcon className="h-3 w-3" />
+            <span>{viewerCount} người đang xem</span>
+          </div>
+        ) : null}
+      </div>
 
       {deleteError ? (
         <p role="alert" className="mb-2 text-xs text-rose-600">

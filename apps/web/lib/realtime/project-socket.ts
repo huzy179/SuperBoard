@@ -202,3 +202,39 @@ export function subscribeTaskComments(
     socket.off('comment:deleted', handleDeleted);
   };
 }
+
+export function subscribeTaskPresence(
+  projectId: string,
+  taskId: string,
+  onPresence: (payload: {
+    projectId: string;
+    taskId: string;
+    viewerCount: number;
+    at: number;
+  }) => void,
+): () => void {
+  const socket = getProjectSocket(projectId);
+
+  if (!socket) {
+    return () => {};
+  }
+
+  const listener = (payload: {
+    projectId: string;
+    taskId: string;
+    viewerCount: number;
+    at: number;
+  }) => {
+    if (payload.projectId === projectId && payload.taskId === taskId) {
+      onPresence(payload);
+    }
+  };
+
+  socket.on('task:presence', listener);
+  socket.emit('task:join', { projectId, taskId });
+
+  return () => {
+    socket.emit('task:leave', { projectId, taskId });
+    socket.off('task:presence', listener);
+  };
+}

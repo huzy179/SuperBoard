@@ -32,11 +32,14 @@ export class AuditLogService {
     });
   }
 
-  async getLogsByWorkspace(workspaceId: string, limit = 50) {
+  async getLogsByWorkspace(input: { workspaceId: string; cursor?: string; limit?: number }) {
+    const limit = input.limit ?? 50;
+
     return this.prisma.auditLog.findMany({
-      where: { workspaceId },
+      where: { workspaceId: input.workspaceId },
       orderBy: { createdAt: 'desc' },
-      take: limit,
+      take: limit + 1,
+      ...(input.cursor ? { cursor: { id: input.cursor }, skip: 1 } : {}),
       include: {
         actor: {
           select: {

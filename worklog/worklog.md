@@ -6,18 +6,18 @@ Tài liệu này theo dõi tiến độ phát triển của dự án SuperBoard.
 
 ## 🏃 Đang thực hiện (Doing)
 
-- [x] **v1.95**: Hoàn thiện CI/CD, Monitoring & Đồng bộ Invitation.
-- [x] **AI Assistant POC**: Tích hợp gRPC giữa NestJS/FastAPI và triển khai tóm tắt task bằng Gemini.
-- [ ] **Tiếp theo**: Deploy thực tế lên môi trường staging/production.
-- [ ] **Chốt roadmap**: Tập trung vào Jira-first, tránh mở rộng sang các nền tảng khác quá sớm.
+- [x] **v2.0**: Khởi động Multi-pillar (Slack + Notion). Thiết lập Schema & Backend Foundation.
+- [ ] **Tiếp theo**: Phát triển Frontend UI cho Chat Sidebar và Doc Tree.
+- [ ] **Tiếp theo**: Tích hợp TipTap editor cho Notion Pillar.
 
 ---
 
 ## 📅 Sắp tới (Todo)
 
-- [x] Cấu hình CI/CD hoàn chỉnh cho deploy tự động (GitHub Actions).
-- [x] Tích hợp Prometheus/Grafana cho hệ thống monitoring.
-- [x] Nghiên cứu & Triển khai AI Assistant (Tóm tắt Task bằng Gemini via gRPC).
+- [x] Triển khai Backend ChatModule, ChatService, ChatGateway (Real-time).
+- [x] Triển khai Backend DocModule, DocService (Hierarchy & Versioning).
+- [ ] Xây dựng giao diện Chat (Message Stream, Channel Sidebar).
+- [ ] Xây dựng giao diện Docs (Editor, Document Tree).
 
 ---
 
@@ -33,10 +33,10 @@ Tài liệu này theo dõi tiến độ phát triển của dự án SuperBoard.
 
 ### UI/UX & Features
 
-- [x] **Giao diện Kanban**: Kéo thả task mượt mà với Optimistic UI.
-- [x] **Email System**: Tích hợp MailHog & Nodemailer cho thông báo.
-- [x] **Presence Indicator**: Hiển thị người dùng đang hoạt động thời gian thực.
-- [x] **Dashboard**: Thống kê số lượng task theo trạng thái và dự án.
+- [x] **Pillar 2 (Slack)**: Backend ổn định, chuẩn bị cho Real-time messaging.
+- [x] **Pillar 3 (Notion)**: Cấu trúc Doc Tree & Versioning cơ bản đã xong.
+- [x] **v1.95**: Hoàn thiện CI/CD, Monitoring & Đồng bộ Invitation.
+- [x] **AI Service**: Tích hợp gRPC giữa NestJS/FastAPI.
 
 ---
 

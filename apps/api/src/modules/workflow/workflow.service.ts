@@ -89,6 +89,109 @@ export class WorkflowService {
     }));
   }
 
+  async getWorkspaceWorkflow(workspaceId: string): Promise<{
+    statuses: WorkflowStatusDTO[];
+    transitions: { fromStatusId: string; toStatusId: string }[];
+  }> {
+    const statuses = await this.getWorkspaceStatuses(workspaceId);
+    const transitions = await this.prisma.workspaceWorkflowTransition.findMany({
+      where: { workspaceId },
+      select: { fromStatusId: true, toStatusId: true },
+    });
+
+    return { statuses, transitions };
+  }
+
+  async createWorkspaceStatus(
+    workspaceId: string,
+    data: { key: string; name: string; category: WorkflowStatusCategory; position?: number },
+  ): Promise<WorkflowStatusDTO> {
+    const status = await this.prisma.workspaceWorkflowStatus.create({
+      data: {
+        workspaceId,
+        key: data.key,
+        name: data.name,
+        category: data.category,
+        position: data.position ?? 99,
+        isSystem: false,
+      },
+    });
+
+    return {
+      id: status.id,
+      key: status.key,
+      name: status.name,
+      category: status.category as WorkflowStatusCategory,
+      position: status.position,
+      isSystem: status.isSystem,
+    };
+  }
+
+  async updateWorkspaceStatus(
+    workspaceId: string,
+    statusId: string,
+    data: { name?: string; category?: WorkflowStatusCategory; position?: number },
+  ): Promise<WorkflowStatusDTO> {
+    const status = await this.prisma.workspaceWorkflowStatus.update({
+      where: { id: statusId, workspaceId },
+      data: {
+        ...(data.name !== undefined ? { name: data.name } : {}),
+        ...(data.category !== undefined ? { category: data.category } : {}),
+        ...(data.position !== undefined ? { position: data.position } : {}),
+      },
+    });
+
+    return {
+      id: status.id,
+      key: status.key,
+      name: status.name,
+      category: status.category as WorkflowStatusCategory,
+      position: status.position,
+      isSystem: status.isSystem,
+    };
+  }
+
+  async deleteWorkspaceStatus(workspaceId: string, statusId: string): Promise<void> {
+    const status = await this.prisma.workspaceWorkflowStatus.findUnique({
+      where: { id: statusId, workspaceId },
+    });
+
+    if (!status) throw new BadRequestException('Trạng thái không tồn tại');
+    if (status.isSystem) throw new BadRequestException('Không thể xoá trạng thái hệ thống');
+
+    await this.prisma.$transaction(async (tx) => {
+      // Remove workspace-level transitions referencing this status
+      await tx.workspaceWorkflowTransition.deleteMany({
+        where: { OR: [{ fromStatusId: statusId }, { toStatusId: statusId }] },
+      });
+
+      await tx.workspaceWorkflowStatus.delete({
+        where: { id: statusId },
+      });
+    });
+  }
+
+  async updateWorkspaceTransitions(
+    workspaceId: string,
+    transitions: { fromStatusId: string; toStatusId: string }[],
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.workspaceWorkflowTransition.deleteMany({
+        where: { workspaceId },
+      });
+
+      if (transitions.length > 0) {
+        await tx.workspaceWorkflowTransition.createMany({
+          data: transitions.map((t) => ({
+            workspaceId,
+            fromStatusId: t.fromStatusId,
+            toStatusId: t.toStatusId,
+          })),
+        });
+      }
+    });
+  }
+
   /**
    * Clones workspace template to a project.
    */

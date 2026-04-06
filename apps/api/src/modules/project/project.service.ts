@@ -1158,6 +1158,30 @@ export class ProjectService {
     }
   }
 
+  async getTasksByProject(input: {
+    projectId: string;
+    workspaceId: string;
+    cursor?: string;
+    limit?: number;
+  }): Promise<ProjectTaskItemDTO[]> {
+    await verifyActiveProjectInWorkspace(this.prisma, input);
+
+    const limit = input.limit ?? 50;
+
+    const tasks = await this.prisma.task.findMany({
+      where: {
+        projectId: input.projectId,
+        deletedAt: null,
+      },
+      select: this.taskSelect,
+      orderBy: { createdAt: 'desc' },
+      take: limit + 1,
+      ...(input.cursor ? { cursor: { id: input.cursor }, skip: 1 } : {}),
+    });
+
+    return tasks.map((task) => this.toTaskDTO(task));
+  }
+
   private async verifyProjectAndTask(input: {
     projectId: string;
     taskId: string;

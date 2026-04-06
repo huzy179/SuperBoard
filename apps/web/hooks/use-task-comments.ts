@@ -13,6 +13,7 @@ import {
   publishTaskCommentsUpdated,
   subscribeTaskCommentsUpdated,
 } from '@/lib/realtime/project-sync';
+import { subscribeTaskComments } from '@/lib/realtime/project-socket';
 
 function commentQueryKey(projectId: string, taskId: string) {
   return ['projects', projectId, 'tasks', taskId, 'comments'] as const;
@@ -68,13 +69,23 @@ export function useTaskComments(projectId: string, taskId: string) {
       }
     };
 
-    const unsubscribe = subscribeTaskCommentsUpdated(projectId, taskId, scheduleInvalidate);
+    const unsubscribeSync = subscribeTaskCommentsUpdated(projectId, taskId, scheduleInvalidate);
+    const unsubscribeSocket = subscribeTaskComments(projectId, (payload) => {
+      if (payload.taskId === taskId) {
+        scheduleInvalidate();
+        if (payload.type === 'added') {
+          // Additional logic like toast or sound if needed
+        }
+      }
+    });
+
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', handleVisibilityChange);
     }
 
     return () => {
-      unsubscribe();
+      unsubscribeSync();
+      unsubscribeSocket();
       if (typeof document !== 'undefined') {
         document.removeEventListener('visibilitychange', handleVisibilityChange);
       }

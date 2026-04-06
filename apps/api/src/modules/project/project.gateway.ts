@@ -1,76 +1,69 @@
 import {
-  ConnectedSocket,
-  MessageBody,
   OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import type { Server, Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
+import { logger } from '../../common/logger';
 
-function toProjectRoom(projectId: string): string {
-  return `project:${projectId}`;
-}
+const toProjectRoom = (projectId: string) => `project:${projectId}`;
+const toTaskRoom = (projectId: string, taskId: string) => `project:${projectId}:task:${taskId}`;
 
 @WebSocketGateway({
-  namespace: '/projects',
   cors: {
-    origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
-    credentials: true,
+    origin: '*',
   },
+  namespace: 'projects',
 })
-export class ProjectGateway implements OnGatewayConnection {
+export class ProjectGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server!: Server;
 
-  private readonly clientProjectRoom = new Map<string, string>();
-
   handleConnection(client: Socket) {
-    const projectId =
-      typeof client.handshake.query.projectId === 'string' ? client.handshake.query.projectId : '';
-
+    const projectId = client.handshake.query.projectId as string;
     if (projectId) {
-      const room = toProjectRoom(projectId);
-      client.join(room);
-      this.clientProjectRoom.set(client.id, room);
+      void client.join(toProjectRoom(projectId));
       this.emitProjectPresence(projectId);
+      logger.info({ clientId: client.id, projectId }, 'Client connected to project');
     }
   }
 
   handleDisconnect(client: Socket) {
-    const previousRoom = this.clientProjectRoom.get(client.id);
-    this.clientProjectRoom.delete(client.id);
-
-    if (!previousRoom) {
-      return;
+    const projectId = client.handshake.query.projectId as string;
+    if (projectId) {
+      this.emitProjectPresence(projectId);
+      logger.info({ clientId: client.id, projectId }, 'Client disconnected from project');
     }
-
-    const projectId = previousRoom.replace('project:', '');
-    this.emitProjectPresence(projectId);
   }
 
   @SubscribeMessage('project:join')
-  handleJoinProject(
-    @MessageBody() payload: { projectId?: string },
-    @ConnectedSocket() client: Socket,
-  ) {
-    const projectId = payload.projectId?.trim();
-    if (!projectId) {
-      return;
-    }
+  handleProjectJoin(client: Socket, payload: { projectId: string }) {
+    if (!payload.projectId) return;
+    void client.join(toProjectRoom(payload.projectId));
+    this.emitProjectPresence(payload.projectId);
+  }
 
-    const nextRoom = toProjectRoom(projectId);
-    const previousRoom = this.clientProjectRoom.get(client.id);
+  @SubscribeMessage('project:leave')
+  handleProjectLeave(client: Socket, payload: { projectId: string }) {
+    if (!payload.projectId) return;
+    void client.leave(toProjectRoom(payload.projectId));
+    this.emitProjectPresence(payload.projectId);
+  }
 
-    if (previousRoom && previousRoom !== nextRoom) {
-      client.leave(previousRoom);
-      const previousProjectId = previousRoom.replace('project:', '');
-      this.emitProjectPresence(previousProjectId);
-    }
+  @SubscribeMessage('task:join')
+  handleTaskJoin(client: Socket, payload: { projectId: string; taskId: string }) {
+    if (!payload.projectId || !payload.taskId) return;
+    void client.join(toTaskRoom(payload.projectId, payload.taskId));
+    this.emitTaskPresence(payload.projectId, payload.taskId);
+  }
 
-    client.join(nextRoom);
-    this.clientProjectRoom.set(client.id, nextRoom);
-    this.emitProjectPresence(projectId);
+  @SubscribeMessage('task:leave')
+  handleTaskLeave(client: Socket, payload: { projectId: string; taskId: string }) {
+    if (!payload.projectId || !payload.taskId) return;
+    void client.leave(toTaskRoom(payload.projectId, payload.taskId));
+    this.emitTaskPresence(payload.projectId, payload.taskId);
   }
 
   emitProjectUpdated(projectId: string) {
@@ -137,6 +130,18 @@ export class ProjectGateway implements OnGatewayConnection {
 
     this.server.to(toProjectRoom(projectId)).emit('project:presence', {
       projectId,
+      viewerCount,
+      at: Date.now(),
+    });
+  }
+
+  private emitTaskPresence(projectId: string, taskId: string) {
+    const room = this.server.sockets.adapter.rooms.get(toTaskRoom(projectId, taskId));
+    const viewerCount = room?.size ?? 0;
+
+    this.server.to(toTaskRoom(projectId, taskId)).emit('task:presence', {
+      projectId,
+      taskId,
       viewerCount,
       at: Date.now(),
     });

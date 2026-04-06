@@ -83,7 +83,13 @@ export default function DocLayout({ children }: { children: ReactNode }) {
           </div>
 
           <nav className="px-2 space-y-0.5">
-            <DocTreeItem nodes={docs || []} activeId={params.docId as string} />
+            <DocTreeItem
+              nodes={docs || []}
+              activeId={params.docId as string}
+              onCreateSubDoc={(parentDocId) =>
+                createDocMutation.mutate({ title: 'Tài liệu con mới', parentDocId })
+              }
+            />
           </nav>
 
           <div className="mt-8 px-4 py-2 space-y-1">
@@ -113,14 +119,18 @@ function DocTreeItem({
   nodes,
   activeId,
   depth = 0,
+  onCreateSubDoc,
 }: {
   nodes: Doc[];
   activeId: string;
   depth?: number;
+  onCreateSubDoc: (parentDocId: string) => void;
 }) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
-  const toggleExpand = (id: string) => {
+  const toggleExpand = (id: string, e?: React.MouseEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
@@ -147,7 +157,7 @@ function DocTreeItem({
               }`}
             >
               <button
-                onClick={() => toggleExpand(doc.id)}
+                onClick={(e) => toggleExpand(doc.id, e)}
                 className={`p-1 text-slate-400 hover:text-slate-600 ${!hasChildren && 'invisible'}`}
               >
                 {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -165,14 +175,26 @@ function DocTreeItem({
                 </span>
               </Link>
 
-              <button className="p-1 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-slate-600 transition-all">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onCreateSubDoc(doc.id);
+                }}
+                className="p-1 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-slate-600 transition-all"
+              >
                 <Plus size={12} />
               </button>
             </div>
 
             {isExpanded && hasChildren && (
               <div className="ml-4 border-l border-slate-200">
-                <DocTreeItem nodes={doc.children!} activeId={activeId} depth={depth + 1} />
+                <DocTreeItem
+                  nodes={doc.children!}
+                  activeId={activeId}
+                  depth={depth + 1}
+                  onCreateSubDoc={onCreateSubDoc}
+                />
               </div>
             )}
           </div>

@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import type { Channel, Message } from '@superboard/shared';
 import {
@@ -21,9 +21,11 @@ export function useChannels(workspaceId: string | undefined) {
 export function useMessages(channelId: string | undefined) {
   const [realtimeMessages, setRealtimeMessages] = useState<Message[]>([]);
 
-  const query = useQuery({
+  const query = useInfiniteQuery({
     queryKey: ['messages', channelId],
-    queryFn: () => getChannelMessages(channelId!),
+    queryFn: ({ pageParam }) => getChannelMessages(channelId!, pageParam as string),
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    initialPageParam: undefined as string | undefined,
     enabled: !!channelId,
   });
 
@@ -33,7 +35,7 @@ export function useMessages(channelId: string | undefined) {
     chatSocket.connect();
     chatSocket.joinChannel(channelId);
 
-    const unsubscribe = chatSocket.onMessage((message) => {
+    const unsubscribe = chatSocket.onMessage((message: Message) => {
       if (message.channelId === channelId) {
         setRealtimeMessages((prev) => [message, ...prev]);
       }
@@ -46,12 +48,15 @@ export function useMessages(channelId: string | undefined) {
     };
   }, [channelId]);
 
-  const allMessages = [...realtimeMessages, ...(query.data?.items || [])];
+  const allPagesMessages = query.data?.pages.flatMap((page) => page.items) || [];
+  const allMessages = [...realtimeMessages, ...allPagesMessages];
 
   return {
     ...query,
     messages: allMessages,
-    nextCursor: query.data?.nextCursor,
+    hasNextPage: query.hasNextPage,
+    isFetchingNextPage: query.isFetchingNextPage,
+    fetchNextPage: query.fetchNextPage,
   };
 }
 

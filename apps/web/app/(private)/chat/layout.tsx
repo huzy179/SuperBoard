@@ -75,24 +75,68 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
             <div className="space-y-0.5">
               {privateChannels.map((channel) => {
                 const isActive = params.channelId === channel.id;
+                // Mock unread for demonstration
+                const isUnread = channel.name.includes('S');
+
                 return (
                   <Link
                     key={channel.id}
                     href={`/chat/${channel.id}`}
-                    className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] font-medium transition-colors ${
+                    className={`flex items-center justify-between px-2 py-1.5 rounded-md text-[13px] transition-colors ${
                       isActive
-                        ? 'bg-brand-600 text-white shadow-sm'
-                        : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-900'
+                        ? 'bg-brand-600 text-white shadow-sm font-bold'
+                        : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-900 font-medium'
                     }`}
                   >
-                    <Lock size={14} className={isActive ? 'text-white' : 'text-slate-400'} />
-                    <span className="truncate">{channel.name}</span>
+                    <div className="flex items-center gap-2 truncate">
+                      <Lock size={14} className={isActive ? 'text-white' : 'text-slate-400'} />
+                      <span className="truncate">{channel.name}</span>
+                    </div>
+                    {isUnread && !isActive && <div className="h-2 w-2 rounded-full bg-brand-500" />}
                   </Link>
                 );
               })}
               {privateChannels.length === 0 && (
                 <p className="px-2 text-[12px] text-slate-400 italic">Không có kênh riêng tư</p>
               )}
+            </div>
+          </div>
+
+          {/* DM Section */}
+          <div>
+            <div className="px-2 mb-2 flex items-center justify-between text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-none">
+              <span>Tin nhắn trực tiếp</span>
+              <button className="hover:text-slate-900 transition-colors">
+                <Plus size={12} />
+              </button>
+            </div>
+            <div className="space-y-0.5">
+              {[
+                { name: 'Nguyễn Văn A', status: 'online' },
+                { name: 'Trần Thị B', status: 'away' },
+                { name: 'Lê Văn C', status: 'offline' },
+              ].map((user, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] font-medium text-slate-600 hover:bg-slate-200/50 hover:text-slate-900 transition-colors cursor-pointer group"
+                >
+                  <div className="relative">
+                    <div className="h-4 w-4 rounded bg-slate-200 flex items-center justify-center text-[8px] text-slate-500 font-bold uppercase">
+                      {user.name[0]}
+                    </div>
+                    <div
+                      className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border-2 border-white ${
+                        user.status === 'online'
+                          ? 'bg-emerald-500'
+                          : user.status === 'away'
+                            ? 'bg-amber-500'
+                            : 'bg-slate-300'
+                      }`}
+                    />
+                  </div>
+                  <span className="truncate flex-1">{user.name}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

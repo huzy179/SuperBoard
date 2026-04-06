@@ -7,8 +7,8 @@ Tài liệu này theo dõi tiến độ phát triển của dự án SuperBoard.
 ## 🏃 Đang thực hiện (Doing)
 
 - [x] **v2.0**: Khởi động Multi-pillar (Slack + Notion). Thiết lập Schema & Backend Foundation.
-- [ ] **Tiếp theo**: Phát triển Frontend UI cho Chat Sidebar và Doc Tree.
-- [ ] **Tiếp theo**: Tích hợp TipTap editor cho Notion Pillar.
+- [x] **v2.1**: Phát triển Frontend UI cho Chat Sidebar và Doc Tree.
+- [x] **v2.2**: Tích hợp TipTap editor cho Notion Pillar & Real-time Typing cho Chat.
 
 ---
 
@@ -16,8 +16,8 @@ Tài liệu này theo dõi tiến độ phát triển của dự án SuperBoard.
 
 - [x] Triển khai Backend ChatModule, ChatService, ChatGateway (Real-time).
 - [x] Triển khai Backend DocModule, DocService (Hierarchy & Versioning).
-- [ ] Xây dựng giao diện Chat (Message Stream, Channel Sidebar).
-- [ ] Xây dựng giao diện Docs (Editor, Document Tree).
+- [x] Xây dựng giao diện Chat (Message Stream, Channel Sidebar, TypingIndicator).
+- [x] Xây dựng giao diện Docs (Editor, Document Tree, Sub-doc creation).
 
 ---
 

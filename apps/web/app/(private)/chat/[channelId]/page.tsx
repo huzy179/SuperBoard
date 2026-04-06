@@ -8,18 +8,65 @@ import { AssigneeAvatar } from '@/components/jira/task-badges';
 import { Hash, Send, Smile, Paperclip, MoreHorizontal, Info } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { chatSocket } from '@/lib/realtime/chat-socket';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function ChannelPage() {
   const params = useParams<{ channelId: string }>();
   const { user } = useAuthSession();
   const { data: channels } = useChannels(undefined); // Cached from layout
-  const { messages, isLoading } = useMessages(params.channelId);
+  const { messages, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useMessages(
+    params.channelId,
+  );
   const sendMessageMutation = useSendMessage(params.channelId);
 
   const [inputText, setInputText] = useState('');
+  const [typingUsers, setTypingUsers] = useState<Record<string, string>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const activeChannel = channels?.find((c) => c.id === params.channelId);
+
+  // Emit typing status
+  useEffect(() => {
+    if (!params.channelId || !user) return;
+
+    const isCurrentlyTyping = inputText.length > 0;
+    chatSocket.sendTyping(params.channelId, user.id, isCurrentlyTyping);
+
+    if (isCurrentlyTyping) {
+      const timeout = setTimeout(() => {
+        chatSocket.sendTyping(params.channelId, user.id, false);
+      }, 3000);
+      return () => clearTimeout(timeout);
+    }
+  }, [inputText, params.channelId, user]);
+
+  // Listen for typing status
+  useEffect(() => {
+    if (!params.channelId) return;
+
+    const unsubscribe = chatSocket.onTyping((data) => {
+      if (data.channelId === params.channelId && data.userId !== user?.id) {
+        setTypingUsers((prev) => {
+          const next = { ...prev };
+          if (data.isTyping) {
+            // We'd ideally need the user's name here.
+            // For now we'll use a placeholder or assume we'll fetch it.
+            next[data.userId] = 'Ai đó';
+          } else {
+            delete next[data.userId];
+          }
+          return next;
+        });
+      }
+    });
+
+    return () => {
+      unsubscribe();
+      setTypingUsers({});
+    };
+  }, [params.channelId, user?.id]);
 
   // Auto scroll to bottom on new messages
   useEffect(() => {
@@ -86,6 +133,18 @@ export default function ChannelPage() {
         ref={scrollRef}
         className="flex-1 overflow-y-auto px-6 py-6 pb-2 space-y-6 scroll-smooth"
       >
+        {hasNextPage && (
+          <div className="flex justify-center py-4">
+            <button
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              className="px-4 py-1.5 rounded-full bg-slate-100 text-[12px] font-bold text-slate-500 hover:bg-slate-200 transition-all disabled:opacity-50"
+            >
+              {isFetchingNextPage ? 'Đang tải...' : 'Tải thêm tin nhắn cũ'}
+            </button>
+          </div>
+        )}
+
         {[...messages].reverse().map((msg, index, array) => {
           const isMe = msg.authorId === user?.id;
           const prevMsg = index > 0 ? array[index - 1] : null;
@@ -121,8 +180,8 @@ export default function ChannelPage() {
                     <span className="text-[10px] text-slate-400 font-medium">{time}</span>
                   </div>
                 )}
-                <div className="text-[14px] leading-relaxed text-slate-700 whitespace-pre-wrap break-words border-l-2 border-transparent hover:border-brand-100 pl-2 transition-all">
-                  {msg.content}
+                <div className="text-[14px] leading-relaxed text-slate-700 whitespace-pre-wrap wrap-break-word border-l-2 border-transparent hover:border-brand-100 pl-2 transition-all prose prose-sm prose-slate max-w-none prose-p:leading-relaxed prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-code:text-brand-600 prose-code:bg-brand-50 prose-code:px-1 prose-code:rounded prose-a:text-brand-600 prose-a:no-underline hover:prose-a:underline">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                 </div>
               </div>
             </div>
@@ -132,16 +191,18 @@ export default function ChannelPage() {
 
       {/* Typing Indicator */}
       <div className="px-6 h-6 flex items-center gap-2">
-        <div className="flex items-center gap-1.5 opacity-0 animate-in fade-in slide-in-from-bottom-1 duration-500">
-          <div className="flex gap-1">
-            <span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce" />
-            <span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce [animation-delay:0.2s]" />
-            <span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce [animation-delay:0.4s]" />
+        {Object.keys(typingUsers).length > 0 && (
+          <div className="flex items-center gap-1.5 animate-in fade-in slide-in-from-bottom-1 duration-500">
+            <div className="flex gap-1">
+              <span className="w-1 h-1 bg-brand-500 rounded-full animate-bounce" />
+              <span className="w-1 h-1 bg-brand-500 rounded-full animate-bounce [animation-delay:0.2s]" />
+              <span className="w-1 h-1 bg-brand-500 rounded-full animate-bounce [animation-delay:0.4s]" />
+            </div>
+            <span className="text-[10px] font-bold text-brand-600 uppercase tracking-widest">
+              {Object.values(typingUsers).join(', ')} đang nhập...
+            </span>
           </div>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-            Ai đó đang nhập...
-          </span>
-        </div>
+        )}
       </div>
 
       {/* Input Area */}

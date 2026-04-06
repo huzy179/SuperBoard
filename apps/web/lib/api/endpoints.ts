@@ -75,4 +75,19 @@ export const API_ENDPOINTS = {
   upload: {
     avatar: '/api/v1/upload/avatar',
   },
+  chat: {
+    channels: (workspaceId: string) => `/api/v1/chat/channels?workspaceId=${workspaceId}`,
+    createChannel: (workspaceId: string) => `/api/v1/chat/channel?workspaceId=${workspaceId}`,
+    joinChannel: (channelId: string) => `/api/v1/chat/channels/${channelId}/join`,
+    messages: (channelId: string) => `/api/v1/chat/channels/${channelId}/messages`,
+    sendMessage: (channelId: string) => `/api/v1/chat/channels/${channelId}/messages`,
+  },
+  docs: {
+    list: (workspaceId: string) => `/api/v1/docs?workspaceId=${workspaceId}`,
+    create: (workspaceId: string) => `/api/v1/docs?workspaceId=${workspaceId}`,
+    detail: (docId: string) => `/api/v1/docs/${docId}`,
+    update: (docId: string) => `/api/v1/docs/${docId}`,
+    delete: (docId: string) => `/api/v1/docs/${docId}`,
+    versions: (docId: string) => `/api/v1/docs/${docId}/versions`,
+  },
 };

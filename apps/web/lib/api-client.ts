@@ -117,6 +117,14 @@ export function apiPatch<TData>(
   return apiRequest<TData>(path, { ...options, method: 'PATCH', body });
 }
 
+export function apiPut<TData>(
+  path: string,
+  body?: unknown,
+  options: Omit<RequestInitOptions, 'method' | 'body'> = {},
+): Promise<TData> {
+  return apiRequest<TData>(path, { ...options, method: 'PUT', body });
+}
+
 export function apiDelete<TData>(path: string, options: RequestInitOptions = {}): Promise<TData> {
   return apiRequest<TData>(path, { ...options, method: 'DELETE' });
 }

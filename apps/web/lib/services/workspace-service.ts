@@ -7,6 +7,10 @@ import type {
 import { apiGet, apiRequest, apiPost, apiDelete } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 
+export async function getWorkspaces(): Promise<WorkspaceItemDTO[]> {
+  return apiGet<WorkspaceItemDTO[]>(API_ENDPOINTS.workspaces.list, { auth: true });
+}
+
 export async function getWorkspaceMembers(workspaceId: string): Promise<WorkspaceMemberItemDTO[]> {
   return apiGet<WorkspaceMemberItemDTO[]>(API_ENDPOINTS.workspaces.members(workspaceId), {
     auth: true,

@@ -1,6 +1,6 @@
 import type { ID } from './common.types';
 
-export type ChannelType = 'public' | 'private';
+export type ChannelType = 'PUBLIC' | 'PRIVATE';
 
 export interface Channel {
   id: ID;
@@ -15,7 +15,12 @@ export interface Channel {
 export interface Message {
   id: ID;
   channelId: ID;
-  authorId: ID; // Changed from senderId to authorId to match Prisma
+  authorId: ID;
+  author?: {
+    id: ID;
+    fullName: string;
+    avatarUrl?: string | null;
+  };
   content: string;
   parentId?: string | null;
   editedAt?: string | null;

@@ -10,12 +10,14 @@ import { verifyProjectAndTaskInWorkspace } from '../../common/project-scope.help
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationService } from '../notification/notification.service';
 import type { CommentItemDTO } from '@superboard/shared';
+import { ProjectGateway } from './project.gateway';
 
 @Injectable()
 export class CommentService {
   constructor(
     private prisma: PrismaService,
     private notificationService: NotificationService,
+    private projectGateway: ProjectGateway,
   ) {}
 
   async getCommentsByTask(input: {
@@ -102,7 +104,18 @@ export class CommentService {
       { commentId: comment.id, taskId: input.taskId, authorId: input.authorId },
       'Comment created',
     );
-    return this.toCommentItemDTO(comment);
+
+    const dto = this.toCommentItemDTO(comment);
+    this.projectGateway.emitCommentAdded({
+      projectId: input.projectId,
+      taskId: input.taskId,
+      commentId: dto.id,
+      authorName: dto.authorName,
+      content: dto.content,
+      createdAt: dto.createdAt,
+    });
+
+    return dto;
   }
 
   async updateComment(input: {
@@ -163,7 +176,17 @@ export class CommentService {
       { commentId: updated.id, taskId: input.taskId, currentUserId: input.currentUserId },
       'Comment updated',
     );
-    return this.toCommentItemDTO(updated);
+
+    const dto = this.toCommentItemDTO(updated);
+    this.projectGateway.emitCommentUpdated({
+      projectId: input.projectId,
+      taskId: input.taskId,
+      commentId: dto.id,
+      content: dto.content,
+      updatedAt: dto.updatedAt,
+    });
+
+    return dto;
   }
 
   async deleteComment(input: {
@@ -213,6 +236,13 @@ export class CommentService {
       { commentId: input.commentId, taskId: input.taskId, currentUserId: input.currentUserId },
       'Comment deleted',
     );
+
+    this.projectGateway.emitCommentDeleted({
+      projectId: input.projectId,
+      taskId: input.taskId,
+      commentId: input.commentId,
+    });
+
     return { deleted: true };
   }
 

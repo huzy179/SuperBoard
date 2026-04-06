@@ -25,6 +25,7 @@ model Workspace {
   notifications Notification[]
   invitations WorkspaceInvitation[]
   labels        Label[]
+  auditLogs     AuditLog[]
 
   @@index([deletedAt])
 }
@@ -52,6 +53,7 @@ model User {
   preferences        NotificationPreference?
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
+  auditLogs          AuditLog[]
 }
 
 model NotificationPreference {
@@ -402,4 +404,22 @@ enum WorkspaceInvitationStatus {
   accepted
   revoked
   expired
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  actorId     String?
+  actor       User?     @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action      String    // e.g., "member_added", "role_changed", "project_deleted"
+  entityType  String    // "workspace", "project", "member"
+  entityId    String
+  payload     Json?     // Old/New values
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([workspaceId, createdAt])
+  @@index([entityType, entityId])
 }

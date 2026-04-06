@@ -12,6 +12,7 @@ import {
 } from '../../common/workspace-member.helper';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationService } from '../notification/notification.service';
+import { AuditLogService } from '../audit/audit.service';
 import { logger } from '../../common/logger';
 
 type WorkspaceItemDTO = {
@@ -45,6 +46,7 @@ export class WorkspaceService {
   constructor(
     private prisma: PrismaService,
     private notificationService: NotificationService,
+    private auditLogService: AuditLogService,
   ) {}
 
   async getWorkspacesByUser(
@@ -232,6 +234,15 @@ export class WorkspaceService {
         deletedAt: input.archivedAt ?? new Date(),
       },
     });
+
+    await this.auditLogService.log({
+      workspaceId: input.workspaceId,
+      actorId: input.userId,
+      action: 'workspace_archived',
+      entityType: 'workspace',
+      entityId: input.workspaceId,
+      payload: { archivedAt: input.archivedAt ?? new Date() },
+    });
   }
 
   async restoreWorkspaceForUser(input: {
@@ -299,6 +310,15 @@ export class WorkspaceService {
       where: { id: input.memberId },
       data: { role: nextRole },
     });
+
+    await this.auditLogService.log({
+      workspaceId: input.workspaceId,
+      actorId: input.currentUserId,
+      action: 'role_updated',
+      entityType: 'member',
+      entityId: input.memberId,
+      payload: { role: nextRole },
+    });
   }
 
   async addMemberToWorkspace(input: {
@@ -355,6 +375,15 @@ export class WorkspaceService {
           role: nextRole,
         },
       });
+
+      await this.auditLogService.log({
+        workspaceId: input.workspaceId,
+        actorId: input.currentUserId,
+        action: 'member_added',
+        entityType: 'member',
+        entityId: user.id,
+        payload: { role: nextRole, email: normalizedEmail },
+      });
       return;
     }
 
@@ -368,6 +397,15 @@ export class WorkspaceService {
         role: nextRole,
         deletedAt: null,
       },
+    });
+
+    await this.auditLogService.log({
+      workspaceId: input.workspaceId,
+      actorId: input.currentUserId,
+      action: 'member_added',
+      entityType: 'member',
+      entityId: user.id,
+      payload: { role: nextRole, email: normalizedEmail, rejoining: true },
     });
   }
 
@@ -474,13 +512,6 @@ export class WorkspaceService {
       ]);
 
       if (inviter && workspace) {
-        // Find if user already exists to send in-app notification,
-        // otherwise just email will be handled by NotificationService/EmailService based on preferences logic
-        // Actually, for invitations to new users, we just want to send the email directly.
-        // But our NotificationService expects a userId.
-        // If the user doesn't exist, we should handle it separately or create a placeholder.
-        // Recommendation: If user exists, send in-app + email. If not, send email only.
-
         if (existingUser) {
           await this.notificationService.createNotification({
             userId: existingUser.id,
@@ -493,7 +524,6 @@ export class WorkspaceService {
             },
           });
         } else {
-          // For non-existing users, we send email directly
           await this.notificationService.sendWorkspaceInvitation({
             email: normalizedEmail,
             inviterName: inviter.fullName,
@@ -618,6 +648,15 @@ export class WorkspaceService {
           defaultWorkspaceId: invitation.workspaceId,
         },
       });
+    });
+
+    await this.auditLogService.log({
+      workspaceId: invitation.workspaceId,
+      actorId: user.id,
+      action: 'member_joined',
+      entityType: 'member',
+      entityId: user.id,
+      payload: { role: invitation.role, email: user.email, via: 'invitation' },
     });
   }
 
@@ -749,6 +788,14 @@ export class WorkspaceService {
         },
       });
     });
+
+    await this.auditLogService.log({
+      workspaceId: input.workspaceId,
+      actorId: input.currentUserId,
+      action: 'member_removed',
+      entityType: 'member',
+      entityId: targetMember.userId,
+    });
   }
 
   async leaveWorkspaceForUser(input: {
@@ -795,6 +842,14 @@ export class WorkspaceService {
         },
       });
     });
+
+    await this.auditLogService.log({
+      workspaceId: input.workspaceId,
+      actorId: input.userId,
+      action: 'member_left',
+      entityType: 'member',
+      entityId: input.userId,
+    });
   }
 
   async transferWorkspaceOwnership(input: {
@@ -837,6 +892,15 @@ export class WorkspaceService {
         where: { id: targetMember.id },
         data: { role: 'owner' },
       });
+    });
+
+    await this.auditLogService.log({
+      workspaceId: input.workspaceId,
+      actorId: input.currentUserId,
+      action: 'ownership_transferred',
+      entityType: 'workspace',
+      entityId: input.workspaceId,
+      payload: { newOwnerId: targetMember.userId, previousOwnerId: input.currentUserId },
     });
   }
 

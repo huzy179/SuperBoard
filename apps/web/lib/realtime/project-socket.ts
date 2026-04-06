@@ -151,3 +151,54 @@ export function subscribeProjectTaskPatched(
     socket.off('project:task-patched', listener);
   };
 }
+
+export function subscribeTaskComments(
+  projectId: string,
+  onCommentEvent: (payload: {
+    type: 'added' | 'updated' | 'deleted';
+    taskId: string;
+    commentId: string;
+    authorName?: string;
+    content?: string;
+    createdAt?: string;
+    updatedAt?: string;
+  }) => void,
+): () => void {
+  const socket = getProjectSocket(projectId);
+
+  if (!socket) {
+    return () => {};
+  }
+
+  const handleAdded = (payload: {
+    taskId: string;
+    commentId: string;
+    authorName: string;
+    content: string;
+    createdAt: string;
+  }) => {
+    onCommentEvent({ type: 'added', ...payload });
+  };
+  const handleUpdated = (payload: {
+    taskId: string;
+    commentId: string;
+    content: string;
+    updatedAt: string;
+  }) => {
+    onCommentEvent({ type: 'updated', ...payload });
+  };
+  const handleDeleted = (payload: { taskId: string; commentId: string }) => {
+    onCommentEvent({ type: 'deleted', ...payload });
+  };
+
+  socket.on('comment:added', handleAdded);
+  socket.on('comment:updated', handleUpdated);
+  socket.on('comment:deleted', handleDeleted);
+  socket.emit('project:join', { projectId });
+
+  return () => {
+    socket.off('comment:added', handleAdded);
+    socket.off('comment:updated', handleUpdated);
+    socket.off('comment:deleted', handleDeleted);
+  };
+}

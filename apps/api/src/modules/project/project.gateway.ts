@@ -97,6 +97,40 @@ export class ProjectGateway implements OnGatewayConnection {
     });
   }
 
+  emitCommentAdded(payload: {
+    projectId: string;
+    taskId: string;
+    commentId: string;
+    authorName: string;
+    content: string;
+    createdAt: string;
+  }) {
+    this.server.to(toProjectRoom(payload.projectId)).emit('comment:added', {
+      ...payload,
+      at: Date.now(),
+    });
+  }
+
+  emitCommentUpdated(payload: {
+    projectId: string;
+    taskId: string;
+    commentId: string;
+    content: string;
+    updatedAt: string;
+  }) {
+    this.server.to(toProjectRoom(payload.projectId)).emit('comment:updated', {
+      ...payload,
+      at: Date.now(),
+    });
+  }
+
+  emitCommentDeleted(payload: { projectId: string; taskId: string; commentId: string }) {
+    this.server.to(toProjectRoom(payload.projectId)).emit('comment:deleted', {
+      ...payload,
+      at: Date.now(),
+    });
+  }
+
   private emitProjectPresence(projectId: string) {
     const room = this.server.sockets.adapter.rooms.get(toProjectRoom(projectId));
     const viewerCount = room?.size ?? 0;

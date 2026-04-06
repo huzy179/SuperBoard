@@ -18,6 +18,7 @@ import { TaskModule } from './modules/task/task.module';
 import { WorkflowModule } from './modules/workflow/workflow.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { SearchModule } from './modules/search/search.module';
+import { MonitoringModule } from './modules/monitoring/monitoring.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { SearchModule } from './modules/search/search.module';
     UploadModule,
     SearchModule,
     PrismaModule,
+    MonitoringModule,
   ],
   controllers: [HealthController],
   providers: [

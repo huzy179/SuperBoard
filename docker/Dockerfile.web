@@ -4,12 +4,12 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json package-lock.json ./
 COPY apps/web/package.json apps/web/
 COPY packages/ packages/
 
 # Install dependencies
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+RUN npm ci
 
 # Copy source code
 COPY apps/web apps/web
@@ -17,7 +17,7 @@ COPY apps/web/.env.production apps/web/.env.production 2>/dev/null || COPY apps/
 
 # Build the application
 WORKDIR /app/apps/web
-RUN pnpm build
+RUN npm run build
 
 # Production stage
 FROM node:20-alpine
@@ -25,11 +25,11 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json package-lock.json ./
 COPY apps/web/package.json apps/web/
 
 # Install production dependencies only
-RUN npm install -g pnpm && pnpm install --frozen-lockfile --prod
+RUN npm ci --omit=dev
 
 # Copy built application
 COPY --from=builder /app/apps/web/.next apps/web/.next
@@ -44,4 +44,4 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-CMD ["pnpm", "start"]
+CMD ["npm", "start"]

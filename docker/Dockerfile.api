@@ -4,31 +4,31 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json package-lock.json ./
 COPY apps/api/package.json apps/api/
 COPY packages/ packages/
 
-# Install dependencies
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+# Install dependencies (use npm)
+RUN npm ci
 
 # Copy source code
 COPY apps/api apps/api
 
 # Build the application
 WORKDIR /app/apps/api
-RUN pnpm build
+RUN npm run build
 
 # Production stage
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json pnpm-lock.yaml ./
+# Copy package files (including root for workspaces)
+COPY package.json package-lock.json ./
 COPY apps/api/package.json apps/api/
 
 # Install production dependencies only
-RUN npm install -g pnpm && pnpm install --frozen-lockfile --prod
+RUN npm ci --omit=dev
 
 # Copy built application
 COPY --from=builder /app/apps/api/dist apps/api/dist

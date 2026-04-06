@@ -130,7 +130,7 @@ export class NotificationService {
     if (input.type === 'workspace_invite' && preferences.workspaceInviteEmail) {
       const payload = input.payload as Record<string, unknown>;
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-      const inviteUrl = `${baseUrl}/invite/${payload.token}`;
+      const inviteUrl = `${baseUrl}/invitation/${payload.token}`;
 
       await this.emailService.sendWorkspaceInviteEmail(
         user.email,
@@ -148,7 +148,7 @@ export class NotificationService {
     token: string;
   }) {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const inviteUrl = `${baseUrl}/invite/${input.token}`;
+    const inviteUrl = `${baseUrl}/invitation/${input.token}`;
 
     await this.emailService.sendWorkspaceInviteEmail(
       input.email,

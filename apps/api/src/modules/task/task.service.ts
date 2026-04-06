@@ -56,4 +56,17 @@ export class TaskService {
 
     void input.restoredAt;
   }
+
+  async getTaskById(taskId: string) {
+    return this.prisma.task.findUnique({
+      where: { id: taskId, deletedAt: null },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        priority: true,
+      },
+    });
+  }
 }

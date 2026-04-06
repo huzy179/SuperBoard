@@ -13,10 +13,17 @@ import {
   createProjectTask,
   deleteProjectTask,
   restoreTask,
+  summarizeProjectTask,
   updateProjectTask,
   updateProjectTaskStatus,
 } from '@/lib/services/task-service';
 import { publishProjectDetailUpdated } from '@/lib/realtime/project-sync';
+
+export function useSummarizeTask() {
+  return useMutation({
+    mutationFn: (taskId: string) => summarizeProjectTask(taskId),
+  });
+}
 
 export function useCreateTask(projectId: string) {
   const queryClient = useQueryClient();

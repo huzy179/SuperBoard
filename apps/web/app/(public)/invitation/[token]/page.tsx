@@ -52,7 +52,7 @@ export default function InvitationPage() {
     setIsProcessing(true);
     try {
       await acceptInvitation.mutateAsync(token);
-      router.push('/dashboard');
+      router.push('/jira');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Không thể chấp nhận lời mời';
       alert(errorMessage);

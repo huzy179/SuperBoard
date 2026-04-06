@@ -1,1 +1,1 @@
-export { useCreateProject, useDeleteProject, useUpdateProject } from '../use-project-mutations';
+export { useCreateProject, useArchiveProject, useUpdateProject } from '../use-project-mutations';

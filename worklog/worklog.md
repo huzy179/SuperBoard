@@ -6,18 +6,18 @@ Tài liệu này theo dõi tiến độ phát triển của dự án SuperBoard.
 
 ## 🏃 Đang thực hiện (Doing)
 
+- [x] **v1.95**: Hoàn thiện CI/CD, Monitoring & Đồng bộ Invitation.
+- [x] **AI Assistant POC**: Tích hợp gRPC giữa NestJS/FastAPI và triển khai tóm tắt task bằng Gemini.
 - [ ] **Tiếp theo**: Deploy thực tế lên môi trường staging/production.
 - [ ] **Chốt roadmap**: Tập trung vào Jira-first, tránh mở rộng sang các nền tảng khác quá sớm.
-- [x] **Jira v1.91**: Hoàn thành Hệ thống Thông báo Email & Quản lý Profile.
-- [x] **Cấu trúc lại tài liệu**: Rút gọn và gộp các file .md để dễ dàng theo dõi và học tập.
 
 ---
 
 ## 📅 Sắp tới (Todo)
 
-- [ ] Cấu hình CI/CD hoàn chỉnh cho deploy tự động.
-- [ ] Tích hợp Prometheus/Grafana cho hệ thống monitoring.
-- [ ] Nghiên cứu AI Assistant tích hợp trực tiếp vào Board.
+- [x] Cấu hình CI/CD hoàn chỉnh cho deploy tự động (GitHub Actions).
+- [x] Tích hợp Prometheus/Grafana cho hệ thống monitoring.
+- [x] Nghiên cứu & Triển khai AI Assistant (Tóm tắt Task bằng Gemini via gRPC).
 
 ---
 

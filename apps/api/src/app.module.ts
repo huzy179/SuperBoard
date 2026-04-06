@@ -19,6 +19,7 @@ import { WorkflowModule } from './modules/workflow/workflow.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { SearchModule } from './modules/search/search.module';
 import { MonitoringModule } from './modules/monitoring/monitoring.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { MonitoringModule } from './modules/monitoring/monitoring.module';
     SearchModule,
     PrismaModule,
     MonitoringModule,
+    AiModule,
   ],
   controllers: [HealthController],
   providers: [

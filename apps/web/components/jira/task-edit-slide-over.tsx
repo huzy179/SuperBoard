@@ -14,6 +14,8 @@ import { type TaskPriority } from '@/lib/constants/task';
 import { TaskSubtaskManager } from '@/components/jira/task-subtask-manager';
 import { TaskPropertiesForm } from '@/components/jira/task-properties-form';
 import { TaskAttachmentManager } from '@/components/jira/task-attachment-manager';
+import { useSummarizeTask } from '@/hooks/use-task-mutations';
+import { useState } from 'react';
 
 interface TaskEditSlideOverProps {
   editingTask: ProjectTaskItemDTO;
@@ -112,6 +114,17 @@ export function TaskEditSlideOver({
   handleDialogKeyDown,
   workflow,
 }: TaskEditSlideOverProps) {
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const summarizeMutation = useSummarizeTask();
+
+  const handleSummarize = async () => {
+    try {
+      const result = await summarizeMutation.mutateAsync(editingTask.id);
+      setAiSummary(result.summary);
+    } catch (err) {
+      console.error('Failed to summarize task:', err);
+    }
+  };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/20 backdrop-blur-sm">
       <div
@@ -190,16 +203,50 @@ export function TaskEditSlideOver({
                   attachments={editingTask.attachments || []}
                 />
 
-                <label className="block text-sm font-medium text-slate-700">
-                  Mô tả
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-sm font-medium text-slate-700">Mô tả</label>
+                    <button
+                      type="button"
+                      onClick={handleSummarize}
+                      disabled={summarizeMutation.isPending}
+                      className="flex items-center gap-1.5 rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-700 transition-all hover:bg-indigo-100 active:scale-95 disabled:opacity-50"
+                    >
+                      {summarizeMutation.isPending ? (
+                        <span className="h-3 w-3 animate-spin rounded-full border-2 border-indigo-700 border-t-transparent" />
+                      ) : (
+                        <span>✨</span>
+                      )}
+                      AI SUMMARY
+                    </button>
+                  </div>
+
+                  {aiSummary && (
+                    <div className="relative overflow-hidden rounded-xl border border-indigo-100 bg-linear-to-br from-indigo-50/50 to-purple-50/50 p-4 shadow-xs animate-in fade-in zoom-in duration-300">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500">
+                          AI Generated Summary
+                        </span>
+                        <button
+                          onClick={() => setAiSummary(null)}
+                          className="text-slate-400 hover:text-slate-600 transition-colors"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      <p className="text-xs leading-relaxed text-slate-700 italic">"{aiSummary}"</p>
+                      <div className="absolute -right-4 -top-4 h-12 w-12 rounded-full bg-indigo-500/5 blur-xl" />
+                    </div>
+                  )}
+
                   <textarea
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
                     rows={5}
-                    className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
                     placeholder="Thêm mô tả chi tiết..."
                   />
-                </label>
+                </div>
 
                 <div className="text-[11px] text-slate-500">
                   <p>Tạo lúc: {formatDate(editingTask.createdAt)}</p>

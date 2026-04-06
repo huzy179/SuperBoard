@@ -8,7 +8,8 @@
 
 .PHONY: dev dev-infra dev-infra-full dev-infra-down \
 	db-generate db-migrate db-deploy db-seed db-fresh db-reset db-status db-studio \
-        typecheck lint test setup health up help
+        typecheck lint test setup health up help \
+        monitoring-up monitoring-down
 
 # ─── Dev servers ───────────────────────────────────────────
 
@@ -27,6 +28,12 @@ dev-infra-full: ## Start full infra (includes unused: keycloak, elasticsearch, m
 
 dev-infra-down: ## Stop all Docker services
 	npm run dev:infra:down
+
+monitoring-up: ## Start Promenade + Grafana
+	docker compose -f docker/docker-compose.monitoring.yml up -d
+
+monitoring-down: ## Stop Promenade + Grafana
+	docker compose -f docker/docker-compose.monitoring.yml down
 
 # ─── Database ──────────────────────────────────────────────
 

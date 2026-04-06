@@ -93,3 +93,13 @@ export async function getProjectStatuses(projectId: string): Promise<WorkflowSta
     auth: true,
   });
 }
+
+export async function summarizeProjectTask(taskId: string): Promise<{ summary: string }> {
+  return apiPost<{ summary: string }>(
+    API_ENDPOINTS.projects.summarizeTask(taskId),
+    {},
+    {
+      auth: true,
+    },
+  );
+}

@@ -37,9 +37,9 @@ export function TaskCreateForm({
 }: TaskCreateFormProps) {
   const defaultStatus = useMemo(() => {
     if (workflow?.statuses && workflow.statuses.length > 0) {
-      return workflow.statuses[0].key;
+      return (workflow.statuses[0] as { key: string }).key;
     }
-    return 'todo';
+    return 'todo' as string;
   }, [workflow?.statuses]);
 
   const [title, setTitle] = useState('');

@@ -1,62 +1,70 @@
 import {
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  SubscribeMessage,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  ConnectedSocket,
+  MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { logger } from '../../common/logger';
-import { Message } from '@superboard/shared';
-
-const toChannelRoom = (channelId: string) => `channel:${channelId}`;
+import { Logger } from '@nestjs/common';
+import type { Message } from '@superboard/shared';
 
 @WebSocketGateway({
-  cors: {
-    origin: '*',
-  },
   namespace: 'chat',
+  cors: { origin: '*' },
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server!: Server;
 
+  private logger = new Logger('ChatGateway');
+
   handleConnection(client: Socket) {
-    logger.info({ clientId: client.id }, 'Client connected to chat namespace');
+    this.logger.log(`Client connected: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
-    logger.info({ clientId: client.id }, 'Client disconnected from chat namespace');
+    this.logger.log(`Client disconnected: ${client.id}`);
   }
 
-  @SubscribeMessage('channel:join')
-  handleChannelJoin(client: Socket, payload: { channelId: string }) {
-    if (!payload.channelId) return;
-    void client.join(toChannelRoom(payload.channelId));
-    logger.info({ clientId: client.id, channelId: payload.channelId }, 'User joined channel room');
+  @SubscribeMessage('join:channel')
+  handleJoinChannel(@ConnectedSocket() client: Socket, @MessageBody() channelId: string) {
+    client.join(channelId);
+    this.logger.log(`Client ${client.id} joined channel ${channelId}`);
   }
 
-  @SubscribeMessage('channel:leave')
-  handleChannelLeave(client: Socket, payload: { channelId: string }) {
-    if (!payload.channelId) return;
-    void client.leave(toChannelRoom(payload.channelId));
-    logger.info({ clientId: client.id, channelId: payload.channelId }, 'User left channel room');
+  @SubscribeMessage('leave:channel')
+  handleLeaveChannel(@ConnectedSocket() client: Socket, @MessageBody() channelId: string) {
+    client.leave(channelId);
+    this.logger.log(`Client ${client.id} left channel ${channelId}`);
   }
 
-  @SubscribeMessage('chat:typing')
-  handleTyping(client: Socket, payload: { channelId: string; userId: string; isTyping: boolean }) {
-    if (!payload.channelId) return;
-    client.to(toChannelRoom(payload.channelId)).emit('chat:typing', {
-      channelId: payload.channelId,
-      userId: payload.userId,
-      isTyping: payload.isTyping,
+  @SubscribeMessage('typing')
+  handleTyping(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { channelId: string; userId: string; fullName: string },
+  ) {
+    client.to(data.channelId).emit('user:typing', {
+      userId: data.userId,
+      fullName: data.fullName,
     });
   }
 
-  emitMessageSent(message: Message) {
-    this.server.to(toChannelRoom(message.channelId)).emit('message:sent', {
-      ...message,
-      at: Date.now(),
-    });
+  broadcastMessage(channelId: string, message: Message) {
+    this.server.to(channelId).emit('message:new', message);
+  }
+
+  broadcastUpdate(channelId: string, message: Message) {
+    this.server.to(channelId).emit('message:updated', message);
+  }
+
+  broadcastDelete(channelId: string, messageId: string) {
+    this.server.to(channelId).emit('message:deleted', { messageId });
+  }
+
+  broadcastReaction(channelId: string, data: { messageId: string; userId: string; emoji: string }) {
+    this.server.to(channelId).emit('message:reaction', data);
   }
 }

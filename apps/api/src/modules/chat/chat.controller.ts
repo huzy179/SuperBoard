@@ -1,48 +1,82 @@
-import { Controller, Get, Post, Body, Param, Query, Req } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import type { AuthUserDTO } from '@superboard/shared';
 import { ChatService } from './chat.service';
-import { ChannelType } from '@superboard/shared';
+import { SendMessageDto, UpdateMessageDto, AddReactionDto } from './dto/chat.dto';
+import { ChatGateway } from './chat.gateway';
+import { BearerAuthGuard } from '../../common/guards/bearer-auth.guard';
 
 @Controller('chat')
+@UseGuards(BearerAuthGuard)
 export class ChatController {
-  constructor(private chatService: ChatService) {}
-
-  @Post('channel')
-  async createChannel(
-    @Query('workspaceId') workspaceId: string,
-    @Body() data: { name: string; description?: string; type: ChannelType },
-  ) {
-    return this.chatService.createChannel(workspaceId, data);
-  }
+  constructor(
+    private chatService: ChatService,
+    private chatGateway: ChatGateway,
+  ) {}
 
   @Get('channels')
-  async getWorkspaceChannels(@Query('workspaceId') workspaceId: string) {
-    return this.chatService.getWorkspaceChannels(workspaceId);
-  }
-
-  @Post('channels/:channelId/join')
-  async joinChannel(@Param('channelId') channelId: string, @Req() req: { user: { id: string } }) {
-    return this.chatService.joinChannel(channelId, req.user.id);
-  }
-
-  @Post('channels/:channelId/messages')
-  async sendMessage(
-    @Param('channelId') channelId: string,
-    @Req() req: { user: { id: string } },
-    @Body() data: { content: string; parentId?: string },
-  ) {
-    return this.chatService.sendMessage(channelId, req.user.id, data.content, data.parentId);
+  async getChannels(@Query('workspaceId') workspaceId: string, @CurrentUser() user: AuthUserDTO) {
+    return this.chatService.getChannels(workspaceId, user.id);
   }
 
   @Get('channels/:channelId/messages')
-  async getChannelMessages(
+  async getMessages(@Param('channelId') channelId: string, @Query('cursor') cursor?: string) {
+    return this.chatService.getMessages(channelId, cursor);
+  }
+
+  @Get('messages/:messageId/thread')
+  async getThreadMessages(@Param('messageId') messageId: string) {
+    return this.chatService.getThreadMessages(messageId);
+  }
+
+  @Post('channels/:channelId/messages')
+  async createMessage(
     @Param('channelId') channelId: string,
-    @Query('cursor') cursor?: string,
-    @Query('limit') limit?: string,
+    @Body() dto: SendMessageDto,
+    @CurrentUser() user: AuthUserDTO,
   ) {
-    return this.chatService.getChannelMessages(
-      channelId,
-      cursor,
-      limit ? parseInt(limit) : undefined,
-    );
+    const message = await this.chatService.createMessage(channelId, user.id, dto);
+    this.chatGateway.broadcastMessage(channelId, message);
+    return message;
+  }
+
+  @Put('messages/:messageId')
+  async updateMessage(
+    @Param('messageId') messageId: string,
+    @Body() dto: UpdateMessageDto,
+    @CurrentUser() user: AuthUserDTO,
+  ) {
+    const message = await this.chatService.updateMessage(messageId, user.id, dto);
+    this.chatGateway.broadcastUpdate(message.channelId, message);
+    return message;
+  }
+
+  @Delete('messages/:messageId')
+  async deleteMessage(@Param('messageId') messageId: string, @CurrentUser() user: AuthUserDTO) {
+    const message = await this.chatService.deleteMessage(messageId, user.id);
+    this.chatGateway.broadcastDelete(message.channelId, messageId);
+    return { success: true };
+  }
+
+  @Post('messages/:messageId/reactions')
+  async addReaction(
+    @Param('messageId') messageId: string,
+    @Body() dto: AddReactionDto,
+    @CurrentUser() user: AuthUserDTO,
+  ) {
+    await this.chatService.addReaction(messageId, user.id, dto);
+    const message = await this.chatService.getMessage(messageId);
+    this.chatGateway.broadcastReaction(message.channelId, {
+      messageId,
+      userId: user.id,
+      emoji: dto.emoji,
+    });
+    return { success: true };
+  }
+
+  @Post('channels/:channelId/join')
+  async joinChannel(@Param('channelId') channelId: string, @CurrentUser() user: AuthUserDTO) {
+    await this.chatService.joinChannel(channelId, user.id);
+    return { success: true };
   }
 }

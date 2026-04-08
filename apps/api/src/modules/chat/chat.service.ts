@@ -1,108 +1,188 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { ChannelType } from '@superboard/shared';
-import { ChatGateway } from './chat.gateway';
+import { SendMessageDto, UpdateMessageDto, AddReactionDto } from './dto/chat.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ChatService {
-  constructor(
-    private prisma: PrismaService,
-    private chatGateway: ChatGateway,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
-  async createChannel(
-    workspaceId: string,
-    data: { name: string; description?: string; type: ChannelType },
-  ) {
-    return this.prisma.channel.create({
-      data: {
-        workspaceId,
-        name: data.name,
-        description: data.description ?? null,
-        type: data.type,
-      },
-    });
-  }
-
-  async getWorkspaceChannels(workspaceId: string) {
+  async getChannels(workspaceId: string, userId: string) {
     return this.prisma.channel.findMany({
-      where: { workspaceId },
-      orderBy: { name: 'asc' },
-    });
-  }
-
-  async getChannelById(channelId: string) {
-    const channel = await this.prisma.channel.findUnique({
-      where: { id: channelId },
-    });
-    if (!channel) throw new NotFoundException('Channel not found');
-    return channel;
-  }
-
-  async joinChannel(channelId: string, userId: string) {
-    return this.prisma.channelMember.upsert({
-      where: { channelId_userId: { channelId, userId } },
-      update: {},
-      create: { channelId, userId },
-    });
-  }
-
-  async sendMessage(channelId: string, authorId: string, content: string, parentId?: string) {
-    const message = await this.prisma.message.create({
-      data: {
-        channelId,
-        authorId,
-        content,
-        parentId: parentId ?? null,
+      where: {
+        workspaceId,
+        members: {
+          some: { userId },
+        },
       },
       include: {
-        author: {
-          select: {
-            id: true,
-            fullName: true,
-            avatarUrl: true,
-          },
+        _count: {
+          select: { members: true },
         },
       },
     });
-
-    this.chatGateway.emitMessageSent({
-      ...message,
-      createdAt: message.createdAt.toISOString(),
-      updatedAt: message.updatedAt.toISOString(),
-      editedAt: message.editedAt?.toISOString() ?? null,
-      deletedAt: message.deletedAt?.toISOString() ?? null,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any); // Type cast since author info is extra
-    return message;
   }
 
-  async getChannelMessages(channelId: string, cursor?: string, limit = 50) {
-    const messages = await this.prisma.message.findMany({
-      where: { channelId },
-      take: limit + 1,
-      ...(cursor ? { cursor: { id: cursor } } : {}),
+  async getMessages(channelId: string, cursor?: string, limit = 50) {
+    const query: Prisma.MessageFindManyArgs = {
+      where: {
+        channelId,
+        parentId: null,
+      },
+      take: limit,
       skip: cursor ? 1 : 0,
       orderBy: { createdAt: 'desc' },
       include: {
         author: {
-          select: {
-            id: true,
-            fullName: true,
-            avatarUrl: true,
-          },
+          select: { id: true, fullName: true, avatarUrl: true },
+        },
+        reactions: true,
+        _count: {
+          select: { replies: true },
+        },
+      },
+    };
+
+    if (cursor) {
+      query.cursor = { id: cursor };
+    }
+
+    const messages = await this.prisma.message.findMany(query);
+
+    const lastMessage = messages[messages.length - 1];
+    const nextCursor = messages.length === limit ? lastMessage?.id : null;
+
+    return {
+      items: messages,
+      nextCursor,
+    };
+  }
+
+  async getMessage(messageId: string) {
+    const message = await this.prisma.message.findUnique({
+      where: { id: messageId },
+      include: {
+        author: {
+          select: { id: true, fullName: true, avatarUrl: true },
+        },
+        reactions: true,
+        _count: {
+          select: { replies: true },
         },
       },
     });
 
-    const hasNextPage = messages.length > limit;
-    const items = hasNextPage ? messages.slice(0, -1) : messages;
-    const lastItem = items[items.length - 1];
-    const nextCursor = hasNextPage && lastItem ? lastItem.id : null;
+    if (!message) throw new NotFoundException('Message not found');
+    return message;
+  }
 
-    return {
-      items,
-      nextCursor,
-    };
+  async getThreadMessages(messageId: string) {
+    return this.prisma.message.findMany({
+      where: {
+        parentId: messageId,
+      },
+      orderBy: { createdAt: 'asc' },
+      include: {
+        author: {
+          select: { id: true, fullName: true, avatarUrl: true },
+        },
+        reactions: true,
+      },
+    });
+  }
+
+  async createMessage(channelId: string, userId: string, dto: SendMessageDto) {
+    return this.prisma.message.create({
+      data: {
+        content: dto.content,
+        channelId,
+        authorId: userId,
+        parentId: dto.parentId ?? null,
+      },
+      include: {
+        author: {
+          select: { id: true, fullName: true, avatarUrl: true },
+        },
+        reactions: true,
+        _count: {
+          select: { replies: true },
+        },
+      },
+    });
+  }
+
+  async updateMessage(messageId: string, userId: string, dto: UpdateMessageDto) {
+    const message = await this.prisma.message.findUnique({
+      where: { id: messageId },
+    });
+
+    if (!message) throw new NotFoundException('Message not found');
+    if (message.authorId !== userId) throw new ForbiddenException('Not allowed');
+
+    return this.prisma.message.update({
+      where: { id: messageId },
+      data: {
+        content: dto.content,
+        editedAt: new Date(),
+      },
+      include: {
+        author: {
+          select: { id: true, fullName: true, avatarUrl: true },
+        },
+        reactions: true,
+        _count: {
+          select: { replies: true },
+        },
+      },
+    });
+  }
+
+  async deleteMessage(messageId: string, userId: string) {
+    const message = await this.prisma.message.findUnique({
+      where: { id: messageId },
+    });
+
+    if (!message) throw new NotFoundException('Message not found');
+    if (message.authorId !== userId) throw new ForbiddenException('Not allowed');
+
+    return this.prisma.message.update({
+      where: { id: messageId },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+  }
+
+  async addReaction(messageId: string, userId: string, dto: AddReactionDto) {
+    const existing = await this.prisma.messageReaction.findUnique({
+      where: {
+        messageId_userId_emoji: {
+          messageId,
+          userId,
+          emoji: dto.emoji,
+        },
+      },
+    });
+
+    if (existing) {
+      await this.prisma.messageReaction.delete({ where: { id: existing.id } });
+    } else {
+      await this.prisma.messageReaction.create({
+        data: { messageId, userId, emoji: dto.emoji },
+      });
+    }
+  }
+
+  async joinChannel(channelId: string, userId: string) {
+    return this.prisma.channelMember.upsert({
+      where: {
+        channelId_userId: { channelId, userId },
+      },
+      update: {},
+      create: {
+        channelId,
+        userId,
+      },
+    });
   }
 }

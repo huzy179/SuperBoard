@@ -3,13 +3,14 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@/app/*": ["./app/*"],
-      "@/components/*": ["./components/*"],
-      "@/hooks/*": ["./hooks/*"],
-      "@/lib/*": ["./lib/*"]
+      "@/*": ["src/*"],
+      "@/features/*": ["src/features/*"],
+      "@/components/*": ["src/components/*"],
+      "@/hooks/*": ["src/hooks/*"],
+      "@/lib/*": ["src/lib/*"],
+      "@/stores/*": ["src/stores/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/**/*"],
   "exclude": ["node_modules"]
 }

@@ -16,11 +16,16 @@ interface SummarizeResponse {
 interface AIService {
   SummarizeTask(data: SummarizeRequest): Observable<SummarizeResponse>;
   GetEmbedding(data: { text: string }): Observable<{ embedding: number[] }>;
-  ProcessText(data: { text: string; mode: string }): Observable<{ result: string }>;
   SummarizeChat(data: {
     messages: { author: string; content: string; created_at: string }[];
   }): Observable<{ result: string }>;
   GenerateAutomationRule(data: { prompt: string }): Observable<{ result: string }>;
+  SuggestLabels(data: {
+    title: string;
+    description: string;
+    existing_labels: string[];
+  }): Observable<{ labels: string[] }>;
+  SuggestPriority(data: { title: string; description: string }): Observable<{ priority: string }>;
 }
 
 @Injectable()
@@ -170,6 +175,39 @@ export class AiService implements OnModuleInit {
       const points = parseInt(result.match(/\d+/)?.[0] || '');
       return isNaN(points) ? null : points;
     } catch {
+      return null;
+    }
+  }
+
+  async suggestLabels(
+    title: string,
+    description: string,
+    existingLabels: { id: string; name: string }[],
+  ): Promise<string[]> {
+    try {
+      const labels = existingLabels.map((l) => l.name);
+      const result = await firstValueFrom(
+        this.aiServiceClient.SuggestLabels({
+          title,
+          description,
+          existing_labels: labels,
+        }),
+      );
+      return result.labels;
+    } catch (error) {
+      this.logger.error('Label suggestion failed', error);
+      return [];
+    }
+  }
+
+  async suggestPriority(title: string, description: string): Promise<string | null> {
+    try {
+      const result = await firstValueFrom(
+        this.aiServiceClient.SuggestPriority({ title, description }),
+      );
+      return result.priority;
+    } catch (error) {
+      this.logger.error('Priority suggestion failed', error);
       return null;
     }
   }

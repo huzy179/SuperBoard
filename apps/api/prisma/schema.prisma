@@ -204,6 +204,7 @@ model Task {
   attachments Attachment[]
   labels      TaskLabel[]
   embedding   TaskEmbedding?
+  summary     String?      // AI-generated scannability summary
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
@@ -529,6 +530,7 @@ model Doc {
   creator      User         @relation("DocCreator", fields: [createdById], references: [id], onDelete: Cascade)
   versions     DocVersion[]
   embedding    DocEmbedding?
+  summary      String?      // AI-generated scannability summary
 
   @@index([workspaceId])
   @@index([parentDocId])

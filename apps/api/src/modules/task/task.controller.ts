@@ -1,4 +1,4 @@
-import { Controller, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import type { AuthUserDTO } from '@superboard/shared';
 import { apiSuccess } from '../../common/api-response';
 import { requireWorkspace } from '../../common/helpers';
@@ -49,5 +49,13 @@ export class TaskController {
     requireWorkspace(user);
     const metadata = await this.taskService.refineTaskMetadata(taskId);
     return apiSuccess(metadata);
+  }
+
+  @Get(':taskId/ai/intelligence')
+  @HttpCode(HttpStatus.OK)
+  async getTaskIntelligence(@CurrentUser() user: AuthUserDTO, @Param('taskId') taskId: string) {
+    const workspaceId = requireWorkspace(user);
+    const intelligence = await this.taskService.getTaskIntelligence(taskId, workspaceId);
+    return apiSuccess(intelligence);
   }
 }

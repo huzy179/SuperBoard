@@ -101,4 +101,75 @@ export class TaskService {
       storyPoints: predictedPoints,
     };
   }
+
+  async getTaskIntelligence(taskId: string, workspaceId: string) {
+    const task = await this.prisma.task.findUnique({
+      where: { id: taskId },
+      include: {
+        project: { select: { workspaceId: true } },
+        embedding: true,
+      },
+    });
+
+    if (!task) throw new BadRequestException('Task not found');
+    if (task.project.workspaceId !== workspaceId) throw new BadRequestException('Access denied');
+
+    const [suggestions, duplicates] = await Promise.all([
+      this.getMetadataSuggestions(task),
+      task.embedding ? this.findSimilarTasks(task.id, workspaceId) : Promise.resolve([]),
+    ]);
+
+    return {
+      suggestions,
+      duplicates,
+    };
+  }
+
+  private async getMetadataSuggestions(task: {
+    title: string;
+    description: string | null;
+    project: { workspaceId: string };
+  }) {
+    const workspaceId = task.project.workspaceId;
+    const existingLabels = await this.prisma.label.findMany({
+      where: { workspaceId },
+      select: { id: true, name: true },
+    });
+
+    const [suggestedLabels, suggestedPriority] = await Promise.all([
+      this.aiService.suggestLabels(task.title, task.description || '', existingLabels),
+      this.aiService.suggestPriority(task.title, task.description || ''),
+    ]);
+
+    return {
+      labels: suggestedLabels,
+      priority: suggestedPriority,
+    };
+  }
+
+  private async findSimilarTasks(taskId: string, workspaceId: string) {
+    const taskWithEmbed = await this.prisma.task.findUnique({
+      where: { id: taskId },
+      include: { embedding: true },
+    });
+
+    if (!taskWithEmbed?.embedding) return [];
+
+    const embedding = taskWithEmbed.embedding as { vector: number[] };
+    const vectorStr = `[${embedding.vector.join(',')}]`;
+
+    const similar = await this.prisma.$queryRaw<{ id: string; title: string; score: number }[]>`
+      SELECT t.id, t.title, (1 - (te.vector <=> ${vectorStr}::vector)) as score
+      FROM "Task" t
+      JOIN "TaskEmbedding" te ON t.id = te."taskId"
+      JOIN "Project" p ON t."projectId" = p.id
+      WHERE p."workspaceId" = ${workspaceId}
+        AND t.id != ${taskId}
+        AND t."deletedAt" IS NULL
+      ORDER BY te.vector <=> ${vectorStr}::vector
+      LIMIT 3;
+    `;
+
+    return similar.filter((s) => s.score > 0.85); // Only high similarity duplicates
+  }
 }

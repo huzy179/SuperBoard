@@ -78,6 +78,12 @@ export interface ProjectTaskItemDTO {
     percent: number;
   } | null;
   attachments: ProjectTaskAttachmentDTO[];
+  summary?: string | null;
+  aiSuggestions?: {
+    priority?: TaskPriorityDTO | null;
+    labels?: string[] | null;
+    similarTasks?: { id: string; title: string; score: number }[] | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;

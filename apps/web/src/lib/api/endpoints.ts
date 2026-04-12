@@ -37,6 +37,7 @@ export const API_ENDPOINTS = {
     summarizeTask: (taskId: string) => `/api/v1/tasks/${taskId}/summarize`,
     aiDecompose: (taskId: string) => `/api/v1/tasks/${taskId}/ai/decompose`,
     aiRefine: (taskId: string) => `/api/v1/tasks/${taskId}/ai/refine`,
+    aiIntelligence: (taskId: string) => `/api/v1/tasks/${taskId}/ai/intelligence`,
   },
   notifications: {
     list: '/api/v1/notifications',

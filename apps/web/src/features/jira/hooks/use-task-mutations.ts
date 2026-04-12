@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import type {
   BulkTaskOperationRequestDTO,
@@ -16,8 +16,8 @@ import {
   summarizeProjectTask,
   aiDecomposeTask,
   aiRefineTask,
-  updateProjectTask,
   updateProjectTaskStatus,
+  getTaskIntelligence,
 } from '@/features/jira/api/task-service';
 import { publishProjectDetailUpdated } from '@/lib/realtime/project-sync';
 
@@ -292,5 +292,14 @@ export function useBulkTaskOperation(projectId: string) {
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
     },
+  });
+}
+
+export function useTaskIntelligence(taskId: string | undefined) {
+  return useQuery({
+    queryKey: ['tasks', taskId, 'intelligence'],
+    queryFn: () => (taskId ? getTaskIntelligence(taskId) : Promise.reject('No task ID')),
+    enabled: !!taskId,
+    staleTime: 1000 * 60 * 5, // 5 minutes cache
   });
 }

@@ -5,6 +5,7 @@ export interface DocItemDTO {
   parentDocId: string | null;
   createdById: string;
   lastEditedBy: string | null;
+  summary?: string | null;
   createdAt: string;
   updatedAt: string;
 }

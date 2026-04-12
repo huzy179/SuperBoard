@@ -31,6 +31,7 @@ import {
   useSummarizeTask,
   useAiDecompose,
   useAiRefine,
+  useTaskIntelligence,
 } from '@/features/jira/hooks/use-task-mutations';
 import { toast } from 'sonner';
 
@@ -137,6 +138,7 @@ export function TaskEditSlideOver({
   const summarizeMutation = useSummarizeTask();
   const decomposeMutation = useAiDecompose();
   const refineMutation = useAiRefine();
+  const { data: intelligence } = useTaskIntelligence(editingTask?.id);
 
   const handleAiDecompose = async () => {
     try {
@@ -318,6 +320,97 @@ export function TaskEditSlideOver({
             className="flex-1 overflow-y-auto elite-scrollbar custom-scrollbar"
           >
             <div className="px-10 py-12 space-y-16">
+              {/* Proactive Intelligence Alerts */}
+              {intelligence?.duplicates && intelligence.duplicates.length > 0 && (
+                <div className="relative group overflow-hidden rounded-[2.5rem] border border-amber-500/20 bg-amber-500/[0.02] p-8 shadow-glow-amber animate-in slide-in-from-top-6 duration-700">
+                  <div className="flex items-start gap-6">
+                    <div className="p-4 bg-amber-500/10 rounded-2xl text-amber-500 border border-amber-500/20 shadow-glow-amber">
+                      <Zap size={24} className="animate-pulse" />
+                    </div>
+                    <div className="space-y-3 flex-1">
+                      <div className="flex items-center gap-3">
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-500">
+                          Semantic Duplicate Warning
+                        </h4>
+                        <div className="h-px flex-1 bg-gradient-to-r from-amber-500/20 to-transparent" />
+                      </div>
+                      <p className="text-sm text-white/90 leading-relaxed font-bold italic tracking-tight">
+                        Detecting {intelligence.duplicates.length} potentially redundant units in
+                        current workspace.
+                      </p>
+                      <div className="flex flex-col gap-2 mt-4">
+                        {intelligence.duplicates.map((dup) => (
+                          <button
+                            key={dup.id}
+                            type="button"
+                            onClick={() => {
+                              const task = (projectTasks ?? []).find((t) => t.id === dup.id);
+                              if (task) handleOpenEdit(task);
+                            }}
+                            className="flex items-center justify-between px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-amber-500/40 hover:bg-white/[0.05] transition-all group/dup"
+                          >
+                            <span className="text-xs font-bold text-white/60 group-hover/dup:text-white truncate">
+                              {dup.title}
+                            </span>
+                            <span className="text-[10px] font-mono text-amber-500/50">
+                              {Math.round(dup.score * 100)}% MATCH
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Neural Prediction Insights */}
+              {intelligence?.suggestions && (
+                <div className="relative group overflow-hidden rounded-[2.5rem] border border-cyan-500/20 bg-cyan-500/[0.02] p-8 shadow-glow-cyan animate-in slide-in-from-top-6 duration-700">
+                  <div className="flex items-start gap-6">
+                    <div className="p-4 bg-cyan-500/10 rounded-2xl text-cyan-400 border border-cyan-500/20 shadow-glow-cyan">
+                      <Brain size={24} className="animate-pulse" />
+                    </div>
+                    <div className="space-y-4 flex-1">
+                      <div className="flex items-center gap-3">
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400">
+                          Neural Triage Suggestions
+                        </h4>
+                        <div className="h-px flex-1 bg-gradient-to-r from-cyan-500/20 to-transparent" />
+                      </div>
+
+                      <div className="flex flex-wrap gap-4">
+                        {intelligence.suggestions.priority &&
+                          intelligence.suggestions.priority !== editPriority && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setEditPriority(intelligence.suggestions.priority as TaskPriority)
+                              }
+                              className="px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-black uppercase tracking-widest hover:bg-cyan-500 hover:text-white transition-all shadow-glow-cyan/10"
+                            >
+                              Suggested Priority: {intelligence.suggestions.priority}
+                            </button>
+                          )}
+
+                        {intelligence.suggestions.labels.map((label) => (
+                          <button
+                            key={label}
+                            type="button"
+                            onClick={() => {
+                              // In a real impl, we'd find the label ID and add it
+                              toast.info(`Applying label: ${label}`);
+                            }}
+                            className="px-4 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest hover:bg-brand-500 hover:text-white transition-all"
+                          >
+                            + {label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Intelligent Analytical Briefing */}
               {aiAnalysis && (
                 <div className="relative group overflow-hidden rounded-[2.5rem] border border-brand-500/20 bg-brand-500/[0.02] p-8 shadow-glow-brand animate-in slide-in-from-top-6 duration-700">

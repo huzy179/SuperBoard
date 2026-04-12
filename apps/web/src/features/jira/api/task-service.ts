@@ -125,3 +125,13 @@ export async function aiRefineTask(
     },
   );
 }
+
+export async function getTaskIntelligence(taskId: string): Promise<{
+  suggestions: { labels: string[]; priority: string | null };
+  duplicates: { id: string; title: string; score: number }[];
+}> {
+  return apiGet<{
+    suggestions: { labels: string[]; priority: string | null };
+    duplicates: { id: string; title: string; score: number }[];
+  }>(API_ENDPOINTS.projects.aiIntelligence(taskId), { auth: true });
+}

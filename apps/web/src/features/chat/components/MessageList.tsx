@@ -36,7 +36,7 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-white">
+    <div className="flex-1 flex flex-col overflow-hidden bg-transparent">
       <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto px-6 py-4 space-y-6 flex flex-col-reverse"
@@ -76,14 +76,25 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
                   )}
 
                   <div
-                    className={`text-slate-700 text-[14px] leading-relaxed break-words whitespace-pre-wrap px-4 py-2 rounded-2xl border transition-all ${showHeader ? 'rounded-tl-none' : ''} ${message.authorId === 'me' ? 'bg-brand-50 border-brand-100 text-brand-900' : 'bg-slate-50 border-slate-100 hover:border-slate-200 hover:bg-white hover:shadow-sm'}`}
+                    className={`text-slate-700 text-[14px] leading-relaxed break-words whitespace-pre-wrap px-4 py-2.5 rounded-2xl border transition-all shadow-sm ${showHeader ? 'rounded-tl-none' : ''} ${message.authorId === 'me' ? 'bg-brand-50/80 border-brand-100/50 text-brand-900 ring-1 ring-brand-200/20' : 'bg-white/80 border-slate-100 hover:border-slate-200 hover:bg-white hover:shadow-md'}`}
                   >
                     {message.content}
                   </div>
 
-                  {/* Rich Action Bar (Hover Only) */}
+                  {/* Reaction Display (Simulated) */}
+                  <div className="flex flex-wrap gap-1 mt-1.5 px-1">
+                    <button className="flex items-center gap-1.2 px-2 py-0.5 bg-slate-50 border border-slate-100 rounded-full text-[10px] font-bold text-slate-500 hover:bg-white hover:border-brand-200 transition-all">
+                      <span>🔥</span>
+                      <span>2</span>
+                    </button>
+                    <button className="flex items-center gap-1.2 px-2 py-0.5 bg-slate-50 border border-slate-100 rounded-full text-[10px] font-bold text-slate-500 hover:bg-white hover:border-brand-200 transition-all">
+                      <span>🚀</span>
+                      <span>1</span>
+                    </button>
+                  </div>
+
                   <div className="absolute right-0 -top-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:-translate-y-1 z-10">
-                    <div className="flex items-center gap-0.5 p-1 bg-white border border-slate-200 rounded-xl shadow-xl glass-panel">
+                    <div className="flex items-center gap-0.5 p-1 bg-white/90 backdrop-blur-md border border-slate-200/50 rounded-xl shadow-2xl">
                       <button
                         onClick={() => onOpenThread?.(message)}
                         className="p-2 hover:bg-slate-50 text-slate-500 hover:text-brand-600 rounded-lg transition-all"

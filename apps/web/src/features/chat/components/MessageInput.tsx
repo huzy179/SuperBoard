@@ -63,10 +63,10 @@ export function MessageInput({ channelId }: MessageInputProps) {
   };
 
   return (
-    <div className="p-4 bg-white border-t border-slate-100">
+    <div className="p-4 bg-transparent">
       <div className="max-w-4xl mx-auto">
-        <div className="relative flex items-end gap-2 p-2 rounded-xl bg-slate-50 border border-slate-200 focus-within:border-brand-500/50 focus-within:ring-4 focus-within:ring-brand-500/5 transition-all">
-          <button className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
+        <div className="relative flex items-end gap-2 p-2 rounded-[1.5rem] bg-white/80 backdrop-blur-md border border-slate-200 shadow-xl shadow-brand-500/5 focus-within:border-brand-500/50 focus-within:ring-4 focus-within:ring-brand-500/5 transition-all group/input">
+          <button className="p-2.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-all">
             <Paperclip size={20} />
           </button>
 
@@ -76,21 +76,21 @@ export function MessageInput({ channelId }: MessageInputProps) {
             value={content}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="Nhập tin nhắn..."
-            className="flex-1 bg-transparent border-none focus:ring-0 resize-none py-2 text-sm text-slate-700 min-h-[40px] max-h-[200px]"
+            placeholder="Viết điều gì đó mượt mà..."
+            className="flex-1 bg-transparent border-none focus:ring-0 resize-none py-3 text-[14px] text-slate-700 min-h-[44px] max-h-[200px] placeholder:text-slate-300 font-medium"
           />
 
-          <div className="flex items-center gap-1 self-center">
-            <button className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
+          <div className="flex items-center gap-1.5 self-center pb-1">
+            <button className="p-2.5 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-xl transition-all">
               <Smile size={20} />
             </button>
             <button
               onClick={handleSend}
               disabled={!content.trim() || sendMessageMutation.isPending}
-              className={`p-2 rounded-lg transition-all ${
+              className={`p-3 rounded-xl transition-all active:scale-90 ${
                 content.trim()
-                  ? 'bg-brand-600 text-white shadow-sm hover:bg-brand-700 active:scale-95'
-                  : 'text-slate-300'
+                  ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20 hover:bg-black'
+                  : 'text-slate-200'
               }`}
             >
               <Send size={18} />
@@ -98,12 +98,20 @@ export function MessageInput({ channelId }: MessageInputProps) {
           </div>
         </div>
 
-        <div className="mt-2 flex items-center justify-between px-1">
-          <div className="h-4">{/* Real-time typing indicators could go here */}</div>
-          <div className="flex items-center gap-4 text-[10px] text-slate-400 font-medium">
-            <button className="hover:text-slate-600 transition-colors">Định dạng (Markdown)</button>
+        <div className="mt-2.5 flex items-center justify-between px-2">
+          <div className="flex items-center gap-3">
+            <div className="flex gap-1">
+              <span className="w-1 h-1 bg-slate-200 rounded-full" />
+              <span className="w-1 h-1 bg-slate-200 rounded-full" />
+            </div>
+            <span className="text-[10px] text-slate-300 font-black uppercase tracking-widest">
+              Markdown Supported
+            </span>
+          </div>
+          <div className="flex items-center gap-4 text-[10px] text-slate-400 font-black uppercase tracking-widest">
+            <button className="hover:text-brand-600 transition-colors">Slash Commands (/)</button>
             <button className="hover:text-slate-600 transition-colors">
-              <MoreHorizontal size={12} />
+              <MoreHorizontal size={14} />
             </button>
           </div>
         </div>

@@ -32,11 +32,10 @@ export function ChatShell({ channel }: ChatShellProps) {
   }, [channel.id]);
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-white">
+    <div className="flex h-full w-full overflow-hidden bg-slate-50/50">
       <ChannelSidebar />
 
       <main className="flex-1 flex flex-col min-w-0 h-full relative border-l border-slate-100">
-        {/* ... existing header ... */}
         <header className="flex h-14 shrink-0 items-center justify-between px-6 border-b border-slate-100 bg-white/50 backdrop-blur-sm sticky top-0 z-20">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 text-slate-400">
@@ -67,8 +66,8 @@ export function ChatShell({ channel }: ChatShellProps) {
           </div>
         </header>
 
-        <div className="flex flex-1 min-h-0 overflow-hidden">
-          <div className="flex-1 flex flex-col min-h-0 bg-white">
+        <div className="flex flex-1 min-h-0 overflow-hidden relative">
+          <div className="flex-1 flex flex-col min-h-0 bg-transparent">
             <MessageList channelId={channel.id} onOpenThread={setActiveThread} />
 
             <div className="px-6 py-1 h-5">
@@ -83,10 +82,9 @@ export function ChatShell({ channel }: ChatShellProps) {
           </div>
 
           {activeThread && (
-            <ThreadPanel
-              parentMessage={activeThread}
-              onClose={() => setActiveThread(null)}
-            />
+            <div className="w-96 border-l border-slate-200 bg-white/80 backdrop-blur-xl animate-in slide-in-from-right-8 fade-in duration-500 shadow-2xl relative z-30">
+              <ThreadPanel parentMessage={activeThread} onClose={() => setActiveThread(null)} />
+            </div>
           )}
         </div>
       </main>

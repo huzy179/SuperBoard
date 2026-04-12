@@ -14,7 +14,8 @@ export function ChannelSidebar() {
   const { data: channels, isLoading } = useChannels(activeWorkspace?.id);
 
   return (
-    <aside className="flex flex-col h-full w-64 bg-sidebar-bg text-white/70">
+    <aside className="flex flex-col h-full w-64 bg-slate-900/90 backdrop-blur-xl border-r border-white/5 text-white/70 relative z-10 box-decoration-clone">
+      <div className="absolute inset-0 bg-gradient-to-b from-brand-600/5 to-transparent pointer-events-none" />
       <div className="p-4 border-b border-white/10 shrink-0">
         <AppBrand subtitle="Chat" variant="dark" />
       </div>

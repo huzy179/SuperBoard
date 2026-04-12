@@ -31,6 +31,12 @@ export function RichTextEditor({
   const [provider, setProvider] = useState<HocuspocusProvider | null>(null);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0, show: false });
   const [isAiProcessing, setIsAiProcessing] = useState(false);
+  const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([]);
+  const [coverImage, setCoverImage] = useState(
+    'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&q=80&w=2000',
+  );
+  const [icon, setIcon] = useState('📄');
+  const [slashMenu, setSlashMenu] = useState({ show: false, top: 0, left: 0 });
   const menuRef = useRef<HTMLDivElement>(null);
 
   const ydoc = useMemo(() => new Y.Doc(), []);
@@ -148,6 +154,31 @@ export function RichTextEditor({
       editable: editable,
       onUpdate: ({ editor }) => {
         onChange(editor.getJSON());
+
+        // Extract headings for TOC
+        const extractedHeadings: { id: string; text: string; level: number }[] = [];
+        editor.state.doc.descendants((node) => {
+          if (node.type.name === 'heading') {
+            const text = node.textContent;
+            const id = text
+              .toLowerCase()
+              .replace(/\s+/g, '-')
+              .replace(/[^\w-]/g, '');
+            extractedHeadings.push({ id, text, level: node.attrs.level });
+          }
+        });
+        setHeadings(extractedHeadings);
+
+        // Slash command detection
+        const { selection } = editor.state;
+        const isSlash = editor.state.doc.textBetween(selection.from - 1, selection.from) === '/';
+        if (isSlash) {
+          const { view } = editor;
+          const coords = view.coordsAtPos(selection.from);
+          setSlashMenu({ show: true, top: coords.top + window.scrollY + 20, left: coords.left });
+        } else {
+          setSlashMenu((prev) => ({ ...prev, show: false }));
+        }
       },
       editorProps: {
         attributes: {
@@ -213,6 +244,36 @@ export function RichTextEditor({
         </div>
       )}
 
+      {/* Slash Command Menu */}
+      {slashMenu.show && editable && (
+        <div
+          className="fixed z-50 w-64 bg-white border border-slate-200 rounded-2xl shadow-2xl p-2 animate-in slide-in-from-top-2 duration-200 glassmorphism"
+          style={{ top: `${slashMenu.top}px`, left: `${slashMenu.left}px` }}
+        >
+          <div className="px-3 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50 mb-1">
+            AI Slash Commands
+          </div>
+          <SlashMenuItem
+            icon={<Sparkles size={14} className="text-brand-500" />}
+            title="Tiếp tục viết"
+            desc="AI sẽ hoàn thiện đoạn văn này"
+            onClick={() => handleAiAction('improve')}
+          />
+          <SlashMenuItem
+            icon={<Type size={14} className="text-emerald-500" />}
+            title="Tóm tắt đoạn văn"
+            desc="Rút gọn ý chính nhanh chóng"
+            onClick={() => handleAiAction('summarize')}
+          />
+          <SlashMenuItem
+            icon={<Scissors size={14} className="text-amber-500" />}
+            title="Làm ngắn gọn"
+            desc="Tối ưu độ dài nội dung"
+            onClick={() => handleAiAction('shorten')}
+          />
+        </div>
+      )}
+
       {editable && (
         <div className="sticky top-0 z-20 flex flex-wrap items-center gap-1 border-b border-slate-100 bg-white/80 py-3 px-6 backdrop-blur-md mb-8 shadow-sm rounded-2xl mx-4 mt-4">
           <MenuButton
@@ -264,31 +325,82 @@ export function RichTextEditor({
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto pb-32">
-        {/* Notion-style Header */}
-        <div className="relative group mb-12">
-          {/* Cover Placeholder */}
-          <div className="h-48 md:h-64 w-full bg-gradient-to-br from-brand-500/10 via-indigo-500/10 to-purple-500/10 rounded-3xl overflow-hidden relative border border-slate-100 mb-[-4rem]">
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20" />
-          </div>
+      <div className="max-w-4xl mx-auto pb-32 flex gap-12">
+        {/* Floating TOC */}
+        {headings.length > 0 && (
+          <aside className="hidden xl:block w-64 shrink-0 sticky top-32 h-fit max-h-[70vh] overflow-y-auto pr-4 scrollbar-thin">
+            <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">
+              Table of Contents
+            </h5>
+            <nav className="space-y-3">
+              {headings.map((h, i) => (
+                <a
+                  key={`${h.id}-${i}`}
+                  href={`#${h.id}`}
+                  className={`block text-[13px] font-bold transition-all hover:text-brand-600 ${
+                    h.level === 1
+                      ? 'text-slate-900 pr-0'
+                      : h.level === 2
+                        ? 'text-slate-500 pl-4'
+                        : 'text-slate-400 pl-8 text-[12px]'
+                  }`}
+                >
+                  {h.text}
+                </a>
+              ))}
+            </nav>
+          </aside>
+        )}
 
-          <div className="px-6 md:px-12 relative z-10">
-            {/* Icon */}
-            <div className="w-24 h-24 bg-white rounded-[2rem] shadow-2xl flex items-center justify-center text-5xl border-4 border-white transform transition hover:scale-110 cursor-pointer">
-              📄
+        <div className="flex-1 min-w-0">
+          {/* Notion-style Header */}
+          <div className="relative group mb-12">
+            {/* Cover Image */}
+            <div className="h-48 md:h-64 w-full rounded-[2.5rem] overflow-hidden relative border border-slate-100 mb-[-4rem] shadow-2xl group/cover overflow-hidden">
+              <img
+                src={coverImage}
+                alt="Cover"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover/cover:scale-105"
+              />
+              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover/cover:opacity-100 transition-opacity" />
+              {editable && (
+                <button
+                  onClick={() =>
+                    setCoverImage(
+                      `https://images.unsplash.com/photo-${Math.floor(Math.random() * 10000)}?auto=format&fit=crop&q=80&w=2000`,
+                    )
+                  }
+                  className="absolute bottom-4 right-4 px-4 py-2 bg-white/80 backdrop-blur-md rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-800 opacity-0 group-hover/cover:opacity-100 transition-all hover:bg-white"
+                >
+                  Đổi ảnh bìa
+                </button>
+              )}
             </div>
 
-            {/* Breadcrumb Title Area */}
-            <div className="mt-6 flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-2">
-              <span>Workspace</span>
-              <span>/</span>
-              <span>Docs</span>
+            <div className="px-6 md:px-12 relative z-10">
+              {/* Icon */}
+              <div
+                onClick={() => {
+                  const icons = ['📄', '📝', '💡', '🚀', '📊', '📚', '🎯'];
+                  setIcon(icons[Math.floor(Math.random() * icons.length)]);
+                }}
+                className="w-24 h-24 bg-white rounded-[2rem] shadow-2xl flex items-center justify-center text-5xl border-4 border-white transform transition hover:scale-110 cursor-pointer active:scale-95"
+              >
+                {icon}
+              </div>
+
+              {/* Breadcrumb Title Area */}
+              <div className="mt-6 flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-2">
+                <span>Workspace</span>
+                <span>/</span>
+                <span>Docs</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="px-6 md:px-12">
-          <EditorContent editor={editor} />
+          <div className="px-6 md:px-12">
+            <EditorContent editor={editor} />
+          </div>
         </div>
       </div>
     </div>
@@ -336,6 +448,35 @@ function MenuButton({
       } ${className}`}
     >
       {label}
+    </button>
+  );
+}
+
+function SlashMenuItem({
+  icon,
+  title,
+  desc,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center gap-3 p-2 hover:bg-slate-50 rounded-xl transition-all group text-left"
+    >
+      <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm">
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-[13px] font-bold text-slate-900 group-hover:text-brand-600">
+          {title}
+        </div>
+        <div className="text-[10px] text-slate-400 group-hover:text-slate-500 truncate">{desc}</div>
+      </div>
     </button>
   );
 }

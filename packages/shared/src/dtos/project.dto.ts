@@ -58,9 +58,11 @@ export interface ProjectTaskAttachmentDTO {
 export interface ProjectTaskItemDTO {
   id: string;
   projectId: string;
+  projectName?: string | null;
   title: string;
   description?: string | null;
   parentTaskId?: string | null;
+  parentTaskTitle?: string | null;
   status: TaskStatusDTO;
   priority: TaskPriorityDTO;
   type: TaskTypeDTO;

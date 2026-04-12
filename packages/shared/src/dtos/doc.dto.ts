@@ -3,6 +3,7 @@ export interface DocItemDTO {
   workspaceId: string;
   title: string;
   parentDocId: string | null;
+  parentDocTitle?: string | null;
   createdById: string;
   lastEditedBy: string | null;
   summary?: string | null;

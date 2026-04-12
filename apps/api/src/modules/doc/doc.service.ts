@@ -41,6 +41,7 @@ export class DocService {
       createdAt: true,
       updatedAt: true,
       workspaceId: true,
+      summary: true,
     } as const;
 
     return this.prisma.doc.findMany({
@@ -162,6 +163,13 @@ export class DocService {
         ON CONFLICT ("docId") 
         DO UPDATE SET "vector" = ${vectorStr}::vector, "updatedAt" = NOW();
       `;
+
+      // NEW: Generate and persist AI Summary
+      const summary = await this.aiService.processText(text, 'summarize');
+      await this.prisma.doc.update({
+        where: { id: docId },
+        data: { summary },
+      });
     } catch (err: unknown) {
       logger.error({ err, docId }, 'Failed to sync doc embedding');
     }

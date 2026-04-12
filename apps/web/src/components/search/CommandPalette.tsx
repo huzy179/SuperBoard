@@ -15,6 +15,7 @@ import {
   Terminal,
 } from 'lucide-react';
 import { useSearch } from '@/features/search/hooks/use-search';
+import { useSearchStatus } from '@/features/search/hooks/use-search-status';
 import { ProjectItemDTO, ProjectTaskItemDTO, DocItemDTO } from '@superboard/shared';
 import { FileText } from 'lucide-react';
 
@@ -36,12 +37,30 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
   const router = useRouter();
   const [query, setQuery] = useState('');
   const { data } = useSearch(query);
+  const { data: syncStatus } = useSearchStatus();
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [recentSearches, setRecentSearches] = useState<CommandItem[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     inputRef.current?.focus();
+    // Load recent searches from localStorage
+    const saved = localStorage.getItem('superboard_recent_searches');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setRecentSearches(parsed);
+      } catch (err) {
+        console.error('Failed to parse recent searches', err);
+      }
+    }
   }, []);
+
+  const saveToRecent = (item: CommandItem) => {
+    const updated = [item, ...recentSearches.filter((r) => r.id !== item.id)].slice(0, 5);
+    setRecentSearches(updated);
+    localStorage.setItem('superboard_recent_searches', JSON.stringify(updated));
+  };
 
   const tasks = data?.tasks ?? [];
   const projects = data?.projects ?? [];
@@ -90,6 +109,19 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
     const list: CommandItem[] = [];
 
     if (!query) {
+      if (recentSearches.length > 0) {
+        list.push(
+          ...recentSearches.map((r) => ({
+            ...r,
+            category: 'Recent Activity',
+            // Re-wrap handler to satisfy saveToRecent
+            handler: () => {
+              r.handler();
+              saveToRecent(r);
+            },
+          })),
+        );
+      }
       list.push(...actions);
     } else {
       const matchedActions = actions.filter(
@@ -108,6 +140,14 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
         subtitle: `PRIMARY_KEY: ${p.key}`,
         icon: <LayoutGrid size={16} className="text-brand-400" />,
         handler: () => {
+          saveToRecent({
+            id: `project-${p.id}`,
+            type: 'project',
+            title: p.name || 'UNNAMED_NODE',
+            icon: <LayoutGrid size={16} />,
+            handler: () => {}, // Placeholder for serialization
+            category: 'Mission Nodes',
+          });
           router.push(`/projects/${p.id}`);
           onClose();
         },
@@ -123,6 +163,14 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
         subtitle: `VECTOR #${t.number} · STATUS: ${t.status.toUpperCase()}`,
         icon: <CheckCircle2 size={16} className="text-cyan-400" />,
         handler: () => {
+          saveToRecent({
+            id: `task-${t.id}`,
+            type: 'task',
+            title: t.title,
+            icon: <CheckCircle2 size={16} />,
+            handler: () => {},
+            category: 'Mission Vectors',
+          });
           router.push(`/projects/${t.projectId}?task=${t.id}`);
           onClose();
         },
@@ -138,6 +186,14 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
         subtitle: `DOCUMENT_NODE · EDITED: ${new Date(d.updatedAt).toLocaleDateString()}`,
         icon: <FileText size={16} className="text-emerald-400" />,
         handler: () => {
+          saveToRecent({
+            id: `doc-${d.id}`,
+            type: 'doc',
+            title: d.title,
+            icon: <FileText size={16} />,
+            handler: () => {},
+            category: 'Information Matrix',
+          });
           router.push(`/docs/${d.id}`);
           onClose();
         },
@@ -315,12 +371,22 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
           <div className="p-6 border-t border-white/5 bg-slate-950/50 flex items-center justify-between">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl text-brand-400 shadow-glow-brand">
+                <div className="w-8 h-8 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl text-brand-400 shadow-glow-brand relative">
                   <ShieldCheck size={14} />
+                  {!syncStatus?.isFullySynced && (
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-brand-500 rounded-full border-2 border-slate-950 animate-pulse shadow-glow-brand" />
+                  )}
                 </div>
-                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">
-                  Secure Node
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">
+                    Neural Index status
+                  </span>
+                  {!syncStatus?.isFullySynced && (
+                    <span className="text-[7px] font-bold text-brand-500/60 uppercase tracking-widest animate-pulse">
+                      Synchronizing Vectors...
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-6 text-[9px] font-black uppercase tracking-[0.2em] text-white/20">

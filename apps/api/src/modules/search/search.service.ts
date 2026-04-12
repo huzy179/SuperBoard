@@ -24,6 +24,8 @@ export class SearchService {
     title: true,
     description: true,
     parentTaskId: true,
+    parentTask: { select: { title: true } },
+    project: { select: { name: true } },
     status: true,
     priority: true,
     type: true,
@@ -57,6 +59,7 @@ export class SearchService {
     title: true,
     workspaceId: true,
     parentDocId: true,
+    parentDoc: { select: { title: true } },
     createdById: true,
     lastEditedBy: true,
     createdAt: true,
@@ -375,6 +378,7 @@ export class SearchService {
       workspaceId: d.workspaceId,
       title: d.title,
       parentDocId: d.parentDocId,
+      parentDocTitle: d.parentDoc?.title ?? null,
       createdById: d.createdById,
       lastEditedBy: d.lastEditedBy,
       createdAt: d.createdAt.toISOString(),
@@ -390,6 +394,8 @@ export class SearchService {
       title: string;
       description: string | null;
       parentTaskId: string | null;
+      parentTask: { title: string } | null;
+      project: { name: string } | null;
       status: string;
       priority: string;
       type: string;
@@ -420,6 +426,8 @@ export class SearchService {
       title: t.title,
       description: t.description ?? '',
       parentTaskId: t.parentTaskId,
+      parentTaskTitle: t.parentTask?.title ?? null,
+      projectName: t.project?.name ?? null,
       status: t.status as ProjectTaskItemDTO['status'],
       priority: t.priority as ProjectTaskItemDTO['priority'],
       type: (t.type ?? 'task') as ProjectTaskItemDTO['type'],

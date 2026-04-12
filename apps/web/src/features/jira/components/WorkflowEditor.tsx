@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import type { WorkflowStatusCategory } from '@superboard/shared';
-import { COLUMN_BORDER } from '@/lib/constants/task';
 
 interface WorkflowData {
   statuses: {
@@ -111,121 +110,130 @@ export function WorkflowEditor({
   const statuses = data?.statuses ?? [];
 
   return (
-    <div className="flex flex-col gap-8 pb-24">
+    <div className="flex flex-col gap-12 pb-32 animate-in fade-in duration-700">
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">{title || 'Workflow & Trạng thái'}</h1>
-          <p className="mt-2 text-slate-600 font-medium">
-            {description ||
-              'Tùy chỉnh các bước trong quy trình làm việc và quy tắc chuyển đổi trạng thái.'}
-          </p>
+          <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase mb-3">
+            {title || 'Workflow Core'}
+          </h1>
+          <div className="flex items-center gap-3">
+            <span className="h-2 w-2 rounded-full bg-brand-500 shadow-[0_0_10px_rgba(99,102,241,1)]" />
+            <p className="text-sm font-bold text-slate-500 uppercase tracking-[0.2em]">
+              {description || 'Neural configuration for project logic pathways.'}
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-3">{extraActions}</div>
+        <div className="flex items-center gap-4">{extraActions}</div>
       </header>
 
       {/* STATUSES SECTION */}
-      <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-          <h2 className="font-bold text-slate-900">Các trạng thái công việc (Cột trên Board)</h2>
-          <span className="text-xs font-medium text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full">
-            {statuses.length} trạng thái
+      <section className="relative group overflow-hidden rounded-[3rem] border border-white/20 bg-white/40 shadow-glass backdrop-blur-3xl transition-all">
+        {/* Rim Light */}
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+
+        <div className="px-10 py-6 border-b border-white/20 bg-white/40 flex justify-between items-center">
+          <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-brand-500" />
+            Logic States Configuration
+          </h2>
+          <span className="text-[10px] font-black text-brand-600 bg-brand-50 border border-brand-100 px-3 py-1 rounded-full uppercase tracking-widest">
+            {statuses.length} active nodes
           </span>
         </div>
-        <div className="p-6">
-          <div className="space-y-4">
+        <div className="p-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {statuses.map((status) => (
               <div
                 key={status.id}
-                className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:border-brand-200 hover:bg-brand-50/30 transition-all group"
+                className="group/item relative flex flex-col gap-4 p-6 rounded-[2rem] border border-white bg-white/50 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
               >
-                <div className="flex items-center gap-4 flex-1">
+                <div className="flex items-center justify-between">
                   <div
-                    className={`h-2 w-2 rounded-full ${COLUMN_BORDER[status.key]?.replace('border-t-', 'bg-') || 'bg-brand-500'} shadow-sm`}
-                  />
-                  <div className="flex-1">
-                    {editingStatusId === status.id ? (
-                      <div className="flex gap-2">
-                        <input
-                          autoFocus
-                          value={editName}
-                          onChange={(e) => setEditName(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && handleSaveStatusName(status.id)}
-                          className="px-2 py-1 border border-brand-300 rounded text-sm font-bold"
-                        />
-                        <button
-                          onClick={() => handleSaveStatusName(status.id)}
-                          className="text-xs text-brand-600 font-bold"
-                        >
-                          Lưu
-                        </button>
-                        <button
-                          onClick={() => setEditingStatusId(null)}
-                          className="text-xs text-slate-400"
-                        >
-                          Huỷ
-                        </button>
-                      </div>
-                    ) : (
-                      <p className="font-bold text-slate-900">{status.name}</p>
-                    )}
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mt-0.5">
-                      Phân loại: <span className="text-brand-600">{status.category}</span>
-                    </p>
+                    className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
+                      status.category === 'done'
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : status.category === 'todo'
+                          ? 'bg-slate-100 text-slate-600'
+                          : 'bg-brand-100 text-brand-700'
+                    }`}
+                  >
+                    {status.category}
                   </div>
+                  {!status.isSystem && (
+                    <div className="flex gap-1.5 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => {
+                          setEditingStatusId(status.id);
+                          setEditName(status.name);
+                        }}
+                        className="p-2 hover:bg-white rounded-xl text-slate-400 hover:text-brand-600 transition-colors"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => onDeleteStatus(status.id)}
+                        className="p-2 hover:bg-white rounded-xl text-slate-400 hover:text-rose-600 transition-colors"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  )}
                 </div>
-                {!status.isSystem && (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        setEditingStatusId(status.id);
-                        setEditName(status.name);
-                      }}
-                      className="p-2 text-slate-400 hover:text-brand-600 hover:bg-white rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                      title="Chỉnh sửa tên"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      onClick={() => onDeleteStatus(status.id)}
-                      className="p-2 text-slate-400 hover:text-rose-600 hover:bg-white rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                      title="Xoá trạng thái"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                )}
+
+                <div className="flex-1">
+                  {editingStatusId === status.id ? (
+                    <div className="flex gap-2">
+                      <input
+                        autoFocus
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSaveStatusName(status.id)}
+                        className="w-full px-3 py-2 bg-white border border-brand-300 rounded-xl text-sm font-black shadow-inner"
+                      />
+                    </div>
+                  ) : (
+                    <h4 className="text-xl font-black text-slate-900 tracking-tight">
+                      {status.name}
+                    </h4>
+                  )}
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                    Node: {status.key}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-8 pt-8 border-t border-slate-100">
-            <h3 className="text-sm font-bold text-slate-900 mb-4">Thêm trạng thái mới</h3>
-            <div className="flex gap-3">
+          <div className="mt-12 pt-10 border-t border-black/5">
+            <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-6 px-2">
+              Initialize New Node
+            </h3>
+            <div className="flex flex-wrap gap-4">
               <input
                 type="text"
-                placeholder="Tên trạng thái (VD: QA, Testing...)"
+                placeholder="Status Name (e.g. Quality Assurance)"
                 value={newStatusName}
                 onChange={(e) => setNewStatusName(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddStatus()}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-sm"
+                className="flex-1 min-w-[300px] px-8 py-5 bg-white/60 border border-white/40 rounded-3xl focus:bg-white focus:border-brand-500/50 outline-none transition-all font-bold text-lg text-slate-800 shadow-inner"
               />
               <select
                 value={newStatusCategory}
                 onChange={(e) => setNewStatusCategory(e.target.value as WorkflowStatusCategory)}
-                className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-sm font-medium"
+                className="px-8 py-5 rounded-3xl border border-white/40 bg-white/60 focus:bg-white focus:border-brand-500/50 outline-none transition-all font-black uppercase text-xs tracking-widest shadow-inner appearance-none pr-12"
               >
-                <option value="todo">Chưa thực hiện (Todo)</option>
-                <option value="in_progress">Đang thực hiện (In Progress)</option>
-                <option value="in_review">Đang review (In Review)</option>
-                <option value="done">Đã xong (Done)</option>
-                <option value="blocked">Đã chặn (Blocked)</option>
+                <option value="todo">Chưa thực hiện</option>
+                <option value="in_progress">Đang thực hiện</option>
+                <option value="in_review">Đang review</option>
+                <option value="done">Hoàn thành</option>
+                <option value="blocked">Bị chặn</option>
               </select>
               <button
                 onClick={handleAddStatus}
                 disabled={isPending || !newStatusName.trim()}
-                className="px-6 py-2.5 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95"
+                className="px-10 py-5 bg-slate-900 hover:bg-brand-600 disabled:bg-slate-300 text-white font-black rounded-3xl shadow-2xl transition-all active:scale-95 uppercase text-[10px] tracking-widest"
               >
-                {isPending ? 'Đang thêm...' : 'Thêm'}
+                {isPending ? 'Propagating...' : 'Register Node'}
               </button>
             </div>
           </div>
@@ -233,69 +241,77 @@ export function WorkflowEditor({
       </section>
 
       {/* TRANSITION MATRIX SECTION */}
-      <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-12">
-        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+      <section className="relative overflow-hidden rounded-[3rem] border border-white/20 bg-white/40 shadow-glass backdrop-blur-3xl">
+        <div className="px-10 py-8 border-b border-white/20 bg-white/40 flex justify-between items-center">
           <div>
-            <h2 className="font-bold text-slate-900">
-              Ma trận chuyển đổi trạng thái (Transition Rules)
+            <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+              Transition Logic Matrix
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Xác định các luồng di chuyển hợp lệ của Task.
+            <p className="text-[10px] font-bold text-slate-500 mt-1 uppercase tracking-widest">
+              Define valid state migration pathways
             </p>
           </div>
           {isMatrixDirty && (
             <button
               onClick={handleSaveTransitions}
               disabled={isPending}
-              className="px-4 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition-all shadow-sm active:scale-95"
+              className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black rounded-2xl shadow-xl transition-all active:scale-95 uppercase tracking-widest"
             >
-              {isPending ? 'Đang lưu...' : 'Lưu quy tắc'}
+              {isPending ? 'Syncing...' : 'Commit Matrix'}
             </button>
           )}
         </div>
-        <div className="p-6 overflow-x-auto">
-          <table className="w-full border-collapse">
+        <div className="p-10 overflow-x-auto">
+          <table className="w-full border-separate border-spacing-2">
             <thead>
               <tr>
-                <th className="p-3 text-left border-b border-slate-100 bg-slate-50/50">
-                  <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold italic">
-                    Từ \ Sang
+                <th className="p-4 border-b border-black/5">
+                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 block text-left">
+                    Source \ Target
                   </span>
                 </th>
                 {statuses.map((s) => (
-                  <th
-                    key={s.id}
-                    className="p-3 text-center border-b border-slate-100 min-w-[100px]"
-                  >
-                    <span className="text-[11px] font-bold text-slate-700">{s.name}</span>
+                  <th key={s.id} className="p-4 border-b border-black/5">
+                    <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
+                      {s.name}
+                    </span>
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {statuses.map((from) => (
-                <tr key={from.id} className="hover:bg-slate-50/30 transition-colors">
-                  <td className="p-3 border-r border-slate-100 bg-slate-50/20">
-                    <span className="text-[11px] font-bold text-slate-700">{from.name}</span>
+                <tr key={from.id}>
+                  <td className="p-4 border-r border-black/5 bg-white/10 rounded-2xl">
+                    <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
+                      {from.name}
+                    </span>
                   </td>
                   {statuses.map((to) => {
                     const isAllowed = localTransitions.has(`${from.id}_${to.id}`);
                     const isSelf = from.id === to.id;
 
                     return (
-                      <td key={to.id} className="p-4 border border-slate-100 text-center">
+                      <td key={to.id} className="p-2">
                         {isSelf ? (
-                          <div className="h-1.5 w-1.5 rounded-full bg-slate-200 mx-auto" />
+                          <div className="h-3 w-3 bg-slate-200 rounded-full mx-auto opacity-20" />
                         ) : (
                           <button
                             onClick={() => toggleTransition(from.id, to.id)}
-                            className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all mx-auto border ${
+                            className={`group relative h-10 w-full rounded-2xl flex items-center justify-center transition-all duration-300 border ${
                               isAllowed
-                                ? 'bg-emerald-50 border-emerald-200 text-emerald-600 shadow-inner'
-                                : 'bg-white border-slate-200 text-slate-300 hover:border-slate-300 hover:bg-slate-50'
+                                ? 'bg-slate-900 border-slate-900 text-emerald-400 shadow-xl scale-[1.05] z-10'
+                                : 'bg-white/40 border-white text-slate-300 hover:border-brand-300'
                             }`}
                           >
-                            {isAllowed ? '✅' : '❌'}
+                            <div
+                              className={`h-2 w-2 rounded-full transition-all duration-300 ${
+                                isAllowed
+                                  ? 'bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]'
+                                  : 'bg-slate-200 group-hover:bg-brand-400'
+                              }`}
+                            />
                           </button>
                         )}
                       </td>
@@ -305,20 +321,19 @@ export function WorkflowEditor({
               ))}
             </tbody>
           </table>
-          <div className="mt-6 flex items-center gap-6 px-4 py-3 bg-slate-50 rounded-xl border border-slate-200">
-            <div className="flex items-center gap-2">
-              <span className="text-emerald-600 bg-emerald-50 border border-emerald-200 rounded p-0.5 text-xs">
-                ✅
-              </span>
-              <span className="text-[11px] font-medium text-slate-600 italic">
-                Được phép di chuyển
+
+          <div className="mt-10 flex items-center gap-8 px-6 py-4 bg-white/40 rounded-3xl border border-white/60">
+            <div className="flex items-center gap-3">
+              <div className="h-3 w-3 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+              <span className="text-[9px] font-black text-slate-900 uppercase tracking-[0.2em]">
+                Authorized Pathway
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-slate-300 bg-white border border-slate-200 rounded p-0.5 text-xs">
-                ❌
+            <div className="flex items-center gap-3">
+              <div className="h-3 w-3 rounded-full bg-slate-200" />
+              <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                Restricted Pathway
               </span>
-              <span className="text-[11px] font-medium text-slate-600 italic">Bị chặn</span>
             </div>
           </div>
         </div>

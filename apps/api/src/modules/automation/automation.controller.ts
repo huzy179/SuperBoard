@@ -6,7 +6,17 @@ import type { AuthUserDTO, CreateWorkflowRuleDTO, UpdateWorkflowRuleDTO } from '
 
 @Controller('automation')
 export class AutomationController {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private automationService: AutomationService,
+  ) {}
+
+  @Post('generate-rule')
+  async generateRule(@CurrentUser() user: AuthUserDTO, @Body('prompt') prompt: string) {
+    if (!prompt) return apiSuccess(null);
+    const rule = await this.automationService.generateRuleFromPrompt(prompt);
+    return apiSuccess(rule);
+  }
 
   @Get('rules')
   async getRules(

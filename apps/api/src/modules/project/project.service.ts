@@ -643,6 +643,22 @@ export class ProjectService {
       }
 
       await this.prisma.taskEvent.createMany({ data: events });
+
+      // Trigger automation rules for each updated task
+      for (const taskId of input.taskIds) {
+        void this.automationService.handleTaskEvent({
+          taskId,
+          workspaceId: input.workspaceId,
+          projectId: input.projectId,
+          type: input.status ? 'status_changed' : 'updated',
+          actorId: input.actorId,
+          payload: {
+            action: 'bulk_update',
+            status: input.status,
+            priority: input.priority,
+          },
+        });
+      }
     }
 
     await this.clearDashboardCache(input.workspaceId);
@@ -848,6 +864,20 @@ export class ProjectService {
     if (changedFields.includes('title') || changedFields.includes('description')) {
       void this.syncTaskEmbedding(task.id, task.title, task.description || '');
     }
+
+    // Trigger automation rules
+    void this.automationService.handleTaskEvent({
+      taskId: task.id,
+      workspaceId: input.workspaceId,
+      projectId: task.projectId,
+      type: 'updated',
+      actorId: input.actorId,
+      payload: {
+        changedFields,
+        status: task.status,
+        priority: task.priority,
+      },
+    });
 
     await this.clearDashboardCache(input.workspaceId);
 

@@ -11,9 +11,10 @@ import { ReportController } from './report.controller';
 
 import { WorkflowModule } from '../workflow/workflow.module';
 import { AiModule } from '../ai/ai.module';
+import { AutomationModule } from '../automation/automation.module';
 
 @Module({
-  imports: [AuthModule, NotificationModule, WorkflowModule, AiModule],
+  imports: [AuthModule, NotificationModule, WorkflowModule, AiModule, AutomationModule],
   controllers: [ProjectController, ReportController],
   providers: [ProjectService, CommentService, ProjectGateway, MentionService, ReportService],
   exports: [ProjectService],

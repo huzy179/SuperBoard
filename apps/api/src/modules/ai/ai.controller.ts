@@ -72,4 +72,10 @@ export class AiController {
 
     return apiSuccess({ summary: result });
   }
+
+  @Post('automation/generate')
+  async generateAutomationRule(@CurrentUser() user: AuthUserDTO, @Body() body: { prompt: string }) {
+    const result = await this.aiService.generateAutomationRule(body.prompt);
+    return apiSuccess(result);
+  }
 }

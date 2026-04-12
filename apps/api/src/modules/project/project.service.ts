@@ -11,6 +11,7 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationService } from '../notification/notification.service';
 import { WorkflowService } from '../workflow/workflow.service';
+import { AutomationService } from '../automation/automation.service';
 import type {
   BulkTaskOperationResultDTO,
   CreateProjectRequestDTO,
@@ -36,6 +37,7 @@ export class ProjectService {
     private workflowService: WorkflowService,
     private aiService: AiService,
     private redisService: RedisService,
+    private automationService: AutomationService,
   ) {}
 
   async getProjectsByWorkspace(
@@ -412,6 +414,20 @@ export class ProjectService {
     // Trigger embedding sync in background
     void this.syncTaskEmbedding(task.id, task.title, task.description || '');
 
+    // Trigger automation rules
+    void this.automationService.handleTaskEvent({
+      taskId: task.id,
+      workspaceId: input.workspaceId,
+      projectId: input.projectId,
+      type: 'created',
+      actorId: input.actorId,
+      payload: {
+        title: task.title,
+        status: task.status,
+        priority: task.priority,
+      },
+    });
+
     await this.clearDashboardCache(input.workspaceId);
 
     return this.toTaskDTO(task);
@@ -471,6 +487,19 @@ export class ProjectService {
         },
       });
     }
+
+    // Trigger automation rules
+    void this.automationService.handleTaskEvent({
+      taskId: input.taskId,
+      workspaceId: input.workspaceId,
+      projectId: input.projectId,
+      type: 'status_changed',
+      actorId: input.actorId,
+      payload: {
+        from: existingTask.status,
+        to: input.status,
+      },
+    });
 
     await this.clearDashboardCache(input.workspaceId);
 

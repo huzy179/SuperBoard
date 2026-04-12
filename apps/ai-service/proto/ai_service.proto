@@ -7,6 +7,11 @@ service AIService {
   rpc GetEmbedding (EmbeddingRequest) returns (EmbeddingResponse);
   rpc ProcessText (ProcessTextRequest) returns (TextResponse);
   rpc SummarizeChat (SummarizeChatRequest) returns (TextResponse);
+  rpc GenerateAutomationRule (GenerateRuleRequest) returns (TextResponse);
+}
+
+message GenerateRuleRequest {
+  string prompt = 1;
 }
 
 message MessageData {

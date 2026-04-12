@@ -91,5 +91,44 @@ class GeminiService:
         except Exception as e:
             return f"Error summarizing chat: {str(e)}"
 
+    def generate_automation_rule(self, user_prompt: str) -> str:
+        if not self.model:
+            return "{}"
+        
+        system_prompt = """
+        Bạn là một chuyên gia về tự động hóa quy trình (Automation Engineer). 
+        Nhiệm vụ của bạn là chuyển đổi yêu cầu của người dùng thành một kiến trúc JSON cho hệ thống Workflow Rule.
+
+        Hệ thống hỗ trợ các Triggers:
+        - TASK_CREATED: Khi task mới được tạo.
+        - STATUS_CHANGED: Khi trạng thái task thay đổi. Cấu hình có 'from' và 'to'.
+        - ASSIGNEE_CHANGED: Khi người nhận task thay đổi.
+
+        Hệ thống hỗ trợ các Actions:
+        - SEND_NOTIFICATION: Gửi thông báo. Cấu hình có 'message' (hỗ trợ placeholder {{taskId}}, {{type}}).
+        - UPDATE_TASK_FIELD: Cập nhật trường dữ liệu task. Cấu hình có 'data' (với các trường như priority, storyPoints).
+
+        Định dạng JSON yêu cầu:
+        {
+          "name": "Tên quy tắc ngắn gọn",
+          "trigger": { "type": "TR_TYPE", "config": {} },
+          "actions": [{ "type": "AC_TYPE", "config": {} }]
+        }
+
+        Chỉ trả về JSON, không kèm giải thích hặc markdown block.
+        Yêu cầu của người dùng:
+        """
+        
+        prompt = f"{system_prompt}\n{user_prompt}"
+        
+        try:
+            response = self.model.generate_content(prompt)
+            # Clean up potential markdown formatting
+            result = response.text.strip().replace("```json", "").replace("```", "")
+            return result
+        except Exception as e:
+            print(f"Error generating rule: {str(e)}")
+            return "{}"
+
 # Singleton instance
 gemini_service = GeminiService()

@@ -18,6 +18,7 @@ interface AIService {
   SummarizeChat(data: {
     messages: { author: string; content: string; created_at: string }[];
   }): Observable<{ result: string }>;
+  GenerateAutomationRule(data: { prompt: string }): Observable<{ result: string }>;
 }
 
 @Injectable()
@@ -66,13 +67,30 @@ export class AiService implements OnModuleInit {
     }
   }
 
-  async summarizeChat(messages: { author: string; content: string; created_at: string }[]): Promise<string> {
+  async summarizeChat(
+    messages: { author: string; content: string; created_at: string }[],
+  ): Promise<string> {
     try {
       const result = await firstValueFrom(this.aiServiceClient.SummarizeChat({ messages }));
       return result.result;
     } catch (error) {
       console.error('AI Chat Summarization failed:', error);
       return 'Không thể tạo tóm tắt cuộc hội thoại.';
+    }
+  }
+
+  async generateAutomationRule(prompt: string): Promise<Record<string, unknown> | null> {
+    try {
+      const result = await firstValueFrom(this.aiServiceClient.GenerateAutomationRule({ prompt }));
+      try {
+        return JSON.parse(result.result) as Record<string, unknown>;
+      } catch {
+        console.error('Failed to parse AI-generated rule JSON:', result.result);
+        return null;
+      }
+    } catch (error) {
+      console.error('AI Rule Generation failed:', error);
+      return null;
     }
   }
 }

@@ -27,6 +27,11 @@ class AIServiceServicer(ai_service_pb2_grpc.AIServiceServicer):
         summary = gemini_service.summarize_chat(messages)
         return ai_service_pb2.TextResponse(result=summary)
 
+    def GenerateAutomationRule(self, request, context):
+        print(f"Generating automation rule for prompt: {request.prompt[:30]}...")
+        result = gemini_service.generate_automation_rule(request.prompt)
+        return ai_service_pb2.TextResponse(result=result)
+
 def start_grpc_server() -> None:
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     ai_service_pb2_grpc.add_AIServiceServicer_to_server(AIServiceServicer(), server)

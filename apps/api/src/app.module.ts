@@ -24,6 +24,7 @@ import { AiModule } from './modules/ai/ai.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { DocModule } from './modules/doc/doc.module';
+import { AutomationModule } from './modules/automation/automation.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { DocModule } from './modules/doc/doc.module';
     AuditModule,
     ChatModule,
     DocModule,
+    AutomationModule,
   ],
   controllers: [HealthController],
   providers: [

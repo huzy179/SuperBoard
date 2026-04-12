@@ -1,6 +1,7 @@
 'use client';
 
 import { Dispatch, SetStateAction, useMemo } from 'react';
+import { Type, Activity, Flag, Zap, Calendar, User } from 'lucide-react';
 import type { ProjectTaskItemDTO, ProjectMemberDTO, TaskTypeDTO } from '@superboard/shared';
 import { LabelDots } from '@/features/jira/components/task-badges';
 import {
@@ -54,7 +55,6 @@ export function TaskPropertiesForm({
 }: TaskPropertiesFormProps) {
   const statusOptions = useMemo(() => {
     if (!workflow || !initialStatus) {
-      // Fallback to default columns if no workflow
       return (
         workflow?.statuses.map((s) => ({ key: s.key, label: s.name })) || [
           { key: 'todo', label: 'Cần làm' },
@@ -79,74 +79,109 @@ export function TaskPropertiesForm({
       .filter((s) => s.key === initialStatus || allowedToStatusIds.has(s.id))
       .map((s) => ({ key: s.key, label: s.name }));
   }, [workflow, initialStatus]);
-  return (
-    <div className="space-y-5">
-      <label className="block text-sm font-medium text-slate-700">
-        Tiêu đề
-        <input
-          type="text"
-          value={editTitle}
-          onChange={(e) => setEditTitle(e.target.value)}
-          className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
-          required
-        />
-      </label>
 
-      <div>
-        <p className="text-sm font-medium text-slate-700 mb-2">Loại task</p>
-        <div className="flex gap-1">
-          {TASK_TYPE_OPTIONS.map((t) => (
-            <button
-              key={t.key}
-              type="button"
-              onClick={() => setEditType(t.key)}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                editType === t.key
-                  ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-300'
-                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              <span className="text-sm">{TASK_TYPE_ICONS[t.key].icon}</span>
-              {t.label}
-            </button>
-          ))}
+  const inputClasses =
+    'mt-2 w-full rounded-2xl border border-white/5 bg-white/5 px-4 py-3 text-sm text-white focus:border-brand-500/50 focus:ring-4 focus:ring-brand-500/10 transition-all placeholder:text-white/20 appearance-none elite-scrollbar overflow-hidden';
+  const labelClasses =
+    'text-[10px] font-black text-white/40 uppercase tracking-[0.3em] flex items-center gap-2 mb-1';
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="space-y-2">
+        <label className="block">
+          <span className={labelClasses}>
+            <Zap size={10} className="text-brand-400" /> Identifier Mission Title
+          </span>
+          <input
+            type="text"
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            className={`${inputClasses} text-lg font-bold tracking-tight`}
+            required
+            placeholder="Mission designation..."
+          />
+        </label>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <span className={labelClasses}>
+            <Type size={10} className="text-indigo-400" /> Prototype Designation
+          </span>
+          <div className="flex flex-wrap gap-2 mt-3">
+            {TASK_TYPE_OPTIONS.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setEditType(t.key)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                  editType === t.key
+                    ? 'bg-brand-500 text-white shadow-luxe scale-105'
+                    : 'bg-white/5 text-white/40 hover:bg-white/10'
+                }`}
+              >
+                <span>{TASK_TYPE_ICONS[t.key].icon}</span>
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-6">
+            <label className="block">
+              <span className={labelClasses}>
+                <Activity size={10} className="text-emerald-400" /> Operational Status
+              </span>
+              <div className="relative">
+                <select
+                  value={editStatus}
+                  onChange={(e) => setEditStatus(e.target.value)}
+                  className={inputClasses}
+                >
+                  {statusOptions.map((opt: { key: string; label: string }) => (
+                    <option key={opt.key} value={opt.key} className="bg-slate-900">
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  size={14}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none"
+                />
+              </div>
+            </label>
+            <label className="block">
+              <span className={labelClasses}>
+                <Flag size={10} className="text-rose-400" /> Protocol Priority
+              </span>
+              <div className="relative">
+                <select
+                  value={editPriority}
+                  onChange={(e) => setEditPriority(e.target.value as TaskPriority)}
+                  className={inputClasses}
+                >
+                  {PRIORITY_OPTIONS.map((priority) => (
+                    <option key={priority.key} value={priority.key} className="bg-slate-900">
+                      {priority.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  size={14}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none"
+                />
+              </div>
+            </label>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <label className="block text-sm font-medium text-slate-700">
-          Trạng thái
-          <select
-            value={editStatus}
-            onChange={(e) => setEditStatus(e.target.value)}
-            className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
-          >
-            {statusOptions.map((opt: { key: string; label: string }) => (
-              <option key={opt.key} value={opt.key}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block text-sm font-medium text-slate-700">
-          Độ ưu tiên
-          <select
-            value={editPriority}
-            onChange={(e) => setEditPriority(e.target.value as TaskPriority)}
-            className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
-          >
-            {PRIORITY_OPTIONS.map((priority) => (
-              <option key={priority.key} value={priority.key}>
-                {priority.label}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <label className="block text-sm font-medium text-slate-700">
-          Story Points
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <label className="block">
+          <span className={labelClasses}>
+            <Zap size={10} className="text-brand-400" /> Complexity Points
+          </span>
           <input
             type="number"
             min="0"
@@ -154,42 +189,73 @@ export function TaskPropertiesForm({
             value={editStoryPoints}
             onChange={(e) => setEditStoryPoints(e.target.value)}
             placeholder="—"
-            className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
+            className={inputClasses}
           />
         </label>
-        <label className="block text-sm font-medium text-slate-700">
-          Hạn hoàn thành
+        <label className="block">
+          <span className={labelClasses}>
+            <Calendar size={10} className="text-blue-400" /> Termination Deadline
+          </span>
           <input
             type="date"
             value={editDueDate}
             onChange={(e) => setEditDueDate(e.target.value)}
-            className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
+            className={inputClasses}
           />
+        </label>
+        <label className="block">
+          <span className={labelClasses}>
+            <User size={10} className="text-orange-400" /> Designated Operative
+          </span>
+          <div className="relative">
+            <select
+              value={editAssigneeId}
+              onChange={(e) => setEditAssigneeId(e.target.value)}
+              className={inputClasses}
+            >
+              <option value="" className="bg-slate-900">
+                -- Unassigned --
+              </option>
+              {members.map((m) => (
+                <option key={m.id} value={m.id} className="bg-slate-900">
+                  {m.fullName}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={14}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none"
+            />
+          </div>
         </label>
       </div>
 
-      <label className="block text-sm font-medium text-slate-700">
-        Người thực hiện
-        <select
-          value={editAssigneeId}
-          onChange={(e) => setEditAssigneeId(e.target.value)}
-          className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
-        >
-          <option value="">-- Chưa gán --</option>
-          {members.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.fullName}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      {labels && labels.length > 0 ? (
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-slate-700">Nhãn</p>
-          <LabelDots labels={labels} />
+      {labels && labels.length > 0 && (
+        <div className="space-y-4 pt-4 border-t border-white/5">
+          <span className={labelClasses}>Mission Classifications</span>
+          <div className="flex flex-wrap gap-2">
+            <LabelDots labels={labels} />
+          </div>
         </div>
-      ) : null}
+      )}
     </div>
+  );
+}
+
+function ChevronDown({ size, className }: { size: number; className?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
   );
 }

@@ -105,4 +105,38 @@ export class AiService implements OnModuleInit {
       return null;
     }
   }
+
+  async smartDecompose(title: string, description: string): Promise<string[]> {
+    try {
+      const text = `Title: ${title}\nDescription: ${description}`;
+      const result = await this.processText(text, 'decompose');
+
+      try {
+        // Attempt to parse if the result is JSON from gRPC
+        const parsed = JSON.parse(result);
+        if (Array.isArray(parsed)) return parsed as string[];
+      } catch {
+        // Fallback: If it's a newline separated list
+        return result
+          .split('\n')
+          .filter((l) => l.trim().length > 0)
+          .map((l) => l.replace(/^[-*•\d.]+\s*/, '').trim());
+      }
+      return [];
+    } catch (error) {
+      console.error('AI Decomposition failed:', error);
+      return [];
+    }
+  }
+
+  async predictStoryPoints(title: string, description: string): Promise<number | null> {
+    try {
+      const text = `Title: ${title}\nDescription: ${description}`;
+      const result = await this.processText(text, 'predict_complexity');
+      const points = parseInt(result.match(/\d+/)?.[0] || '');
+      return isNaN(points) ? null : points;
+    } catch {
+      return null;
+    }
+  }
 }

@@ -3,11 +3,15 @@ import {
   findTaskWithProjectInWorkspaceOrThrow,
   verifyActiveTaskInWorkspace,
 } from '../../common/project-scope.helper';
+import { AiService } from '../ai/ai.service';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class TaskService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private aiService: AiService,
+  ) {}
 
   async archiveTaskForWorkspace(input: {
     taskId: string;
@@ -66,7 +70,35 @@ export class TaskService {
         description: true,
         status: true,
         priority: true,
+        projectId: true,
       },
     });
+  }
+
+  async generateAiSubtasks(taskId: string) {
+    const task = await this.getTaskById(taskId);
+    if (!task) throw new BadRequestException('Task not found');
+
+    const subtasks = await this.aiService.smartDecompose(task.title, task.description || '');
+
+    // Note: We don't save them automatically here, we just return for preview/approval in UI
+    // Alternatively, we could create them in a transaction.
+    // For "Elite" UX, let's return them so the user can see them "revealed".
+    return subtasks;
+  }
+
+  async refineTaskMetadata(taskId: string) {
+    const task = await this.getTaskById(taskId);
+    if (!task) throw new BadRequestException('Task not found');
+
+    const [refinedDescription, predictedPoints] = await Promise.all([
+      this.aiService.processText(task.description || '', 'improve'),
+      this.aiService.predictStoryPoints(task.title, task.description || ''),
+    ]);
+
+    return {
+      description: refinedDescription,
+      storyPoints: predictedPoints,
+    };
   }
 }

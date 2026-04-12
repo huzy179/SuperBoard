@@ -14,6 +14,8 @@ import {
   deleteProjectTask,
   restoreTask,
   summarizeProjectTask,
+  aiDecomposeTask,
+  aiRefineTask,
   updateProjectTask,
   updateProjectTaskStatus,
 } from '@/features/jira/api/task-service';
@@ -22,6 +24,18 @@ import { publishProjectDetailUpdated } from '@/lib/realtime/project-sync';
 export function useSummarizeTask() {
   return useMutation({
     mutationFn: (taskId: string) => summarizeProjectTask(taskId),
+  });
+}
+
+export function useAiDecompose() {
+  return useMutation({
+    mutationFn: (taskId: string) => aiDecomposeTask(taskId),
+  });
+}
+
+export function useAiRefine() {
+  return useMutation({
+    mutationFn: (taskId: string) => aiRefineTask(taskId),
   });
 }
 

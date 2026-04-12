@@ -1,4 +1,4 @@
-import { Controller, HttpCode, HttpStatus, Param, Patch } from '@nestjs/common';
+import { Controller, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import type { AuthUserDTO } from '@superboard/shared';
 import { apiSuccess } from '../../common/api-response';
 import { requireWorkspace } from '../../common/helpers';
@@ -33,5 +33,21 @@ export class TaskController {
     });
 
     return apiSuccess({ archived: false });
+  }
+
+  @Post(':taskId/ai/decompose')
+  @HttpCode(HttpStatus.OK)
+  async decomposeTask(@CurrentUser() user: AuthUserDTO, @Param('taskId') taskId: string) {
+    requireWorkspace(user);
+    const subtasks = await this.taskService.generateAiSubtasks(taskId);
+    return apiSuccess({ subtasks });
+  }
+
+  @Post(':taskId/ai/refine')
+  @HttpCode(HttpStatus.OK)
+  async refineTask(@CurrentUser() user: AuthUserDTO, @Param('taskId') taskId: string) {
+    requireWorkspace(user);
+    const metadata = await this.taskService.refineTaskMetadata(taskId);
+    return apiSuccess(metadata);
   }
 }

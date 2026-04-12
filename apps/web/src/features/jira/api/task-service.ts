@@ -103,3 +103,25 @@ export async function summarizeProjectTask(taskId: string): Promise<{ summary: s
     },
   );
 }
+
+export async function aiDecomposeTask(taskId: string): Promise<{ subtasks: string[] }> {
+  return apiPost<{ subtasks: string[] }>(
+    API_ENDPOINTS.projects.aiDecompose(taskId),
+    {},
+    {
+      auth: true,
+    },
+  );
+}
+
+export async function aiRefineTask(
+  taskId: string,
+): Promise<{ description: string; storyPoints: number | null }> {
+  return apiPost<{ description: string; storyPoints: number | null }>(
+    API_ENDPOINTS.projects.aiRefine(taskId),
+    {},
+    {
+      auth: true,
+    },
+  );
+}

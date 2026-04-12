@@ -35,6 +35,8 @@ export const API_ENDPOINTS = {
     uploadAttachment: (taskId: string) => `/api/v1/upload/tasks/${taskId}`,
     deleteAttachment: (attachmentId: string) => `/api/v1/upload/attachments/${attachmentId}`,
     summarizeTask: (taskId: string) => `/api/v1/tasks/${taskId}/summarize`,
+    aiDecompose: (taskId: string) => `/api/v1/tasks/${taskId}/ai/decompose`,
+    aiRefine: (taskId: string) => `/api/v1/tasks/${taskId}/ai/refine`,
   },
   notifications: {
     list: '/api/v1/notifications',

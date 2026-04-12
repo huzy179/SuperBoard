@@ -135,51 +135,63 @@ export default function DashboardPage() {
   }
 
   return (
-    <section className="animate-fade-in">
-      <h1 className="mb-6 text-2xl font-bold tracking-tight text-slate-900">Dashboard</h1>
+    <section className="animate-fade-in space-y-8 grain-overlay">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-black tracking-tight text-luxe-gradient">Dashboard</h1>
+        <div className="flex gap-2">
+          <div className="px-4 py-1 bg-white/50 backdrop-blur rounded-full border border-slate-200 text-[11px] font-black uppercase tracking-widest text-slate-500">
+            Live Updates
+          </div>
+        </div>
+      </div>
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Tổng tasks"
           value={totalTasks}
-          color="bg-brand-50 text-brand-700"
+          color="from-indigo-500/10 via-brand-500/5 to-transparent"
           icon="📋"
           delay={0}
         />
         <StatCard
           label="Hoàn thành"
           value={doneTasks}
-          color="bg-emerald-50 text-emerald-700"
+          color="from-emerald-500/10 via-emerald-500/5 to-transparent"
           icon="✅"
           delay={1}
         />
         <StatCard
           label="Đang làm"
           value={inProgressTasks}
-          color="bg-blue-50 text-blue-700"
+          color="from-blue-500/10 via-blue-500/5 to-transparent"
           icon="🔧"
           delay={2}
         />
         <StatCard
           label="Quá hạn"
           value={safeStats.overdueTasks}
-          color="bg-red-50 text-red-700"
+          color="from-rose-500/10 via-rose-500/5 to-transparent"
           icon="⏰"
           delay={3}
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl bg-surface-card p-5" style={{ boxShadow: 'var(--shadow-card)' }}>
-          <h2 className="mb-4 text-sm font-semibold text-slate-900">Tasks theo trạng thái</h2>
+      <div className="grid gap-8 lg:grid-cols-2">
+        <div className="premium-card p-6 bg-white/40 backdrop-blur-xl relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/5 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-brand-500/10 transition-colors" />
+          <h2 className="mb-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+            Tasks theo trạng thái
+          </h2>
           <DonutDistributionChart
             items={statusChartData}
             emptyMessage="Chưa có dữ liệu trạng thái"
           />
         </div>
 
-        <div className="rounded-xl bg-surface-card p-5" style={{ boxShadow: 'var(--shadow-card)' }}>
-          <h2 className="mb-4 text-sm font-semibold text-slate-900">Tasks theo dự án</h2>
+        <div className="premium-card p-6 bg-white/40 backdrop-blur-xl">
+          <h2 className="mb-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+            Tasks theo dự án
+          </h2>
           <div className="space-y-3">
             {safeStats.tasksByProject.map((project) => (
               <div key={project.projectId}>
@@ -208,16 +220,14 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div
-          className="rounded-xl bg-amber-50/40 p-5"
-          style={{
-            boxShadow: '0 1px 3px oklch(0.3 0.01 255 / 0.06), 0 0 0 1px oklch(0.8 0.06 75 / 0.3)',
-          }}
-        >
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-900">Dự án cần chú ý</h2>
-            <span className="rounded bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
-              Top {projectsNeedingAttention.length}
+        <div className="premium-card p-6 bg-amber-50/20 backdrop-blur-md relative overflow-hidden group border-amber-100/30">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="mb-6 flex items-center justify-between relative z-10">
+            <h2 className="text-[11px] font-black text-amber-600 uppercase tracking-[0.2em]">
+              Dự án cần chú ý
+            </h2>
+            <span className="rounded-full bg-amber-100 px-3 py-1 text-[10px] font-black text-amber-700 border border-amber-200/50">
+              URGENT
             </span>
           </div>
 
@@ -274,8 +284,10 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="rounded-xl bg-surface-card p-5" style={{ boxShadow: 'var(--shadow-card)' }}>
-          <h2 className="mb-4 text-sm font-semibold text-slate-900">Workload theo thành viên</h2>
+        <div className="premium-card p-6 bg-white/40 backdrop-blur-xl">
+          <h2 className="mb-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+            Workload theo thành viên
+          </h2>
           {safeStats.tasksByAssignee.length === 0 ? (
             <p className="text-xs text-slate-500">Chưa có task được gán</p>
           ) : (
@@ -301,8 +313,10 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="rounded-xl bg-surface-card p-5" style={{ boxShadow: 'var(--shadow-card)' }}>
-          <h2 className="mb-4 text-sm font-semibold text-slate-900">Tasks theo loại</h2>
+        <div className="premium-card p-6 bg-white/40 backdrop-blur-xl">
+          <h2 className="mb-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+            Tasks theo loại
+          </h2>
           {typeChartData.length === 0 ? (
             <p className="text-xs text-slate-500">Chưa có dữ liệu loại task</p>
           ) : (
@@ -330,8 +344,10 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="rounded-xl bg-surface-card p-5" style={{ boxShadow: 'var(--shadow-card)' }}>
-          <h2 className="mb-4 text-sm font-semibold text-slate-900">Tasks theo độ ưu tiên</h2>
+        <div className="premium-card p-6 bg-white/40 backdrop-blur-xl">
+          <h2 className="mb-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+            Tasks theo độ ưu tiên
+          </h2>
           {priorityChartData.length === 0 ? (
             <p className="text-xs text-slate-500">Chưa có dữ liệu độ ưu tiên</p>
           ) : (
@@ -367,8 +383,10 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="rounded-xl bg-surface-card p-5" style={{ boxShadow: 'var(--shadow-card)' }}>
-          <h2 className="mb-4 text-sm font-semibold text-slate-900">Tổng quan hoàn thành</h2>
+        <div className="premium-card p-6 bg-white/40 backdrop-blur-xl">
+          <h2 className="mb-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+            Tổng quan hoàn thành
+          </h2>
           <div className="space-y-3">
             <div>
               <div className="mb-1 flex items-center justify-between text-xs">
@@ -402,9 +420,11 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-xl bg-surface-card p-5" style={{ boxShadow: 'var(--shadow-card)' }}>
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold text-slate-900">Hoạt động gần đây</h2>
+        <div className="premium-card p-6 bg-white/40 backdrop-blur-xl">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+              Hoạt động gần đây
+            </h2>
             <button
               type="button"
               onClick={() => {
@@ -417,11 +437,11 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          <div className="mb-3 flex flex-wrap items-center gap-2">
+          <div className="mb-6 flex flex-wrap items-center gap-2">
             <select
               value={activityTypeFilter}
               onChange={(event) => setActivityTypeFilter(event.target.value)}
-              className="rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-700"
+              className="rounded-xl border border-slate-200 bg-white/50 px-3 py-1.5 text-[11px] font-bold text-slate-700 backdrop-blur-sm"
               aria-label="Lọc hoạt động theo loại"
             >
               {activityTypeOptions.map((type) => (
@@ -436,13 +456,9 @@ export default function DashboardPage() {
               value={activitySearchQuery}
               onChange={(event) => setActivitySearchQuery(event.target.value)}
               placeholder="Tìm theo task/actor..."
-              className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-700 sm:w-56"
+              className="w-full rounded-xl border border-slate-200 bg-white/50 px-3 py-1.5 text-[11px] font-bold text-slate-700 backdrop-blur-sm sm:w-56"
               aria-label="Tìm kiếm hoạt động gần đây"
             />
-
-            <span className="text-[11px] text-slate-500">
-              {filteredRecentActivity.length}/{safeStats.recentActivity.length}
-            </span>
           </div>
 
           {safeStats.recentActivity.length === 0 ? (
@@ -450,22 +466,29 @@ export default function DashboardPage() {
           ) : filteredRecentActivity.length === 0 ? (
             <p className="text-xs text-slate-500">Không có hoạt động khớp bộ lọc</p>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-4 relative before:absolute before:left-4 before:top-2 before:bottom-2 before:w-px before:bg-slate-100">
               {filteredRecentActivity.map((event) => (
                 <div
                   key={event.id}
-                  className="flex items-start gap-2 rounded-lg px-2.5 py-2 transition-all hover:bg-slate-50/80"
+                  className="flex items-start gap-4 rounded-xl px-2 py-2 transition-all hover:bg-white/50 group/item relative z-10"
                 >
-                  <span className="mt-0.5 text-sm">{EVENT_ICONS[event.type] ?? '📝'}</span>
+                  <div className="w-8 h-8 shrink-0 flex items-center justify-center bg-white border border-slate-100 rounded-xl shadow-sm group-hover/item:border-brand-200 transition-colors">
+                    <span className="text-sm">{EVENT_ICONS[event.type] ?? '📝'}</span>
+                  </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="px-2 py-0.5 rounded-full bg-slate-50 border border-slate-100 text-[9px] font-black uppercase tracking-widest text-slate-500">
                         {EVENT_LABELS[event.type] ?? event.type}
                       </span>
                     </div>
-                    <p className="mt-0.5 truncate text-xs text-slate-700">{event.taskTitle}</p>
-                    <p className="text-[11px] text-slate-500">
-                      {event.actorName ?? 'Hệ thống'} · {formatRelativeTime(event.createdAt)}
+                    <p className="truncate text-[13px] font-bold text-slate-900 group-hover/item:text-brand-600 transition-colors">
+                      {event.taskTitle}
+                    </p>
+                    <p className="text-[11px] font-medium text-slate-400">
+                      <span className="text-slate-600 font-black uppercase">
+                        {event.actorName ?? 'Hệ thống'}
+                      </span>{' '}
+                      · {formatRelativeTime(event.createdAt)}
                     </p>
                   </div>
                 </div>
@@ -618,22 +641,33 @@ function StatCard({
 }) {
   return (
     <div
-      className={`animate-slide-up relative overflow-hidden rounded-xl p-4 ${color} transition-all hover:-translate-y-px`}
+      className="animate-slide-up relative group"
       style={{
         animationDelay: `${delay * 75}ms`,
         animationFillMode: 'both',
-        boxShadow: 'var(--shadow-card)',
       }}
     >
       <div
-        className="pointer-events-none absolute -right-3 -top-3 h-16 w-16 rounded-full opacity-[0.15] blur-xl"
-        style={{ background: 'currentColor' }}
+        className={`absolute inset-0 bg-gradient-to-br ${color} opacity-20 blur-2xl group-hover:opacity-40 transition-opacity duration-500`}
       />
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-medium opacity-70">{label}</p>
-        <span className="text-lg">{icon}</span>
+      <div className="relative premium-card p-6 hover:-translate-y-1 bg-white/60 backdrop-blur-xl border-white/50 active:scale-[0.98]">
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-xl shadow-inner group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+            {icon}
+          </div>
+          <div className="px-2 py-0.5 bg-brand-50 text-brand-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-brand-100/50">
+            Live
+          </div>
+        </div>
+        <div>
+          <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">
+            {label}
+          </p>
+          <p className="tabular-nums text-3xl font-black text-slate-900 tracking-tighter">
+            {value}
+          </p>
+        </div>
       </div>
-      <p className="tabular-nums mt-1 text-2xl font-bold">{value}</p>
     </div>
   );
 }

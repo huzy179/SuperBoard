@@ -39,52 +39,96 @@ function LoginContent() {
   }
 
   return (
-    <div className="flex min-h-full items-center justify-center px-4 py-10 bg-linear-to-br from-brand-50 via-white to-brand-100">
-      <div className="w-full max-w-md rounded-2xl border border-surface-border bg-surface-card p-7 shadow-lg">
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
-          Đăng nhập SuperBoard
-        </h1>
-        <p className="mt-2 text-sm text-slate-600">Đăng nhập MVP (tài khoản seed đã có sẵn).</p>
+    <div className="w-full max-w-xl animate-in fade-in zoom-in-95 duration-700">
+      <div className="relative group overflow-hidden rounded-[3rem] border border-white/20 bg-white/10 p-12 shadow-glass backdrop-blur-3xl">
+        {/* Rim Light */}
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <label className="block text-sm font-medium text-slate-700">
-            Email
-            <input
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              type="email"
-              required
-              autoComplete="email"
-              className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-slate-500"
-            />
-          </label>
+        <div className="relative z-10 flex flex-col items-center text-center">
+          <div className="mb-8 p-4 bg-slate-900 rounded-[2rem] shadow-2xl border border-white/10">
+            <AppBrand subtitle="SECURE PORTAL" variant="dark" />
+          </div>
 
-          <label className="block text-sm font-medium text-slate-700">
-            Mật khẩu
-            <input
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              type="password"
-              required
-              autoComplete="current-password"
-              className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-slate-500"
-            />
-          </label>
+          <h1 className="text-4xl font-black tracking-tighter text-luxe-gradient leading-tight mb-2">
+            Đăng nhập SuperBoard
+          </h1>
+          <p className="text-sm font-bold text-white/40 uppercase tracking-[0.2em] mb-10">
+            Elite Efficiency Gateway
+          </p>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-400"
-          >
-            {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="w-full space-y-8 text-left">
+            <div className="space-y-4">
+              <label className="block text-[10px] font-black text-white/40 uppercase tracking-[0.25em] pl-4">
+                Identity Email
+              </label>
+              <div className="relative group/input">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-500 to-indigo-500 rounded-2xl blur opacity-0 group-focus-within/input:opacity-20 transition duration-500" />
+                <input
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="name@company.com"
+                  className="relative w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm font-bold text-white placeholder:text-white/20 outline-none transition-all focus:bg-white/10 focus:border-brand-500/50 shadow-inner"
+                />
+              </div>
+            </div>
 
-        {error ? <p className="mt-3 text-sm text-rose-600">{error}</p> : null}
+            <div className="space-y-4">
+              <label className="block text-[10px] font-black text-white/40 uppercase tracking-[0.25em] pl-4">
+                Access Secret
+              </label>
+              <div className="relative group/input">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-500 to-indigo-500 rounded-2xl blur opacity-0 group-focus-within/input:opacity-20 transition duration-500" />
+                <input
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  className="relative w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm font-bold text-white placeholder:text-white/20 outline-none transition-all focus:bg-white/10 focus:border-brand-500/50 shadow-inner"
+                />
+              </div>
+            </div>
 
-        <p className="mt-5 text-xs text-slate-500">
-          Tài khoản seed: nguyen.minh.tuan@techviet.local / Passw0rd!
-        </p>
+            <button
+              type="submit"
+              disabled={loading}
+              className="group relative w-full h-16 rounded-2xl bg-white text-slate-900 text-xs font-black uppercase tracking-[0.3em] transition-all hover:scale-[1.02] active:scale-95 disabled:bg-slate-700 disabled:text-white/30 disabled:hover:scale-100 overflow-hidden shadow-2xl"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-brand-100 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="relative flex items-center justify-center gap-3">
+                {loading ? (
+                  <div className="h-4 w-4 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin" />
+                ) : (
+                  'ENTER TERMINAL'
+                )}
+              </span>
+            </button>
+          </form>
+
+          {error ? (
+            <div className="mt-8 flex items-center gap-3 text-rose-400 bg-rose-500/10 border border-rose-500/20 px-6 py-4 rounded-2xl animate-in slide-in-from-top-2 duration-300">
+              <span className="text-xs font-black uppercase tracking-widest">{error}</span>
+            </div>
+          ) : null}
+
+          <div className="mt-12 pt-8 border-t border-white/5 w-full flex flex-col items-center gap-3">
+            <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
+              Seed Access Credentials
+            </span>
+            <div className="flex gap-4">
+              <div className="px-4 py-2 bg-white/5 rounded-xl border border-white/5 text-[10px] font-bold text-white/60">
+                nguyen.minh.tuan@techviet.local
+              </div>
+              <div className="px-4 py-2 bg-white/5 rounded-xl border border-white/5 text-[10px] font-bold text-white/60 font-mono">
+                Passw0rd!
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

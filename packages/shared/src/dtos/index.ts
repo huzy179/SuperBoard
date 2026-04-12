@@ -5,3 +5,4 @@ export * from './project.dto';
 export * from './workspace.dto';
 export * from './workflow.dto';
 export * from './search.dto';
+export * from './automation.dto';

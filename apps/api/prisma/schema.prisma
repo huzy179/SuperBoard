@@ -28,6 +28,7 @@ model Workspace {
   auditLogs     AuditLog[]
   channels      Channel[]
   docs          Doc[]
+  workflowRules WorkflowRule[]
 
   @@index([deletedAt])
 }
@@ -169,6 +170,7 @@ model Project {
   workflowStatuses ProjectWorkflowStatus[]
   workflowTransitions ProjectWorkflowTransition[]
   tasks       Task[]
+  workflowRules WorkflowRule[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -536,4 +538,28 @@ model DocVersion {
 enum ChannelType {
   public
   private
+}
+
+model WorkflowRule {
+  id          String   @id @default(cuid())
+  workspaceId String
+  projectId   String?  // If null, it's workspace-wide
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  
+  // JSON trigger configuration: { type: "task_created" } or { type: "status_changed", from: "todo", to: "done" }
+  trigger     Json     
+  
+  // JSON actions configuration: [{ type: "send_notification", message: "Task {{title}} was completed!" }]
+  actions     Json     
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project     Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, isActive])
+  @@index([projectId, isActive])
 }

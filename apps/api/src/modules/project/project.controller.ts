@@ -391,6 +391,8 @@ export class ProjectController {
     @CurrentUser() user: AuthUserDTO,
     @Param('projectId') projectId: string,
     @Param('taskId') taskId: string,
+    @Query('cursor') cursor?: string,
+    @Query('limit') limit?: string,
   ): Promise<CommentListResponseDTO> {
     const workspaceId = requireWorkspace(user);
 
@@ -398,6 +400,8 @@ export class ProjectController {
       projectId,
       taskId,
       workspaceId,
+      ...(cursor ? { cursor } : {}),
+      ...(limit ? { limit: parseInt(limit, 10) } : {}),
     });
 
     return apiSuccess(comments);

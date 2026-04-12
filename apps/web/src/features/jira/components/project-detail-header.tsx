@@ -133,6 +133,12 @@ export function ProjectDetailHeader({
             >
               Lịch
             </button>
+            <Link
+              href={`/jira/projects/${project.id}/reports`}
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+            >
+              Báo cáo
+            </Link>
             <button
               type="button"
               onClick={onCopyFilterLink}

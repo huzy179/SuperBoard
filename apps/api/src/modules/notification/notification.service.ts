@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import type { Prisma, NotificationPreference } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { EmailService } from './email.service';
+import { NotificationGateway } from './notification.gateway';
 import { logger } from '../../common/logger';
 
 @Injectable()
@@ -9,6 +10,7 @@ export class NotificationService {
   constructor(
     private prisma: PrismaService,
     private emailService: EmailService,
+    private gateway: NotificationGateway,
   ) {}
 
   async getNotifications(userId: string, workspaceId: string) {
@@ -61,13 +63,21 @@ export class NotificationService {
     type: string;
     payload: Record<string, unknown>;
   }) {
-    await this.prisma.notification.create({
+    const notification = await this.prisma.notification.create({
       data: {
         userId: input.userId,
         workspaceId: input.workspaceId,
         type: input.type,
         payload: input.payload as Prisma.InputJsonValue,
       },
+    });
+
+    // Emit real-time notification
+    void this.gateway.emitNotification(input.userId, {
+      id: notification.id,
+      type: notification.type,
+      payload: notification.payload,
+      createdAt: notification.createdAt.toISOString(),
     });
 
     // Handle Email Notifications
@@ -137,6 +147,21 @@ export class NotificationService {
         payload.inviterName as string,
         payload.workspaceName as string,
         inviteUrl,
+      );
+    }
+
+    if (input.type === 'comment_mention' && preferences.commentMentionEmail) {
+      const payload = input.payload as Record<string, unknown>;
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      const taskUrl = `${baseUrl}/projects/${payload.projectId}/tasks/${payload.taskId}`;
+
+      await this.emailService.sendCommentMentionEmail(
+        user.email,
+        user.fullName,
+        payload.authorName as string,
+        payload.taskTitle as string,
+        payload.commentPreview as string,
+        taskUrl,
       );
     }
   }

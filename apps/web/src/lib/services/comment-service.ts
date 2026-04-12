@@ -9,8 +9,16 @@ import { API_ENDPOINTS } from '@/lib/api/endpoints';
 export async function getTaskComments(
   projectId: string,
   taskId: string,
+  params?: { cursor?: string; limit?: number },
 ): Promise<CommentItemDTO[]> {
-  return apiGet<CommentItemDTO[]>(API_ENDPOINTS.projects.listComments(projectId, taskId), {
+  const queryParams = new URLSearchParams();
+  if (params?.cursor) queryParams.set('cursor', params.cursor);
+  if (params?.limit) queryParams.set('limit', params.limit.toString());
+
+  const queryString = queryParams.toString();
+  const url = `${API_ENDPOINTS.projects.listComments(projectId, taskId)}${queryString ? `?${queryString}` : ''}`;
+
+  return apiGet<CommentItemDTO[]>(url, {
     auth: true,
   });
 }

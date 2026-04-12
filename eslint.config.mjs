@@ -13,6 +13,7 @@ export default [
       '**/*.d.ts',
       'apps/web/next-env.d.ts',
       'apps/web/tsconfig.tsbuildinfo',
+      '.venv/**',
     ],
   },
   js.configs.recommended,

@@ -38,6 +38,7 @@ model User {
   email              String            @unique
   passwordHash       String
   fullName           String
+  username           String?           @unique
   avatarUrl          String?
   avatarColor        String?
   isActive           Boolean           @default(true)
@@ -70,6 +71,8 @@ model NotificationPreference {
   inAppEnabled         Boolean  @default(true)
   taskAssignedEmail    Boolean  @default(true)
   workspaceInviteEmail Boolean  @default(true)
+  commentMentionEmail  Boolean  @default(true)
+  commentMentionInApp  Boolean  @default(true)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 }

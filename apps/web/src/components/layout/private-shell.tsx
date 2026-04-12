@@ -9,7 +9,7 @@ import { AppBrand } from './app-brand';
 import { NotificationBell } from '@/components/notifications/notification-bell';
 import { SearchModal } from '@/components/search/SearchModal';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
-import { AssigneeAvatar } from '../jira/task-badges';
+import { AssigneeAvatar } from '@/features/jira/components/task-badges';
 
 type PrivateShellProps = {
   children: ReactNode;

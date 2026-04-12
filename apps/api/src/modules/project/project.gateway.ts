@@ -98,7 +98,7 @@ export class ProjectGateway implements OnGatewayConnection, OnGatewayDisconnect 
     content: string;
     createdAt: string;
   }) {
-    this.server.to(toProjectRoom(payload.projectId)).emit('comment:added', {
+    this.server.to(toTaskRoom(payload.projectId, payload.taskId)).emit('comment:added', {
       ...payload,
       at: Date.now(),
     });
@@ -111,14 +111,14 @@ export class ProjectGateway implements OnGatewayConnection, OnGatewayDisconnect 
     content: string;
     updatedAt: string;
   }) {
-    this.server.to(toProjectRoom(payload.projectId)).emit('comment:updated', {
+    this.server.to(toTaskRoom(payload.projectId, payload.taskId)).emit('comment:updated', {
       ...payload,
       at: Date.now(),
     });
   }
 
   emitCommentDeleted(payload: { projectId: string; taskId: string; commentId: string }) {
-    this.server.to(toProjectRoom(payload.projectId)).emit('comment:deleted', {
+    this.server.to(toTaskRoom(payload.projectId, payload.taskId)).emit('comment:deleted', {
       ...payload,
       at: Date.now(),
     });

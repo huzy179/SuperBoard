@@ -66,12 +66,16 @@ class ChatSocketManager {
 
   onMessage(handler: (message: Message) => void) {
     this.socket?.on('message:sent', handler);
-    return () => this.socket?.off('message:sent', handler);
+    return () => {
+      this.socket?.off('message:sent', handler);
+    };
   }
 
   onTyping(handler: (data: { channelId: string; userId: string; isTyping: boolean }) => void) {
     this.socket?.on('chat:typing', handler);
-    return () => this.socket?.off('chat:typing', handler);
+    return () => {
+      this.socket?.off('chat:typing', handler);
+    };
   }
 }
 

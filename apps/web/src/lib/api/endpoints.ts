@@ -63,6 +63,12 @@ export const API_ENDPOINTS = {
   workflow: {
     workspaceStatuses: (workspaceId: string) =>
       `/api/v1/workflow/workspace/${workspaceId}/statuses`,
+    workspaceWorkflow: (workspaceId: string) => `/api/v1/workflow/workspace/${workspaceId}`,
+    workspaceStatusDetail: (workspaceId: string, statusId: string) =>
+      `/api/v1/workflow/workspace/${workspaceId}/statuses/${statusId}`,
+    workspaceTransitions: (workspaceId: string) =>
+      `/api/v1/workflow/workspace/${workspaceId}/transitions`,
+    syncTemplate: (workspaceId: string) => `/api/v1/workflow/workspace/${workspaceId}/sync`,
     projectStatuses: (projectId: string) => `/api/v1/workflow/project/${projectId}/statuses`,
     projectWorkflow: (projectId: string) => `/api/v1/workflow/project/${projectId}`,
     statusDetail: (projectId: string, statusId: string) =>

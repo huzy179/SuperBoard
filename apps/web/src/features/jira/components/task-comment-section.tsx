@@ -22,8 +22,22 @@ export function TaskCommentSection({
   taskId: string;
   currentUserId: string;
 }) {
-  const { data: comments, isLoading } = useTaskComments(projectId, taskId);
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useTaskComments(
+    projectId,
+    taskId,
+  );
   const { data: history, isLoading: isHistoryLoading } = useTaskHistory(projectId, taskId);
+
+  // Flatten pages and handle the cursor item (limit + 1)
+  const comments =
+    data?.pages.flatMap((page: CommentItemDTO[], index: number, allPages: CommentItemDTO[][]) => {
+      // If it's not the last page, or it has a next page, slice the extra item
+      if (index < allPages.length - 1 || hasNextPage) {
+        return page.slice(0, -1);
+      }
+      return page;
+    }) ?? [];
+
   const createComment = useCreateComment(projectId, taskId);
   const updateComment = useUpdateComment(projectId, taskId);
   const deleteComment = useDeleteComment(projectId, taskId);
@@ -117,11 +131,11 @@ export function TaskCommentSection({
             </div>
           ))}
         </div>
-      ) : !comments || comments.length === 0 ? (
+      ) : comments.length === 0 ? (
         <p className="mb-4 text-xs text-slate-500">Chưa có bình luận</p>
       ) : (
         <div className="mb-4 space-y-3">
-          {comments.map((comment) => (
+          {comments.map((comment: CommentItemDTO) => (
             <CommentItem
               key={comment.id}
               comment={comment}
@@ -138,6 +152,16 @@ export function TaskCommentSection({
               onDelete={handleDeleteComment}
             />
           ))}
+
+          {hasNextPage && (
+            <button
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              className="w-full rounded-lg border border-slate-200 py-2 text-xs font-medium text-slate-500 hover:bg-slate-50 disabled:opacity-50"
+            >
+              {isFetchingNextPage ? 'Đang tải...' : 'Xem các bình luận cũ hơn'}
+            </button>
+          )}
         </div>
       )}
       <form onSubmit={handleCreateComment} className="space-y-2">
@@ -175,7 +199,7 @@ export function TaskCommentSection({
           <p className="text-xs text-slate-500">Chưa có lịch sử thay đổi</p>
         ) : (
           <div className="space-y-2">
-            {history.map((event) => (
+            {history.map((event: TaskHistoryItemDTO) => (
               <div
                 key={event.id}
                 className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs"
@@ -261,6 +285,24 @@ function CommentItem({
   const isEditing = editingCommentId === comment.id;
   const isOwn = comment.authorId === currentUserId;
 
+  const renderContentWithMentions = (content: string) => {
+    const parts = content.split(/(\B@\w+)/g);
+    return (
+      <p className="mt-1 text-sm text-slate-700 whitespace-pre-wrap">
+        {parts.map((part, i) => {
+          if (part.startsWith('@')) {
+            return (
+              <span key={i} className="font-bold text-brand-600 bg-brand-50 px-1 rounded">
+                {part}
+              </span>
+            );
+          }
+          return part;
+        })}
+      </p>
+    );
+  };
+
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-3">
       {isEditing ? (
@@ -328,7 +370,7 @@ function CommentItem({
               </div>
             ) : null}
           </div>
-          <p className="mt-1 text-sm text-slate-700 whitespace-pre-wrap">{comment.content}</p>
+          {renderContentWithMentions(comment.content)}
         </>
       )}
     </div>

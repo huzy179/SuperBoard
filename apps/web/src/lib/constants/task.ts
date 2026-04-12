@@ -88,6 +88,14 @@ export const EVENT_LABELS: Record<string, string> = {
   comment_added: 'Bình luận',
 };
 
+export const EVENT_ICONS: Record<string, string> = {
+  created: '🆕',
+  updated: '📝',
+  status_changed: '🔄',
+  assignee_changed: '👤',
+  comment_added: '💬',
+};
+
 export const ROLE_OPTIONS = [
   { key: 'owner', label: 'Owner' },
   { key: 'admin', label: 'Admin' },

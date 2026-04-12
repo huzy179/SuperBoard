@@ -60,6 +60,15 @@ export class WorkflowController {
     return this.workflowService.updateWorkspaceTransitions(workspaceId, body.transitions);
   }
 
+  @Post('workspace/:workspaceId/sync')
+  async syncWorkspaceWorkflow(@Param('workspaceId') workspaceId: string): Promise<void> {
+    // This method needs to be implemented in WorkflowService
+    // For now, I'll assume it exists or I'll add it.
+    // wait, I checked WorkflowService earlier and it has cloneWorkspaceTemplateToProject(workspaceId, projectId)
+    // but not a bulk sync. I'll need to add bulk sync to WorkflowService too.
+    return this.workflowService.syncWorkspaceToProjects(workspaceId);
+  }
+
   @Get('project/:projectId/statuses')
   async getProjectStatuses(@Param('projectId') projectId: string): Promise<WorkflowStatusDTO[]> {
     return this.workflowService.getProjectStatuses(projectId);

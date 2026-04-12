@@ -432,4 +432,17 @@ export class WorkflowService {
       }
     });
   }
+
+  async syncWorkspaceToProjects(workspaceId: string): Promise<void> {
+    const projects = await this.prisma.project.findMany({
+      where: { workspaceId, deletedAt: null },
+    });
+
+    for (const project of projects) {
+      // Clear existing and clone
+      await this.prisma.projectWorkflowTransition.deleteMany({ where: { projectId: project.id } });
+      await this.prisma.projectWorkflowStatus.deleteMany({ where: { projectId: project.id } });
+      await this.cloneWorkspaceTemplateToProject(workspaceId, project.id);
+    }
+  }
 }

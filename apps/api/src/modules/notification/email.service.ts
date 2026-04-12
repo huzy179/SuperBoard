@@ -95,4 +95,40 @@ export class EmailService implements OnModuleInit {
 
     return this.sendEmail({ to: email, subject, html });
   }
+
+  async sendCommentMentionEmail(
+    userEmail: string,
+    userName: string,
+    authorName: string,
+    taskTitle: string,
+    commentPreview: string,
+    taskUrl: string,
+  ) {
+    const subject = `[SuperBoard] ${authorName} đã nhắc đến bạn trong một bình luận`;
+    const html = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h2 style="color: #0f172a;">Chào ${userName},</h2>
+        <p style="color: #475569; font-size: 16px;">
+          <strong>${authorName}</strong> đã nhắc đến bạn trong một bình luận trên task: 
+          <strong style="color: #1e293b;">${taskTitle}</strong>
+        </p>
+        
+        <div style="background-color: #f8fafc; padding: 16px; border-left: 4px solid #2563eb; border-radius: 4px; margin: 24px 0; font-style: italic; color: #334155;">
+          "${commentPreview}"
+        </div>
+
+        <p style="margin-top: 32px;">
+          <a href="${taskUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Xem chi tiết và trả lời</a>
+        </p>
+        
+        <hr style="margin: 40px 0; border: 0; border-top: 1px solid #e2e8f0;" />
+        <p style="color: #94a3b8; font-size: 12px; text-align: center;">
+          Bạn nhận được thông báo này vì cài đặt nhận thông báo khi được nhắc tên đang bật.<br/> 
+          Đây là email tự động từ hệ thống SuperBoard. Vui lòng không trả lời email này.
+        </p>
+      </div>
+    `;
+
+    return this.sendEmail({ to: userEmail, subject, html });
+  }
 }

@@ -11,6 +11,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationService } from '../notification/notification.service';
 import type { CommentItemDTO } from '@superboard/shared';
 import { ProjectGateway } from './project.gateway';
+import { MentionService } from './mention.service';
 
 @Injectable()
 export class CommentService {
@@ -18,6 +19,7 @@ export class CommentService {
     private prisma: PrismaService,
     private notificationService: NotificationService,
     private projectGateway: ProjectGateway,
+    private mentionService: MentionService,
   ) {}
 
   async getCommentsByTask(input: {
@@ -62,6 +64,10 @@ export class CommentService {
     }
 
     await verifyProjectAndTaskInWorkspace(this.prisma, input);
+
+    // Ensure author has a username for others to mention them
+    void this.mentionService.ensureUsername(input.authorId).catch(() => {});
+
     const comment = await this.prisma.comment.create({
       data: {
         taskId: input.taskId,
@@ -89,9 +95,46 @@ export class CommentService {
     // Notify task assignee about new comment (if different from author)
     const task = await this.prisma.task.findFirst({
       where: { id: input.taskId, deletedAt: null },
-      select: { assigneeId: true, title: true, project: { select: { workspaceId: true } } },
+      select: {
+        assigneeId: true,
+        title: true,
+        project: { select: { id: true, workspaceId: true } },
+      },
     });
-    if (task?.assigneeId && task.assigneeId !== input.authorId) {
+
+    // Process Mentions
+    const usernames = this.mentionService.extractMentions(trimmed);
+    const mentionedUsers = await this.mentionService.resolveMentions(usernames, input.workspaceId);
+    const author = comment.author;
+
+    for (const mentionedUser of mentionedUsers) {
+      // Avoid notifying yourself if you mention your own username
+      if (mentionedUser.id === input.authorId) continue;
+
+      void this.notificationService
+        .createNotification({
+          userId: mentionedUser.id,
+          workspaceId: input.workspaceId,
+          type: 'comment_mention',
+          payload: {
+            taskId: input.taskId,
+            projectId: input.projectId,
+            taskTitle: task?.title || 'Unknown Task',
+            authorName: author.fullName || 'Ai đó',
+            commentPreview: trimmed.length > 50 ? `${trimmed.substring(0, 50)}...` : trimmed,
+          },
+        })
+        .catch((err: unknown) => logger.error({ err }, 'Mention notification failed'));
+    }
+
+    const mentionedUserIds = new Set(mentionedUsers.map((u) => u.id));
+
+    // Notify task assignee about new comment (if different from author AND not already mentioned)
+    if (
+      task?.assigneeId &&
+      task.assigneeId !== input.authorId &&
+      !mentionedUserIds.has(task.assigneeId)
+    ) {
       void this.notificationService
         .createNotification({
           userId: task.assigneeId,
@@ -99,6 +142,7 @@ export class CommentService {
           type: 'comment_added',
           payload: {
             taskId: input.taskId,
+            projectId: input.projectId, // Added projectId for better linking
             taskTitle: task.title,
             message: `Bình luận mới trên task: ${task.title}`,
           },

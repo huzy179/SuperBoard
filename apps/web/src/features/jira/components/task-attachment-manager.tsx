@@ -2,7 +2,10 @@
 
 import React, { useCallback, useRef } from 'react';
 import { Paperclip, X, Download, FileIcon, Loader2, Plus } from 'lucide-react';
-import { useUploadAttachment, useDeleteAttachment } from '@/hooks/use-task-attachments';
+import {
+  useUploadAttachment,
+  useDeleteAttachment,
+} from '@/features/jira/hooks/use-task-attachments';
 import type { ProjectTaskAttachmentDTO } from '@superboard/shared';
 import { format } from 'date-fns';
 

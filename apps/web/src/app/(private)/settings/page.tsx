@@ -2,14 +2,15 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { FullPageError, FullPageLoader } from '@/components/ui/page-states';
 import { AssigneeAvatar } from '@/features/jira/components/task-badges';
 import { useAuthSession } from '@/features/auth/hooks';
-import { useUpdateProfile } from '@/hooks/user-profile';
+import { useUpdateProfile } from '@/features/user/hooks/user-profile';
 import {
   useNotificationPreferences,
   useUpdateNotificationPreferences,
-} from '@/hooks/notification-preferences';
+} from '@/features/notifications/hooks/notification-preferences';
 import {
   useWorkspaceMembers,
   useUpdateMemberRole,
@@ -21,7 +22,17 @@ import {
   useWorkspace,
   useUpdateWorkspace,
 } from '@/features/workspace/hooks';
+import {
+  useWorkspaceWorkflow,
+  useCreateWorkspaceStatus,
+  useUpdateWorkspaceStatus,
+  useDeleteWorkspaceStatus,
+  useUpdateWorkspaceTransitions,
+  useSyncWorkspaceWorkflow,
+} from '@/features/jira/hooks/use-workflow';
+import { WorkflowEditor } from '@/features/jira/components/WorkflowEditor';
 import { WorkspaceInvitationItemDTO } from '@superboard/shared';
+import { WorkspaceCreateModal } from '@/features/workspace/components/WorkspaceCreateModal';
 import { InviteMemberModal } from '@/features/workspace/components/InviteMemberModal';
 import { AvatarUpload } from '@/components/user/AvatarUpload';
 import { formatDate } from '@/lib/format-date';
@@ -42,6 +53,7 @@ export default function SettingsPage() {
   const [roleFilter, setRoleFilter] = useState<'all' | 'owner' | 'admin' | 'member'>('all');
   const [sortByJoinDate, setSortByJoinDate] = useState<'desc' | 'asc'>('desc');
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const { data: invitations } = useWorkspaceInvitations(workspaceId ?? undefined);
   const revokeInvitation = useRevokeInvitation(workspaceId ?? undefined);
@@ -52,17 +64,28 @@ export default function SettingsPage() {
   const { data: workspace, isLoading: isWorkspaceLoading } = useWorkspace(workspaceId ?? undefined);
   const updateWorkspace = useUpdateWorkspace(workspaceId ?? undefined);
 
+  // Workflow hooks
+  const { data: workflow, isLoading: isWorkflowLoading } = useWorkspaceWorkflow(workspaceId ?? '');
+  const createWorkspaceStatus = useCreateWorkspaceStatus(workspaceId ?? '');
+  const updateWorkspaceStatus = useUpdateWorkspaceStatus(workspaceId ?? '');
+  const deleteWorkspaceStatus = useDeleteWorkspaceStatus(workspaceId ?? '');
+  const updateWorkspaceTransitions = useUpdateWorkspaceTransitions(workspaceId ?? '');
+  const syncWorkflow = useSyncWorkspaceWorkflow(workspaceId ?? '');
+
   const [isEditingInfo, setIsEditingInfo] = useState(false);
   const [editName, setEditName] = useState('');
   const [editSlug, setEditSlug] = useState('');
 
-  const [activeTab, setActiveTab] = useState<'workspace' | 'profile' | 'notifications'>('profile');
+  const [activeTab, setActiveTab] = useState<
+    'workspace' | 'profile' | 'notifications' | 'workflows'
+  >('profile');
   const updateProfile = useUpdateProfile();
   const { data: preferences, isLoading: isPrefsLoading } = useNotificationPreferences();
   const updatePrefs = useUpdateNotificationPreferences();
   const [profileName, setProfileName] = useState(user?.fullName || '');
 
-  if (isLoading || isWorkspaceLoading) return <FullPageLoader label="Đang tải cài đặt..." />;
+  if (isLoading || isWorkspaceLoading || (activeTab === 'workflows' && isWorkflowLoading))
+    return <FullPageLoader label="Đang tải cài đặt..." />;
   if (isError) {
     return (
       <FullPageError
@@ -159,6 +182,30 @@ export default function SettingsPage() {
             }`}
           >
             Thông báo
+          </button>
+
+          {canChangeRoles && (
+            <button
+              onClick={() => setActiveTab('workflows')}
+              className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === 'workflows'
+                  ? 'border-brand-500 text-brand-600'
+                  : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+              }`}
+            >
+              Workflow Template
+            </button>
+          )}
+
+          <div className="flex-1" />
+
+          <button
+            type="button"
+            onClick={() => setIsCreateModalOpen(true)}
+            id="e2e-open-create-ws-button"
+            className="mb-3 rounded-lg border border-brand-200 bg-brand-50 px-3 py-1 text-[11px] font-bold text-brand-700 transition-all hover:bg-brand-100 active:scale-95"
+          >
+            + New Workspace
           </button>
         </nav>
       </div>
@@ -646,9 +693,80 @@ export default function SettingsPage() {
         </div>
       )}
 
+      {activeTab === 'workflows' && canChangeRoles && (
+        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <WorkflowEditor
+            data={workflow}
+            isLoading={isWorkflowLoading}
+            title="Quy trình mẫu (Global Template)"
+            description="Định nghĩa các trạng thái và quy tắc chuyển đổi chung cho toàn bộ workspace. Các dự án mới sẽ kế thừa cấu hình này."
+            onAddStatus={(data) =>
+              createWorkspaceStatus.mutateAsync(data).then(() => {
+                toast.success('Đã thêm trạng thái mẫu');
+              })
+            }
+            onUpdateStatus={(statusId, data) =>
+              updateWorkspaceStatus.mutateAsync({ statusId, data }).then(() => {
+                toast.success('Đã cập nhật trạng thái mẫu');
+              })
+            }
+            onDeleteStatus={(statusId) => {
+              if (
+                confirm(
+                  'Xoá trạng thái mẫu? Điều này chỉ ảnh hưởng đến các dự án được tạo sau này hoặc khi thực hiện đồng bộ.',
+                )
+              ) {
+                deleteWorkspaceStatus.mutateAsync({ statusId }).then(() => {
+                  toast.success('Đã xoá trạng thái mẫu');
+                });
+              }
+            }}
+            onSaveTransitions={(transitions) =>
+              updateWorkspaceTransitions.mutateAsync({ transitions }).then(() => {
+                toast.success('Đã cập nhật ma trận chuyển đổi mẫu');
+              })
+            }
+            isPending={
+              createWorkspaceStatus.isPending ||
+              updateWorkspaceStatus.isPending ||
+              deleteWorkspaceStatus.isPending ||
+              updateWorkspaceTransitions.isPending ||
+              syncWorkflow.isPending
+            }
+            extraActions={
+              <button
+                onClick={() => {
+                  if (
+                    confirm(
+                      'Lưu ý: Hành động này sẽ GHI ĐÈ quy trình của TẤT CẢ dự án hiện có bằng mẫu này. Bạn có chắc chắn muốn tiếp tục?',
+                    )
+                  ) {
+                    syncWorkflow.mutate();
+                  }
+                }}
+                disabled={syncWorkflow.isPending}
+                className="px-4 py-2 bg-brand-50 text-brand-700 text-xs font-bold rounded-lg border border-brand-200 hover:bg-brand-100 transition-all"
+              >
+                {syncWorkflow.isPending ? 'Đang đồng bộ...' : '🔄 Đồng bộ cho tất cả dự án'}
+              </button>
+            }
+          />
+        </div>
+      )}
+
       {/* Invite Modal */}
       {isInviteModalOpen && workspaceId && (
         <InviteMemberModal workspaceId={workspaceId} onClose={() => setIsInviteModalOpen(false)} />
+      )}
+
+      {isCreateModalOpen && (
+        <WorkspaceCreateModal
+          onClose={() => setIsCreateModalOpen(false)}
+          onSuccess={() => {
+            // After creating, maybe redirect or just refresh
+            window.location.reload();
+          }}
+        />
       )}
     </section>
   );

@@ -154,6 +154,7 @@ export function subscribeProjectTaskPatched(
 
 export function subscribeTaskComments(
   projectId: string,
+  taskId: string,
   onCommentEvent: (payload: {
     type: 'added' | 'updated' | 'deleted';
     taskId: string;
@@ -194,12 +195,19 @@ export function subscribeTaskComments(
   socket.on('comment:added', handleAdded);
   socket.on('comment:updated', handleUpdated);
   socket.on('comment:deleted', handleDeleted);
+
+  // Join both project and task room (Task room for specific events, Project room for general sync)
   socket.emit('project:join', { projectId });
+  if (taskId) {
+    socket.emit('task:join', { projectId, taskId });
+  }
 
   return () => {
     socket.off('comment:added', handleAdded);
     socket.off('comment:updated', handleUpdated);
     socket.off('comment:deleted', handleDeleted);
+    // Note: We don't necessarily want to task:leave here if other components are still using it,
+    // but the presence hook handles its own leave.
   };
 }
 

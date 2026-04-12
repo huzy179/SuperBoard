@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import type { CommentItemDTO, TaskHistoryItemDTO } from '@superboard/shared';
 import {
@@ -23,7 +23,7 @@ function taskHistoryQueryKey(projectId: string, taskId: string) {
   return ['projects', projectId, 'tasks', taskId, 'history'] as const;
 }
 
-export function useTaskComments(projectId: string, taskId: string) {
+export function useTaskComments(projectId: string, taskId: string, limit = 50) {
   const queryClient = useQueryClient();
   const invalidateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasPendingInvalidateRef = useRef(false);
@@ -35,6 +35,7 @@ export function useTaskComments(projectId: string, taskId: string) {
 
     const runInvalidate = () => {
       void queryClient.invalidateQueries({ queryKey: commentQueryKey(projectId, taskId) });
+      void queryClient.invalidateQueries({ queryKey: taskHistoryQueryKey(projectId, taskId) });
     };
 
     const scheduleInvalidate = () => {
@@ -70,12 +71,9 @@ export function useTaskComments(projectId: string, taskId: string) {
     };
 
     const unsubscribeSync = subscribeTaskCommentsUpdated(projectId, taskId, scheduleInvalidate);
-    const unsubscribeSocket = subscribeTaskComments(projectId, (payload) => {
+    const unsubscribeSocket = subscribeTaskComments(projectId, taskId, (payload) => {
       if (payload.taskId === taskId) {
         scheduleInvalidate();
-        if (payload.type === 'added') {
-          // Additional logic like toast or sound if needed
-        }
       }
     });
 
@@ -97,9 +95,22 @@ export function useTaskComments(projectId: string, taskId: string) {
     };
   }, [projectId, queryClient, taskId]);
 
-  return useQuery<CommentItemDTO[]>({
+  return useInfiniteQuery({
     queryKey: commentQueryKey(projectId, taskId),
-    queryFn: () => getTaskComments(projectId, taskId),
+    queryFn: ({ pageParam }) =>
+      getTaskComments(projectId, taskId, {
+        ...(pageParam ? { cursor: pageParam as string } : {}),
+        limit,
+      }),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage: CommentItemDTO[]) => {
+      // If we got 'limit + 1' items, the last one is the cursor for the next page
+      if (lastPage && lastPage.length > limit) {
+        const lastItem = lastPage[lastPage.length - 1];
+        return lastItem ? lastItem.id : undefined;
+      }
+      return undefined;
+    },
     enabled: !!projectId && !!taskId,
   });
 }

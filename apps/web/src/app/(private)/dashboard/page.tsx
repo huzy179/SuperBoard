@@ -7,12 +7,7 @@ import { AssigneeAvatar } from '@/features/jira/components/task-badges';
 import { useDashboardStats } from '@/features/dashboard/hooks';
 import { EVENT_ICONS, EVENT_LABELS, PRIORITY_LABELS, STATUS_LABELS } from '@/lib/constants/task';
 import { formatRelativeTime } from '@/lib/format-date';
-import type {
-  DashboardStatsDTO,
-  MessagePriority,
-  MessageStatus,
-  TaskType,
-} from '@superboard/shared';
+import type { DashboardStatsDTO } from '@superboard/shared';
 
 const CHART_COLOR_CLASSES = [
   'text-brand-600',
@@ -61,21 +56,21 @@ export default function DashboardPage() {
 
   const statusChartData = safeStats.tasksByStatus.map((item, index) => ({
     key: item.status,
-    label: STATUS_LABELS[item.status as MessageStatus] ?? item.status,
+    label: STATUS_LABELS[item.status] ?? item.status,
     value: item.count,
     colorClass: CHART_COLOR_CLASSES[index % CHART_COLOR_CLASSES.length] ?? 'text-slate-500',
   }));
 
   const priorityChartData = safeStats.tasksByPriority.map((item, index) => ({
     key: item.priority,
-    label: PRIORITY_LABELS[item.priority as MessagePriority] ?? item.priority,
+    label: PRIORITY_LABELS[item.priority] ?? item.priority,
     value: item.count,
     colorClass: CHART_COLOR_CLASSES[index % CHART_COLOR_CLASSES.length] ?? 'text-slate-500',
   }));
 
   const typeChartData = safeStats.tasksByType.map((item, index) => ({
     key: item.type,
-    label: taskTypeLabelMap[item.type as TaskType] ?? item.type,
+    label: taskTypeLabelMap[item.type] ?? item.type,
     value: item.count,
     colorClass: CHART_COLOR_CLASSES[index % CHART_COLOR_CLASSES.length] ?? 'text-slate-500',
   }));

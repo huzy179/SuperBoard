@@ -36,8 +36,9 @@ export class ChatController {
     @CurrentUser() user: AuthUserDTO,
   ) {
     const message = await this.chatService.createMessage(channelId, user.id, dto);
-    this.chatGateway.broadcastMessage(channelId, message);
-    return message;
+    const messageDTO = this.chatService.mapMessageToDTO(message);
+    this.chatGateway.broadcastMessage(channelId, messageDTO);
+    return messageDTO;
   }
 
   @Put('messages/:messageId')
@@ -47,8 +48,9 @@ export class ChatController {
     @CurrentUser() user: AuthUserDTO,
   ) {
     const message = await this.chatService.updateMessage(messageId, user.id, dto);
-    this.chatGateway.broadcastUpdate(message.channelId, message);
-    return message;
+    const messageDTO = this.chatService.mapMessageToDTO(message);
+    this.chatGateway.broadcastUpdate(message.channelId, messageDTO);
+    return messageDTO;
   }
 
   @Delete('messages/:messageId')

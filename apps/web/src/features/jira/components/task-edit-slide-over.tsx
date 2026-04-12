@@ -14,7 +14,7 @@ import { type TaskPriority } from '@/lib/constants/task';
 import { TaskSubtaskManager } from '@/features/jira/components/task-subtask-manager';
 import { TaskPropertiesForm } from '@/features/jira/components/task-properties-form';
 import { TaskAttachmentManager } from '@/features/jira/components/task-attachment-manager';
-import { useSummarizeTask } from '@/hooks/use-task-mutations';
+import { useSummarizeTask } from '@/features/jira/hooks/use-task-mutations';
 import { useState } from 'react';
 
 interface TaskEditSlideOverProps {

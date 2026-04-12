@@ -11,6 +11,13 @@ export async function getWorkspaces(): Promise<WorkspaceItemDTO[]> {
   return apiGet<WorkspaceItemDTO[]>(API_ENDPOINTS.workspaces.list, { auth: true });
 }
 
+export async function createWorkspace(data: {
+  name: string;
+  slug?: string;
+}): Promise<WorkspaceItemDTO> {
+  return apiPost<WorkspaceItemDTO>(API_ENDPOINTS.workspaces.list, data, { auth: true });
+}
+
 export async function getWorkspaceMembers(workspaceId: string): Promise<WorkspaceMemberItemDTO[]> {
   return apiGet<WorkspaceMemberItemDTO[]>(API_ENDPOINTS.workspaces.members(workspaceId), {
     auth: true,

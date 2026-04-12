@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { FullPageLoader } from '@/components/ui/page-states';
 import { useRedirectAuthenticated } from '@/features/auth/hooks';
 import { setAccessToken } from '@/lib/auth-storage';
-import { login } from '@/features/auth/api/auth-service';
+import { login } from '@/lib/services/auth-service';
 
 function LoginContent() {
   const router = useRouter();

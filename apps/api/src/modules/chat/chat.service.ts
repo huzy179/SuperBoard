@@ -153,6 +153,20 @@ export class ChatService {
     });
   }
 
+  mapMessageToDTO(message: Record<string, unknown>): Record<string, unknown> {
+    return {
+      ...message,
+      createdAt:
+        message.createdAt instanceof Date ? message.createdAt.toISOString() : message.createdAt,
+      updatedAt:
+        message.updatedAt instanceof Date ? message.updatedAt.toISOString() : message.updatedAt,
+      editedAt:
+        message.editedAt instanceof Date ? message.editedAt.toISOString() : message.editedAt,
+      deletedAt:
+        message.deletedAt instanceof Date ? message.deletedAt.toISOString() : message.deletedAt,
+    };
+  }
+
   async addReaction(messageId: string, userId: string, dto: AddReactionDto) {
     const existing = await this.prisma.messageReaction.findUnique({
       where: {

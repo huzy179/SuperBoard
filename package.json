@@ -28,7 +28,13 @@
     "db:status": "npm --workspace @superboard/api run db:status",
     "db:fresh": "npm --workspace @superboard/api run db:fresh",
     "db:reset": "node scripts/db-reset.mjs",
-    "db:studio": "npm --workspace @superboard/api run db:studio"
+    "db:studio": "npm --workspace @superboard/api run db:studio",
+    "commit": "cz"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   },
   "lint-staged": {
     "*.{js,mjs,cjs,ts,tsx,json,md,yml,yaml}": [
@@ -39,9 +45,13 @@
     ]
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
     "@typescript-eslint/eslint-plugin": "^8.57.0",
     "@typescript-eslint/parser": "^8.57.0",
     "chalk": "^4.1.2",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^9.22.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",

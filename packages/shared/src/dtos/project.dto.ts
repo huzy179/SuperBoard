@@ -262,3 +262,59 @@ export interface DashboardStatsDTO {
 }
 
 export type DashboardStatsResponseDTO = ApiResponse<DashboardStatsDTO>;
+
+// Project Reporting DTOs
+
+export interface VelocityPointDTO {
+  label: string;
+  points: number;
+  taskCount: number;
+}
+
+export interface StatusDistributionDTO {
+  status: string;
+  count: number;
+  color?: string;
+}
+
+export interface AssigneeWorkloadDTO {
+  assigneeId: string;
+  assigneeName: string;
+  count: number;
+}
+
+export interface HealthMetricsDTO {
+  overdueCount: number;
+  unassignedCount: number;
+  staleCount: number;
+  totalTasks: number;
+}
+
+export interface BurndownPointDTO {
+  date: string;
+  remainingPoints: number;
+  idealPoints: number;
+}
+
+export interface CumulativeFlowPointDTO {
+  date: string;
+  [status: string]: number | string; // status name -> count
+}
+
+export interface ProjectReportDTO {
+  velocity: VelocityPointDTO[];
+  distribution: StatusDistributionDTO[];
+  workload: AssigneeWorkloadDTO[];
+  health: HealthMetricsDTO;
+  burndown: BurndownPointDTO[];
+  cumulativeFlow: CumulativeFlowPointDTO[];
+  metrics: {
+    avgCycleTimeDays: number;
+    totalStoryPoints: number;
+    completedStoryPoints: number;
+    completionRate: number;
+    activeTaskCount: number;
+  };
+}
+
+export type ProjectReportResponseDTO = ApiResponse<ProjectReportDTO>;

@@ -101,9 +101,11 @@ Tai lieu nay tong hop cac tinh nang nang cao ban co the hoc va tu implement tron
 ## Bai tap goi y theo thu tu
 
 1. [DONE] Implement endpoint transfer owner workspace + test role matrix.
-2. Them invite member voi token va expiration.
-3. Bat real-time comment stream cho 1 task.
-4. Them cursor pagination cho comments.
-5. Viet E2E test cho full collaboration flow.
+2. [DONE] Them invite member voi token va expiration.
+3. [DONE] Bat real-time comment stream cho 1 task.
+4. [DONE] Them cursor pagination cho comments.
+5. [DONE] Global Workflow Template Management.
+6. [DONE] Mention System & Notifications.
+7. [DONE] Advanced Task Reporting & Export.
 
-Feature tiep theo nen lam: Bai tap 2 (invite member voi token va expiration).
+Feature tiep theo nen lam: Bai tap 8 (Advanced Task Reporting & Export).

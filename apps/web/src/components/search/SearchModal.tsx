@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSearch } from '@/hooks/use-search';
+import { useSearch } from '@/features/search/hooks/use-search';
 import { ProjectItemDTO, ProjectTaskItemDTO } from '@superboard/shared';
 
 interface SearchModalProps {
@@ -47,8 +47,8 @@ export function SearchModal({ onClose }: SearchModalProps) {
     } else if (e.key === 'Enter') {
       e.preventDefault();
       const allResults = [
-        ...projects.map((p) => ({ ...p, type: 'project' as const })),
-        ...tasks.map((t) => ({ ...t, type: 'task' as const })),
+        ...projects.map((p: ProjectItemDTO) => ({ ...p, type: 'project' as const })),
+        ...tasks.map((t: ProjectTaskItemDTO) => ({ ...t, type: 'task' as const })),
       ];
       const selected = allResults[selectedIndex];
       if (selected) {
@@ -109,7 +109,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
                     Dự án
                   </h3>
                   <div className="mt-1 space-y-0.5">
-                    {projects.map((p, i) => (
+                    {projects.map((p: ProjectItemDTO, i: number) => (
                       <SearchResultItem
                         key={p.id}
                         title={p.name || ''}
@@ -128,7 +128,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
                     Công việc
                   </h3>
                   <div className="mt-1 space-y-0.5">
-                    {tasks.map((t, i) => (
+                    {tasks.map((t: ProjectTaskItemDTO, i: number) => (
                       <SearchResultItem
                         key={t.id}
                         title={t.title || ''}

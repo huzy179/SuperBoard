@@ -139,6 +139,13 @@ export function ProjectDetailHeader({
             >
               Báo cáo
             </Link>
+            <Link
+              href={`/jira/projects/${project.id}/automation`}
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-brand-600 transition-colors hover:bg-brand-50"
+              title="Tự động hóa dự án"
+            >
+              ⚡ Tự động hóa
+            </Link>
             <button
               type="button"
               onClick={onCopyFilterLink}

@@ -65,34 +65,46 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
 
                 <div className="flex-1 min-w-0">
                   {showHeader && (
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-slate-900 text-sm">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="font-black text-slate-900 text-[13px] tracking-tight">
                         {message.author?.fullName}
                       </span>
-                      <span className="text-[10px] text-slate-400">
+                      <span className="text-[10px] font-bold text-slate-400 opacity-60">
                         {format(new Date(message.createdAt), 'HH:mm', { locale: vi })}
                       </span>
                     </div>
                   )}
 
-                  <div className="text-slate-700 text-sm leading-relaxed break-words whitespace-pre-wrap">
+                  <div
+                    className={`text-slate-700 text-[14px] leading-relaxed break-words whitespace-pre-wrap px-4 py-2 rounded-2xl border transition-all ${showHeader ? 'rounded-tl-none' : ''} ${message.authorId === 'me' ? 'bg-brand-50 border-brand-100 text-brand-900' : 'bg-slate-50 border-slate-100 hover:border-slate-200 hover:bg-white hover:shadow-sm'}`}
+                  >
                     {message.content}
                   </div>
 
-                  {/* Reply Button (Hover Only) */}
-                  <div className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white border border-slate-100 rounded-lg shadow-sm">
-                    <button
-                      onClick={() => onOpenThread?.(message)}
-                      className="p-1.5 hover:bg-slate-50 text-slate-400 hover:text-brand-600 transition-colors"
-                      title="Trả lời chủ đề"
-                    >
-                      <MessageSquare size={14} />
-                    </button>
+                  {/* Rich Action Bar (Hover Only) */}
+                  <div className="absolute right-0 -top-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:-translate-y-1 z-10">
+                    <div className="flex items-center gap-0.5 p-1 bg-white border border-slate-200 rounded-xl shadow-xl glass-panel">
+                      <button
+                        onClick={() => onOpenThread?.(message)}
+                        className="p-2 hover:bg-slate-50 text-slate-500 hover:text-brand-600 rounded-lg transition-all"
+                        title="Trả lời chủ đề"
+                      >
+                        <MessageSquare size={16} />
+                      </button>
+                      <button
+                        className="p-2 hover:bg-slate-50 text-slate-500 hover:text-amber-500 rounded-lg transition-all"
+                        title="Thả cảm xúc"
+                      >
+                        <span className="text-xs">😀</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             );
           })}
+        </div>
+      </div>
 
       {hasNextPage && (
         <div className="flex justify-center py-4">

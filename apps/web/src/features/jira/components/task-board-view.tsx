@@ -29,7 +29,7 @@ interface TaskBoardViewProps {
   ) => void;
   onOpenEdit: (task: ProjectTaskItemDTO) => void;
   selectedTaskIds: Set<string>;
-  toggleTaskSelection: (taskId: string) => void;
+  onSelectTask: (taskId: string, event: React.MouseEvent | React.KeyboardEvent) => void;
   isUpdatePending: boolean;
   updatingTaskId: string | undefined;
   onAddTask: (status: ProjectTaskItemDTO['status']) => void;
@@ -37,7 +37,6 @@ interface TaskBoardViewProps {
   workflow?: WorkflowStatusTemplateDTO | undefined;
   draggedTaskId: string | null;
 }
-
 export function TaskBoardView({
   boardData,
   projectKey,
@@ -50,7 +49,7 @@ export function TaskBoardView({
   onDropByPosition,
   onOpenEdit,
   selectedTaskIds,
-  toggleTaskSelection,
+  onSelectTask,
   isUpdatePending,
   updatingTaskId,
   onAddTask,
@@ -139,16 +138,16 @@ export function TaskBoardView({
         return (
           <div
             key={column.key}
-            className={`w-80 shrink-0 rounded-xl border border-t-2 bg-slate-50 transition-all ${
+            className={`w-80 shrink-0 rounded-2xl border-t-4 bg-slate-50/50 transition-all duration-300 flex flex-col max-h-full ${
               COLUMN_BORDER[column.key] ?? 'border-t-slate-400'
             } ${
               isDragOver
                 ? isAllowedTarget
-                  ? 'border-dashed border-emerald-400 bg-emerald-50/30 animate-pulse scale-[1.02]'
-                  : 'border-dashed border-rose-400 bg-rose-50/30 opacity-70'
+                  ? 'border-emerald-500 bg-emerald-50/50 ring-4 ring-emerald-500/10 scale-[1.01]'
+                  : 'border-rose-500 bg-rose-50/50 opacity-70 cursor-no-drop'
                 : isBlocked
                   ? 'opacity-40 grayscale-[0.5]'
-                  : 'border-slate-200'
+                  : 'border-transparent border-b border-x border-slate-200/60'
             }`}
             onDragOver={(e) => {
               onDragOver(e);
@@ -207,40 +206,50 @@ export function TaskBoardView({
                       event.stopPropagation();
                     }}
                     onDrop={(event) => onDropByPosition(event, column.key, task.id)}
-                    onClick={() => onOpenEdit(task)}
+                    onClick={(e) => {
+                      if (e.metaKey || e.ctrlKey || e.shiftKey) {
+                        onSelectTask(task.id, e);
+                      } else {
+                        onOpenEdit(task);
+                      }
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         onOpenEdit(task);
                       }
                     }}
-                    className={`group relative rounded-lg border border-slate-200 bg-white p-3.5 shadow-xs border-l-2 transition ${
+                    className={`group relative rounded-xl border-2 bg-white p-4 shadow-sm transition-all duration-300 ${
                       task.priority === 'urgent'
                         ? 'border-l-red-500'
                         : task.priority === 'high'
                           ? 'border-l-orange-500'
                           : task.priority === 'medium'
                             ? 'border-l-blue-400'
-                            : 'border-l-slate-300'
+                            : 'border-l-slate-200'
                     } ${
                       isUpdatePending && updatingTaskId === task.id
-                        ? 'opacity-60'
+                        ? 'opacity-60 scale-95'
                         : isDragDropLocked
                           ? 'cursor-not-allowed opacity-80'
-                          : 'cursor-pointer hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md'
-                    } ${selectedTaskIds.has(task.id) ? 'ring-1 ring-brand-300' : ''} ${
-                      task.deletedAt ? 'bg-slate-50 opacity-60 grayscale' : ''
-                    }
+                          : 'cursor-pointer hover:border-brand-500 hover:shadow-xl hover:-translate-y-1'
+                    } ${
+                      selectedTaskIds.has(task.id)
+                        ? 'border-brand-500 ring-4 ring-brand-500/10 shadow-lg translate-y-[-2px] bg-brand-50/30'
+                        : 'border-slate-100'
+                    } ${task.deletedAt ? 'bg-slate-50 opacity-60 grayscale' : ''}
                   `}
                   >
-                    <div className="mb-1 flex justify-end">
+                    <div
+                      className={`absolute top-2 right-2 transition-opacity duration-200 ${selectedTaskIds.has(task.id) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                    >
                       <input
                         type="checkbox"
                         checked={selectedTaskIds.has(task.id)}
-                        onChange={() => toggleTaskSelection(task.id)}
+                        onChange={(e) => onSelectTask(task.id, e)}
                         onClick={(event) => event.stopPropagation()}
                         aria-label={`Chọn task ${task.title}`}
-                        className="h-3.5 w-3.5 rounded border-slate-300 text-brand-600"
+                        className="h-4 w-4 rounded-md border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer shadow-sm"
                       />
                     </div>
                     {/* Top: type icon + task ID + story points */}

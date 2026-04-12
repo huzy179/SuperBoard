@@ -152,7 +152,7 @@ export default function ProjectDetailPage() {
   const {
     selectedTaskIds,
     selectedVisibleCount,
-    toggleTaskSelection,
+    handleSelectTask,
     toggleSelectAllVisible,
     clearTaskSelection,
   } = useTaskSelection(tasks, visibleTasks);
@@ -208,23 +208,15 @@ export default function ProjectDetailPage() {
     setBulkStatus,
     bulkPriority,
     setBulkPriority,
-    bulkType,
-    setBulkType,
-    bulkDueDate,
-    setBulkDueDate,
     bulkAssigneeId,
     setBulkAssigneeId,
     bulkUpdatePending,
     bulkPriorityPending,
-    bulkTypePending,
-    bulkDueDatePending,
     bulkAssignPending,
     bulkDeletePending,
     handleBulkUpdateStatus,
     handleBulkAssignAssignee,
     handleBulkUpdatePriority,
-    handleBulkUpdateType,
-    handleBulkUpdateDueDate,
     handleBulkDeleteTasks,
     isDragDropLocked,
   } = useTaskBulkActions({
@@ -397,10 +389,6 @@ export default function ProjectDetailPage() {
           onBulkStatusChange={setBulkStatus}
           bulkPriority={bulkPriority}
           onBulkPriorityChange={setBulkPriority}
-          bulkType={bulkType}
-          onBulkTypeChange={setBulkType}
-          bulkDueDate={bulkDueDate}
-          onBulkDueDateChange={setBulkDueDate}
           bulkAssigneeId={bulkAssigneeId}
           onBulkAssigneeIdChange={setBulkAssigneeId}
           isStatusPending={bulkUpdatePending}
@@ -413,8 +401,6 @@ export default function ProjectDetailPage() {
           onClearSelection={clearTaskSelection}
           onApplyStatus={() => handleBulkUpdateStatus({ selectedTaskIds, clearTaskSelection })}
           onApplyPriority={() => handleBulkUpdatePriority({ selectedTaskIds, clearTaskSelection })}
-          onApplyType={() => handleBulkUpdateType({ selectedTaskIds, clearTaskSelection })}
-          onApplyDueDate={() => handleBulkUpdateDueDate({ selectedTaskIds, clearTaskSelection })}
           onApplyAssignee={() => handleBulkAssignAssignee({ selectedTaskIds, clearTaskSelection })}
           onDeleteSelected={() => handleBulkDeleteTasks({ selectedTaskIds, clearTaskSelection })}
           workflow={workflow}
@@ -450,7 +436,7 @@ export default function ProjectDetailPage() {
           onDropByPosition={handleDropByPosition}
           onOpenEdit={handleOpenEdit}
           selectedTaskIds={selectedTaskIds}
-          toggleTaskSelection={toggleTaskSelection}
+          onSelectTask={handleSelectTask}
           isUpdatePending={updateTaskStatusMutation.isPending}
           updatingTaskId={updateTaskStatusMutation.variables?.taskId}
           onAddTask={(status) => {
@@ -467,7 +453,7 @@ export default function ProjectDetailPage() {
           projectKey={projectKey}
           selectedTaskIds={selectedTaskIds}
           selectedVisibleCount={selectedVisibleCount}
-          toggleTaskSelection={toggleTaskSelection}
+          onSelectTask={handleSelectTask}
           toggleSelectAllVisible={toggleSelectAllVisible}
           onOpenEdit={handleOpenEdit}
           onUpdateTaskStatus={handleUpdateTaskStatusDirect}

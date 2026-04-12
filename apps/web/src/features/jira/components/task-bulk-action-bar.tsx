@@ -1,3 +1,7 @@
+'use client';
+
+import { useState } from 'react';
+import { X, Check, Trash2, User, Flag, Loader2, SquareCheck, MousePointer2 } from 'lucide-react';
 import type {
   ProjectMemberDTO,
   ProjectTaskItemDTO,
@@ -5,7 +9,7 @@ import type {
   TaskTypeDTO,
   WorkflowStatusTemplateDTO,
 } from '@superboard/shared';
-import { BOARD_COLUMNS, PRIORITY_OPTIONS, TASK_TYPE_OPTIONS } from '@/lib/constants/task';
+import { BOARD_COLUMNS, PRIORITY_OPTIONS } from '@/lib/constants/task';
 
 type TaskBulkActionBarProps = {
   members: ProjectMemberDTO[];
@@ -25,263 +29,217 @@ type TaskBulkActionBarProps = {
   isDeletePending: boolean;
   onBulkStatusChange: (value: ProjectTaskItemDTO['status']) => void;
   onBulkPriorityChange: (value: TaskPriorityDTO) => void;
-  onBulkTypeChange: (value: TaskTypeDTO) => void;
-  onBulkDueDateChange: (value: string) => void;
   onBulkAssigneeIdChange: (value: string) => void;
   onToggleSelectAllVisible: () => void;
   onClearSelection: () => void;
   onApplyStatus: () => void;
   onApplyPriority: () => void;
-  onApplyType: () => void;
-  onApplyDueDate: () => void;
   onApplyAssignee: () => void;
   onDeleteSelected: () => void;
   workflow?: WorkflowStatusTemplateDTO | undefined;
 };
 
-export function TaskBulkActionBar({
-  members,
-  selectedCount,
-  selectedVisibleCount,
-  totalVisibleCount,
-  bulkStatus,
-  bulkPriority,
-  bulkType,
-  bulkDueDate,
-  bulkAssigneeId,
-  isStatusPending,
-  isPriorityPending,
-  isTypePending,
-  isDueDatePending,
-  isAssignPending,
-  isDeletePending,
-  onBulkStatusChange,
-  onBulkPriorityChange,
-  onBulkTypeChange,
-  onBulkDueDateChange,
-  onBulkAssigneeIdChange,
-  onToggleSelectAllVisible,
-  onClearSelection,
-  onApplyStatus,
-  onApplyPriority,
-  onApplyType,
-  onApplyDueDate,
-  onApplyAssignee,
-  onDeleteSelected,
-  workflow,
-}: TaskBulkActionBarProps) {
-  if (selectedCount === 0) {
-    return null;
-  }
+export function TaskBulkActionBar(props: TaskBulkActionBarProps) {
+  const {
+    members,
+    selectedCount,
+    selectedVisibleCount,
+    totalVisibleCount,
+    bulkStatus,
+    bulkPriority,
+    bulkAssigneeId,
+    isStatusPending,
+    isPriorityPending,
+    isAssignPending,
+    isDeletePending,
+    onBulkStatusChange,
+    onBulkPriorityChange,
+    onBulkAssigneeIdChange,
+    onToggleSelectAllVisible,
+    onClearSelection,
+    onApplyStatus,
+    onApplyPriority,
+    onApplyAssignee,
+    onDeleteSelected,
+    workflow,
+  } = props;
+
+  const [activeMenu, setActiveMenu] = useState<'status' | 'priority' | 'assignee' | null>(null);
+
+  if (selectedCount === 0) return null;
 
   return (
-    <div className="mb-4 rounded-xl border border-slate-200 bg-white p-3 shadow-xs">
-      <div className="mb-2 flex items-center justify-between">
-        <span className="text-xs font-semibold text-brand-700">Đã chọn {selectedCount} task</span>
-        <button
-          type="button"
-          onClick={onClearSelection}
-          className="rounded-md px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-100"
-        >
-          Xoá chọn
-        </button>
-      </div>
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[80] animate-in slide-in-from-bottom-8 fade-in duration-500">
+      <div className="glass-panel p-1 rounded-[2rem] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.18)]">
+        <div className="bg-slate-900 rounded-[1.8rem] flex items-center h-16 px-2 gap-4">
+          {/* Selected Info */}
+          <div className="flex items-center gap-3 pl-4 pr-6 border-r border-white/10 h-10">
+            <div className="w-6 h-6 bg-brand-600 rounded-lg flex items-center justify-center text-[10px] font-black text-white shadow-lg shadow-brand-600/30">
+              {selectedCount}
+            </div>
+            <span className="text-[11px] font-black text-white/90 uppercase tracking-widest whitespace-nowrap">
+              Đã Chọn
+            </span>
+            <button
+              onClick={onClearSelection}
+              className="w-6 h-6 flex items-center justify-center text-white/30 hover:text-white transition-colors"
+              title="Hủy chọn"
+            >
+              <X size={14} />
+            </button>
+          </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onClick={onToggleSelectAllVisible}
-          className="rounded-md bg-slate-100 px-2.5 py-1.5 text-[11px] font-medium text-slate-700 hover:bg-slate-200"
-        >
-          {selectedVisibleCount === totalVisibleCount
-            ? 'Bỏ chọn tất cả đang hiển thị'
-            : 'Chọn tất cả đang hiển thị'}
-        </button>
+          {/* Action Buttons Group */}
+          <div className="flex items-center gap-1">
+            {/* Status Action */}
+            <div className="relative">
+              <button
+                onClick={() => setActiveMenu(activeMenu === 'status' ? null : 'status')}
+                className={`h-11 px-4 rounded-2xl flex items-center gap-2 transition-all group ${activeMenu === 'status' ? 'bg-white text-slate-900 shadow-xl' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
+              >
+                <Loader2 size={16} className={isStatusPending ? 'animate-spin' : ''} />
+                <span className="text-[11px] font-black uppercase tracking-widest">Trạng thái</span>
+              </button>
+              {activeMenu === 'status' && (
+                <div className="absolute bottom-full mb-4 left-0 glass-panel p-1 rounded-2xl w-56 shadow-2xl animate-in fade-in slide-in-from-bottom-2">
+                  <div className="bg-slate-800 rounded-xl overflow-hidden py-1">
+                    {(workflow?.statuses || BOARD_COLUMNS).map(
+                      (s: { key: string; label?: string; name?: string }) => (
+                        <button
+                          key={s.key}
+                          onClick={() => {
+                            onBulkStatusChange(s.key);
+                            onApplyStatus();
+                            setActiveMenu(null);
+                          }}
+                          className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-xs font-bold transition-all ${bulkStatus === s.key ? 'text-brand-400 bg-brand-500/5' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}
+                        >
+                          <span>{s.label || s.name}</span>
+                          {bulkStatus === s.key && <Check size={14} />}
+                        </button>
+                      ),
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
 
-        <div className="h-5 w-px bg-slate-200" />
+            {/* Priority Action */}
+            <div className="relative">
+              <button
+                onClick={() => setActiveMenu(activeMenu === 'priority' ? null : 'priority')}
+                className={`h-11 px-4 rounded-2xl flex items-center gap-2 transition-all group ${activeMenu === 'priority' ? 'bg-white text-slate-900 shadow-xl' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
+              >
+                <Flag size={16} className={isPriorityPending ? 'animate-pulse' : ''} />
+                <span className="text-[11px] font-black uppercase tracking-widest">Ưu tiên</span>
+              </button>
+              {activeMenu === 'priority' && (
+                <div className="absolute bottom-full mb-4 left-0 glass-panel p-1 rounded-2xl w-48 shadow-2xl animate-in fade-in slide-in-from-bottom-2">
+                  <div className="bg-slate-800 rounded-xl overflow-hidden py-1">
+                    {PRIORITY_OPTIONS.map((p) => (
+                      <button
+                        key={p.key}
+                        onClick={() => {
+                          onBulkPriorityChange(p.key as TaskPriorityDTO);
+                          onApplyPriority();
+                          setActiveMenu(null);
+                        }}
+                        className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-xs font-bold transition-all ${bulkPriority === p.key ? 'text-brand-400 bg-brand-500/5' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}
+                      >
+                        <span>{p.label}</span>
+                        {bulkPriority === p.key && <Check size={14} />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
-        <label className="rounded-lg bg-slate-50 px-2 py-1 text-[11px] text-slate-600">
-          Đổi trạng thái
-          <select
-            value={bulkStatus}
-            onChange={(event) =>
-              onBulkStatusChange(event.target.value as ProjectTaskItemDTO['status'])
-            }
-            className="ml-2 rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1.5 text-[11px] text-slate-700"
-          >
-            {workflow?.statuses
-              ? workflow.statuses.map((s) => (
-                  <option key={s.key} value={s.key}>
-                    {s.name}
-                  </option>
-                ))
-              : BOARD_COLUMNS.map((column) => (
-                  <option key={column.key} value={column.key}>
-                    {column.label}
-                  </option>
-                ))}
-          </select>
-        </label>
+            {/* Assignee Action */}
+            <div className="relative">
+              <button
+                onClick={() => setActiveMenu(activeMenu === 'assignee' ? null : 'assignee')}
+                className={`h-11 px-4 rounded-2xl flex items-center gap-2 transition-all group ${activeMenu === 'assignee' ? 'bg-white text-slate-900 shadow-xl' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
+              >
+                <User size={16} className={isAssignPending ? 'animate-pulse' : ''} />
+                <span className="text-[11px] font-black uppercase tracking-widest">Gán việc</span>
+              </button>
+              {activeMenu === 'assignee' && (
+                <div className="absolute bottom-full mb-4 left-0 glass-panel p-1 rounded-2xl w-64 shadow-2xl animate-in fade-in slide-in-from-bottom-2">
+                  <div className="bg-slate-800 rounded-xl overflow-hidden py-1">
+                    <button
+                      onClick={() => {
+                        onBulkAssigneeIdChange('');
+                        onApplyAssignee();
+                        setActiveMenu(null);
+                      }}
+                      className="w-full px-4 py-2.5 text-left text-xs font-bold text-rose-400 hover:bg-rose-500/5 border-b border-white/5"
+                    >
+                      Bỏ gán tất cả
+                    </button>
+                    <div className="max-h-60 overflow-y-auto">
+                      {members.map((m) => (
+                        <button
+                          key={m.id}
+                          onClick={() => {
+                            onBulkAssigneeIdChange(m.id);
+                            onApplyAssignee();
+                            setActiveMenu(null);
+                          }}
+                          className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all ${bulkAssigneeId === m.id ? 'text-brand-400 bg-brand-500/5' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}
+                        >
+                          <div className="w-6 h-6 rounded-lg bg-slate-700 font-bold flex items-center justify-center text-[10px]">
+                            {m.fullName.charAt(0)}
+                          </div>
+                          <span className="text-xs font-bold truncate">{m.fullName}</span>
+                          {bulkAssigneeId === m.id && <Check size={14} className="ml-auto" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
-        <button
-          type="button"
-          onClick={onApplyStatus}
-          disabled={
-            isStatusPending ||
-            isPriorityPending ||
-            isTypePending ||
-            isDueDatePending ||
-            isAssignPending ||
-            isDeletePending
-          }
-          className="rounded-md bg-brand-600 px-2.5 py-1.5 text-[11px] font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
-        >
-          {isStatusPending ? 'Đang cập nhật...' : 'Áp dụng'}
-        </button>
+            {/* More Actions (Date, Type, Select All) */}
+            <div className="relative ml-2 pl-2 border-l border-white/10 flex items-center gap-1">
+              <button
+                onClick={onToggleSelectAllVisible}
+                className="h-11 w-11 rounded-2xl flex items-center justify-center text-white/40 hover:text-white hover:bg-white/5 transition-all"
+                title={selectedVisibleCount === totalVisibleCount ? 'Bỏ chọn hết' : 'Chọn hết'}
+              >
+                {selectedVisibleCount === totalVisibleCount ? (
+                  <SquareCheck size={18} className="text-brand-500" />
+                ) : (
+                  <MousePointer2 size={18} />
+                )}
+              </button>
 
-        <div className="h-5 w-px bg-slate-200" />
+              <button
+                onClick={onDeleteSelected}
+                disabled={isDeletePending}
+                className="h-11 w-11 rounded-2xl flex items-center justify-center text-rose-500/40 hover:text-rose-500 hover:bg-rose-500/5 transition-all disabled:opacity-30"
+                title="Xóa công việc"
+              >
+                {isDeletePending ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <Trash2 size={18} />
+                )}
+              </button>
+            </div>
+          </div>
 
-        <label className="rounded-lg bg-slate-50 px-2 py-1 text-[11px] text-slate-600">
-          Đổi ưu tiên
-          <select
-            value={bulkPriority}
-            onChange={(event) => onBulkPriorityChange(event.target.value as TaskPriorityDTO)}
-            className="ml-2 rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1.5 text-[11px] text-slate-700"
-          >
-            {PRIORITY_OPTIONS.map((priority) => (
-              <option key={priority.key} value={priority.key}>
-                {priority.label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <button
-          type="button"
-          onClick={onApplyPriority}
-          disabled={
-            isPriorityPending ||
-            isStatusPending ||
-            isTypePending ||
-            isDueDatePending ||
-            isAssignPending ||
-            isDeletePending
-          }
-          className="rounded-md bg-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
-        >
-          {isPriorityPending ? 'Đang cập nhật...' : 'Áp dụng ưu tiên'}
-        </button>
-
-        <div className="h-5 w-px bg-slate-200" />
-
-        <label className="rounded-lg bg-slate-50 px-2 py-1 text-[11px] text-slate-600">
-          Đổi loại task
-          <select
-            value={bulkType}
-            onChange={(event) => onBulkTypeChange(event.target.value as TaskTypeDTO)}
-            className="ml-2 rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1.5 text-[11px] text-slate-700"
-          >
-            {TASK_TYPE_OPTIONS.map((type) => (
-              <option key={type.key} value={type.key}>
-                {type.label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <button
-          type="button"
-          onClick={onApplyType}
-          disabled={
-            isTypePending ||
-            isStatusPending ||
-            isPriorityPending ||
-            isDueDatePending ||
-            isAssignPending ||
-            isDeletePending
-          }
-          className="rounded-md bg-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
-        >
-          {isTypePending ? 'Đang cập nhật...' : 'Áp dụng loại'}
-        </button>
-
-        <div className="h-5 w-px bg-slate-200" />
-
-        <label className="rounded-lg bg-slate-50 px-2 py-1 text-[11px] text-slate-600">
-          Đổi hạn hoàn thành
-          <input
-            type="date"
-            value={bulkDueDate}
-            onChange={(event) => onBulkDueDateChange(event.target.value)}
-            className="ml-2 rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1.5 text-[11px] text-slate-700"
-          />
-        </label>
-
-        <button
-          type="button"
-          onClick={onApplyDueDate}
-          disabled={
-            isDueDatePending ||
-            isStatusPending ||
-            isPriorityPending ||
-            isTypePending ||
-            isAssignPending ||
-            isDeletePending
-          }
-          className="rounded-md bg-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
-        >
-          {isDueDatePending ? 'Đang cập nhật...' : 'Áp dụng hạn'}
-        </button>
-
-        <div className="h-5 w-px bg-slate-200" />
-
-        <label className="rounded-lg bg-slate-50 px-2 py-1 text-[11px] text-slate-600">
-          Gán người thực hiện
-          <select
-            value={bulkAssigneeId}
-            onChange={(event) => onBulkAssigneeIdChange(event.target.value)}
-            className="ml-2 rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1.5 text-[11px] text-slate-700"
-          >
-            <option value="">-- Bỏ gán --</option>
-            {members.map((member) => (
-              <option key={member.id} value={member.id}>
-                {member.fullName}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <button
-          type="button"
-          onClick={onApplyAssignee}
-          disabled={
-            isAssignPending ||
-            isStatusPending ||
-            isPriorityPending ||
-            isTypePending ||
-            isDueDatePending ||
-            isDeletePending
-          }
-          className="rounded-md bg-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
-        >
-          {isAssignPending ? 'Đang gán...' : 'Áp dụng gán'}
-        </button>
-
-        <button
-          type="button"
-          onClick={onDeleteSelected}
-          disabled={
-            isDeletePending ||
-            isStatusPending ||
-            isPriorityPending ||
-            isTypePending ||
-            isDueDatePending ||
-            isAssignPending
-          }
-          className="rounded-md bg-rose-600 px-2.5 py-1.5 text-[11px] font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
-        >
-          {isDeletePending ? 'Đang xử lý...' : 'Xoá đã chọn'}
-        </button>
+          {/* Close Action */}
+          <div className="pl-4 pr-2">
+            <button
+              onClick={onClearSelection}
+              className="h-10 px-6 rounded-2xl bg-white/5 text-white/60 hover:text-white hover:bg-white/10 text-[10px] font-black uppercase tracking-widest transition-all"
+            >
+              Hoàn tất
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

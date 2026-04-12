@@ -563,6 +563,33 @@ function DonutDistributionChart({
     <div className="flex flex-wrap items-center gap-4">
       <div className="relative h-28 w-28">
         <svg viewBox="0 0 100 100" className="h-28 w-28 -rotate-90">
+          <defs>
+            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="2" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+            {items.map((item) => (
+              <linearGradient
+                key={`grad-${item.key}`}
+                id={`grad-${item.key}`}
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
+                <stop
+                  offset="0%"
+                  style={{ stopColor: 'currentColor', stopOpacity: 1 }}
+                  className={item.colorClass}
+                />
+                <stop
+                  offset="100%"
+                  style={{ stopColor: 'currentColor', stopOpacity: 0.6 }}
+                  className={item.colorClass}
+                />
+              </linearGradient>
+            ))}
+          </defs>
           <circle
             cx="50"
             cy="50"
@@ -570,7 +597,7 @@ function DonutDistributionChart({
             fill="none"
             stroke="currentColor"
             strokeWidth="10"
-            className="text-slate-200"
+            className="text-slate-100"
           />
           {items.map((item) => {
             const segmentLength = (item.value / total) * circumference;
@@ -584,12 +611,13 @@ function DonutDistributionChart({
                 cy="50"
                 r={radius}
                 fill="none"
-                stroke="currentColor"
+                stroke={`url(#grad-${item.key})`}
                 strokeWidth="10"
                 strokeLinecap="round"
-                className={item.colorClass}
+                style={{ filter: 'url(#glow)' }}
                 strokeDasharray={`${segmentLength} ${circumference}`}
                 strokeDashoffset={dashOffset}
+                className="transition-all duration-700 ease-out"
               >
                 <title>
                   {`${item.label}: ${item.value} task (${Math.round((item.value / total) * 100)}%)`}

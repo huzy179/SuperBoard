@@ -138,16 +138,16 @@ export function TaskBoardView({
         return (
           <div
             key={column.key}
-            className={`w-80 shrink-0 rounded-2xl border-t-4 bg-slate-50/50 transition-all duration-300 flex flex-col max-h-full ${
+            className={`w-80 shrink-0 rounded-[2rem] border-t-8 bg-white/40 backdrop-blur-xl transition-all duration-500 flex flex-col max-h-full shadow-glass ${
               COLUMN_BORDER[column.key] ?? 'border-t-slate-400'
             } ${
               isDragOver
                 ? isAllowedTarget
-                  ? 'border-emerald-500 bg-emerald-50/50 ring-4 ring-emerald-500/10 scale-[1.01]'
+                  ? 'border-emerald-500 bg-emerald-50/50 ring-8 ring-emerald-500/5 scale-[1.02] z-20 shadow-2xl'
                   : 'border-rose-500 bg-rose-50/50 opacity-70 cursor-no-drop'
                 : isBlocked
                   ? 'opacity-40 grayscale-[0.5]'
-                  : 'border-transparent border-b border-x border-slate-200/60'
+                  : 'border-white/50 border-b border-x'
             }`}
             onDragOver={(e) => {
               onDragOver(e);
@@ -165,7 +165,7 @@ export function TaskBoardView({
               }
             }}
           >
-            <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-3 py-2.5">
+            <div className="flex items-center justify-between border-b border-white/40 bg-white/20 px-4 py-3.5 backdrop-blur-sm rounded-t-[2rem]">
               <div className="flex items-center gap-2">
                 <div
                   className={`flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${categoryStyles}`}
@@ -175,7 +175,7 @@ export function TaskBoardView({
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-200 px-1.5 text-[11px] font-bold text-slate-700">
+                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-900/5 px-1.5 text-[10px] font-black text-slate-500">
                   {tasks.length}
                 </span>
                 <button
@@ -219,7 +219,7 @@ export function TaskBoardView({
                         onOpenEdit(task);
                       }
                     }}
-                    className={`group relative rounded-xl border-2 bg-white p-4 shadow-sm transition-all duration-300 ${
+                    className={`group relative premium-card p-5 bg-white/80 backdrop-blur-sm transition-all duration-500 ${
                       task.priority === 'urgent'
                         ? 'border-l-red-500'
                         : task.priority === 'high'
@@ -232,11 +232,11 @@ export function TaskBoardView({
                         ? 'opacity-60 scale-95'
                         : isDragDropLocked
                           ? 'cursor-not-allowed opacity-80'
-                          : 'cursor-pointer hover:border-brand-500 hover:shadow-xl hover:-translate-y-1'
+                          : 'cursor-pointer hover:border-brand-500 hover:shadow-2xl hover:-translate-y-1.5 active:scale-[0.98]'
                     } ${
                       selectedTaskIds.has(task.id)
-                        ? 'border-brand-500 ring-4 ring-brand-500/10 shadow-lg translate-y-[-2px] bg-brand-50/30'
-                        : 'border-slate-100'
+                        ? 'border-brand-500 ring-8 ring-brand-500/5 shadow-2xl translate-y-[-4px] bg-brand-50/50'
+                        : 'border-white/50'
                     } ${task.deletedAt ? 'bg-slate-50 opacity-60 grayscale' : ''}
                   `}
                   >
@@ -252,8 +252,7 @@ export function TaskBoardView({
                         className="h-4 w-4 rounded-md border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer shadow-sm"
                       />
                     </div>
-                    {/* Top: type icon + task ID + story points */}
-                    <div className="mb-1.5 flex items-center justify-between gap-1">
+                    <div className="flex items-center justify-between gap-1 mb-2">
                       <div className="flex items-center gap-1.5">
                         <TaskTypeIcon type={task.type ?? 'task'} />
                         <TaskIdBadge projectKey={projectKey} number={task.number} />
@@ -262,7 +261,7 @@ export function TaskBoardView({
                     </div>
                     {/* Title */}
                     <p
-                      className={`text-[13px] font-medium transition-colors ${
+                      className={`text-[14px] font-bold leading-snug transition-colors ${
                         task.deletedAt
                           ? 'text-slate-400 line-through'
                           : 'text-slate-900 group-hover:text-brand-700'

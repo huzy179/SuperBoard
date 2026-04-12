@@ -29,26 +29,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
-  @SubscribeMessage('join:channel')
-  handleJoinChannel(@ConnectedSocket() client: Socket, @MessageBody() channelId: string) {
-    client.join(channelId);
-    this.logger.log(`Client ${client.id} joined channel ${channelId}`);
+  @SubscribeMessage('channel:join')
+  handleJoinChannel(@ConnectedSocket() client: Socket, @MessageBody() data: { channelId: string }) {
+    client.join(data.channelId);
+    this.logger.log(`Client ${client.id} joined channel ${data.channelId}`);
   }
 
-  @SubscribeMessage('leave:channel')
-  handleLeaveChannel(@ConnectedSocket() client: Socket, @MessageBody() channelId: string) {
-    client.leave(channelId);
-    this.logger.log(`Client ${client.id} left channel ${channelId}`);
+  @SubscribeMessage('channel:leave')
+  handleLeaveChannel(@ConnectedSocket() client: Socket, @MessageBody() data: { channelId: string }) {
+    client.leave(data.channelId);
+    this.logger.log(`Client ${client.id} left channel ${data.channelId}`);
   }
 
-  @SubscribeMessage('typing')
+  @SubscribeMessage('chat:typing')
   handleTyping(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { channelId: string; userId: string; fullName: string },
+    @MessageBody() data: { channelId: string; userId: string; isTyping: boolean },
   ) {
-    client.to(data.channelId).emit('user:typing', {
+    client.to(data.channelId).emit('chat:typing', {
       userId: data.userId,
-      fullName: data.fullName,
+      isTyping: data.isTyping,
     });
   }
 

@@ -5,17 +5,19 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { useMessages } from '../hooks/use-chat';
 import { AssigneeAvatar } from '@/features/jira/components/task-badges';
-import { Loader2 } from 'lucide-react';
+import { Loader2, MessageSquare } from 'lucide-react';
+import type { Message } from '@superboard/shared';
 
 interface MessageListProps {
   channelId: string;
+  onOpenThread?: (message: Message) => void;
 }
 
-export function MessageList({ channelId }: MessageListProps) {
+export function MessageList({ channelId, onOpenThread }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const { messages, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
+  const { messages, typingUsers, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useMessages(channelId);
 
   // Auto scroll to bottom on new messages
@@ -49,7 +51,7 @@ export function MessageList({ channelId }: MessageListProps) {
             return (
               <div
                 key={message.id}
-                className={`flex gap-3 group animate-in slide-in-from-bottom-2 duration-300 ${showHeader ? 'mt-4' : 'mt-1'}`}
+                className={`flex gap-3 group animate-in slide-in-from-bottom-2 duration-300 relative ${showHeader ? 'mt-4' : 'mt-1'}`}
               >
                 {showHeader ? (
                   <AssigneeAvatar
@@ -76,24 +78,48 @@ export function MessageList({ channelId }: MessageListProps) {
                   <div className="text-slate-700 text-sm leading-relaxed break-words whitespace-pre-wrap">
                     {message.content}
                   </div>
+
+                  {/* Reply Button (Hover Only) */}
+                  <div className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white border border-slate-100 rounded-lg shadow-sm">
+                    <button
+                      onClick={() => onOpenThread?.(message)}
+                      className="p-1.5 hover:bg-slate-50 text-slate-400 hover:text-brand-600 transition-colors"
+                      title="Trả lời chủ đề"
+                    >
+                      <MessageSquare size={14} />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
           })}
 
-          {hasNextPage && (
-            <div className="flex justify-center py-4">
-              <button
-                onClick={() => fetchNextPage()}
-                disabled={isFetchingNextPage}
-                className="text-xs font-semibold text-brand-600 hover:text-brand-700 transition-colors"
-              >
-                {isFetchingNextPage ? 'Đang tải...' : 'Tải thêm tin nhắn cũ'}
-              </button>
-            </div>
-          )}
+      {hasNextPage && (
+        <div className="flex justify-center py-4">
+          <button
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            className="text-xs font-semibold text-brand-600 hover:text-brand-700 transition-colors"
+          >
+            {isFetchingNextPage ? 'Đang tải...' : 'Tải thêm tin nhắn cũ'}
+          </button>
         </div>
-      </div>
+      )}
+
+      {typingUsers.length > 0 && (
+        <div className="px-6 py-2 flex items-center gap-2">
+          <div className="flex gap-1">
+            <span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce" />
+            <span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce [animation-delay:0.2s]" />
+            <span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce [animation-delay:0.4s]" />
+          </div>
+          <span className="text-[10px] text-slate-400 italic">
+            {typingUsers.length === 1
+              ? 'Một người đang nhập...'
+              : `${typingUsers.length} người đang nhập...`}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { AiService } from '../ai/ai.service';
+import { RedisService } from '../../common/redis.service';
 import type { Prisma } from '@prisma/client';
 import { logger } from '../../common/logger';
 import {
@@ -32,6 +34,8 @@ export class ProjectService {
     private prisma: PrismaService,
     private notificationService: NotificationService,
     private workflowService: WorkflowService,
+    private aiService: AiService,
+    private redisService: RedisService,
   ) {}
 
   async getProjectsByWorkspace(
@@ -225,7 +229,9 @@ export class ProjectService {
     // Clone workspace workflow status template into project snapshot
     await this.workflowService.cloneWorkspaceTemplateToProject(workspaceId, project.id);
 
-    return this.toProjectItemDTO(project);
+    const result = this.toProjectItemDTO(project);
+    await this.clearDashboardCache(workspaceId);
+    return result;
   }
 
   async updateProjectForWorkspace(input: {
@@ -245,7 +251,9 @@ export class ProjectService {
       },
     });
 
-    return this.toProjectItemDTO(project);
+    const result = this.toProjectItemDTO(project);
+    await this.clearDashboardCache(input.workspaceId);
+    return result;
   }
 
   async archiveProjectForWorkspace(input: {
@@ -261,6 +269,8 @@ export class ProjectService {
         deletedAt: input.archivedAt ?? new Date(),
       } as Prisma.ProjectUpdateInput,
     });
+
+    await this.clearDashboardCache(input.workspaceId);
   }
 
   async restoreProjectForWorkspace(input: {
@@ -304,7 +314,7 @@ export class ProjectService {
       } as Prisma.ProjectUpdateInput,
     });
 
-    void input.restoredAt;
+    await this.clearDashboardCache(input.workspaceId);
   }
 
   async createTaskForProject(input: {
@@ -399,6 +409,11 @@ export class ProjectService {
       { taskId: task.id, projectId: input.projectId, actorId: input.actorId },
       'Task created',
     );
+    // Trigger embedding sync in background
+    void this.syncTaskEmbedding(task.id, task.title, task.description || '');
+
+    await this.clearDashboardCache(input.workspaceId);
+
     return this.toTaskDTO(task);
   }
 
@@ -456,6 +471,8 @@ export class ProjectService {
         },
       });
     }
+
+    await this.clearDashboardCache(input.workspaceId);
 
     return this.toTaskDTO(task);
   }
@@ -598,6 +615,8 @@ export class ProjectService {
 
       await this.prisma.taskEvent.createMany({ data: events });
     }
+
+    await this.clearDashboardCache(input.workspaceId);
 
     return {
       updated: updateResult.count,
@@ -796,6 +815,13 @@ export class ProjectService {
         .catch((err: unknown) => logger.error({ err }, 'Notification failed'));
     }
 
+    // Trigger embedding sync if title or description changed
+    if (changedFields.includes('title') || changedFields.includes('description')) {
+      void this.syncTaskEmbedding(task.id, task.title, task.description || '');
+    }
+
+    await this.clearDashboardCache(input.workspaceId);
+
     return this.toTaskDTO(task);
   }
 
@@ -834,6 +860,8 @@ export class ProjectService {
       { taskId: input.taskId, projectId: input.projectId, actorId: input.actorId },
       'Task deleted',
     );
+
+    await this.clearDashboardCache(input.workspaceId);
   }
 
   async getTaskHistoryForProject(input: {
@@ -880,6 +908,17 @@ export class ProjectService {
   }
 
   async getDashboardStats(workspaceId: string): Promise<DashboardStatsDTO> {
+    const cacheKey = `dashboard:stats:${workspaceId}`;
+
+    // Try to get from cache
+    const cachedStats = await this.redisService.getJson<DashboardStatsDTO>(cacheKey);
+    if (cachedStats) {
+      logger.info(`[ProjectService] Dashboard stats cache HIT for workspace ${workspaceId}`);
+      return cachedStats;
+    }
+
+    logger.info(`[ProjectService] Dashboard stats cache MISS for workspace ${workspaceId}`);
+
     const tasks = await this.prisma.task.findMany({
       where: {
         project: { workspaceId, deletedAt: null },
@@ -1005,7 +1044,7 @@ export class ProjectService {
       createdAt: e.createdAt.toISOString(),
     }));
 
-    return {
+    const stats: DashboardStatsDTO = {
       tasksByStatus,
       tasksByPriority,
       tasksByType,
@@ -1014,6 +1053,17 @@ export class ProjectService {
       overdueTasks,
       recentActivity,
     };
+
+    // Store in cache for 5 minutes
+    await this.redisService.setJson(cacheKey, stats, 300);
+
+    return stats;
+  }
+
+  private async clearDashboardCache(workspaceId: string) {
+    const cacheKey = `dashboard:stats:${workspaceId}`;
+    await this.redisService.del(cacheKey);
+    logger.info(`[ProjectService] Dashboard stats cache CLEAR for workspace ${workspaceId}`);
   }
 
   private toProjectItemDTO(project: {
@@ -1188,5 +1238,24 @@ export class ProjectService {
     workspaceId: string;
   }): Promise<void> {
     await verifyProjectAndTaskInWorkspace(this.prisma, input);
+  }
+
+  private async syncTaskEmbedding(taskId: string, title: string, description: string) {
+    try {
+      const text = `${title}\n${description}`;
+      const embedding = await this.aiService.getEmbedding(text);
+      const vectorStr = `[${embedding.join(',')}]`;
+
+      // Use raw SQL with parameterized template literal for safety
+      await this.prisma.$executeRaw`
+        INSERT INTO "TaskEmbedding" ("taskId", "vector", "updatedAt")
+        VALUES (${taskId}, ${vectorStr}::vector, NOW())
+        ON CONFLICT ("taskId") 
+        DO UPDATE SET "vector" = ${vectorStr}::vector, "updatedAt" = NOW();
+      `;
+    } catch (err: unknown) {
+      logger.error({ err, taskId }, 'Failed to sync task embedding');
+      // We don't throw here to avoid failing the main task creation/update
+    }
   }
 }

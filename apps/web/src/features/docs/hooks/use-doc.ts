@@ -5,6 +5,7 @@ import {
   getDocVersions,
   getWorkspaceDocs,
   createDoc,
+  summarizeDoc,
 } from '@/features/docs/api/doc-service';
 import { toast } from 'sonner';
 import type { Doc, DocVersion } from '@superboard/shared';
@@ -100,6 +101,15 @@ export function useCreateDoc(workspaceId: string | undefined) {
     onSuccess: () => {
       toast.success('Đã tạo tài liệu mới');
       void queryClient.invalidateQueries({ queryKey: ['docs'] });
+    },
+  });
+}
+
+export function useSummarizeDoc() {
+  return useMutation({
+    mutationFn: (docId: string) => summarizeDoc(docId),
+    onError: (error: Error) => {
+      toast.error(error.message || 'Không thể tạo tóm tắt tài liệu');
     },
   });
 }

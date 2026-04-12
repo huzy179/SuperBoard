@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10\x61i_service.proto\x12\x02\x61i\"4\n\x10SummarizeRequest\x12\x0f\n\x07task_id\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"$\n\x11SummarizeResponse\x12\x0f\n\x07summary\x18\x01 \x01(\t2I\n\tAIService\x12<\n\rSummarizeTask\x12\x14.ai.SummarizeRequest\x1a\x15.ai.SummarizeResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10\x61i_service.proto\x12\x02\x61i\"4\n\x10SummarizeRequest\x12\x0f\n\x07task_id\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"$\n\x11SummarizeResponse\x12\x0f\n\x07summary\x18\x01 \x01(\t\" \n\x10\x45mbeddingRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\"&\n\x11\x45mbeddingResponse\x12\x11\n\tembedding\x18\x01 \x03(\x02\x32\x86\x01\n\tAIService\x12<\n\rSummarizeTask\x12\x14.ai.SummarizeRequest\x1a\x15.ai.SummarizeResponse\x12;\n\x0cGetEmbedding\x12\x14.ai.EmbeddingRequest\x1a\x15.ai.EmbeddingResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -35,6 +35,10 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_SUMMARIZEREQUEST']._serialized_end=76
   _globals['_SUMMARIZERESPONSE']._serialized_start=78
   _globals['_SUMMARIZERESPONSE']._serialized_end=114
-  _globals['_AISERVICE']._serialized_start=116
-  _globals['_AISERVICE']._serialized_end=189
+  _globals['_EMBEDDINGREQUEST']._serialized_start=116
+  _globals['_EMBEDDINGREQUEST']._serialized_end=148
+  _globals['_EMBEDDINGRESPONSE']._serialized_start=150
+  _globals['_EMBEDDINGRESPONSE']._serialized_end=188
+  _globals['_AISERVICE']._serialized_start=191
+  _globals['_AISERVICE']._serialized_end=325
 # @@protoc_insertion_point(module_scope)

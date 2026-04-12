@@ -39,12 +39,23 @@ class AIServiceStub(object):
                 request_serializer=ai__service__pb2.SummarizeRequest.SerializeToString,
                 response_deserializer=ai__service__pb2.SummarizeResponse.FromString,
                 _registered_method=True)
+        self.GetEmbedding = channel.unary_unary(
+                '/ai.AIService/GetEmbedding',
+                request_serializer=ai__service__pb2.EmbeddingRequest.SerializeToString,
+                response_deserializer=ai__service__pb2.EmbeddingResponse.FromString,
+                _registered_method=True)
 
 
 class AIServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def SummarizeTask(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetEmbedding(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -57,6 +68,11 @@ def add_AIServiceServicer_to_server(servicer, server):
                     servicer.SummarizeTask,
                     request_deserializer=ai__service__pb2.SummarizeRequest.FromString,
                     response_serializer=ai__service__pb2.SummarizeResponse.SerializeToString,
+            ),
+            'GetEmbedding': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetEmbedding,
+                    request_deserializer=ai__service__pb2.EmbeddingRequest.FromString,
+                    response_serializer=ai__service__pb2.EmbeddingResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -86,6 +102,33 @@ class AIService(object):
             '/ai.AIService/SummarizeTask',
             ai__service__pb2.SummarizeRequest.SerializeToString,
             ai__service__pb2.SummarizeResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetEmbedding(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/ai.AIService/GetEmbedding',
+            ai__service__pb2.EmbeddingRequest.SerializeToString,
+            ai__service__pb2.EmbeddingResponse.FromString,
             options,
             channel_credentials,
             insecure,

@@ -65,9 +65,23 @@ class ChatSocketManager {
   }
 
   onMessage(handler: (message: Message) => void) {
-    this.socket?.on('message:sent', handler);
+    this.socket?.on('message:new', handler);
     return () => {
-      this.socket?.off('message:sent', handler);
+      this.socket?.off('message:new', handler);
+    };
+  }
+
+  onMessageUpdated(handler: (message: Message) => void) {
+    this.socket?.on('message:updated', handler);
+    return () => {
+      this.socket?.off('message:updated', handler);
+    };
+  }
+
+  onMessageDeleted(handler: (data: { messageId: string }) => void) {
+    this.socket?.on('message:deleted', handler);
+    return () => {
+      this.socket?.off('message:deleted', handler);
     };
   }
 

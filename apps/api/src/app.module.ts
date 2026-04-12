@@ -4,6 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { BearerAuthGuard } from './common/guards/bearer-auth.guard';
+import { RateLimitGuard } from './common/guards/rate-limit.guard';
 import { HealthController } from './health.controller';
 import { validateEnv } from './config/env';
 import { HealthService } from './health.service';
@@ -58,6 +59,10 @@ import { DocModule } from './modules/doc/doc.module';
     {
       provide: APP_GUARD,
       useClass: BearerAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RateLimitGuard,
     },
   ],
 })

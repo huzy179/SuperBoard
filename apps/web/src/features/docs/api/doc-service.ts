@@ -50,3 +50,11 @@ export async function getDocVersions(docId: string): Promise<DocVersion[]> {
 export async function restoreVersion(docId: string, versionId: string): Promise<Doc> {
   return apiPost<Doc>(`/docs/${docId}/restore/${versionId}`, {}, { auth: true });
 }
+
+export async function summarizeDoc(docId: string): Promise<{ summary: string }> {
+  return apiPost<{ summary: string }>(`/ai/docs/${docId}/summarize`, {}, { auth: true });
+}
+
+export async function processText(text: string, mode: string): Promise<{ result: string }> {
+  return apiPost<{ result: string }>('/ai/text/process', { text, mode }, { auth: true });
+}

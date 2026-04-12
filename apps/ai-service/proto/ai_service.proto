@@ -4,6 +4,28 @@ package ai;
 
 service AIService {
   rpc SummarizeTask (SummarizeRequest) returns (SummarizeResponse);
+  rpc GetEmbedding (EmbeddingRequest) returns (EmbeddingResponse);
+  rpc ProcessText (ProcessTextRequest) returns (TextResponse);
+  rpc SummarizeChat (SummarizeChatRequest) returns (TextResponse);
+}
+
+message MessageData {
+  string author = 1;
+  string content = 2;
+  string created_at = 3;
+}
+
+message SummarizeChatRequest {
+  repeated MessageData messages = 1;
+}
+
+message ProcessTextRequest {
+  string text = 1;
+  string mode = 2; // "improve", "shorten", "summarize"
+}
+
+message TextResponse {
+  string result = 1;
 }
 
 message SummarizeRequest {
@@ -13,4 +35,12 @@ message SummarizeRequest {
 
 message SummarizeResponse {
   string summary = 1;
+}
+
+message EmbeddingRequest {
+  string text = 1;
+}
+
+message EmbeddingResponse {
+  repeated float embedding = 1;
 }

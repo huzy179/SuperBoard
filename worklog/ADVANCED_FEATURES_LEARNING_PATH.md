@@ -107,5 +107,6 @@ Tai lieu nay tong hop cac tinh nang nang cao ban co the hoc va tu implement tron
 5. [DONE] Global Workflow Template Management.
 6. [DONE] Mention System & Notifications.
 7. [DONE] Advanced Task Reporting & Export.
+8. [DONE] Semantic Search with AI (Vector Search).
 
-Feature tiep theo nen lam: Bai tap 8 (Advanced Task Reporting & Export).
+Feature tiep theo nen lam: Bai tap 9 (Collaborative Real-time Editing for Docs).

@@ -16,6 +16,7 @@ import type { AuthUserDTO, WorkspaceMemberItemDTO } from '@superboard/shared';
 import { apiSuccess } from '../../common/api-response';
 import { parseBooleanQuery } from '../../common/helpers';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { RateLimit } from '../../common/decorators/rate-limit.decorator';
 import { WorkspaceService } from './workspace.service';
 
 @Controller('workspaces')
@@ -153,6 +154,7 @@ export class WorkspaceController {
     return apiSuccess({ updated: true });
   }
 
+  @RateLimit({ limit: 10, ttl: 60 })
   @Post(':workspaceId/members')
   async addWorkspaceMember(
     @CurrentUser() user: AuthUserDTO,
@@ -174,6 +176,7 @@ export class WorkspaceController {
     return apiSuccess({ added: true });
   }
 
+  @RateLimit({ limit: 10, ttl: 60 })
   @Post(':workspaceId/invitations')
   async createWorkspaceInvitation(
     @CurrentUser() user: AuthUserDTO,
@@ -196,6 +199,7 @@ export class WorkspaceController {
     return apiSuccess(invitation);
   }
 
+  @RateLimit({ limit: 3, ttl: 300 })
   @Post('invitations/:token/accept')
   @HttpCode(HttpStatus.OK)
   async acceptWorkspaceInvitation(@CurrentUser() user: AuthUserDTO, @Param('token') token: string) {

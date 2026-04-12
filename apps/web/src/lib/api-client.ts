@@ -84,11 +84,24 @@ export async function apiRequest<TData>(
   }
 
   if (!response.ok || !payload?.success || payload.data === undefined) {
-    throw new ApiClientError(
-      payload?.error?.message ?? 'Request failed',
-      response.status,
-      payload?.error?.code,
-    );
+    const errorMessage = payload?.error?.message ?? 'Request failed';
+    const errorStatus = response.status;
+    const errorCode = payload?.error?.code;
+
+    // Handle Rate Limiting globally for better UX
+    if (errorStatus === 429 && typeof window !== 'undefined') {
+      try {
+        const { toast } = await import('sonner');
+        toast.error(errorMessage, {
+          duration: 4000,
+          id: 'rate-limit-toast', // Prevent multiple identical toasts
+        });
+      } catch (e) {
+        // sonner not available or failed to load
+      }
+    }
+
+    throw new ApiClientError(errorMessage, errorStatus, errorCode);
   }
 
   return payload.data;

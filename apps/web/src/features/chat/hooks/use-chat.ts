@@ -6,8 +6,10 @@ import {
   getChannelMessages,
   sendMessage,
   joinChannel,
+  summarizeThread,
 } from '@/features/chat/api/chat-service';
 import { chatSocket } from '@/lib/realtime/chat-socket';
+import { apiGet } from '@/lib/api-client';
 import { toast } from 'sonner';
 
 export function useChannels(workspaceId: string | undefined) {
@@ -20,6 +22,7 @@ export function useChannels(workspaceId: string | undefined) {
 
 export function useMessages(channelId: string | undefined) {
   const [realtimeMessages, setRealtimeMessages] = useState<Message[]>([]);
+  const [typingUsers, setTypingUsers] = useState<Record<string, { userId: string; isTyping: boolean }>>({});
 
   const query = useInfiniteQuery({
     queryKey: ['messages', channelId],
@@ -35,25 +38,56 @@ export function useMessages(channelId: string | undefined) {
     chatSocket.connect();
     chatSocket.joinChannel(channelId);
 
-    const unsubscribe = chatSocket.onMessage((message: Message) => {
+    const unsubMsg = chatSocket.onMessage((message: Message) => {
       if (message.channelId === channelId) {
         setRealtimeMessages((prev) => [message, ...prev]);
       }
     });
 
+    const unsubUpdate = chatSocket.onMessageUpdated((message: Message) => {
+      if (message.channelId === channelId) {
+        setRealtimeMessages((prev) => prev.map((m) => (m.id === message.id ? message : m)));
+        // Also update react-query cache
+      }
+    });
+
+    const unsubDelete = chatSocket.onMessageDeleted(({ messageId }) => {
+      setRealtimeMessages((prev) => prev.filter((m) => m.id !== messageId));
+    });
+
+    const unsubTyping = chatSocket.onTyping((data) => {
+      if (data.channelId === channelId) {
+        setTypingUsers((prev) => ({
+          ...prev,
+          [data.userId]: { userId: data.userId, isTyping: data.isTyping },
+        }));
+      }
+    });
+
     return () => {
-      unsubscribe();
+      unsubMsg();
+      unsubUpdate();
+      unsubDelete();
+      unsubTyping();
       chatSocket.leaveChannel(channelId);
       setRealtimeMessages([]);
+      setTypingUsers({});
     };
   }, [channelId]);
 
   const allPagesMessages = query.data?.pages.flatMap((page) => page.items) || [];
-  const allMessages = [...realtimeMessages, ...allPagesMessages];
+  // Merge and deduplicate (realtime messages take precedence)
+  const allMessages = [...realtimeMessages];
+  allPagesMessages.forEach((m) => {
+    if (!allMessages.find((rm) => rm.id === m.id)) {
+      allMessages.push(m);
+    }
+  });
 
   return {
     ...query,
     messages: allMessages,
+    typingUsers: Object.values(typingUsers).filter((u) => u.isTyping),
     hasNextPage: query.hasNextPage,
     isFetchingNextPage: query.isFetchingNextPage,
     fetchNextPage: query.fetchNextPage,

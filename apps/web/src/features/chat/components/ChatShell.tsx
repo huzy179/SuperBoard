@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ChannelSidebar } from './ChannelSidebar';
 import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
+import { ThreadPanel } from './ThreadPanel';
 import { chatSocket } from '@/lib/realtime/chat-socket';
 import { Hash, Lock, Users, Settings, Search } from 'lucide-react';
-import type { Channel } from '@superboard/shared';
+import type { Channel, Message } from '@superboard/shared';
 
 interface ChatShellProps {
   channel: Channel;
@@ -14,6 +13,7 @@ interface ChatShellProps {
 
 export function ChatShell({ channel }: ChatShellProps) {
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const [activeThread, setActiveThread] = useState<Message | null>(null);
 
   useEffect(() => {
     const unsubscribe = chatSocket.onTyping((data) => {
@@ -36,7 +36,7 @@ export function ChatShell({ channel }: ChatShellProps) {
       <ChannelSidebar />
 
       <main className="flex-1 flex flex-col min-w-0 h-full relative border-l border-slate-100">
-        {/* Channel Header */}
+        {/* ... existing header ... */}
         <header className="flex h-14 shrink-0 items-center justify-between px-6 border-b border-slate-100 bg-white/50 backdrop-blur-sm sticky top-0 z-20">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 text-slate-400">
@@ -67,19 +67,27 @@ export function ChatShell({ channel }: ChatShellProps) {
           </div>
         </header>
 
-        {/* Messages and Input */}
-        <div className="flex-1 flex flex-col min-h-0 bg-white">
-          <MessageList channelId={channel.id} />
+        <div className="flex flex-1 min-h-0 overflow-hidden">
+          <div className="flex-1 flex flex-col min-h-0 bg-white">
+            <MessageList channelId={channel.id} onOpenThread={setActiveThread} />
 
-          <div className="px-6 py-1 h-5">
-            {typingUsers.length > 0 && (
-              <p className="text-[11px] text-slate-400 italic animate-pulse">
-                Ai đó đang soạn tin nhắn...
-              </p>
-            )}
+            <div className="px-6 py-1 h-5">
+              {typingUsers.length > 0 && (
+                <p className="text-[11px] text-slate-400 italic animate-pulse">
+                  Ai đó đang soạn tin nhắn...
+                </p>
+              )}
+            </div>
+
+            <MessageInput channelId={channel.id} />
           </div>
 
-          <MessageInput channelId={channel.id} />
+          {activeThread && (
+            <ThreadPanel
+              parentMessage={activeThread}
+              onClose={() => setActiveThread(null)}
+            />
+          )}
         </div>
       </main>
     </div>

@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { SearchResponseDTO, ProjectTaskItemDTO, ProjectItemDTO } from '@superboard/shared';
+import { AiService } from '../ai/ai.service';
 
 @Injectable()
 export class SearchService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private aiService: AiService,
+  ) {}
 
   private readonly taskSelect = {
     id: true,
@@ -45,15 +49,26 @@ export class SearchService {
       return { tasks: [], projects: [] };
     }
 
-    const [tasks, projects] = await Promise.all([
-      this.searchTasks(workspaceId, q),
+    const [traditionalTasks, semanticTasks, projects] = await Promise.all([
+      this.searchTasksTraditional(workspaceId, q),
+      this.searchTasksSemantic(workspaceId, q),
       this.searchProjects(workspaceId, q),
     ]);
+
+    // Combine and deduplicate tasks
+    const allTaskIds = new Set(traditionalTasks.map((t) => t.id));
+    const uniqueSemanticTasks = semanticTasks.filter((t) => !allTaskIds.has(t.id));
+
+    // Hybrid search: results from keyword search come first, then semantic matches
+    const tasks = [...traditionalTasks, ...uniqueSemanticTasks].slice(0, 15);
 
     return { tasks, projects };
   }
 
-  private async searchTasks(workspaceId: string, q: string): Promise<ProjectTaskItemDTO[]> {
+  private async searchTasksTraditional(
+    workspaceId: string,
+    q: string,
+  ): Promise<ProjectTaskItemDTO[]> {
     const isNumber = /^\d+$/.test(q);
     const taskNumber = isNumber ? parseInt(q, 10) : undefined;
 
@@ -73,6 +88,44 @@ export class SearchService {
     });
 
     return tasks.map((task) => this.toTaskDTO(task));
+  }
+
+  private async searchTasksSemantic(workspaceId: string, q: string): Promise<ProjectTaskItemDTO[]> {
+    try {
+      const embedding = await this.aiService.getEmbedding(q);
+      const vectorStr = `[${embedding.join(',')}]`;
+
+      // perform vector similarity search using raw SQL
+      // using <=> for cosine distance (smaller is more similar)
+      const tasks = await this.prisma.$queryRaw<RawTaskResult[]>`
+        SELECT t.id
+        FROM "Task" t
+        JOIN "TaskEmbedding" te ON t.id = te."taskId"
+        JOIN "Project" p ON t."projectId" = p.id
+        WHERE p."workspaceId" = ${workspaceId} 
+          AND t."deletedAt" IS NULL
+        ORDER BY te.vector <=> ${vectorStr}::vector
+        LIMIT 10;
+      `;
+
+      if (tasks.length === 0) return [];
+
+      const hydratedTasks = await this.prisma.task.findMany({
+        where: { id: { in: tasks.map((t) => t.id) } },
+        select: this.taskSelect,
+      });
+
+      // Maintain the order from the vector search
+      const taskMap = new Map(hydratedTasks.map((t) => [t.id, t]));
+      const orderedTasks = tasks
+        .map((t) => taskMap.get(t.id))
+        .filter((t): t is NonNullable<typeof t> => !!t);
+
+      return orderedTasks.map((task) => this.toTaskDTO(task));
+    } catch (error) {
+      console.error('Semantic search failed:', error);
+      return [];
+    }
   }
 
   private async searchProjects(workspaceId: string, q: string): Promise<ProjectItemDTO[]> {
@@ -118,61 +171,34 @@ export class SearchService {
     }));
   }
 
-  private toTaskDTO(task: {
-    id: string;
-    title: string;
-    description: string | null;
-    parentTaskId?: string | null;
-    status: string;
-    priority: string;
-    type?: string;
-    number?: number | null;
-    storyPoints?: number | null;
-    position?: string | null;
-    labels?: Array<{ label: { id: string; name: string; color: string } }>;
-    attachments?: Array<{
-      id: string;
-      name: string;
-      key: string;
-      url: string;
-      size: bigint;
-      mimeType: string;
-      createdAt: Date;
-    }>;
-    assigneeId: string | null;
-    assignee?: { fullName: string; avatarColor?: string | null } | null;
-    dueDate: Date | null;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt: Date | null;
-    projectId: string;
-  }): ProjectTaskItemDTO {
+  private toTaskDTO(task: any): ProjectTaskItemDTO {
+    const t = task as any; // Temporary cast to avoid massive interface definition for prisma select
     return {
-      id: task.id,
-      projectId: task.projectId,
-      title: task.title,
-      description: task.description,
-      parentTaskId: task.parentTaskId ?? null,
-      status: task.status as ProjectTaskItemDTO['status'],
-      priority: task.priority as ProjectTaskItemDTO['priority'],
-      type: (task.type ?? 'task') as ProjectTaskItemDTO['type'],
-      number: task.number ?? null,
-      storyPoints: task.storyPoints ?? null,
-      position: task.position ?? null,
-      labels: (task.labels ?? []).map((tl) => tl.label),
-      attachments: (task.attachments ?? []).map((a) => ({
+      id: t.id,
+      projectId: t.projectId,
+      title: t.title,
+      description: t.description,
+      parentTaskId: t.parentTaskId ?? null,
+      status: t.status as ProjectTaskItemDTO['status'],
+      priority: t.priority as ProjectTaskItemDTO['priority'],
+      type: (t.type ?? 'task') as ProjectTaskItemDTO['type'],
+      number: t.number ?? null,
+      storyPoints: t.storyPoints ?? null,
+      position: t.position ?? null,
+      labels: (t.labels ?? []).map((tl: { label: any }) => tl.label),
+      attachments: (t.attachments ?? []).map((a: any) => ({
         ...a,
         size: Number(a.size),
         createdAt: a.createdAt.toISOString(),
       })),
-      dueDate: task.dueDate ? task.dueDate.toISOString() : null,
-      assigneeId: task.assigneeId,
-      assigneeName: task.assignee?.fullName ?? null,
-      assigneeAvatarColor: task.assignee?.avatarColor ?? null,
+      dueDate: t.dueDate ? t.dueDate.toISOString() : null,
+      assigneeId: t.assigneeId,
+      assigneeName: t.assignee?.fullName ?? null,
+      assigneeAvatarColor: t.assignee?.avatarColor ?? null,
       subtaskProgress: null,
-      createdAt: task.createdAt.toISOString(),
-      updatedAt: task.updatedAt.toISOString(),
-      deletedAt: task.deletedAt ? task.deletedAt.toISOString() : null,
+      createdAt: t.createdAt.toISOString(),
+      updatedAt: t.updatedAt.toISOString(),
+      deletedAt: t.deletedAt ? t.deletedAt.toISOString() : null,
     };
   }
 }

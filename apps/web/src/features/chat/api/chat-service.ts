@@ -45,3 +45,7 @@ export async function sendMessage(
     { auth: true },
   );
 }
+
+export async function summarizeThread(messageId: string): Promise<{ summary: string }> {
+  return apiPost<{ summary: string }>(`/ai/messages/${messageId}/summarize`, {}, { auth: true });
+}

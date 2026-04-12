@@ -95,4 +95,23 @@ export class DocService {
       take: 20,
     });
   }
+
+  async getDocTextContent(docId: string): Promise<string> {
+    const doc = await this.getDocById(docId);
+    if (!doc.content) return '';
+
+    return this.extractTextFromJSON(doc.content);
+  }
+
+  private extractTextFromJSON(node: any): string {
+    if (!node) return '';
+    if (node.type === 'text') return node.text || '';
+    if (Array.isArray(node.content)) {
+      return node.content.map((child: any) => this.extractTextFromJSON(child)).join(' ');
+    }
+    if (node.content) {
+      return this.extractTextFromJSON(node.content);
+    }
+    return '';
+  }
 }

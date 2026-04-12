@@ -9,6 +9,7 @@ import type {
 import { apiSuccess } from '../../common/api-response';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
+import { RateLimit } from '../../common/decorators/rate-limit.decorator';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -16,6 +17,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
+  @RateLimit({ limit: 5, ttl: 60 })
   @Post('login')
   async login(@Body() body: Partial<LoginRequestDTO>): Promise<AuthResponseDTO> {
     const email = body.email?.trim();

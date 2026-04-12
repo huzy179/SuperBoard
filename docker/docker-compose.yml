@@ -5,7 +5,7 @@
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:16-pg16
     container_name: superboard-postgres
     ports:
       - '5433:5432'
@@ -47,6 +47,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      - superboard
+
+  collab-service:
+    build:
+      context: ..
+      dockerfile: ./docker/collab.Dockerfile
+    container_name: superboard-collab
+    ports:
+      - '1234:1234'
+    environment:
+      - DATABASE_URL=postgresql://dev:devpassword@postgres:5432/superboard?schema=public
+      - JWT_SECRET=superboard-secure-secret-2024
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - superboard
 

@@ -113,3 +113,35 @@ textarea {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Collaboration Cursors */
+.collaboration-cursor__caret {
+  position: relative;
+  display: inline-block;
+  margin-left: -1px;
+  margin-right: -1px;
+  border-left: 2px solid;
+  border-right: 2px solid;
+  border-color: var(--cursor-color, #6366f1);
+  height: 1.25rem;
+  word-break: normal;
+  pointer-events: none;
+}
+
+.collaboration-cursor__label {
+  position: absolute;
+  top: -1.25rem;
+  left: -2px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: normal;
+  user-select: none;
+  color: #fff;
+  background-color: var(--cursor-color, #6366f1);
+  padding: 1px 4px;
+  border-radius: 4px 4px 4px 0;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 50;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}

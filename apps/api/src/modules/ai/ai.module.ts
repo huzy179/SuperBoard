@@ -4,10 +4,14 @@ import { join } from 'path';
 import { AiController } from './ai.controller';
 import { AiService } from './ai.service';
 import { TaskModule } from '../task/task.module';
+import { DocModule } from '../doc/doc.module';
+import { ChatModule } from '../chat/chat.module';
 
 @Module({
   imports: [
     TaskModule,
+    DocModule,
+    ChatModule,
     ClientsModule.register([
       {
         name: 'AI_PACKAGE',

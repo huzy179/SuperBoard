@@ -1,9 +1,13 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useDoc } from '@/features/docs/hooks/use-doc';
+import { useDoc, useSummarizeDoc } from '@/features/docs/hooks/use-doc';
+import { useAuthSession } from '@/features/auth/hooks/use-auth-session';
 import { RichTextEditor } from '@/features/docs/components/RichTextEditor';
+import { DocTOC } from '@/features/docs/components/DocTOC';
+import { DocVersionSidebar } from '@/features/docs/components/DocVersionSidebar';
 import { AssigneeAvatar } from '@/features/jira/components/task-badges';
+import { useState } from 'react';
 import {
   Cloud,
   Settings,
@@ -12,11 +16,17 @@ import {
   MoreVertical,
   CheckCircle2,
   Loader2,
+  Sparkles,
+  X,
 } from 'lucide-react';
 import { SectionError } from '@/components/ui/page-states';
+import { toast } from 'sonner';
 
 export default function DocDetailPage() {
   const params = useParams<{ docId: string }>();
+  const [showVersions, setShowVersions] = useState(false);
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const { user } = useAuthSession();
   const {
     data: doc,
     isLoading,
@@ -29,6 +39,18 @@ export default function DocDetailPage() {
     isSaving,
     refetch,
   } = useDoc(params.docId);
+
+  const summarizeMutation = useSummarizeDoc();
+
+  const handleSummarize = async () => {
+    try {
+      const result = await summarizeMutation.mutateAsync(params.docId);
+      setAiSummary(result.summary);
+      toast.success('Đã tạo tóm tắt tài liệu!');
+    } catch (err) {
+      console.error('Failed to summarize doc:', err);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -80,12 +102,29 @@ export default function DocDetailPage() {
         </div>
 
         <div className="flex items-center gap-4 text-slate-400">
+          <button
+            onClick={handleSummarize}
+            disabled={summarizeMutation.isPending}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-all font-bold text-[12px] group disabled:opacity-50"
+          >
+            {summarizeMutation.isPending ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Sparkles size={14} className="group-hover:rotate-12 transition-transform" />
+            )}
+            <span>{summarizeMutation.isPending ? 'Đang tóm tắt...' : 'AI Summary'}</span>
+          </button>
+          <div className="w-px h-4 bg-slate-200" />
           <button className="flex items-center gap-1.5 px-2 py-1 rounded hover:bg-slate-100 transition-colors text-[12px] font-bold">
             <UserPlus size={14} />
             <span>Chia sẻ</span>
           </button>
           <div className="w-px h-4 bg-slate-200" />
-          <button className="p-1 hover:text-slate-600 transition-colors" title="Lịch sử phiên bản">
+          <button
+            onClick={() => setShowVersions(!showVersions)}
+            className={`p-1 transition-colors ${showVersions ? 'text-brand-600 bg-brand-50 rounded' : 'hover:text-slate-600'}`}
+            title="Lịch sử phiên bản"
+          >
             <History size={18} />
           </button>
           <button className="p-1 hover:text-slate-600 transition-colors">
@@ -97,37 +136,95 @@ export default function DocDetailPage() {
         </div>
       </header>
 
-      {/* Main Editor Surface */}
-      <div className="flex-1 overflow-y-auto px-6 py-12 scroll-smooth">
-        <div className="max-w-4xl mx-auto animate-in slide-in-from-bottom-4 duration-1000">
-          {/* Title Editor */}
-          <input
-            type="text"
-            value={localTitle}
-            onChange={(e) => setLocalTitle(e.target.value)}
-            placeholder="Tiêu đề tài liệu..."
-            className="w-full mb-8 text-4xl font-extrabold text-slate-900 border-none focus:outline-none placeholder:text-slate-200 transition-all font-display"
-          />
-
-          {/* Doc Metadata */}
-          <div className="flex items-center gap-4 mb-10 text-[13px] text-slate-400 font-medium">
-            <div className="flex items-center gap-2">
-              <AssigneeAvatar
-                name={doc?.creator?.fullName || 'Người dùng'}
-                src={doc?.creator?.avatarUrl}
-                size="sm"
-              />
-              <span>Tạo bởi {doc?.creator?.fullName}</span>
+      {/* AI Summary Card */}
+      {aiSummary && (
+        <div className="px-12 pt-6 max-w-4xl mx-auto w-full animate-in slide-in-from-top fade-in duration-500">
+          <div className="relative overflow-hidden rounded-2xl border border-indigo-100 bg-linear-to-br from-indigo-50/80 to-purple-50/80 p-6 shadow-xl shadow-indigo-500/5 backdrop-blur-md">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="bg-indigo-600 p-1.5 rounded-lg text-white shadow-lg shadow-indigo-200">
+                  <Sparkles size={14} />
+                </div>
+                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600">
+                  AI INSIGHTS & SUMMARY
+                </h3>
+              </div>
+              <button
+                onClick={() => setAiSummary(null)}
+                className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-white/50 rounded-full transition-all"
+              >
+                <X size={16} />
+              </button>
             </div>
-            <div className="w-1 h-1 rounded-full bg-slate-200" />
-            <span>Chỉnh sửa: {new Date(doc?.updatedAt || '').toLocaleString('vi-VN')}</span>
-          </div>
-
-          {/* TipTap Editor */}
-          <div className="min-h-[600px] pb-32">
-            <RichTextEditor content={localContent} onChange={setLocalContent} />
+            <p className="text-sm leading-relaxed text-slate-700 italic font-medium">
+              "{aiSummary}"
+            </p>
+            <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-indigo-500/10 blur-3xl" />
+            <div className="absolute -left-4 -bottom-4 h-24 w-24 rounded-full bg-purple-500/10 blur-3xl" />
           </div>
         </div>
+      )}
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Main Editor Surface */}
+        <div className="flex-1 overflow-y-auto px-6 py-12 scroll-smooth">
+          <div className="max-w-4xl mx-auto animate-in slide-in-from-bottom-4 duration-1000">
+            {/* ... title and metadata ... */}
+            <input
+              type="text"
+              value={localTitle}
+              onChange={(e) => setLocalTitle(e.target.value)}
+              placeholder="Tiêu đề tài liệu..."
+              className="w-full mb-8 text-4xl font-extrabold text-slate-900 border-none focus:outline-none placeholder:text-slate-200 transition-all font-display"
+            />
+
+            <div className="flex items-center gap-4 mb-10 text-[13px] text-slate-400 font-medium">
+              <div className="flex items-center gap-2">
+                <AssigneeAvatar
+                  name={doc?.creator?.fullName || 'Người dùng'}
+                  src={doc?.creator?.avatarUrl}
+                  size="sm"
+                />
+                <span>Tạo bởi {doc?.creator?.fullName}</span>
+              </div>
+              <div className="w-1 h-1 rounded-full bg-slate-200" />
+              <span>Chỉnh sửa: {new Date(doc?.updatedAt || '').toLocaleString('vi-VN')}</span>
+            </div>
+
+            <div className="min-h-[600px] pb-32">
+              <RichTextEditor
+                docId={params.docId}
+                content={localContent}
+                onChange={setLocalContent}
+                user={
+                  user
+                    ? {
+                        id: user.id,
+                        fullName: user.fullName,
+                        avatarColor: user.avatarColor,
+                      }
+                    : undefined
+                }
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Table of Contents */}
+        {!showVersions && <DocTOC content={localContent} />}
+
+        {/* Version Sidebar */}
+        {showVersions && (
+          <DocVersionSidebar
+            docId={params.docId}
+            onClose={() => setShowVersions(false)}
+            onRestore={(content) => {
+              setLocalContent(content);
+              toast.success('Đã khôi phục phiên bản cũ. Hệ thống sẽ tự động lưu sau vài giây.');
+            }}
+          />
+        )}
       </div>
     </div>
   );

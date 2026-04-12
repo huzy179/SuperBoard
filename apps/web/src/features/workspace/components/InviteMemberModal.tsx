@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { Mail, Shield, User, Copy, Check, X, Loader2, Info } from 'lucide-react';
 import { useCreateInvitation } from '@/features/workspace/hooks';
+import { toast } from 'sonner';
 
 interface InviteMemberModalProps {
   workspaceId: string;
@@ -13,6 +15,8 @@ export function InviteMemberModal({ workspaceId, onClose }: InviteMemberModalPro
   const [role, setRole] = useState('member');
   const [error, setError] = useState<string | null>(null);
   const [successToken, setSuccessToken] = useState<string | null>(null);
+  const [isCopied, setIsCopied] = useState(false);
+
   const createInvitation = useCreateInvitation(workspaceId);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -23,164 +27,173 @@ export function InviteMemberModal({ workspaceId, onClose }: InviteMemberModalPro
     }
 
     setError(null);
-
     const trimmedEmail = email.trim();
     if (!trimmedEmail) {
-      setError('Vui lòng nhập email');
+      setError('Vui lòng nhập địa chỉ email người nhận.');
       return;
     }
 
     try {
       const result = await createInvitation.mutateAsync({ email: trimmedEmail, role });
       setSuccessToken(result.token);
+      toast.success('Đã tạo liên kết mời thành công!');
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Có lỗi xảy ra khi gửi lời mời';
-      setError(errorMessage);
+      setError((err as Error).message || 'Có lỗi xảy ra khi tạo lời mời.');
     }
   }
 
-  const invitationUrl = successToken ? `${window.location.origin}/invitation/${successToken}` : '';
+  const invitationUrl = successToken ? `${window.location.origin}/invite/${successToken}` : '';
 
   function handleCopyLink() {
     void navigator.clipboard.writeText(invitationUrl);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+    toast.success('Đã sao chép liên kết!');
   }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md animate-in fade-in duration-300"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-md rounded-xl border border-surface-border bg-surface-card shadow-2xl animate-in fade-in zoom-in duration-200">
-        <div className="flex items-center justify-between border-b border-surface-border px-6 py-4">
-          <h3 className="text-lg font-semibold text-slate-900">
-            {successToken ? 'Đã tạo lời mời' : 'Mời thành viên mới'}
-          </h3>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-          >
-            ✕
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6">
-          {!successToken ? (
-            <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="email"
-                  className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500"
-                >
-                  Email người nhận
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="nhap.email@vidu.com"
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-                  autoFocus
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="role"
-                  className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500"
-                >
-                  Vai trò mặc định
-                </label>
-                <select
-                  id="role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
-                >
-                  <option value="member">Thành viên (Member)</option>
-                  <option value="admin">Quản trị viên (Admin)</option>
-                  <option value="viewer">Người xem (Viewer)</option>
-                </select>
-                <div className="mt-2 rounded-lg bg-slate-50 p-2 text-[11px] leading-relaxed text-slate-500">
-                  {role === 'admin' ? (
-                    <p>
-                      ✨ <b>Admin:</b> Có toàn quyền quản lý công việc và các thành viên khác trong
-                      workspace.
-                    </p>
-                  ) : role === 'viewer' ? (
-                    <p>
-                      👁 <b>Viewer:</b> Chỉ có quyền xem thông tin, không thể thay đổi dữ liệu.
-                    </p>
-                  ) : (
-                    <p>
-                      👥 <b>Member:</b> Có quyền tạo, cập nhật công việc và tương tác cơ bản.
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {error && (
-                <div className="flex gap-2 rounded-lg bg-red-50 p-3 text-xs font-medium text-red-600">
-                  <span>⚠️</span>
-                  <p>{error}</p>
-                </div>
-              )}
+      <div className="w-full max-w-lg glass-panel p-1 rounded-[2.5rem] shadow-2xl animate-in zoom-in-95 duration-300">
+        <div className="bg-white rounded-[2.2rem] overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between px-8 py-6 border-b border-slate-50">
+            <div>
+              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                {successToken ? 'Lời mời sẵn sàng' : 'Mời đồng đội mới'}
+              </h3>
+              <p className="text-xs text-slate-500 font-medium tracking-tight">
+                Cộng tác cùng nhau để hoàn thành dự án nhanh hơn.
+              </p>
             </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex flex-col items-center justify-center py-2 text-center">
-                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-2xl text-emerald-600">
-                  ✓
-                </div>
-                <p className="text-sm font-medium text-slate-900">Lời mời đã sẵn sàng!</p>
-                <p className="mt-1 text-xs text-slate-500">
-                  Hãy gửi link bên dưới cho <b>{email}</b>
-                </p>
-              </div>
-
-              <div className="relative">
-                <input
-                  readOnly
-                  value={invitationUrl}
-                  className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-3 pr-20 text-xs text-slate-600"
-                />
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="absolute right-1 top-1 rounded-md bg-white px-2.5 py-1.5 text-[11px] font-bold text-brand-600 shadow-xs border border-slate-200 hover:bg-brand-50 active:scale-95 transition-all"
-                >
-                  SAO CHÉP
-                </button>
-              </div>
-
-              <div className="rounded-lg border border-amber-100 bg-amber-50 p-3 text-[11px] text-amber-800 leading-relaxed">
-                📢 <b>Lưu ý:</b> Vì hệ thống demo chưa tích hợp Mail Server, vui lòng copy link trên
-                và gửi trực tiếp cho người nhận.
-              </div>
-            </div>
-          )}
-
-          <div className="mt-8 flex justify-end gap-3">
             <button
-              type="button"
               onClick={onClose}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+              className="w-10 h-10 flex items-center justify-center rounded-2xl text-slate-400 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-90"
             >
-              {successToken ? 'Đóng' : 'Hủy'}
-            </button>
-            <button
-              type="submit"
-              disabled={createInvitation.isPending}
-              className="rounded-lg bg-brand-600 px-5 py-2 text-sm font-bold text-white shadow-md shadow-brand-200 hover:bg-brand-700 active:scale-95 disabled:opacity-50 transition-all"
-            >
-              {createInvitation.isPending
-                ? 'Đang tạo...'
-                : successToken
-                  ? 'Hoàn tất'
-                  : 'Tạo lời mời'}
+              <X size={20} />
             </button>
           </div>
-        </form>
+
+          <form onSubmit={handleSubmit} className="p-8 space-y-8">
+            {!successToken ? (
+              <div className="space-y-6">
+                {/* Email Section */}
+                <div className="space-y-3">
+                  <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    <Mail size={12} />
+                    Địa chỉ Email
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="dong-doi@cong-ty.com"
+                    className="w-full h-14 px-5 rounded-2xl border border-slate-200 bg-slate-50/50 text-sm font-medium focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all outline-none"
+                    autoFocus
+                  />
+                </div>
+
+                {/* Role Section */}
+                <div className="space-y-3">
+                  <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    <Shield size={12} />
+                    Vai trò trong Workspace
+                  </label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { id: 'member', label: 'Member', icon: <User size={14} /> },
+                      { id: 'admin', label: 'Admin', icon: <Shield size={14} /> },
+                      { id: 'viewer', label: 'Viewer', icon: <Info size={14} /> },
+                    ].map((r) => (
+                      <button
+                        key={r.id}
+                        type="button"
+                        onClick={() => setRole(r.id)}
+                        className={`flex flex-col items-center justify-center gap-2 h-20 rounded-2xl border-2 transition-all font-bold text-xs ${role === r.id ? 'border-brand-600 bg-brand-50 text-brand-700 shadow-sm' : 'border-slate-100 bg-white text-slate-400 hover:border-slate-200'}`}
+                      >
+                        {r.icon}
+                        <span>{r.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-xs font-bold text-rose-600 animate-in shake duration-300">
+                    <X size={16} />
+                    <p>{error}</p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-8 animate-in fade-in duration-500">
+                <div className="text-center space-y-2">
+                  <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-[1.5rem] flex items-center justify-center mx-auto mb-4">
+                    <Check size={32} />
+                  </div>
+                  <h4 className="text-lg font-black text-slate-900 uppercase tracking-tight">
+                    Liên kết đã được tạo!
+                  </h4>
+                  <p className="text-sm text-slate-500 font-medium">
+                    Bạn có thể gửi liên kết này trực tiếp cho đồng nghiệp.
+                  </p>
+                </div>
+
+                <div className="relative group">
+                  <input
+                    readOnly
+                    value={invitationUrl}
+                    className="w-full h-14 pl-5 pr-32 rounded-2xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-600 outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    className={`absolute right-2 top-2 h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 ${isCopied ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-white hover:bg-black'}`}
+                  >
+                    {isCopied ? <Check size={14} /> : <Copy size={14} />}
+                    <span>{isCopied ? 'Đã chép' : 'Sao chép'}</span>
+                  </button>
+                </div>
+
+                <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl flex gap-3 text-[11px] font-medium text-amber-800 leading-relaxed">
+                  <Info size={16} className="shrink-0" />
+                  <p>
+                    <b>Lưu ý Demo:</b> Hệ thống chưa tích hợp Mail Server tự động. Hãy copy liên kết
+                    trên và gửi qua các kênh chat cho đồng nghiệp của bạn.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex items-center gap-3 pt-4 border-t border-slate-50">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 h-14 rounded-2xl text-sm font-black text-slate-400 hover:bg-slate-50 hover:text-slate-900 transition-all uppercase tracking-tight"
+              >
+                {successToken ? 'Đóng' : 'Để sau'}
+              </button>
+              {!successToken && (
+                <button
+                  type="submit"
+                  disabled={createInvitation.isPending}
+                  className="flex-[2] h-14 bg-slate-900 hover:bg-black text-white rounded-2xl font-black shadow-xl shadow-slate-900/10 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2 uppercase tracking-tight"
+                >
+                  {createInvitation.isPending ? (
+                    <Loader2 className="animate-spin" size={20} />
+                  ) : (
+                    <>
+                      <span>Gửi lời mời</span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

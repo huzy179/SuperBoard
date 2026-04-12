@@ -33,9 +33,8 @@ export class MentionService {
       where: {
         username: { in: usernames },
         memberships: {
-          some: { workspaceId, deletedAt: null },
+          some: { workspaceId },
         },
-        deletedAt: null,
       },
       select: {
         id: true,

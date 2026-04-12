@@ -173,6 +173,7 @@ model Project {
   workflowRules WorkflowRule[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  embedding   ProjectEmbedding?
 
   @@unique([workspaceId, key])
   @@index([workspaceId, deletedAt])
@@ -215,6 +216,13 @@ model Task {
 model TaskEmbedding {
   taskId    String                      @id
   task      Task                        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  vector    Unsupported("vector(768)")
+  updatedAt DateTime                    @updatedAt
+}
+
+model ProjectEmbedding {
+  projectId String                      @id
+  project   Project                     @relation(fields: [projectId], references: [id], onDelete: Cascade)
   vector    Unsupported("vector(768)")
   updatedAt DateTime                    @updatedAt
 }
@@ -520,6 +528,7 @@ model Doc {
   children     Doc[]        @relation("DocTree")
   creator      User         @relation("DocCreator", fields: [createdById], references: [id], onDelete: Cascade)
   versions     DocVersion[]
+  embedding    DocEmbedding?
 
   @@index([workspaceId])
   @@index([parentDocId])
@@ -533,6 +542,13 @@ model DocVersion {
   doc       Doc      @relation(fields: [docId], references: [id], onDelete: Cascade)
 
   @@index([docId, savedAt])
+}
+
+model DocEmbedding {
+  docId     String                      @id
+  doc       Doc                         @relation(fields: [docId], references: [id], onDelete: Cascade)
+  vector    Unsupported("vector(768)")
+  updatedAt DateTime                    @updatedAt
 }
 
 enum ChannelType {

@@ -2,21 +2,38 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import {
+  BarChart3,
+  Activity,
+  Clock,
+  Users,
+  Folders,
+  AlertCircle,
+  Zap,
+  Search,
+  RefreshCcw,
+  LayoutDashboard,
+  BrainCircuit,
+  ShieldCheck,
+  ChevronRight,
+  TrendingUp,
+  Cpu,
+} from 'lucide-react';
 import { FullPageError } from '@/components/ui/page-states';
 import { AssigneeAvatar } from '@/features/jira/components/task-badges';
 import { useDashboardStats } from '@/features/dashboard/hooks';
-import { EVENT_ICONS, EVENT_LABELS, PRIORITY_LABELS, STATUS_LABELS } from '@/lib/constants/task';
+import { EVENT_ICONS, EVENT_LABELS, STATUS_LABELS } from '@/lib/constants/task';
 import { formatRelativeTime } from '@/lib/format-date';
 import type { DashboardStatsDTO } from '@superboard/shared';
 
 const CHART_COLOR_CLASSES = [
-  'text-brand-600',
-  'text-blue-500',
-  'text-amber-500',
+  'text-brand-500',
+  'text-indigo-500',
   'text-emerald-500',
-  'text-violet-500',
   'text-rose-500',
-  'text-slate-500',
+  'text-amber-500',
+  'text-sky-500',
+  'text-violet-500',
 ];
 
 const EMPTY_DASHBOARD_STATS: DashboardStatsDTO = {
@@ -35,13 +52,6 @@ export default function DashboardPage() {
   const [activitySearchQuery, setActivitySearchQuery] = useState('');
   const safeStats = stats ?? EMPTY_DASHBOARD_STATS;
 
-  const taskTypeLabelMap: Record<string, string> = {
-    task: 'Task',
-    bug: 'Bug',
-    story: 'Story',
-    epic: 'Epic',
-  };
-
   const totalTasks = safeStats.tasksByStatus.reduce((sum, item) => sum + item.count, 0);
   const doneTasks = safeStats.tasksByStatus.find((item) => item.status === 'done')?.count ?? 0;
   const inProgressTasks =
@@ -51,26 +61,10 @@ export default function DashboardPage() {
 
   const completionRatio = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
   const overdueRatio = totalTasks > 0 ? Math.round((safeStats.overdueTasks / totalTasks) * 100) : 0;
-  const totalPriorityTasks = safeStats.tasksByPriority.reduce((sum, item) => sum + item.count, 0);
-  const totalTypeTasks = safeStats.tasksByType.reduce((sum, item) => sum + item.count, 0);
 
   const statusChartData = safeStats.tasksByStatus.map((item, index) => ({
     key: item.status,
-    label: STATUS_LABELS[item.status] ?? item.status,
-    value: item.count,
-    colorClass: CHART_COLOR_CLASSES[index % CHART_COLOR_CLASSES.length] ?? 'text-slate-500',
-  }));
-
-  const priorityChartData = safeStats.tasksByPriority.map((item, index) => ({
-    key: item.priority,
-    label: PRIORITY_LABELS[item.priority] ?? item.priority,
-    value: item.count,
-    colorClass: CHART_COLOR_CLASSES[index % CHART_COLOR_CLASSES.length] ?? 'text-slate-500',
-  }));
-
-  const typeChartData = safeStats.tasksByType.map((item, index) => ({
-    key: item.type,
-    label: taskTypeLabelMap[item.type] ?? item.type,
+    label: (STATUS_LABELS[item.status] ?? item.status).toUpperCase(),
     value: item.count,
     colorClass: CHART_COLOR_CLASSES[index % CHART_COLOR_CLASSES.length] ?? 'text-slate-500',
   }));
@@ -87,13 +81,8 @@ export default function DashboardPage() {
         };
       })
       .filter((project) => project.total > 0 && project.remainingTasks > 0)
-      .sort((a, b) => {
-        if (a.completionRate === b.completionRate) {
-          return b.remainingTasks - a.remainingTasks;
-        }
-        return a.completionRate - b.completionRate;
-      })
-      .slice(0, 5);
+      .sort((a, b) => b.remainingTasks - a.remainingTasks)
+      .slice(0, 4);
   }, [safeStats.tasksByProject]);
 
   const activityTypeOptions = useMemo(() => {
@@ -103,20 +92,12 @@ export default function DashboardPage() {
 
   const filteredRecentActivity = useMemo(() => {
     const normalizedQuery = activitySearchQuery.trim().toLowerCase();
-
     return safeStats.recentActivity.filter((event) => {
-      if (activityTypeFilter !== 'all' && event.type !== activityTypeFilter) {
-        return false;
-      }
-
-      if (!normalizedQuery) {
-        return true;
-      }
-
-      const actorName = event.actorName?.toLowerCase() ?? '';
+      if (activityTypeFilter !== 'all' && event.type !== activityTypeFilter) return false;
+      if (!normalizedQuery) return true;
       return (
         event.taskTitle.toLowerCase().includes(normalizedQuery) ||
-        actorName.includes(normalizedQuery)
+        (event.actorName?.toLowerCase() ?? '').includes(normalizedQuery)
       );
     });
   }, [activitySearchQuery, activityTypeFilter, safeStats.recentActivity]);
@@ -126,470 +107,415 @@ export default function DashboardPage() {
   if (isError || !stats) {
     return (
       <FullPageError
-        title="Không thể tải dashboard"
-        message={error?.message ?? 'Lỗi không xác định'}
-        actionLabel="Thử lại"
+        title="DASHBOARD_SYSCALL_FAILED"
+        message={error?.message ?? 'KERNEL_PANIC: UNEXPECTED_DASHBOARD_STATE'}
+        actionLabel="RETRY_SYSCALL"
         onAction={() => window.location.reload()}
       />
     );
   }
 
   return (
-    <section className="animate-fade-in space-y-8 grain-overlay">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-black tracking-tight text-luxe-gradient">Dashboard</h1>
-        <div className="flex gap-2">
-          <div className="px-4 py-1 bg-white/50 backdrop-blur rounded-full border border-slate-200 text-[11px] font-black uppercase tracking-widest text-slate-500">
-            Live Updates
+    <div className="space-y-10 animate-in fade-in duration-700">
+      {/* Strategic Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-brand-500/10 rounded-xl border border-brand-500/20 shadow-glow-brand/10">
+              <LayoutDashboard className="h-5 w-5 text-brand-400" />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
+              Operational Sector
+            </span>
           </div>
+          <h1 className="text-4xl font-black tracking-tight text-white uppercase leading-none">
+            Strategic <span className="text-brand-500">Command</span>
+          </h1>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col items-end">
+            <span className="text-[9px] font-black uppercase tracking-widest text-white/20">
+              System Status
+            </span>
+            <div className="flex items-center gap-2">
+              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shadow-glow-emerald" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                Sync_Active
+              </span>
+            </div>
+          </div>
+          <div className="h-10 w-px bg-white/10 hidden md:block" />
+          <button
+            onClick={() => window.location.reload()}
+            className="p-3 bg-white/[0.03] border border-white/10 rounded-2xl text-white/40 hover:text-white hover:border-white/20 hover:bg-white/[0.05] transition-all group"
+          >
+            <RefreshCcw className="h-5 w-5 group-hover:rotate-180 transition-transform duration-700" />
+          </button>
         </div>
       </div>
 
+      {/* Operational Metric Nodes */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Tổng tasks"
+          label="Total Protocols"
           value={totalTasks}
-          color="from-indigo-500/10 via-brand-500/5 to-transparent"
-          icon="📋"
+          icon={<Folders className="h-5 w-5" />}
+          color="brand"
+          trend={`${completionRatio}% Done`}
           delay={0}
         />
         <StatCard
-          label="Hoàn thành"
+          label="Synchronized"
           value={doneTasks}
-          color="from-emerald-500/10 via-emerald-500/5 to-transparent"
-          icon="✅"
+          icon={<ShieldCheck className="h-5 w-5" />}
+          color="emerald"
+          trend="Success State"
           delay={1}
         />
         <StatCard
-          label="Đang làm"
+          label="Active Processing"
           value={inProgressTasks}
-          color="from-blue-500/10 via-blue-500/5 to-transparent"
-          icon="🔧"
+          icon={<Zap className="h-5 w-5" />}
+          color="blue"
+          trend="Live Ops"
           delay={2}
         />
         <StatCard
-          label="Quá hạn"
+          label="Stalled Units"
           value={safeStats.overdueTasks}
-          color="from-rose-500/10 via-rose-500/5 to-transparent"
-          icon="⏰"
+          icon={<AlertCircle className="h-5 w-5" />}
+          color="rose"
+          trend={`${overdueRatio}% Critical`}
           delay={3}
         />
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        <div className="premium-card p-6 bg-white/40 backdrop-blur-xl relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/5 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-brand-500/10 transition-colors" />
-          <h2 className="mb-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
-            Tasks theo trạng thái
-          </h2>
-          <DonutDistributionChart
-            items={statusChartData}
-            emptyMessage="Chưa có dữ liệu trạng thái"
-          />
-        </div>
-
-        <div className="premium-card p-6 bg-white/40 backdrop-blur-xl">
-          <h2 className="mb-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
-            Tasks theo dự án
-          </h2>
-          <div className="space-y-3">
-            {safeStats.tasksByProject.map((project) => (
-              <div key={project.projectId}>
-                <div className="mb-1 flex items-center justify-between text-xs">
-                  <Link
-                    href={`/jira/projects/${project.projectId}`}
-                    className="font-medium text-brand-700 hover:underline"
-                  >
-                    {project.projectKey ? `[${project.projectKey}] ` : ''}
-                    {project.projectName}
-                  </Link>
-                  <span className="text-slate-600">
-                    {project.done}/{project.total}
-                  </span>
-                </div>
-                <div className="h-2 rounded-full bg-slate-100">
-                  <div
-                    className="h-2 rounded-full bg-emerald-500 transition-all duration-500"
-                    style={{
-                      width: project.total > 0 ? `${(project.done / project.total) * 100}%` : '0%',
-                    }}
-                  />
-                </div>
+      <div className="grid gap-8 lg:grid-cols-12">
+        {/* Distribution Matrix */}
+        <div className="lg:col-span-8 space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Status Distribution */}
+            <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.01] p-8 backdrop-blur-3xl relative overflow-hidden group">
+              <div className="absolute inset-0 bg-brand-500/[0.01] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              <div className="flex items-center gap-3 mb-8">
+                <BrainCircuit className="h-4 w-4 text-brand-400" />
+                <h2 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
+                  State Matrix Distribution
+                </h2>
               </div>
-            ))}
-          </div>
-        </div>
+              <DonutDistributionChart
+                items={statusChartData}
+                total={totalTasks}
+                emptyMessage="EMPTY_DATA_SET"
+              />
+            </div>
 
-        <div className="premium-card p-6 bg-amber-50/20 backdrop-blur-md relative overflow-hidden group border-amber-100/30">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="mb-6 flex items-center justify-between relative z-10">
-            <h2 className="text-[11px] font-black text-amber-600 uppercase tracking-[0.2em]">
-              Dự án cần chú ý
-            </h2>
-            <span className="rounded-full bg-amber-100 px-3 py-1 text-[10px] font-black text-amber-700 border border-amber-200/50">
-              URGENT
-            </span>
-          </div>
+            {/* Completion Intelligence */}
+            <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.01] p-8 backdrop-blur-3xl space-y-10">
+              <div className="flex items-center gap-3">
+                <TrendingUp className="h-4 w-4 text-emerald-400" />
+                <h2 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
+                  Objective Efficiency
+                </h2>
+              </div>
 
-          {projectsNeedingAttention.length === 0 ? (
-            <p className="text-xs text-slate-500">Mọi dự án đang ổn, chưa có project cần ưu tiên</p>
-          ) : (
-            <div className="space-y-3">
-              {projectsNeedingAttention.map((project) => (
-                <div
-                  key={project.projectId}
-                  className="rounded-lg border border-amber-100 bg-white p-3"
-                >
-                  <div className="mb-1 flex items-center justify-between text-xs">
-                    <Link
-                      href={`/jira/projects/${project.projectId}`}
-                      className="font-medium text-amber-700 hover:underline"
-                    >
-                      {project.projectKey ? `[${project.projectKey}] ` : ''}
-                      {project.projectName}
-                    </Link>
-                    <span className="font-semibold text-slate-700">
-                      Còn {project.remainingTasks}/{project.total}
+              <div className="space-y-8">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-end px-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/40">
+                      Sync Completion
                     </span>
+                    <span className="text-2xl font-black text-emerald-400">{completionRatio}%</span>
                   </div>
-
-                  <div className="h-2 rounded-full bg-amber-100">
+                  <div className="h-3 w-full bg-slate-950 rounded-full border border-white/5 p-0.5 shadow-inner">
                     <div
-                      className="h-2 rounded-full bg-amber-500 transition-all duration-500"
-                      style={{ width: `${project.completionRate * 100}%` }}
+                      className="h-full bg-gradient-to-r from-brand-500 to-emerald-500 rounded-full shadow-glow-emerald/30 transition-all duration-1000"
+                      style={{ width: `${completionRatio}%` }}
                     />
                   </div>
-
-                  <p className="mt-1 text-[11px] text-slate-500">
-                    Hoàn thành {Math.round(project.completionRate * 100)}%
-                  </p>
-
-                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                    <Link
-                      href={`/jira/projects/${project.projectId}?view=list&statuses=todo,in_progress`}
-                      className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] font-medium text-amber-700 hover:bg-amber-100"
-                    >
-                      Xem task chưa xong
-                    </Link>
-                    <Link
-                      href={`/jira/projects/${project.projectId}?view=board`}
-                      className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
-                    >
-                      Mở board
-                    </Link>
-                  </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
 
-        <div className="premium-card p-6 bg-white/40 backdrop-blur-xl">
-          <h2 className="mb-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
-            Workload theo thành viên
-          </h2>
-          {safeStats.tasksByAssignee.length === 0 ? (
-            <p className="text-xs text-slate-500">Chưa có task được gán</p>
-          ) : (
-            <div className="space-y-3">
-              {safeStats.tasksByAssignee.map((item) => (
-                <div key={item.assigneeId} className="flex items-center gap-2">
-                  <AssigneeAvatar name={item.assigneeName} color={item.avatarColor} />
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-0.5 flex items-center justify-between text-xs">
-                      <span className="truncate text-slate-700">{item.assigneeName}</span>
-                      <span className="font-semibold text-slate-900">{item.count}</span>
-                    </div>
-                    <div className="h-1.5 rounded-full bg-slate-100">
-                      <div
-                        className="h-1.5 rounded-full bg-brand-500 transition-all duration-500"
-                        style={{ width: `${(item.count / maxAssigneeCount) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="premium-card p-6 bg-white/40 backdrop-blur-xl">
-          <h2 className="mb-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
-            Tasks theo loại
-          </h2>
-          {typeChartData.length === 0 ? (
-            <p className="text-xs text-slate-500">Chưa có dữ liệu loại task</p>
-          ) : (
-            <div>
-              <div className="flex h-40 items-end gap-3 rounded-lg border border-slate-100 bg-slate-50 px-3 pb-3 pt-4">
-                {typeChartData.map((item) => (
-                  <div key={item.key} className="flex min-w-0 flex-1 flex-col items-center gap-1">
-                    <span className="text-[10px] font-semibold text-slate-700">{item.value}</span>
-                    <div className="flex h-24 w-full items-end justify-center">
-                      <div
-                        title={`${item.label}: ${item.value} task (${Math.round((item.value / Math.max(totalTypeTasks, 1)) * 100)}%)`}
-                        className={`w-6 rounded-t-md transition-all duration-500 ${item.colorClass.replace('text-', 'bg-')}`}
-                        style={{
-                          height: `${Math.max((item.value / maxTypeCount) * 100, item.value > 0 ? 8 : 0)}%`,
-                        }}
-                      />
-                    </div>
-                    <span className="truncate text-[10px] text-slate-600" title={item.label}>
-                      {item.label}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-end px-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/40">
+                      Stalled Latency
                     </span>
+                    <span className="text-2xl font-black text-rose-500">{overdueRatio}%</span>
                   </div>
-                ))}
+                  <div className="h-3 w-full bg-slate-950 rounded-full border border-white/5 p-0.5 shadow-inner">
+                    <div
+                      className="h-full bg-gradient-to-r from-rose-600 to-rose-400 rounded-full shadow-glow-rose/30 transition-all duration-1000"
+                      style={{ width: `${overdueRatio}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex flex-col items-center">
+                    <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
+                      Active_Units
+                    </span>
+                    <span className="text-xl font-black text-white">{totalTasks}</span>
+                  </div>
+                  <div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex flex-col items-center">
+                    <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
+                      Done_Units
+                    </span>
+                    <span className="text-xl font-black text-brand-400">{doneTasks}</span>
+                  </div>
+                </div>
               </div>
             </div>
-          )}
-        </div>
+          </div>
 
-        <div className="premium-card p-6 bg-white/40 backdrop-blur-xl">
-          <h2 className="mb-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
-            Tasks theo độ ưu tiên
-          </h2>
-          {priorityChartData.length === 0 ? (
-            <p className="text-xs text-slate-500">Chưa có dữ liệu độ ưu tiên</p>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex h-3 overflow-hidden rounded-full bg-slate-100">
-                {priorityChartData.map((item) => (
-                  <div
-                    key={item.key}
-                    title={`${item.label}: ${item.value} task (${Math.round((item.value / Math.max(totalPriorityTasks, 1)) * 100)}%)`}
-                    className={`h-full transition-all duration-500 ${item.colorClass.replace('text-', 'bg-')}`}
-                    style={{ width: `${(item.value / Math.max(totalTasks, 1)) * 100}%` }}
+          {/* Active Signal Stream */}
+          <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.01] p-8 backdrop-blur-3xl relative overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 px-2">
+              <div className="flex items-center gap-3">
+                <Activity className="h-4 w-4 text-brand-400" />
+                <h2 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
+                  Active Signal Stream
+                </h2>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-white/20" />
+                  <input
+                    type="text"
+                    value={activitySearchQuery}
+                    onChange={(e) => setActivitySearchQuery(e.target.value)}
+                    placeholder="FILTER_SIGNALS..."
+                    className="pl-9 pr-4 py-2 bg-slate-950 border border-white/10 rounded-xl text-[10px] font-black text-white uppercase tracking-widest focus:border-brand-500/40 transition-all placeholder:text-white/5 shadow-inner"
                   />
-                ))}
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                {priorityChartData.map((item) => (
-                  <div
-                    key={item.key}
-                    className="flex items-center justify-between rounded-md bg-slate-50 px-2 py-1.5"
-                  >
-                    <span className="inline-flex items-center gap-1.5 text-xs text-slate-700">
-                      <span
-                        className={`h-2 w-2 rounded-full ${item.colorClass.replace('text-', 'bg-')}`}
-                      />
-                      {item.label}
-                    </span>
-                    <span className="text-xs font-semibold text-slate-900">{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="premium-card p-6 bg-white/40 backdrop-blur-xl">
-          <h2 className="mb-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
-            Tổng quan hoàn thành
-          </h2>
-          <div className="space-y-3">
-            <div>
-              <div className="mb-1 flex items-center justify-between text-xs">
-                <span className="text-slate-600">Tỷ lệ hoàn thành</span>
-                <span className="font-semibold text-emerald-700">{completionRatio}%</span>
-              </div>
-              <div className="h-2 rounded-full bg-slate-100">
-                <div
-                  className="h-2 rounded-full bg-emerald-500 transition-all duration-500"
-                  style={{ width: `${completionRatio}%` }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="mb-1 flex items-center justify-between text-xs">
-                <span className="text-slate-600">Tỷ lệ quá hạn</span>
-                <span className="font-semibold text-rose-700">{overdueRatio}%</span>
-              </div>
-              <div className="h-2 rounded-full bg-slate-100">
-                <div
-                  className="h-2 rounded-full bg-rose-500 transition-all duration-500"
-                  style={{ width: `${overdueRatio}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">
-              Hoàn thành {doneTasks}/{totalTasks} task · Quá hạn {safeStats.overdueTasks}
-            </div>
-          </div>
-        </div>
-
-        <div className="premium-card p-6 bg-white/40 backdrop-blur-xl">
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
-              Hoạt động gần đây
-            </h2>
-            <button
-              type="button"
-              onClick={() => {
-                setActivityTypeFilter('all');
-                setActivitySearchQuery('');
-              }}
-              className="rounded-md px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-100"
-            >
-              Đặt lại
-            </button>
-          </div>
-
-          <div className="mb-6 flex flex-wrap items-center gap-2">
-            <select
-              value={activityTypeFilter}
-              onChange={(event) => setActivityTypeFilter(event.target.value)}
-              className="rounded-xl border border-slate-200 bg-white/50 px-3 py-1.5 text-[11px] font-bold text-slate-700 backdrop-blur-sm"
-              aria-label="Lọc hoạt động theo loại"
-            >
-              {activityTypeOptions.map((type) => (
-                <option key={type} value={type}>
-                  {type === 'all' ? 'Tất cả loại' : (EVENT_LABELS[type] ?? type)}
-                </option>
-              ))}
-            </select>
-
-            <input
-              type="text"
-              value={activitySearchQuery}
-              onChange={(event) => setActivitySearchQuery(event.target.value)}
-              placeholder="Tìm theo task/actor..."
-              className="w-full rounded-xl border border-slate-200 bg-white/50 px-3 py-1.5 text-[11px] font-bold text-slate-700 backdrop-blur-sm sm:w-56"
-              aria-label="Tìm kiếm hoạt động gần đây"
-            />
-          </div>
-
-          {safeStats.recentActivity.length === 0 ? (
-            <p className="text-xs text-slate-500">Chưa có hoạt động</p>
-          ) : filteredRecentActivity.length === 0 ? (
-            <p className="text-xs text-slate-500">Không có hoạt động khớp bộ lọc</p>
-          ) : (
-            <div className="space-y-4 relative before:absolute before:left-4 before:top-2 before:bottom-2 before:w-px before:bg-slate-100">
-              {filteredRecentActivity.map((event) => (
-                <div
-                  key={event.id}
-                  className="flex items-start gap-4 rounded-xl px-2 py-2 transition-all hover:bg-white/50 group/item relative z-10"
+                </div>
+                <select
+                  value={activityTypeFilter}
+                  onChange={(e) => setActivityTypeFilter(e.target.value)}
+                  className="px-4 py-2 bg-slate-950 border border-white/10 rounded-xl text-[10px] font-black text-white uppercase tracking-widest focus:border-brand-500/40 transition-all appearance-none cursor-pointer shadow-inner pr-8"
                 >
-                  <div className="w-8 h-8 shrink-0 flex items-center justify-center bg-white border border-slate-100 rounded-xl shadow-sm group-hover/item:border-brand-200 transition-colors">
-                    <span className="text-sm">{EVENT_ICONS[event.type] ?? '📝'}</span>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="px-2 py-0.5 rounded-full bg-slate-50 border border-slate-100 text-[9px] font-black uppercase tracking-widest text-slate-500">
-                        {EVENT_LABELS[event.type] ?? event.type}
-                      </span>
+                  {activityTypeOptions.map((type) => (
+                    <option key={type} value={type}>
+                      {type === 'all' ? 'ALL_SIGNALS' : (EVENT_LABELS[type] ?? type).toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {filteredRecentActivity.length === 0 ? (
+              <div className="py-20 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-[2rem] opacity-20">
+                <Clock size={32} className="mb-4" />
+                <p className="text-[10px] font-black uppercase tracking-[0.3em]">
+                  Zero Signals Detected
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-2 relative before:absolute before:left-[2.25rem] before:top-4 before:bottom-4 before:w-px before:bg-white/5">
+                {filteredRecentActivity.map((event) => (
+                  <div
+                    key={event.id}
+                    className="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/[0.02] border border-transparent hover:border-white/5 transition-all group/item relative z-10"
+                  >
+                    <div className="w-10 h-10 shrink-0 flex items-center justify-center bg-slate-950 border border-white/5 rounded-xl text-lg shadow-inner group-hover/item:border-brand-500/30 transition-all group-hover/item:scale-110">
+                      {EVENT_ICONS[event.type] ?? '📝'}
                     </div>
-                    <p className="truncate text-[13px] font-bold text-slate-900 group-hover/item:text-brand-600 transition-colors">
-                      {event.taskTitle}
-                    </p>
-                    <p className="text-[11px] font-medium text-slate-400">
-                      <span className="text-slate-600 font-black uppercase">
-                        {event.actorName ?? 'Hệ thống'}
-                      </span>{' '}
-                      · {formatRelativeTime(event.createdAt)}
-                    </p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-1">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-brand-400/60 group-hover/item:text-brand-400 transition-colors">
+                          {EVENT_LABELS[event.type] ?? event.type}
+                        </span>
+                        <div className="h-1 w-1 rounded-full bg-white/10" />
+                        <span className="text-[9px] font-black uppercase tracking-widest text-white/20 italic">
+                          {formatRelativeTime(event.createdAt)}
+                        </span>
+                      </div>
+                      <p className="truncate text-sm font-black text-white/80 group-hover/item:text-white transition-colors uppercase tracking-tight">
+                        {event.taskTitle}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] font-black text-white/10 uppercase tracking-widest group-hover/item:text-brand-400/20 transition-colors">
+                        {event.actorName ?? 'SYSTEM_KERNEL'}
+                      </span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-brand-500/20 group-hover/item:bg-brand-500 shadow-glow-brand transition-all" />
+                    </div>
                   </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Tactical Overview Panels */}
+        <div className="lg:col-span-4 space-y-8">
+          {/* Attention Vectors */}
+          <div className="rounded-[2.5rem] border border-white/5 bg-rose-500/[0.01] p-8 backdrop-blur-3xl relative overflow-hidden group border-rose-500/10">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/[0.02] blur-3xl rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <AlertCircle className="h-4 w-4 text-rose-400" />
+                <h2 className="text-[10px] font-black text-rose-500/40 uppercase tracking-[0.3em]">
+                  Critical Vectors
+                </h2>
+              </div>
+              <span className="text-[9px] font-black text-rose-500 bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20 shadow-glow-rose/10 uppercase tracking-widest">
+                Priority_Attention
+              </span>
+            </div>
+
+            {projectsNeedingAttention.length === 0 ? (
+              <p className="text-[10px] font-black text-white/10 uppercase tracking-widest text-center py-6 italic">
+                No immediate threats detected
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {projectsNeedingAttention.map((project) => (
+                  <div
+                    key={project.projectId}
+                    className="rounded-2xl bg-white/[0.01] border border-white/5 hover:border-rose-500/20 p-5 group/p transition-all shadow-inner"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <Link
+                        href={`/jira/projects/${project.projectId}`}
+                        className="text-xs font-black text-white/60 group-hover/p:text-rose-400 transition-colors uppercase tracking-widest truncate max-w-[150px]"
+                      >
+                        {project.projectName}
+                      </Link>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-black text-rose-500 underline decoration-rose-500/20 underline-offset-4">
+                          {project.remainingTasks} Units
+                        </span>
+                      </div>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-950 rounded-full overflow-hidden border border-white/5 shadow-inner">
+                      <div
+                        className="h-full bg-rose-500 group-hover/p:shadow-glow-rose transition-all duration-700"
+                        style={{ width: `${project.completionRate * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+                <Link
+                  href="/jira"
+                  className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-white/[0.03] border border-white/5 text-[10px] font-black text-white/20 uppercase tracking-[0.2em] hover:text-white hover:bg-white/[0.05] hover:border-white/10 transition-all"
+                >
+                  View All Tactical Zones <ChevronRight size={14} />
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Operator Workload */}
+          <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.01] p-8 backdrop-blur-3xl">
+            <div className="flex items-center gap-3 mb-8">
+              <Users className="h-4 w-4 text-orange-400" />
+              <h2 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
+                Operator Capacity
+              </h2>
+            </div>
+
+            <div className="space-y-6">
+              {safeStats.tasksByAssignee.length === 0 ? (
+                <p className="text-[10px] font-black text-white/10 uppercase tracking-widest text-center py-6 italic">
+                  No operators provisioned
+                </p>
+              ) : (
+                safeStats.tasksByAssignee.slice(0, 6).map((item) => (
+                  <div key={item.assigneeId} className="flex items-center gap-4 group/op">
+                    <div className="relative">
+                      <AssigneeAvatar name={item.assigneeName} color={item.avatarColor} />
+                      <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-slate-950 rounded-full border-2 border-slate-950">
+                        <div className="h-full w-full bg-emerald-500 rounded-full shadow-glow-emerald" />
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[11px] font-black text-white uppercase tracking-tight truncate">
+                          {item.assigneeName}
+                        </span>
+                        <span className="text-[10px] font-black text-brand-400">
+                          {item.count} Nodes
+                        </span>
+                      </div>
+                      <div className="h-1 w-full bg-slate-950 rounded-full border border-white/5">
+                        <div
+                          className="h-full bg-brand-500 group-hover/op:shadow-glow-brand transition-all duration-700"
+                          style={{ width: `${(item.count / maxAssigneeCount) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Protocol Classification */}
+          <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.01] p-8 backdrop-blur-3xl">
+            <div className="flex items-center gap-3 mb-8">
+              <BarChart3 className="h-4 w-4 text-indigo-400" />
+              <h2 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
+                Protocol Taxonomy
+              </h2>
+            </div>
+
+            <div className="flex items-end justify-between gap-3 h-32 px-2">
+              {safeStats.tasksByType.map((item, idx) => (
+                <div key={item.type} className="flex-1 flex flex-col items-center group/bar">
+                  <span className="text-[9px] font-black text-white/20 mb-2 opacity-0 group-hover/bar:opacity-100 transition-opacity">
+                    {item.count}
+                  </span>
+                  <div className="w-full relative px-2 flex items-end justify-center h-20">
+                    <div
+                      className={`w-full rounded-t-lg transition-all duration-1000 group-hover/bar:shadow-glow-current ${CHART_COLOR_CLASSES[idx % CHART_COLOR_CLASSES.length].replace('text-', 'bg-')}`}
+                      style={{ height: `${(item.value / maxTypeCount) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-[8px] font-black text-white/40 uppercase tracking-widest mt-3 transform transition-all group-hover/bar:text-brand-400">
+                    {item.type.substring(0, 4)}
+                  </span>
                 </div>
               ))}
             </div>
-          )}
+          </div>
         </div>
       </div>
-    </section>
-  );
-}
-
-function DashboardSkeleton() {
-  return (
-    <section className="animate-fade-in">
-      <div className="mb-6 h-8 w-36 animate-pulse rounded bg-slate-200" />
-
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }, (_, index) => (
-          <div
-            key={index}
-            className="rounded-xl bg-surface-card p-4"
-            style={{ boxShadow: 'var(--shadow-card)' }}
-          >
-            <div className="h-3 w-24 animate-pulse rounded bg-slate-200" />
-            <div className="mt-3 h-7 w-16 animate-pulse rounded bg-slate-200" />
-          </div>
-        ))}
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        {Array.from({ length: 8 }, (_, blockIndex) => (
-          <div
-            key={blockIndex}
-            className="rounded-xl bg-surface-card p-5"
-            style={{ boxShadow: 'var(--shadow-card)' }}
-          >
-            <div className="mb-4 h-4 w-40 animate-pulse rounded bg-slate-200" />
-            <div className="space-y-3">
-              {Array.from({ length: 4 }, (_, rowIndex) => (
-                <div key={rowIndex}>
-                  <div className="mb-1 h-3 w-full animate-pulse rounded bg-slate-200" />
-                  <div className="h-2 w-full animate-pulse rounded-full bg-slate-200" />
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
+    </div>
   );
 }
 
 function DonutDistributionChart({
   items,
+  total,
   emptyMessage,
 }: {
   items: Array<{ key: string; label: string; value: number; colorClass: string }>;
+  total: number;
   emptyMessage: string;
 }) {
-  const total = items.reduce((sum, item) => sum + item.value, 0);
-  const radius = 36;
+  const radius = 38;
   const circumference = 2 * Math.PI * radius;
 
   if (items.length === 0 || total === 0) {
-    return <p className="text-xs text-slate-500">{emptyMessage}</p>;
+    return (
+      <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-[2rem] opacity-20">
+        <Cpu size={32} className="mb-4" />
+        <p className="text-[10px] font-black uppercase tracking-[0.3em]">{emptyMessage}</p>
+      </div>
+    );
   }
 
   let currentOffset = 0;
 
   return (
-    <div className="flex flex-wrap items-center gap-4">
-      <div className="relative h-28 w-28">
-        <svg viewBox="0 0 100 100" className="h-28 w-28 -rotate-90">
-          <defs>
-            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="2" result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
-            {items.map((item) => (
-              <linearGradient
-                key={`grad-${item.key}`}
-                id={`grad-${item.key}`}
-                x1="0%"
-                y1="0%"
-                x2="100%"
-                y2="100%"
-              >
-                <stop
-                  offset="0%"
-                  style={{ stopColor: 'currentColor', stopOpacity: 1 }}
-                  className={item.colorClass}
-                />
-                <stop
-                  offset="100%"
-                  style={{ stopColor: 'currentColor', stopOpacity: 0.6 }}
-                  className={item.colorClass}
-                />
-              </linearGradient>
-            ))}
-          </defs>
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 items-center">
+      <div className="relative flex justify-center">
+        <svg
+          viewBox="0 0 100 100"
+          className="h-48 w-48 -rotate-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.05)]"
+        >
           <circle
             cx="50"
             cy="50"
@@ -597,7 +523,7 @@ function DonutDistributionChart({
             fill="none"
             stroke="currentColor"
             strokeWidth="10"
-            className="text-slate-100"
+            className="text-white/[0.02]"
           />
           {items.map((item) => {
             const segmentLength = (item.value / total) * circumference;
@@ -611,41 +537,54 @@ function DonutDistributionChart({
                 cy="50"
                 r={radius}
                 fill="none"
-                stroke={`url(#grad-${item.key})`}
+                stroke="currentColor"
                 strokeWidth="10"
                 strokeLinecap="round"
-                style={{ filter: 'url(#glow)' }}
                 strokeDasharray={`${segmentLength} ${circumference}`}
                 strokeDashoffset={dashOffset}
-                className="transition-all duration-700 ease-out"
-              >
-                <title>
-                  {`${item.label}: ${item.value} task (${Math.round((item.value / total) * 100)}%)`}
-                </title>
-              </circle>
+                className={`${item.colorClass} transition-all duration-1000 ease-out`}
+                style={{
+                  filter: `drop-shadow(0 0 8px currentColor)`,
+                  strokeDashoffset: dashOffset,
+                }}
+              />
             );
           })}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="tabular-nums text-lg font-bold text-slate-900">{total}</span>
-          <span className="text-[10px] text-slate-500">tasks</span>
+          <span className="text-4xl font-black text-white tracking-tighter leading-none">
+            {total}
+          </span>
+          <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] mt-2">
+            Active Nodes
+          </span>
         </div>
       </div>
 
-      <div className="min-w-45 flex-1 space-y-1.5">
+      <div className="space-y-4">
         {items.map((item) => {
           const percent = Math.round((item.value / total) * 100);
           return (
-            <div key={item.key} className="flex items-center justify-between text-xs">
-              <span className="inline-flex items-center gap-1.5 text-slate-700">
-                <span
-                  className={`h-2 w-2 rounded-full ${item.colorClass.replace('text-', 'bg-')}`}
+            <div
+              key={item.key}
+              className="group/legend flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-white/10 transition-all"
+            >
+              <div className="flex items-center gap-4">
+                <div
+                  className={`h-2 w-2 rounded-full shadow-glow-current transition-transform group-hover/legend:scale-150 ${item.colorClass.replace('text-', 'bg-')}`}
                 />
-                {item.label}
-              </span>
-              <span className="font-semibold text-slate-900">
-                {item.value} · {percent}%
-              </span>
+                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest group-hover/legend:text-white transition-colors">
+                  {item.label}
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="block text-sm font-black text-white tracking-tight">
+                  {item.value} Units
+                </span>
+                <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
+                  {percent}% Weight
+                </span>
+              </div>
             </div>
           );
         })}
@@ -657,43 +596,106 @@ function DonutDistributionChart({
 function StatCard({
   label,
   value,
-  color,
   icon,
+  color,
+  trend,
   delay,
 }: {
   label: string;
   value: number;
-  color: string;
-  icon: string;
+  icon: React.ReactNode;
+  color: 'brand' | 'emerald' | 'blue' | 'rose';
+  trend: string;
   delay: number;
 }) {
+  const colorMap = {
+    brand: 'border-brand-500/20 text-brand-400 bg-brand-500/10 shadow-glow-brand/5',
+    emerald: 'border-emerald-500/20 text-emerald-400 bg-emerald-500/10 shadow-glow-emerald/5',
+    blue: 'border-blue-500/20 text-blue-400 bg-blue-500/10 shadow-glow-blue/5',
+    rose: 'border-rose-500/20 text-rose-400 bg-rose-500/10 shadow-glow-rose/5',
+  };
+
+  const glowMap = {
+    brand: 'bg-brand-500/5 shadow-glow-brand/20',
+    emerald: 'bg-emerald-500/5 shadow-glow-emerald/20',
+    blue: 'bg-blue-500/5 shadow-glow-blue/20',
+    rose: 'bg-rose-500/5 shadow-glow-rose/20',
+  };
+
   return (
     <div
-      className="animate-slide-up relative group"
-      style={{
-        animationDelay: `${delay * 75}ms`,
-        animationFillMode: 'both',
-      }}
+      className="group relative animate-in slide-in-from-bottom-8 duration-700"
+      style={{ animationDelay: `${delay * 100}ms`, animationFillMode: 'both' }}
     >
       <div
-        className={`absolute inset-0 bg-gradient-to-br ${color} opacity-20 blur-2xl group-hover:opacity-40 transition-opacity duration-500`}
+        className={`absolute inset-x-8 -bottom-4 h-8 ${glowMap[color]} blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700`}
       />
-      <div className="relative premium-card p-6 hover:-translate-y-1 bg-white/60 backdrop-blur-xl border-white/50 active:scale-[0.98]">
-        <div className="flex items-center justify-between mb-4">
-          <div className="p-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-xl shadow-inner group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+
+      <div
+        className={`relative h-full rounded-[2.5rem] border border-white/5 bg-white/[0.01] p-8 backdrop-blur-3xl transition-all duration-500 hover:bg-white/[0.03] hover:-translate-y-2 hover:border-white/10 shadow-inner overflow-hidden`}
+      >
+        {/* Physical noise texture proxy */}
+        <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100" />
+
+        <div className="flex items-start justify-between relative z-10 mb-8">
+          <div
+            className={`p-4 rounded-2xl border ${colorMap[color]} transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6`}
+          >
             {icon}
           </div>
-          <div className="px-2 py-0.5 bg-brand-50 text-brand-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-brand-100/50">
-            Live
+          <div className="text-right">
+            <span className="block text-[8px] font-black uppercase tracking-[0.3em] text-white/20 mb-1">
+              Telemetry
+            </span>
+            <span
+              className={`text-[10px] font-black uppercase tracking-widest ${color === 'rose' ? 'text-rose-500 animate-pulse' : 'text-white/40'}`}
+            >
+              {trend}
+            </span>
           </div>
         </div>
-        <div>
-          <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">
+
+        <div className="relative z-10">
+          <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-2 pl-1">
             {label}
           </p>
-          <p className="tabular-nums text-3xl font-black text-slate-900 tracking-tighter">
+          <p className="text-5xl font-black text-white tracking-tighter tabular-nums leading-none">
             {value}
           </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-10 animate-pulse">
+      <div className="flex justify-between items-end">
+        <div className="space-y-4">
+          <div className="h-3 w-32 bg-white/5 rounded-full" />
+          <div className="h-12 w-96 bg-white/5 rounded-2xl" />
+        </div>
+        <div className="h-10 w-10 bg-white/5 rounded-2xl" />
+      </div>
+
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-64 bg-white/5 border border-white/5 rounded-[2.5rem]" />
+        ))}
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-12">
+        <div className="lg:col-span-8 space-y-8">
+          <div className="grid grid-cols-2 gap-8">
+            <div className="h-72 bg-white/5 border border-white/5 rounded-[2.5rem]" />
+            <div className="h-72 bg-white/5 border border-white/5 rounded-[2.5rem]" />
+          </div>
+          <div className="h-96 bg-white/5 border border-white/5 rounded-[2.5rem]" />
+        </div>
+        <div className="lg:col-span-4 space-y-8">
+          <div className="h-[400px] bg-white/5 border border-white/5 rounded-[2.5rem]" />
+          <div className="h-[400px] bg-white/5 border border-white/5 rounded-[2.5rem]" />
         </div>
       </div>
     </div>

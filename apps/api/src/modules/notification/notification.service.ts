@@ -15,7 +15,7 @@ export class NotificationService {
 
   async getNotifications(userId: string, workspaceId: string) {
     const notifications = await this.prisma.notification.findMany({
-      where: { userId, workspaceId, deletedAt: null },
+      where: { userId, workspaceId },
       orderBy: { createdAt: 'desc' },
       take: 50,
       select: {
@@ -28,7 +28,7 @@ export class NotificationService {
     });
 
     const unreadCount = await this.prisma.notification.count({
-      where: { userId, workspaceId, deletedAt: null, readAt: null },
+      where: { userId, workspaceId, readAt: null },
     });
 
     return {
@@ -52,7 +52,7 @@ export class NotificationService {
 
   async markAllAsRead(userId: string, workspaceId: string) {
     await this.prisma.notification.updateMany({
-      where: { userId, workspaceId, readAt: null, deletedAt: null },
+      where: { userId, workspaceId, readAt: null },
       data: { readAt: new Date() },
     });
   }
@@ -118,7 +118,7 @@ export class NotificationService {
     preferences: NotificationPreference,
   ) {
     const user = await this.prisma.user.findUnique({
-      where: { id: input.userId, deletedAt: null },
+      where: { id: input.userId },
       select: { email: true, fullName: true },
     });
 

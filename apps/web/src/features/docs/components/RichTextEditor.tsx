@@ -1,3 +1,5 @@
+'use client';
+
 import { useEditor, EditorContent, type JSONContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Collaboration from '@tiptap/extension-collaboration';
@@ -5,7 +7,17 @@ import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import * as Y from 'yjs';
 import { useEffect, useMemo, useState, useRef } from 'react';
-import { Sparkles, Type, Scissors, Loader2 } from 'lucide-react';
+import {
+  Sparkles,
+  Type,
+  Scissors,
+  Bold,
+  Italic,
+  List as ListIcon,
+  Code,
+  Command,
+  Activity,
+} from 'lucide-react';
 import { processText } from '../api/doc-service';
 import { toast } from 'sonner';
 
@@ -31,17 +43,15 @@ export function RichTextEditor({
   const [provider, setProvider] = useState<HocuspocusProvider | null>(null);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0, show: false });
   const [isAiProcessing, setIsAiProcessing] = useState(false);
-  const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([]);
   const [coverImage, setCoverImage] = useState(
-    'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&q=80&w=2000',
+    'https://images.unsplash.com/photo-1635776062127-d379bfcba9f8?auto=format&fit=crop&q=80&w=2000',
   );
-  const [icon, setIcon] = useState('📄');
+  const [icon, setIcon] = useState('📑');
   const [slashMenu, setSlashMenu] = useState({ show: false, top: 0, left: 0 });
   const menuRef = useRef<HTMLDivElement>(null);
 
   const ydoc = useMemo(() => new Y.Doc(), []);
 
-  // Update selection for Bubble Menu
   useEffect(() => {
     if (!editor || !editable) return;
 
@@ -79,9 +89,9 @@ export function RichTextEditor({
     try {
       const { result } = await processText(selectedText, mode);
       editor.chain().focus().insertContentAt({ from, to }, result).run();
-      toast.success('AI hoàn tất xử lý!');
+      toast.success('Neural Synthesis Complete');
     } catch {
-      toast.error('AI gặp lỗi, vui lòng thử lại.');
+      toast.error('Synthesis Interrupted');
     } finally {
       setIsAiProcessing(false);
       setMenuPos((prev) => ({ ...prev, show: false }));
@@ -95,7 +105,7 @@ export function RichTextEditor({
       url: process.env.NEXT_PUBLIC_COLLAB_WS_URL || 'ws://localhost:1234',
       name: docId,
       document: ydoc,
-      token: localStorage.getItem('access_token') || '', // Standard JWT from our auth
+      token: localStorage.getItem('access_token') || '',
     });
 
     setProvider(newProvider);
@@ -113,30 +123,10 @@ export function RichTextEditor({
           heading: {
             levels: [1, 2, 3],
             HTMLAttributes: {
-              class: 'scroll-mt-20', // Add margin for sticky headers
+              class: 'scroll-mt-20 font-black tracking-tight text-white mb-6 uppercase',
             },
           },
         }),
-        // Custom extension to add IDs to headings dynamically based on their content
-        {
-          name: 'heading-ids',
-          addGlobalAttributes() {
-            return [
-              {
-                types: ['heading'],
-                attributes: {
-                  id: {
-                    default: null,
-                    renderHTML: () => {
-                      // This is a simplified approach; in production, we'd sync this with the content
-                      return {};
-                    },
-                  },
-                },
-              },
-            ];
-          },
-        },
         Collaboration.configure({
           document: ydoc,
         }),
@@ -145,7 +135,7 @@ export function RichTextEditor({
             typeof CollaborationCursor.configure
           >[0]['provider'],
           user: {
-            name: user?.fullName || 'Anonymous',
+            name: user?.fullName || 'Operative',
             color: user?.avatarColor || '#6366f1',
           },
         }),
@@ -155,21 +145,6 @@ export function RichTextEditor({
       onUpdate: ({ editor }) => {
         onChange(editor.getJSON());
 
-        // Extract headings for TOC
-        const extractedHeadings: { id: string; text: string; level: number }[] = [];
-        editor.state.doc.descendants((node) => {
-          if (node.type.name === 'heading') {
-            const text = node.textContent;
-            const id = text
-              .toLowerCase()
-              .replace(/\s+/g, '-')
-              .replace(/[^\w-]/g, '');
-            extractedHeadings.push({ id, text, level: node.attrs.level });
-          }
-        });
-        setHeadings(extractedHeadings);
-
-        // Slash command detection
         const { selection } = editor.state;
         const isSlash = editor.state.doc.textBetween(selection.from - 1, selection.from) === '/';
         if (isSlash) {
@@ -182,7 +157,8 @@ export function RichTextEditor({
       },
       editorProps: {
         attributes: {
-          class: 'prose prose-slate focus:outline-none min-h-[500px] max-w-none px-4 md:px-0',
+          class:
+            'prose prose-invert max-w-none focus:outline-none min-h-[500px] prose-slate prose-headings:text-white prose-p:text-white/60 prose-strong:text-white prose-code:text-brand-400 prose-pre:bg-black/40 prose-pre:border prose-pre:border-white/5',
         },
       },
     },
@@ -197,7 +173,7 @@ export function RichTextEditor({
 
   if (!editor) {
     return (
-      <div className="animate-pulse bg-slate-50 h-[500px] rounded-lg border border-slate-100" />
+      <div className="animate-pulse bg-white/[0.02] h-[500px] rounded-[2.5rem] border border-white/5" />
     );
   }
 
@@ -207,7 +183,7 @@ export function RichTextEditor({
       {menuPos.show && editable && (
         <div
           ref={menuRef}
-          className="fixed z-50 flex items-center gap-1 p-1 bg-white border border-slate-200 rounded-xl shadow-2xl shadow-indigo-500/20 glassmorphism animate-in zoom-in-95 duration-200"
+          className="fixed z-50 flex items-center gap-1.5 p-1.5 bg-slate-900/90 border border-white/10 rounded-2xl shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-200"
           style={{
             top: `${menuPos.top}px`,
             left: `${menuPos.left}px`,
@@ -215,29 +191,29 @@ export function RichTextEditor({
           }}
         >
           {isAiProcessing ? (
-            <div className="flex items-center gap-2 px-3 py-1.5 text-[11px] font-bold text-indigo-600">
-              <Loader2 size={14} className="animate-spin" />
-              <span>AI đang xử lý...</span>
+            <div className="flex items-center gap-2 px-4 py-2 text-[10px] font-black text-brand-400 uppercase tracking-widest">
+              <Activity size={14} className="animate-spin" />
+              <span>Synthesizing...</span>
             </div>
           ) : (
             <>
               <BubbleItem
                 icon={<Sparkles size={14} />}
-                label="Cải thiện"
+                label="Improve"
                 onClick={() => handleAiAction('improve')}
-                className="text-indigo-600 hover:bg-indigo-50"
+                className="text-brand-400 hover:bg-brand-500/10"
               />
               <BubbleItem
                 icon={<Scissors size={14} />}
-                label="Rút gọn"
+                label="Shorten"
                 onClick={() => handleAiAction('shorten')}
-                className="text-amber-600 hover:bg-amber-50"
+                className="text-amber-400 hover:bg-amber-500/10"
               />
               <BubbleItem
                 icon={<Type size={14} />}
-                label="Tóm tắt"
+                label="Summarize"
                 onClick={() => handleAiAction('summarize')}
-                className="text-emerald-600 hover:bg-emerald-50"
+                className="text-emerald-400 hover:bg-emerald-500/10"
               />
             </>
           )}
@@ -247,122 +223,90 @@ export function RichTextEditor({
       {/* Slash Command Menu */}
       {slashMenu.show && editable && (
         <div
-          className="fixed z-50 w-64 bg-white border border-slate-200 rounded-2xl shadow-2xl p-2 animate-in slide-in-from-top-2 duration-200 glassmorphism"
+          className="fixed z-50 w-72 bg-slate-950/90 border border-white/10 rounded-[2rem] shadow-2xl p-3 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-2xl"
           style={{ top: `${slashMenu.top}px`, left: `${slashMenu.left}px` }}
         >
-          <div className="px-3 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50 mb-1">
-            AI Slash Commands
+          <div className="px-4 py-3 text-[9px] font-black text-white/20 uppercase tracking-[0.3em] border-b border-white/5 mb-2">
+            AI_PROTOCOL_CMDS
           </div>
           <SlashMenuItem
-            icon={<Sparkles size={14} className="text-brand-500" />}
-            title="Tiếp tục viết"
-            desc="AI sẽ hoàn thiện đoạn văn này"
+            icon={<Sparkles size={14} className="text-brand-400" />}
+            title="Continue Writing"
+            desc="AI will complete the neural sequence"
             onClick={() => handleAiAction('improve')}
           />
           <SlashMenuItem
-            icon={<Type size={14} className="text-emerald-500" />}
-            title="Tóm tắt đoạn văn"
-            desc="Rút gọn ý chính nhanh chóng"
+            icon={<Type size={14} className="text-emerald-400" />}
+            title="Extract Keywords"
+            desc="Isolate core intel points"
             onClick={() => handleAiAction('summarize')}
           />
           <SlashMenuItem
-            icon={<Scissors size={14} className="text-amber-500" />}
-            title="Làm ngắn gọn"
-            desc="Tối ưu độ dài nội dung"
+            icon={<Scissors size={14} className="text-amber-400" />}
+            title="Protocol Condenser"
+            desc="Optimize data density"
             onClick={() => handleAiAction('shorten')}
           />
         </div>
       )}
 
       {editable && (
-        <div className="sticky top-0 z-20 flex flex-wrap items-center gap-1 border-b border-slate-100 bg-white/80 py-3 px-6 backdrop-blur-md mb-8 shadow-sm rounded-2xl mx-4 mt-4">
+        <div className="sticky top-20 z-40 flex flex-wrap items-center gap-1.5 border border-white/5 bg-slate-900/60 p-2.5 backdrop-blur-xl mb-12 shadow-2xl rounded-2xl">
           <MenuButton
             onClick={() => editor.chain().focus().toggleBold().run()}
             active={editor.isActive('bold')}
-            label="B"
-            className="font-bold w-10 h-10"
+            icon={<Bold size={16} />}
           />
           <MenuButton
             onClick={() => editor.chain().focus().toggleItalic().run()}
             active={editor.isActive('italic')}
-            label="I"
-            className="italic font-serif w-10 h-10"
+            icon={<Italic size={16} />}
           />
-          <div className="w-px h-6 bg-slate-200 mx-2" />
+          <div className="w-px h-6 bg-white/5 mx-2" />
           <MenuButton
             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
             active={editor.isActive('heading', { level: 1 })}
             label="H1"
-            className="w-10 h-10"
           />
           <MenuButton
             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
             active={editor.isActive('heading', { level: 2 })}
             label="H2"
-            className="w-10 h-10"
           />
           <MenuButton
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             active={editor.isActive('bulletList')}
-            label="• List"
-            className="px-4 h-10"
+            icon={<ListIcon size={16} />}
           />
-          <div className="w-px h-6 bg-slate-200 mx-2" />
+          <div className="w-px h-6 bg-white/5 mx-2" />
           <MenuButton
             onClick={() => editor.chain().focus().toggleCodeBlock().run()}
             active={editor.isActive('codeBlock')}
-            label="Code"
-            className="px-4 h-10"
+            icon={<Code size={16} />}
           />
           <div className="flex-1" />
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 rounded-xl text-brand-600 font-bold text-[10px] uppercase tracking-wider">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
-            </span>
-            Live
+          <div className="flex items-center gap-2.5 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 font-black text-[9px] uppercase tracking-widest">
+            <div className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-glow-emerald"></span>
+            </div>
+            Neural_Bridge_Active
           </div>
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto pb-32 flex gap-12">
-        {/* Floating TOC */}
-        {headings.length > 0 && (
-          <aside className="hidden xl:block w-64 shrink-0 sticky top-32 h-fit max-h-[70vh] overflow-y-auto pr-4 scrollbar-thin">
-            <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">
-              Table of Contents
-            </h5>
-            <nav className="space-y-3">
-              {headings.map((h, i) => (
-                <a
-                  key={`${h.id}-${i}`}
-                  href={`#${h.id}`}
-                  className={`block text-[13px] font-bold transition-all hover:text-brand-600 ${
-                    h.level === 1
-                      ? 'text-slate-900 pr-0'
-                      : h.level === 2
-                        ? 'text-slate-500 pl-4'
-                        : 'text-slate-400 pl-8 text-[12px]'
-                  }`}
-                >
-                  {h.text}
-                </a>
-              ))}
-            </nav>
-          </aside>
-        )}
-
+      <div className="max-w-5xl mx-auto pb-48 flex gap-12">
         <div className="flex-1 min-w-0">
           {/* Notion-style Header */}
-          <div className="relative group mb-12">
+          <div className="relative group mb-20">
             {/* Cover Image */}
-            <div className="h-48 md:h-64 w-full rounded-[2.5rem] overflow-hidden relative border border-slate-100 mb-[-4rem] shadow-2xl group/cover overflow-hidden">
+            <div className="h-64 md:h-80 w-full rounded-[3rem] overflow-hidden relative border border-white/5 mb-[-5rem] shadow-glass group/cover">
               <img
                 src={coverImage}
                 alt="Cover"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover/cover:scale-105"
+                className="w-full h-full object-cover transition-transform duration-1000 group-hover/cover:scale-105 opacity-60"
               />
-              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover/cover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
               {editable && (
                 <button
                   onClick={() =>
@@ -370,35 +314,37 @@ export function RichTextEditor({
                       `https://images.unsplash.com/photo-${Math.floor(Math.random() * 10000)}?auto=format&fit=crop&q=80&w=2000`,
                     )
                   }
-                  className="absolute bottom-4 right-4 px-4 py-2 bg-white/80 backdrop-blur-md rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-800 opacity-0 group-hover/cover:opacity-100 transition-all hover:bg-white"
+                  className="absolute bottom-10 right-10 px-6 py-3 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white opacity-0 group-hover/cover:opacity-100 transition-all hover:bg-brand-500 hover:border-brand-500"
                 >
-                  Đổi ảnh bìa
+                  Regenerate_Skin
                 </button>
               )}
             </div>
 
-            <div className="px-6 md:px-12 relative z-10">
+            <div className="px-12 relative z-10 flex items-end gap-8">
               {/* Icon */}
               <div
                 onClick={() => {
-                  const icons = ['📄', '📝', '💡', '🚀', '📊', '📚', '🎯'];
+                  const icons = ['📑', '💾', '🛡️', '⚡', '📊', '🏛️', '🎯'];
                   setIcon(icons[Math.floor(Math.random() * icons.length)]);
                 }}
-                className="w-24 h-24 bg-white rounded-[2rem] shadow-2xl flex items-center justify-center text-5xl border-4 border-white transform transition hover:scale-110 cursor-pointer active:scale-95"
+                className="w-32 h-32 bg-slate-900 rounded-[2.5rem] shadow-glow-brand/5 flex items-center justify-center text-6xl border border-white/10 transform transition hover:scale-110 cursor-pointer active:scale-95 group/icon"
               >
-                {icon}
+                <span className="group-hover/icon:scale-110 transition-transform">{icon}</span>
               </div>
 
-              {/* Breadcrumb Title Area */}
-              <div className="mt-6 flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-2">
-                <span>Workspace</span>
-                <span>/</span>
-                <span>Docs</span>
+              <div className="mb-4">
+                <div className="flex items-center gap-2 text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
+                  <Command size={12} />
+                  <span>Archive_Node</span>
+                  <span>/</span>
+                  <span className="text-brand-500/60 font-mono">ID_{docId?.substring(0, 8)}</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="px-6 md:px-12">
+          <div className="px-12">
             <EditorContent editor={editor} />
           </div>
         </div>
@@ -421,7 +367,7 @@ function BubbleItem({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all text-[11px] font-bold ${className}`}
+      className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest ${className}`}
     >
       {icon}
       <span>{label}</span>
@@ -433,21 +379,25 @@ function MenuButton({
   onClick,
   active,
   label,
+  icon,
   className = '',
 }: {
   onClick: () => void;
   active: boolean;
-  label: string;
+  label?: string;
+  icon?: React.ReactNode;
   className?: string;
 }) {
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1.5 rounded text-[12px] font-bold transition-all ${
-        active ? 'bg-brand-100 text-brand-700' : 'text-slate-500 hover:bg-slate-100'
-      } ${className}`}
+      className={`h-11 flex items-center justify-center rounded-xl transition-all font-black text-[11px] border ${
+        active
+          ? 'bg-brand-500/10 text-brand-400 border-brand-500/30'
+          : 'text-white/30 border-transparent hover:bg-white/5 hover:text-white'
+      } ${label ? 'px-4' : 'w-11'} ${className}`}
     >
-      {label}
+      {icon || label}
     </button>
   );
 }
@@ -466,16 +416,18 @@ function SlashMenuItem({
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3 p-2 hover:bg-slate-50 rounded-xl transition-all group text-left"
+      className="w-full flex items-center gap-4 p-3 hover:bg-white/[0.03] rounded-2xl transition-all group text-left border border-transparent hover:border-white/5"
     >
-      <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm">
+      <div className="w-12 h-12 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:border-brand-500/20 transition-all">
         {icon}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-[13px] font-bold text-slate-900 group-hover:text-brand-600">
+        <div className="text-[12px] font-black text-white uppercase tracking-wider group-hover:text-brand-400 transition-colors">
           {title}
         </div>
-        <div className="text-[10px] text-slate-400 group-hover:text-slate-500 truncate">{desc}</div>
+        <div className="text-[10px] text-white/20 group-hover:text-white/40 truncate font-medium">
+          {desc}
+        </div>
       </div>
     </button>
   );

@@ -1,0 +1,70 @@
+
+> superboard@0.1.0 lint
+> turbo run lint
+
+• turbo 2.8.17
+• Packages in scope: @superboard/ai-service, @superboard/api, @superboard/collab-service, @superboard/config-eslint, @superboard/config-ts, @superboard/shared, @superboard/ui, @superboard/web
+• Running lint in 8 packages
+• Remote caching disabled
+@superboard/web:lint: cache miss, executing 70483acc01f2985f
+@superboard/shared:lint: cache hit, replaying logs 965f94597b270d50
+@superboard/collab-service:lint: cache hit, replaying logs 697e6b873be59dac
+@superboard/shared:lint: 
+@superboard/shared:lint: 
+@superboard/collab-service:lint: 
+@superboard/collab-service:lint: 
+@superboard/collab-service:lint: > @superboard/collab-service@0.1.0 lint
+@superboard/collab-service:lint: > eslint src --ext .ts
+@superboard/collab-service:lint: 
+@superboard/shared:lint: > @superboard/shared@0.1.0 lint
+@superboard/shared:lint: > eslint src --ext .ts
+@superboard/shared:lint: 
+@superboard/api:lint: cache hit, replaying logs faa1493fa0350ccf
+@superboard/api:lint: 
+@superboard/api:lint: 
+@superboard/api:lint: > @superboard/api@0.1.0 lint
+@superboard/api:lint: > eslint .
+@superboard/api:lint: 
+@superboard/web:lint: 
+@superboard/web:lint: > @superboard/web@0.1.0 lint
+@superboard/web:lint: > eslint .
+@superboard/web:lint: 
+@superboard/web:lint: 
+@superboard/web:lint: /Users/maitranhuy/SuperBoard/apps/web/src/features/chat/components/ThreadPanel.tsx
+@superboard/web:lint:   25:14  error  'err' is defined but never used  @typescript-eslint/no-unused-vars
+@superboard/web:lint: 
+@superboard/web:lint: /Users/maitranhuy/SuperBoard/apps/web/src/features/docs/components/RichTextEditor.tsx
+@superboard/web:lint:   10:83  error  'Search' is defined but never used             @typescript-eslint/no-unused-vars
+@superboard/web:lint:   10:91  error  'Zap' is defined but never used                @typescript-eslint/no-unused-vars
+@superboard/web:lint:   36:10  error  'headings' is assigned a value but never used  @typescript-eslint/no-unused-vars
+@superboard/web:lint: 
+@superboard/web:lint: /Users/maitranhuy/SuperBoard/apps/web/src/features/jira/components/project-card.tsx
+@superboard/web:lint:   40:3  error  'isArchivingProject' is defined but never used  @typescript-eslint/no-unused-vars
+@superboard/web:lint: 
+@superboard/web:lint: /Users/maitranhuy/SuperBoard/apps/web/src/features/jira/components/project-cards-grid.tsx
+@superboard/web:lint:   6:16  error  'LayoutGrid' is defined but never used  @typescript-eslint/no-unused-vars
+@superboard/web:lint: 
+@superboard/web:lint: /Users/maitranhuy/SuperBoard/apps/web/src/features/jira/components/project-detail-header.tsx
+@superboard/web:lint:   8:3  error  'Sparkles' is defined but never used  @typescript-eslint/no-unused-vars
+@superboard/web:lint: 
+@superboard/web:lint: /Users/maitranhuy/SuperBoard/apps/web/src/lib/api-client.ts
+@superboard/web:lint:   99:16  error  'e' is defined but never used  @typescript-eslint/no-unused-vars
+@superboard/web:lint: 
+@superboard/web:lint: ✖ 8 problems (8 errors, 0 warnings)
+@superboard/web:lint: 
+@superboard/web:lint: npm error Lifecycle script `lint` failed with error:
+@superboard/web:lint: npm error code 1
+@superboard/web:lint: npm error path /Users/maitranhuy/SuperBoard/apps/web
+@superboard/web:lint: npm error workspace @superboard/web@0.1.0
+@superboard/web:lint: npm error location /Users/maitranhuy/SuperBoard/apps/web
+@superboard/web:lint: npm error command failed
+@superboard/web:lint: npm error command sh -c eslint .
+@superboard/web:lint: ERROR: command finished with error: command (/Users/maitranhuy/SuperBoard/apps/web) /opt/homebrew/bin/npm run lint exited (1)
+@superboard/web#lint: command (/Users/maitranhuy/SuperBoard/apps/web) /opt/homebrew/bin/npm run lint exited (1)
+
+ Tasks:    3 successful, 4 total
+Cached:    3 cached, 4 total
+  Time:    1.414s 
+Failed:    @superboard/web#lint
+
+ ERROR  run failed: command  exited (1)

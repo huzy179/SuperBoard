@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
-import { X, Sparkles, Send, Check, AlertCircle, Terminal } from 'lucide-react';
+import {
+  X,
+  Sparkles,
+  AlertCircle,
+  Terminal,
+  Cpu,
+  Zap,
+  Activity,
+  ShieldCheck,
+  Box,
+  Check,
+} from 'lucide-react';
 import { apiPost } from '@/lib/api-client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -25,9 +36,9 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
     onSuccess: (data) => {
       if (data) {
         setGeneratedRule(data);
-        toast.success('AI đã tạo quy tắc cho bạn!');
+        toast.success('Neural Logic Synthesis Complete');
       } else {
-        toast.error('AI không thể tạo quy tắc từ yêu cầu này. Hãy thử lại cụ thể hơn.');
+        toast.error('Synthesis Failed');
       }
     },
   });
@@ -37,7 +48,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
       apiPost(`/automation/rules?workspaceId=${workspaceId}`, data, { auth: true }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
-      toast.success('Đã kích hoạt tự động hóa thành công');
+      toast.success('Protocol Activated');
       onClose();
     },
   });
@@ -57,180 +68,240 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl animate-in fade-in duration-700">
       {/* Dynamic Background mesh */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-500/10 blur-[120px] rounded-full animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/10 blur-[120px] rounded-full animate-pulse delay-700" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-500/[0.03] blur-[150px] rounded-full animate-pulse" />
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay" />
       </div>
 
-      <div className="bg-white/40 w-full max-w-2xl rounded-[3rem] shadow-glass border border-white/20 backdrop-blur-3xl overflow-hidden animate-in zoom-in-95 duration-500 flex flex-col max-h-[90vh] relative z-10">
+      <div className="bg-slate-950/80 w-full max-w-4xl rounded-[2.5rem] shadow-2xl border border-white/5 backdrop-blur-3xl overflow-hidden animate-in zoom-in-95 duration-500 flex flex-col max-h-[90vh] relative z-10 transition-all">
         {/* Rim Light */}
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/20 to-transparent" />
 
         {/* Header */}
-        <div className="p-10 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-slate-900 rounded-2xl shadow-xl shadow-slate-900/20">
-              <Sparkles size={28} className="text-brand-400 animate-pulse" />
+        <div className="px-10 py-8 flex items-center justify-between border-b border-white/5">
+          <div className="flex items-center gap-5">
+            <div className="p-3.5 bg-brand-500/10 rounded-2xl border border-brand-500/20 shadow-glow-brand/5 group">
+              <Sparkles
+                size={24}
+                className="text-brand-400 group-hover:scale-110 transition-transform"
+              />
             </div>
             <div>
-              <h3 className="font-black text-2xl uppercase tracking-tighter text-slate-900">
-                AI Assistant
+              <h3 className="font-black text-xl uppercase tracking-widest text-white">
+                Neural Logic Engine
               </h3>
               <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-                <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">
-                  Workflow Architect Online
+                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shadow-glow-emerald" />
+                <p className="text-white/20 text-[9px] font-black uppercase tracking-[0.3em]">
+                  Synthesis_Module_Online // v2.4.0
                 </p>
               </div>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-3 hover:bg-white/50 rounded-2xl transition-all hover:scale-110 active:scale-90 text-slate-400 hover:text-slate-900"
+            className="p-3 hover:bg-white/5 rounded-2xl transition-all text-white/20 hover:text-white"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-10 pb-10 space-y-10">
+        <div className="flex-1 overflow-y-auto px-10 py-10 space-y-12 scrollbar-none">
           {/* Input Section */}
-          <div className="space-y-4">
-            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-2">
-              <Terminal size={14} className="text-brand-500" />
-              <span>Define your automation goal</span>
-            </label>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between px-2">
+              <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] flex items-center gap-3">
+                <Terminal size={14} className="text-brand-500" />
+                <span>Protocol_Definition_Stream</span>
+              </label>
+              <div className="flex items-center gap-2">
+                <div className="h-1 w-8 bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full bg-brand-500 w-1/3 animate-progress" />
+                </div>
+              </div>
+            </div>
+
             <form onSubmit={handleGenerate} className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-brand-500 to-indigo-500 rounded-[2.5rem] blur opacity-10 group-focus-within:opacity-25 transition duration-500" />
+              <div className="absolute -inset-1 bg-gradient-to-r from-brand-500/10 to-transparent rounded-[2.2rem] opacity-0 group-focus-within:opacity-100 transition-opacity blur-lg" />
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Ví dụ: Khi task chuyển sang High priority, hãy gửi thông báo báo cho tôi..."
-                className="relative w-full px-8 py-7 bg-white/60 border border-white/40 rounded-[2.2rem] focus:bg-white focus:border-brand-500/50 outline-none transition-all font-medium min-h-[160px] resize-none text-lg text-slate-800 shadow-inner"
+                placeholder="DEFINE_OBJECTIVE_SEQUENCE..."
+                className="relative w-full px-8 py-8 bg-white/[0.02] border border-white/5 rounded-[2rem] focus:bg-white/[0.04] focus:border-brand-500/30 outline-none transition-all font-black text-lg text-white min-h-[160px] resize-none placeholder:text-white/5 tracking-tight"
               />
-              <button
-                type="submit"
-                disabled={generateMutation.isPending || !prompt.trim()}
-                className="absolute bottom-6 right-6 px-6 py-3 bg-slate-900 hover:bg-brand-600 disabled:bg-slate-300 text-white rounded-2xl shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 font-black uppercase text-[10px] tracking-widest"
-              >
-                {generateMutation.isPending ? (
-                  <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <span>Generate</span>
-                    <Send size={16} />
-                  </>
-                )}
-              </button>
+
+              <div className="absolute bottom-6 right-6 flex items-center gap-4">
+                <button
+                  type="submit"
+                  disabled={generateMutation.isPending || !prompt.trim()}
+                  className={`px-8 py-4 rounded-xl flex items-center gap-3 font-black uppercase text-[10px] tracking-widest transition-all ${
+                    prompt.trim()
+                      ? 'bg-brand-500 text-white shadow-glow-brand/20 hover:bg-brand-400'
+                      : 'bg-white/5 text-white/10'
+                  }`}
+                >
+                  {generateMutation.isPending ? (
+                    <Activity size={16} className="animate-pulse" />
+                  ) : (
+                    <Zap size={16} className={prompt.trim() ? 'animate-pulse' : ''} />
+                  )}
+                  <span>{generateMutation.isPending ? 'Synthesizing...' : 'Run_Analysis'}</span>
+                </button>
+              </div>
             </form>
           </div>
 
-          {/* Preview Section */}
+          {/* Logic Flow Visualization */}
           {generatedRule && (
-            <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-700">
-              <div className="relative p-[1px] bg-gradient-to-br from-white/80 via-white/20 to-brand-500/30 rounded-[2.5rem] shadow-luxe overflow-hidden group">
-                <div className="absolute inset-0 bg-white/40 backdrop-blur-3xl" />
-                <div className="relative bg-white/40 rounded-[2.5rem] p-8">
-                  <h4 className="flex items-center gap-3 text-slate-900 font-black uppercase text-xs mb-8">
-                    <div className="h-8 w-8 rounded-xl bg-brand-500 text-white flex items-center justify-center shadow-lg shadow-brand-500/20">
-                      <Check size={18} />
-                    </div>
-                    Proposed Workflow Blueprint
-                  </h4>
+            <div className="space-y-10 animate-in slide-in-from-bottom-8 duration-1000">
+              <div className="flex items-center gap-4">
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+                <span className="text-[9px] font-black text-white/10 uppercase tracking-[0.5em]">
+                  Sequence_Visualization
+                </span>
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+              </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <div className="space-y-6">
-                      <div className="space-y-2">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                          Identity
+              <div className="relative">
+                {/* Connection Line Proxy */}
+                <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-brand-500/20 via-indigo-500/20 to-brand-500/20 -translate-y-1/2" />
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+                  {/* Trigger Node */}
+                  <div className="p-8 rounded-[2.5rem] bg-slate-900/40 border border-brand-500/20 shadow-glow-brand/5 group/node hover:bg-slate-900/60 transition-all">
+                    <div className="flex flex-col items-center text-center gap-5">
+                      <div className="p-4 bg-brand-500/10 rounded-2xl border border-brand-500/30 text-brand-400 group-hover/node:scale-110 transition-transform">
+                        <Cpu size={24} />
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[9px] font-black text-brand-500/60 uppercase tracking-widest">
+                          Initialization
                         </span>
-                        <p className="text-2xl font-black text-slate-900 tracking-tight">
-                          {generatedRule.name as string}
+                        <p className="text-sm font-black text-white uppercase tracking-wider">
+                          {generatedRule.trigger.type}
                         </p>
                       </div>
-                      <div className="space-y-3">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                          Trigger Condition
-                        </span>
-                        <div className="flex items-center gap-3 text-brand-700 font-black text-[11px] uppercase tracking-wider bg-brand-50/50 border border-brand-100 px-4 py-2 rounded-xl w-fit shadow-sm">
-                          <Terminal size={14} />
-                          {generatedRule.trigger.type}
-                        </div>
+                      <div className="px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-[9px] font-black text-brand-400 uppercase tracking-widest">
+                        Trigger_Active
                       </div>
                     </div>
+                  </div>
 
-                    <div className="space-y-6">
-                      <div className="space-y-3">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                          Active Actions
+                  {/* Logic Core */}
+                  <div className="p-8 rounded-[2.5rem] bg-indigo-500/[0.03] border border-white/5 flex flex-col items-center justify-center gap-4">
+                    <div className="flex gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-brand-500 animate-ping" />
+                      <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse [animation-delay:0.2s]" />
+                      <div className="h-1.5 w-1.5 rounded-full bg-brand-500 animate-ping [animation-delay:0.4s]" />
+                    </div>
+                    <span className="text-[10px] font-black text-white/10 uppercase tracking-[0.3em] font-mono">
+                      NEURAL_X_OVER
+                    </span>
+                  </div>
+
+                  {/* Action Node */}
+                  <div className="p-8 rounded-[2.5rem] bg-slate-900/40 border border-indigo-500/20 shadow-glow-indigo/5 group/node hover:bg-slate-900/60 transition-all">
+                    <div className="flex flex-col items-center text-center gap-5">
+                      <div className="p-4 bg-indigo-500/10 rounded-2xl border border-indigo-500/30 text-indigo-400 group-hover/node:scale-110 transition-transform">
+                        <Box size={24} />
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[9px] font-black text-indigo-500/60 uppercase tracking-widest">
+                          Execution
                         </span>
-                        {generatedRule.actions.map((action, i: number) => (
-                          <div
-                            key={i}
-                            className="group/action flex flex-col gap-3 p-5 bg-white/50 rounded-3xl border border-white shadow-sm transition-all hover:bg-white hover:shadow-xl hover:-translate-y-1"
-                          >
-                            <div className="flex items-center gap-2 text-indigo-700 font-black text-[9px] uppercase tracking-widest bg-indigo-50 border border-indigo-100 px-3 py-1.5 rounded-xl w-fit">
-                              {action.type}
-                            </div>
-                            <p className="text-[13px] font-bold text-slate-600 leading-relaxed italic">
-                              "{(action.config?.message as string) || JSON.stringify(action.config)}
-                              "
-                            </p>
-                          </div>
-                        ))}
+                        <p className="text-sm font-black text-white uppercase tracking-wider">
+                          {generatedRule.actions[0]?.type || 'ACTION'}
+                        </p>
+                      </div>
+                      <div className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[9px] font-black text-indigo-400 uppercase tracking-widest">
+                        Payload_Ready
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-slate-900/90 backdrop-blur-xl rounded-[2.5rem] p-8 text-slate-300 border border-white/10 shadow-2xl group">
-                <div className="flex items-center justify-between mb-6">
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 flex items-center gap-2 px-2">
-                    <Terminal size={14} className="text-brand-400" />
-                    Neural Execution Payload
+              {/* Result Blueprint */}
+              <div className="p-8 rounded-[2.5rem] bg-slate-900/60 border border-white/5 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/[0.02] blur-3xl rounded-full" />
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-3">
+                    <ShieldCheck size={16} className="text-brand-500" />
+                    <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">
+                      Verified_Protocol_Blueprint
+                    </span>
+                  </div>
+                  <span className="text-[12px] font-black text-white tracking-widest bg-brand-500/10 border border-brand-500/20 px-3 py-1 rounded-lg">
+                    {generatedRule.name}
                   </span>
-                  <div className="flex gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-rose-500/50 border border-rose-500/20" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-amber-500/50 border border-amber-500/20" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/50 border border-emerald-500/20" />
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <span className="text-[9px] font-black text-white/10 uppercase tracking-widest">
+                      Technical_Definition
+                    </span>
+                    <p className="text-sm text-white/60 leading-relaxed font-medium italic">
+                      "Deploy automation rule '{generatedRule.name}' to monitor and respond to{' '}
+                      {generatedRule.trigger.type} events within the primary execution cluster."
+                    </p>
+                  </div>
+                  <div className="bg-black/40 rounded-2xl p-6 border border-white/5 font-mono group-hover:border-brand-500/20 transition-colors">
+                    <div className="flex items-center gap-4 mb-4 opacity-20">
+                      <div className="h-2 w-2 rounded-full bg-rose-500" />
+                      <div className="h-2 w-2 rounded-full bg-amber-500" />
+                      <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                    </div>
+                    <pre className="text-[10px] text-brand-400/80 leading-relaxed">
+                      {JSON.stringify(
+                        {
+                          trigger: generatedRule.trigger.type,
+                          action_count: generatedRule.actions.length,
+                          priority_level: 'ELITE',
+                        },
+                        null,
+                        2,
+                      )}
+                    </pre>
                   </div>
                 </div>
-                <pre className="text-[11px] font-mono overflow-x-auto p-6 bg-black/40 rounded-3xl border border-white/5 scrollbar-hide group-hover:border-brand-500/30 transition-colors">
-                  {JSON.stringify(generatedRule, null, 2)}
-                </pre>
               </div>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="p-10 border-t border-white/20 flex items-center justify-between bg-white/20 backdrop-blur-md">
-          <div className="flex items-center gap-3 text-slate-500 px-2">
-            <AlertCircle size={18} className="text-amber-500" />
-            <p className="text-[10px] font-black uppercase tracking-widest opacity-60">
-              Audit blueprint before activation
+        <div className="px-10 py-8 border-t border-white/5 flex items-center justify-between bg-black/20">
+          <div className="flex items-center gap-3 opacity-30">
+            <AlertCircle size={16} className="text-amber-500" />
+            <p className="text-[9px] font-black text-white uppercase tracking-widest">
+              Audit sequence before protocol activation
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <button
               onClick={onClose}
-              className="px-8 py-4 font-black text-slate-400 hover:text-slate-900 transition-all uppercase text-[10px] tracking-widest"
+              className="font-black text-white/20 hover:text-white transition-all uppercase text-[10px] tracking-[0.2em]"
             >
-              Hủy
+              Terminate
             </button>
             <button
               onClick={handleSave}
               disabled={!generatedRule || saveMutation.isPending}
-              className="group relative px-10 py-5 bg-slate-900 hover:bg-brand-600 disabled:bg-slate-300 text-white rounded-[1.5rem] font-black shadow-2xl transition-all duration-300 active:scale-95 flex items-center gap-3 uppercase text-[11px] tracking-[0.2em] overflow-hidden"
+              className={`px-10 py-5 rounded-2xl font-black shadow-2xl transition-all duration-300 active:scale-95 flex items-center gap-3 uppercase text-[11px] tracking-[0.2em] relative overflow-hidden group/btn ${
+                generatedRule && !saveMutation.isPending
+                  ? 'bg-brand-500 text-white shadow-glow-brand/20 hover:bg-brand-400'
+                  : 'bg-white/5 text-white/10'
+              }`}
             >
               {saveMutation.isPending ? (
-                <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <Activity size={18} className="animate-spin" />
               ) : (
                 <>
-                  <Check size={18} className="group-hover:scale-125 transition-transform" />
-                  <span>Activate Rule</span>
+                  <Check size={18} className="group-hover/btn:scale-125 transition-transform" />
+                  <span>Activate_Protocol</span>
                 </>
               )}
             </button>

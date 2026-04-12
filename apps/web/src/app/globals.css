@@ -13,10 +13,11 @@
 }
 
 .mesh-bg {
-  background: radial-gradient(at 0% 0%, oklch(0.95 0.02 260) 0px, transparent 50%),
-              radial-gradient(at 100% 0%, oklch(0.95 0.05 180) 0px, transparent 50%),
-              radial-gradient(at 100% 100%, oklch(0.95 0.02 240) 0px, transparent 50%),
-              radial-gradient(at 0% 100%, oklch(0.95 0.04 160) 0px, transparent 50%);
+  background:
+    radial-gradient(at 0% 0%, oklch(0.95 0.02 260) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, oklch(0.95 0.05 180) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, oklch(0.95 0.02 240) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, oklch(0.95 0.04 160) 0px, transparent 50%);
 }
 
 .grain-overlay {
@@ -24,7 +25,7 @@
 }
 
 .grain-overlay::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   width: 100%;

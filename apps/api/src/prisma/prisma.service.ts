@@ -17,24 +17,79 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       query: {
         $allModels: {
           async $allOperations({ operation, model, args, query }) {
-            const start = Date.now();
-            const result = await query(args);
-            const duration = Date.now() - start;
+            // Global Soft-Delete Filter
+            const softDeleteModels = [
+              'Workspace',
+              'User',
+              'WorkspaceMember',
+              'Project',
+              'Task',
+              'TaskEvent',
+              'Comment',
+              'Attachment',
+              'Notification',
+              'Label',
+              'AuditLog',
+              'Channel',
+              'Message',
+              'Doc',
+            ];
 
-            if (duration > 100) {
-              logger.warn(
+            if (
+              model &&
+              softDeleteModels.includes(model) &&
+              [
+                'findMany',
+                'findFirst',
+                'findUnique',
+                'findUniqueOrThrow',
+                'count',
+                'aggregate',
+              ].includes(operation)
+            ) {
+              const whereParams = (args as { where?: Record<string, unknown> }).where || {};
+              // Only inject if not explicitly searching for deleted items
+              if (whereParams.deletedAt === undefined) {
+                (args as { where: Record<string, unknown> }).where = {
+                  ...whereParams,
+                  deletedAt: null,
+                };
+              }
+            }
+
+            const start = Date.now();
+            try {
+              const result = await query(args);
+              const duration = Date.now() - start;
+
+              if (duration > 100) {
+                logger.warn(
+                  {
+                    type: 'DB_QUERY',
+                    model,
+                    operation,
+                    duration: `${duration}ms`,
+                    slow: true,
+                  },
+                  `🐢 SLOW QUERY: ${model}.${operation} took ${duration}ms`,
+                );
+              }
+
+              return result;
+            } catch (error) {
+              const duration = Date.now() - start;
+              logger.error(
                 {
-                  type: 'DB_QUERY',
+                  type: 'DB_ERROR',
                   model,
                   operation,
                   duration: `${duration}ms`,
-                  slow: true,
+                  error: error instanceof Error ? error.message : String(error),
                 },
-                `🐢 SLOW QUERY: ${model}.${operation} took ${duration}ms`,
+                `❌ DB ERROR: ${model}.${operation} failed after ${duration}ms`,
               );
+              throw error;
             }
-
-            return result;
           },
         },
       },

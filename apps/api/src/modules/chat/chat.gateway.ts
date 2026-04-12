@@ -36,7 +36,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('channel:leave')
-  handleLeaveChannel(@ConnectedSocket() client: Socket, @MessageBody() data: { channelId: string }) {
+  handleLeaveChannel(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { channelId: string },
+  ) {
     client.leave(data.channelId);
     this.logger.log(`Client ${client.id} left channel ${data.channelId}`);
   }

@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { useMessages } from '../hooks/use-chat';
 import { AssigneeAvatar } from '@/features/jira/components/task-badges';
-import { Loader2, MessageSquare } from 'lucide-react';
+import { Loader2, Reply, Heart, Zap, MoreHorizontal } from 'lucide-react';
 import type { Message } from '@superboard/shared';
 
 interface MessageListProps {
@@ -17,7 +17,7 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const { messages, typingUsers, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
+  const { messages, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useMessages(channelId);
 
   // Auto scroll to bottom on new messages
@@ -30,84 +30,127 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-brand-500" />
+        <div className="relative">
+          <Loader2 className="h-10 w-10 animate-spin text-brand-500/20" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Zap className="h-4 w-4 text-brand-400 animate-pulse" />
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-transparent">
+      {hasNextPage && (
+        <div className="flex justify-center py-6">
+          <button
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            className="px-6 py-2 rounded-full bg-white/[0.03] border border-white/10 text-[10px] font-black text-brand-400 uppercase tracking-widest hover:bg-white/[0.05] hover:text-white transition-all transition-colors"
+          >
+            {isFetchingNextPage ? 'Retrieving Protocols...' : 'Fetch Previous Transmission'}
+          </button>
+        </div>
+      )}
+
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-6 py-4 space-y-6 flex flex-col-reverse"
+        className="flex-1 overflow-y-auto px-8 py-6 space-y-8 flex flex-col-reverse scrollbar-none"
       >
         <div ref={bottomRef} />
 
-        <div className="space-y-6">
+        <div className="space-y-8">
           {messages.map((message, index) => {
             const isLastFromUser = index > 0 && messages[index - 1]?.authorId === message.authorId;
             const showHeader = !isLastFromUser;
+            const isMe = message.authorId === 'me';
 
             return (
               <div
                 key={message.id}
-                className={`flex gap-3 group animate-in slide-in-from-bottom-2 duration-300 relative ${showHeader ? 'mt-4' : 'mt-1'}`}
+                className={`flex gap-5 group animate-in slide-in-from-bottom-4 duration-500 relative ${showHeader ? 'mt-8' : 'mt-1'}`}
               >
                 {showHeader ? (
-                  <AssigneeAvatar
-                    name={message.author?.fullName || 'Người dùng'}
-                    src={message.author?.avatarUrl}
-                    size="md"
-                  />
+                  <div className="relative shrink-0">
+                    <AssigneeAvatar
+                      name={message.author?.fullName || 'Operator'}
+                      src={message.author?.avatarUrl}
+                      size="md"
+                    />
+                    <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-slate-950 rounded-full border-2 border-slate-950 flex items-center justify-center">
+                      <div className="h-full w-full bg-emerald-500 rounded-full animate-pulse shadow-glow-emerald" />
+                    </div>
+                  </div>
                 ) : (
-                  <div className="w-10" /> // Spacer
+                  <div className="w-10 shrink-0" />
                 )}
 
-                <div className="flex-1 min-w-0">
+                <div className={`flex-1 min-w-0 max-w-3xl ${isMe ? 'ml-auto text-right' : ''}`}>
                   {showHeader && (
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="font-black text-slate-900 text-[13px] tracking-tight">
+                    <div className={`flex items-center gap-3 mb-2 ${isMe ? 'justify-end' : ''}`}>
+                      <span className="font-black text-white text-[13px] uppercase tracking-wider">
                         {message.author?.fullName}
                       </span>
-                      <span className="text-[10px] font-bold text-slate-400 opacity-60">
-                        {format(new Date(message.createdAt), 'HH:mm', { locale: vi })}
+                      <div className="h-1 w-1 rounded-full bg-white/20" />
+                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">
+                        {format(new Date(message.createdAt), 'HH:mm:ss', { locale: vi })}
                       </span>
                     </div>
                   )}
 
-                  <div
-                    className={`text-slate-700 text-[14px] leading-relaxed break-words whitespace-pre-wrap px-4 py-2.5 rounded-2xl border transition-all shadow-sm ${showHeader ? 'rounded-tl-none' : ''} ${message.authorId === 'me' ? 'bg-brand-50/80 border-brand-100/50 text-brand-900 ring-1 ring-brand-200/20' : 'bg-white/80 border-slate-100 hover:border-slate-200 hover:bg-white hover:shadow-md'}`}
-                  >
-                    {message.content}
-                  </div>
+                  <div className="relative group/bubble">
+                    <div
+                      className={`relative text-[14px] leading-relaxed break-words whitespace-pre-wrap px-5 py-3.5 rounded-2xl border transition-all duration-500 shadow-inner group-hover/bubble:shadow-glow-brand/5 ${
+                        showHeader ? (isMe ? 'rounded-tr-none' : 'rounded-tl-none') : ''
+                      } ${
+                        isMe
+                          ? 'bg-brand-500/10 border-brand-500/20 text-brand-100'
+                          : 'bg-white/[0.03] border-white/5 text-white/80 group-hover/bubble:bg-white/[0.05] group-hover/bubble:border-white/10'
+                      }`}
+                    >
+                      {message.content}
 
-                  {/* Reaction Display (Simulated) */}
-                  <div className="flex flex-wrap gap-1 mt-1.5 px-1">
-                    <button className="flex items-center gap-1.2 px-2 py-0.5 bg-slate-50 border border-slate-100 rounded-full text-[10px] font-bold text-slate-500 hover:bg-white hover:border-brand-200 transition-all">
-                      <span>🔥</span>
-                      <span>2</span>
-                    </button>
-                    <button className="flex items-center gap-1.2 px-2 py-0.5 bg-slate-50 border border-slate-100 rounded-full text-[10px] font-bold text-slate-500 hover:bg-white hover:border-brand-200 transition-all">
-                      <span>🚀</span>
-                      <span>1</span>
-                    </button>
-                  </div>
+                      {/* Physical noise texture proxy */}
+                      <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 rounded-2xl" />
+                    </div>
 
-                  <div className="absolute right-0 -top-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:-translate-y-1 z-10">
-                    <div className="flex items-center gap-0.5 p-1 bg-white/90 backdrop-blur-md border border-slate-200/50 rounded-xl shadow-2xl">
-                      <button
-                        onClick={() => onOpenThread?.(message)}
-                        className="p-2 hover:bg-slate-50 text-slate-500 hover:text-brand-600 rounded-lg transition-all"
-                        title="Trả lời chủ đề"
-                      >
-                        <MessageSquare size={16} />
+                    {/* Reaction System */}
+                    <div
+                      className={`flex flex-wrap gap-1.5 mt-2 px-1 ${isMe ? 'justify-end' : ''}`}
+                    >
+                      <button className="flex items-center gap-1.5 px-3 py-1 bg-slate-950 border border-white/5 rounded-full text-[10px] font-black text-white/40 hover:text-brand-400 hover:border-brand-500/30 transition-all group/reaction">
+                        <Heart
+                          size={10}
+                          className="group-hover/reaction:scale-125 transition-transform"
+                        />
+                        <span>OPERATOR_ACK</span>
                       </button>
-                      <button
-                        className="p-2 hover:bg-slate-50 text-slate-500 hover:text-amber-500 rounded-lg transition-all"
-                        title="Thả cảm xúc"
-                      >
-                        <span className="text-xs">😀</span>
-                      </button>
+                    </div>
+
+                    {/* Floating Controls */}
+                    <div
+                      className={`absolute -top-3 opacity-0 group-hover:opacity-100 transition-all transform group-hover:-translate-y-1 z-20 ${isMe ? 'right-0' : 'left-0'}`}
+                    >
+                      <div className="flex items-center gap-1 p-1 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl">
+                        <button
+                          onClick={() => onOpenThread?.(message)}
+                          className="p-2.5 hover:bg-white/5 text-white/40 hover:text-brand-400 rounded-lg transition-all"
+                          title="Open Transmission Thread"
+                        >
+                          <Reply size={16} />
+                        </button>
+                        <button
+                          className="p-2.5 hover:bg-white/5 text-white/40 hover:text-rose-400 rounded-lg transition-all"
+                          title="Signal Intensity"
+                        >
+                          <Zap size={16} />
+                        </button>
+                        <div className="w-px h-4 bg-white/5 mx-1" />
+                        <button className="p-2.5 hover:bg-white/5 text-white/40 hover:text-white rounded-lg transition-all">
+                          <MoreHorizontal size={16} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -116,33 +159,6 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
           })}
         </div>
       </div>
-
-      {hasNextPage && (
-        <div className="flex justify-center py-4">
-          <button
-            onClick={() => fetchNextPage()}
-            disabled={isFetchingNextPage}
-            className="text-xs font-semibold text-brand-600 hover:text-brand-700 transition-colors"
-          >
-            {isFetchingNextPage ? 'Đang tải...' : 'Tải thêm tin nhắn cũ'}
-          </button>
-        </div>
-      )}
-
-      {typingUsers.length > 0 && (
-        <div className="px-6 py-2 flex items-center gap-2">
-          <div className="flex gap-1">
-            <span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce" />
-            <span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce [animation-delay:0.2s]" />
-            <span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce [animation-delay:0.4s]" />
-          </div>
-          <span className="text-[10px] text-slate-400 italic">
-            {typingUsers.length === 1
-              ? 'Một người đang nhập...'
-              : `${typingUsers.length} người đang nhập...`}
-          </span>
-        </div>
-      )}
     </div>
   );
 }

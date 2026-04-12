@@ -21,6 +21,20 @@ import { WorkflowEditor } from '@/features/jira/components/WorkflowEditor';
 import { WorkspaceCreateModal } from '@/features/workspace/components/WorkspaceCreateModal';
 import { AvatarUpload } from '@/components/user/AvatarUpload';
 import { WorkspaceMemberSettings } from '@/features/workspace/components/WorkspaceMemberSettings';
+import {
+  Shield,
+  User,
+  Users,
+  Bell,
+  Workflow,
+  Plus,
+  Check,
+  ShieldCheck,
+  Cpu,
+  Mail,
+  Zap,
+  Target,
+} from 'lucide-react';
 
 export default function SettingsPage() {
   const { user } = useAuthSession();
@@ -32,7 +46,7 @@ export default function SettingsPage() {
     error,
   } = useWorkspaceMembers(workspaceId ?? undefined);
 
-  useWorkspace(workspaceId ?? undefined);
+  const { isLoading: isWorkspaceLoading } = useWorkspace(workspaceId ?? undefined);
 
   // Workflow hooks
   const { data: workflow, isLoading: isWorkflowLoading } = useWorkspaceWorkflow(workspaceId ?? '');
@@ -48,19 +62,19 @@ export default function SettingsPage() {
   >('profile');
 
   const updateProfile = useUpdateProfile();
-  const { data: preferences, isLoading: isPrefsLoading } = useNotificationPreferences();
+  const { data: preferences } = useNotificationPreferences();
   const updatePrefs = useUpdateNotificationPreferences();
   const [profileName, setProfileName] = useState(user?.fullName || '');
 
   if (isLoading || isWorkspaceLoading || (activeTab === 'workflows' && isWorkflowLoading))
-    return <FullPageLoader label="Đang tải cài đặt..." />;
+    return <FullPageLoader label="Establishing Secure Connection..." />;
 
   if (isError) {
     return (
       <FullPageError
-        title="Không thể tải cài đặt"
-        message={error?.message ?? 'Lỗi không xác định'}
-        actionLabel="Thử lại"
+        title="Access Protocol Failed"
+        message={error?.message ?? 'Unknown system error encountered'}
+        actionLabel="Re-Authenticate"
         onAction={() => window.location.reload()}
       />
     );
@@ -70,206 +84,300 @@ export default function SettingsPage() {
   const canChangeRoles = currentMember?.role === 'owner' || currentMember?.role === 'admin';
 
   return (
-    <section className="animate-fade-in pb-12">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tight">
-          Cài đặt hệ thống
-        </h1>
+    <section className="animate-in fade-in duration-1000 pb-20">
+      <div className="mb-12 flex items-center justify-between">
+        <div className="space-y-1">
+          <div className="flex items-center gap-3">
+            <ShieldCheck size={16} className="text-brand-400" />
+            <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">
+              Core Interface
+            </span>
+          </div>
+          <h1 className="text-4xl font-black text-white uppercase tracking-tighter leading-none">
+            Control Center
+          </h1>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsCreateModalOpen(true)}
+          className="group relative flex items-center gap-3 bg-white/[0.03] border border-white/5 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-white hover:bg-white/5 hover:border-brand-500/30 transition-all shadow-luxe"
+        >
+          <div className="p-1 bg-white/5 rounded-lg group-hover:bg-brand-500 group-hover:text-slate-950 transition-colors">
+            <Plus size={14} />
+          </div>
+          Initialize Workspace
+        </button>
       </div>
 
-      <div className="mb-10 border-b border-slate-200">
-        <nav className="-mb-px flex space-x-8">
+      <div className="mb-12 relative">
+        <div className="absolute inset-x-0 bottom-0 h-px bg-white/5" />
+        <nav className="flex space-x-12 relative z-10">
           {[
-            { id: 'profile', label: 'Hồ sơ cá nhân' },
-            { id: 'workspace', label: 'Workspace & Team' },
-            { id: 'notifications', label: 'Thông báo' },
-            ...(canChangeRoles ? [{ id: 'workflows', label: 'Quy trình mẫu' }] : []),
+            { id: 'profile', label: 'Operator Identity', icon: <User size={14} /> },
+            { id: 'workspace', label: 'Nodes & Ops', icon: <Users size={14} /> },
+            { id: 'notifications', label: 'Signal Config', icon: <Bell size={14} /> },
+            ...(canChangeRoles
+              ? [{ id: 'workflows', label: 'Neural Protocols', icon: <Workflow size={14} /> }]
+              : []),
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() =>
                 setActiveTab(tab.id as 'profile' | 'workspace' | 'notifications' | 'workflows')
               }
-              className={`whitespace-nowrap pb-4 px-1 border-b-2 font-black text-xs uppercase tracking-widest transition-all ${
-                activeTab === tab.id
-                  ? 'border-brand-600 text-brand-600'
-                  : 'border-transparent text-slate-400 hover:text-slate-600 hover:border-slate-300'
+              className={`relative flex items-center gap-3 pb-6 px-1 font-black text-[11px] uppercase tracking-[0.2em] transition-all group ${
+                activeTab === tab.id ? 'text-brand-400' : 'text-white/20 hover:text-white/60'
               }`}
             >
+              <div
+                className={`transition-all duration-500 ${activeTab === tab.id ? 'text-brand-500 animate-pulse' : 'text-white/10 group-hover:text-brand-400'}`}
+              >
+                {tab.icon}
+              </div>
               {tab.label}
+              {activeTab === tab.id && (
+                <div className="absolute inset-x-0 bottom-0 h-1 bg-brand-500 rounded-full shadow-glow-brand animate-in slide-in-from-bottom-2" />
+              )}
             </button>
           ))}
-
-          <div className="flex-1" />
-
-          <button
-            type="button"
-            onClick={() => setIsCreateModalOpen(true)}
-            className="mb-3 rounded-xl border border-brand-100 bg-brand-50 px-4 py-1.5 text-[10px] font-black uppercase tracking-wider text-brand-700 transition-all hover:bg-brand-100 active:scale-95"
-          >
-            + Create Workspace
-          </button>
         </nav>
       </div>
 
       {/* Tab Content */}
-      <div className="space-y-8">
+      <div className="max-w-4xl space-y-12">
         {activeTab === 'profile' && (
-          <div className="max-w-2xl space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <section className="premium-card p-8 space-y-8">
-              <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">
-                Thông tin cá nhân
-              </h2>
-
-              {user && <AvatarUpload user={user} />}
-
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  updateProfile.mutate({ fullName: profileName });
-                }}
-                className="space-y-6"
-              >
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    Họ và tên
-                  </label>
-                  <input
-                    type="text"
-                    value={profileName}
-                    onChange={(e) => setProfileName(e.target.value)}
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-none"
-                    required
-                  />
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <section className="relative rounded-[3rem] border border-white/5 bg-slate-900/40 p-12 shadow-glass backdrop-blur-3xl overflow-hidden group">
+              <div className="absolute inset-0 bg-noise opacity-[0.02] pointer-events-none" />
+              <div className="relative z-10 space-y-12">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-brand-500/10 rounded-2xl border border-brand-500/20 text-brand-400">
+                    <Target size={20} />
+                  </div>
+                  <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
+                    Operator Identity
+                  </h2>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    Email đăng nhập
-                  </label>
-                  <input
-                    type="email"
-                    value={user?.email}
-                    disabled
-                    className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-400 cursor-not-allowed"
-                  />
-                </div>
+                {user && <AvatarUpload user={user} />}
 
-                <div className="pt-2">
-                  <button
-                    type="submit"
-                    disabled={updateProfile.isPending || profileName === user?.fullName}
-                    className="rounded-2xl bg-slate-900 px-8 py-3 text-sm font-black text-white hover:bg-black transition-all active:scale-95 disabled:opacity-50 uppercase tracking-tight"
-                  >
-                    {updateProfile.isPending ? 'Đang lưu...' : 'Lưu thông tin'}
-                  </button>
-                </div>
-              </form>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    updateProfile.mutate({ fullName: profileName });
+                  }}
+                  className="grid gap-10 md:grid-cols-2"
+                >
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 pl-4">
+                      DESIGNATION
+                    </label>
+                    <input
+                      type="text"
+                      value={profileName}
+                      onChange={(e) => setProfileName(e.target.value)}
+                      className="w-full bg-slate-950 border border-white/5 rounded-[2rem] px-8 py-5 text-sm font-bold text-white placeholder:text-white/5 focus:outline-none focus:border-brand-500 transition-all shadow-inner"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 pl-4">
+                      ENCRYPTED EMAIL
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="email"
+                        value={user?.email}
+                        disabled
+                        className="w-full bg-slate-950 border border-white/5 rounded-[2rem] px-8 py-5 text-sm font-bold text-white/20 cursor-not-allowed shadow-inner"
+                      />
+                      <Shield
+                        size={14}
+                        className="absolute right-6 top-1/2 -translate-y-1/2 text-white/5"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="md:col-span-2 pt-6 flex justify-end">
+                    <button
+                      type="submit"
+                      disabled={updateProfile.isPending || profileName === user?.fullName}
+                      className="group relative flex items-center gap-4 bg-white px-12 py-5 rounded-full text-slate-950 font-black text-[11px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-luxe overflow-hidden disabled:opacity-30"
+                    >
+                      <div className="absolute inset-0 bg-brand-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                      <span className="relative z-10 flex items-center gap-3 group-hover:text-white transition-colors">
+                        {updateProfile.isPending ? (
+                          <Cpu className="animate-spin" size={16} />
+                        ) : (
+                          <Check size={16} />
+                        )}
+                        {updateProfile.isPending ? 'SYNCING...' : 'UPDATE IDENTITY'}
+                      </span>
+                    </button>
+                  </div>
+                </form>
+              </div>
             </section>
           </div>
         )}
 
         {activeTab === 'workspace' && workspaceId && (
-          <WorkspaceMemberSettings workspaceId={workspaceId} currentUserId={user?.id || ''} />
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <section className="relative rounded-[3rem] border border-white/5 bg-slate-900/40 p-4 shadow-glass backdrop-blur-3xl overflow-hidden group">
+              <WorkspaceMemberSettings workspaceId={workspaceId} currentUserId={user?.id || ''} />
+            </section>
+          </div>
         )}
 
         {activeTab === 'notifications' && (
-          <div className="max-w-2xl space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <section className="premium-card p-8 space-y-8">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">
-                    Email Notifications
-                  </h2>
-                  <p className="text-xs text-slate-500 font-medium mt-1">
-                    Quản lý cách SuperBoard liên lạc với bạn qua hòm thư.
-                  </p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={preferences?.emailEnabled ?? true}
-                  onChange={(e) => updatePrefs.mutate({ emailEnabled: e.target.checked })}
-                  disabled={updatePrefs.isPending || isPrefsLoading}
-                  className="h-6 w-11 rounded-full border-slate-300 text-brand-600 focus:ring-brand-500"
-                />
-              </div>
-
-              <div className="space-y-4 pt-6 border-t border-slate-100">
-                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                  Sự kiện thông báo
-                </h3>
-
-                {[
-                  {
-                    id: 'taskAssignedEmail',
-                    label: 'Được giao công việc mới',
-                    desc: 'Có ai đó gán bạn vào một thẻ công việc.',
-                  },
-                  {
-                    id: 'workspaceInviteEmail',
-                    label: 'Lời mời Workspace',
-                    desc: 'Nhận thư mời gia nhập các tổ chức mới.',
-                  },
-                ].map((item) => (
-                  <div key={item.id} className="flex items-center justify-between group">
-                    <div>
-                      <p className="text-sm font-bold text-slate-800">{item.label}</p>
-                      <p className="text-xs text-slate-500 font-medium">{item.desc}</p>
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <section className="relative rounded-[3rem] border border-white/5 bg-slate-900/40 p-12 shadow-glass backdrop-blur-3xl overflow-hidden group">
+              <div className="absolute inset-0 bg-noise opacity-[0.02] pointer-events-none" />
+              <div className="relative z-10 space-y-12">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-cyan-500/10 rounded-2xl border border-cyan-500/20 text-cyan-400">
+                      <Zap size={20} />
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={
-                        ((preferences as Record<string, unknown>)?.[item.id] as boolean) ?? true
-                      }
-                      onChange={(e) => updatePrefs.mutate({ [item.id]: e.target.checked })}
-                      disabled={
-                        updatePrefs.isPending || isPrefsLoading || !preferences?.emailEnabled
-                      }
-                      className="h-5 w-5 rounded-lg border-slate-300 text-brand-600 focus:ring-brand-500 transition-all"
-                    />
+                    <div>
+                      <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
+                        Signal Config
+                      </h2>
+                      <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mt-1">
+                        Configure telemetry relay protocols.
+                      </p>
+                    </div>
                   </div>
-                ))}
+
+                  <button
+                    onClick={() => updatePrefs.mutate({ emailEnabled: !preferences?.emailEnabled })}
+                    className={`relative w-16 h-8 rounded-full transition-all duration-500 p-1 ${
+                      preferences?.emailEnabled ? 'bg-brand-500 shadow-glow-brand' : 'bg-white/10'
+                    }`}
+                  >
+                    <div
+                      className={`h-6 w-6 rounded-full bg-white transition-all duration-500 shadow-luxe ${
+                        preferences?.emailEnabled ? 'translate-x-8' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                <div className="space-y-4 pt-10 border-t border-white/5">
+                  <label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/10 pl-4">
+                    TRIGGER EVENTS
+                  </label>
+                  <div className="grid gap-4">
+                    {[
+                      {
+                        id: 'taskAssignedEmail',
+                        label: 'Vector Authorization',
+                        desc: 'You are designated as the primary operator for a new mission vector.',
+                        icon: <Target size={18} />,
+                      },
+                      {
+                        id: 'workspaceInviteEmail',
+                        label: 'Namespace Invitation',
+                        desc: 'Receive access requests to establish connection with external node clusters.',
+                        icon: <Mail size={18} />,
+                      },
+                    ].map((item) => (
+                      <div
+                        key={item.id}
+                        onClick={() => {
+                          if (preferences?.emailEnabled) {
+                            updatePrefs.mutate({
+                              [item.id]: !(preferences as Record<string, unknown>)?.[item.id],
+                            });
+                          }
+                        }}
+                        className={`flex items-center justify-between p-6 rounded-[2rem] border transition-all cursor-pointer group ${
+                          (preferences as Record<string, unknown>)?.[item.id]
+                            ? 'bg-white/[0.04] border-white/10'
+                            : 'bg-transparent border-white/5 opacity-40 grayscale'
+                        }`}
+                      >
+                        <div className="flex items-center gap-6">
+                          <div
+                            className={`p-4 rounded-2xl transition-all ${
+                              (preferences as Record<string, unknown>)?.[item.id]
+                                ? 'bg-brand-500 text-slate-950 shadow-glow-brand'
+                                : 'bg-white/5 text-white/20'
+                            }`}
+                          >
+                            {item.icon}
+                          </div>
+                          <div>
+                            <p className="text-sm font-black text-white uppercase tracking-wider">
+                              {item.label}
+                            </p>
+                            <p className="text-[10px] font-medium text-white/20 uppercase tracking-widest leading-none mt-1">
+                              {item.desc}
+                            </p>
+                          </div>
+                        </div>
+                        <div
+                          className={`h-5 w-5 rounded-lg border-2 transition-all flex items-center justify-center ${
+                            (preferences as Record<string, unknown>)?.[item.id]
+                              ? 'border-brand-500 bg-brand-500 text-slate-950'
+                              : 'border-white/10'
+                          }`}
+                        >
+                          {(preferences as Record<string, unknown>)?.[item.id] && (
+                            <Check size={14} />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </section>
           </div>
         )}
 
         {activeTab === 'workflows' && canChangeRoles && (
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <WorkflowEditor
-              data={workflow}
-              isLoading={isWorkflowLoading}
-              title="Quy trình mẫu chuẩn (Workspace Template)"
-              description="Thiết lập trạng thái và quy tắc chuyển đổi mặc định. Mọi dự án mới sẽ được kế thừa từ đây."
-              onAddStatus={(data) => createWorkspaceStatus.mutateAsync(data)}
-              onUpdateStatus={(statusId, data) =>
-                updateWorkspaceStatus.mutateAsync({ statusId, data })
-              }
-              onDeleteStatus={(statusId) =>
-                confirm('Xoá trạng thái mẫu?') && deleteWorkspaceStatus.mutateAsync({ statusId })
-              }
-              onSaveTransitions={(transitions) =>
-                updateWorkspaceTransitions.mutateAsync({ transitions })
-              }
-              isPending={
-                createWorkspaceStatus.isPending ||
-                updateWorkspaceStatus.isPending ||
-                deleteWorkspaceStatus.isPending ||
-                updateWorkspaceTransitions.isPending ||
-                syncWorkflow.isPending
-              }
-              extraActions={
-                <button
-                  onClick={() =>
-                    confirm('GHI ĐÈ quy trình của TẤT CẢ dự án hiện có?') && syncWorkflow.mutate()
-                  }
-                  disabled={syncWorkflow.isPending}
-                  className="px-6 py-2.5 bg-brand-50 text-brand-700 text-[10px] font-black uppercase tracking-widest rounded-xl border border-brand-200 hover:bg-brand-100 transition-all"
-                >
-                  {syncWorkflow.isPending ? 'Đang đồng bộ...' : '🔄 Đồng bộ toàn hệ thống'}
-                </button>
-              }
-            />
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <section className="relative rounded-[3rem] border border-white/5 bg-slate-900/40 shadow-glass backdrop-blur-3xl overflow-hidden group">
+              <WorkflowEditor
+                data={workflow}
+                isLoading={isWorkflowLoading}
+                title="Universal Protocol Manifest"
+                description="Establish default status vectors and transition logic for all workspace mission blocks."
+                onAddStatus={(data) => createWorkspaceStatus.mutateAsync(data)}
+                onUpdateStatus={(statusId, data) =>
+                  updateWorkspaceStatus.mutateAsync({ statusId, data })
+                }
+                onDeleteStatus={(statusId) =>
+                  confirm('De-authorize mission status status?') &&
+                  deleteWorkspaceStatus.mutateAsync({ statusId })
+                }
+                onSaveTransitions={(transitions) =>
+                  updateWorkspaceTransitions.mutateAsync({ transitions })
+                }
+                isPending={
+                  createWorkspaceStatus.isPending ||
+                  updateWorkspaceStatus.isPending ||
+                  deleteWorkspaceStatus.isPending ||
+                  updateWorkspaceTransitions.isPending ||
+                  syncWorkflow.isPending
+                }
+                extraActions={
+                  <button
+                    onClick={() =>
+                      confirm('TRANSMIT GLOBAL PROTOCOL OVERWRITE TO ALL NODES?') &&
+                      syncWorkflow.mutate()
+                    }
+                    disabled={syncWorkflow.isPending}
+                    className="px-8 py-3 bg-white/[0.03] border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-brand-500 hover:text-slate-950 hover:border-brand-500 transition-all shadow-luxe"
+                  >
+                    {syncWorkflow.isPending ? 'TRANSMITTING...' : 'Propagate to System'}
+                  </button>
+                }
+              />
+            </section>
           </div>
         )}
       </div>

@@ -1,0 +1,102 @@
+
+> @superboard/web@0.1.0 lint
+> eslint .
+
+
+/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/dashboard/page.tsx
+   8:3   error  'Target' is defined but never used           @typescript-eslint/no-unused-vars
+  26:37  error  'PRIORITY_LABELS' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/docs/[docId]/page.tsx
+  12:3   error  'Cloud' is defined but never used         @typescript-eslint/no-unused-vars
+  17:3   error  'CheckCircle2' is defined but never used  @typescript-eslint/no-unused-vars
+  25:10  error  'SectionError' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/jira/page.tsx
+   3:10  error  'EmptyStateCard' is defined but never used  @typescript-eslint/no-unused-vars
+  11:3   error  'Database' is defined but never used        @typescript-eslint/no-unused-vars
+  12:3   error  'Cpu' is defined but never used             @typescript-eslint/no-unused-vars
+  18:3   error  'Filter' is defined but never used          @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/settings/page.tsx
+  65:41  error  'isPrefsLoading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/components/layout/private-shell.tsx
+  15:3  error  'Layout' is defined but never used    @typescript-eslint/no-unused-vars
+  23:3  error  'Zap' is defined but never used       @typescript-eslint/no-unused-vars
+  25:3  error  'History' is defined but never used   @typescript-eslint/no-unused-vars
+  26:3  error  'Activity' is defined but never used  @typescript-eslint/no-unused-vars
+  27:3  error  'User' is defined but never used      @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/components/search/CommandPalette.tsx
+   6:3  error  'Search' is defined but never used      @typescript-eslint/no-unused-vars
+   7:3  error  'Command' is defined but never used     @typescript-eslint/no-unused-vars
+  13:3  error  'TrendingUp' is defined but never used  @typescript-eslint/no-unused-vars
+  17:3  error  'Database' is defined but never used    @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/features/automation/components/AIAutomationDialog.tsx
+  2:91  error  'Send' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/features/automation/components/AutomationList.tsx
+  2:20  error  'Trash2' is defined but never used      @typescript-eslint/no-unused-vars
+  2:55  error  'ArrowRight' is defined but never used  @typescript-eslint/no-unused-vars
+  2:67  error  'Settings2' is defined but never used   @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/features/chat/components/ChannelSidebar.tsx
+  5:41  error  'MessageSquare' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/features/chat/components/ChatShell.tsx
+  7:29  error  'Settings' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/features/chat/components/MessageInput.tsx
+  4:34  error  'MoreHorizontal' is defined but never used  @typescript-eslint/no-unused-vars
+  4:55  error  'ZapOff' is defined but never used          @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/features/chat/components/MessageList.tsx
+  8:19  error  'MessageSquare' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/features/chat/components/ThreadPanel.tsx
+  135:2  error  Parsing error: Declaration or statement expected
+
+/Users/maitranhuy/SuperBoard/apps/web/src/features/chat/hooks/use-chat.ts
+   9:3   error  'summarizeThread' is defined but never used  @typescript-eslint/no-unused-vars
+  12:10  error  'apiGet' is defined but never used           @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/features/docs/components/DocTOC.tsx
+   2:16  error  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+  11:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/maitranhuy/SuperBoard/apps/web/src/features/docs/components/DocVersionSidebar.tsx
+   6:40  error  'User' is defined but never used          @typescript-eslint/no-unused-vars
+   7:10  error  'Loader2' is defined but never used       @typescript-eslint/no-unused-vars
+  12:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/maitranhuy/SuperBoard/apps/web/src/features/docs/components/RichTextEditor.tsx
+  10:36   error  'Loader2' is defined but never used            @typescript-eslint/no-unused-vars
+  10:92   error  'Search' is defined but never used             @typescript-eslint/no-unused-vars
+  10:100  error  'Zap' is defined but never used                @typescript-eslint/no-unused-vars
+  36:10   error  'headings' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/features/jira/components/project-card.tsx
+  40:3  error  'isArchivingProject' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/features/jira/components/project-cards-grid.tsx
+  6:16  error  'LayoutGrid' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/features/jira/components/project-detail-header.tsx
+  8:3  error  'Sparkles' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/maitranhuy/SuperBoard/apps/web/src/lib/api-client.ts
+  99:16  error  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 46 problems (46 errors, 0 warnings)
+
+npm error Lifecycle script `lint` failed with error:
+npm error code 1
+npm error path /Users/maitranhuy/SuperBoard/apps/web
+npm error workspace @superboard/web@0.1.0
+npm error location /Users/maitranhuy/SuperBoard/apps/web
+npm error command failed
+npm error command sh -c eslint .

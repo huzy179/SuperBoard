@@ -3,13 +3,13 @@
 import { useRouter } from 'next/navigation';
 import type { ProjectItemDTO } from '@superboard/shared';
 import { ProjectCard } from '@/features/jira/components/project-card';
+import { Plus } from 'lucide-react';
 
 type ProjectCardsGridProps = {
   projects: ProjectItemDTO[];
   onOpenCreate: () => void;
   onOpenEdit: (project: ProjectItemDTO) => void;
   onArchive: (projectId: string) => void;
-  isArchivingProject: (projectId: string) => boolean;
   onToggleFavorite: (projectId: string) => void;
   isFavorite: (projectId: string) => boolean;
   getProjectOpenHref: (projectId: string) => string;
@@ -23,7 +23,6 @@ export function ProjectCardsGrid({
   onOpenCreate,
   onOpenEdit,
   onArchive,
-  isArchivingProject,
   onToggleFavorite,
   isFavorite,
   getProjectOpenHref,
@@ -34,7 +33,7 @@ export function ProjectCardsGrid({
   const router = useRouter();
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
       {projects.map((project, index) => (
         <ProjectCard
           key={project.id}
@@ -43,7 +42,6 @@ export function ProjectCardsGrid({
           onOpen={(href) => router.push(href)}
           onOpenEdit={onOpenEdit}
           onArchive={onArchive}
-          isArchivingProject={isArchivingProject}
           onToggleFavorite={onToggleFavorite}
           isFavorite={isFavorite}
           getProjectOpenHref={getProjectOpenHref}
@@ -52,21 +50,29 @@ export function ProjectCardsGrid({
         />
       ))}
 
-      {showCreateCard ? (
+      {showCreateCard && (
         <button
           type="button"
           onClick={onOpenCreate}
-          className="group relative rounded-xl border-2 border-dashed border-surface-border bg-surface-bg p-6 text-center transition-all hover:border-brand-300 hover:bg-brand-50/50"
+          className="group relative flex flex-col items-center justify-center gap-6 rounded-[2.5rem] border-2 border-dashed border-white/5 bg-white/[0.02] p-10 transition-all duration-500 hover:border-brand-500/50 hover:bg-white/[0.05] hover:scale-[1.02] active:scale-[0.98] min-h-[380px]"
         >
-          <div className="space-y-2">
-            <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-white transition-colors group-hover:bg-brand-100">
-              <span className="text-lg text-slate-400 group-hover:text-brand-600">+</span>
-            </div>
-            <p className="font-semibold text-slate-700 group-hover:text-brand-600">Dự án mới</p>
-            <p className="text-xs text-slate-500">Tạo dự án để bắt đầu</p>
+          <div className="relative p-6 bg-slate-900 rounded-3xl border border-white/5 group-hover:bg-brand-500/10 group-hover:border-brand-500/20 transition-all duration-500 group-hover:shadow-glow-brand">
+            <Plus
+              size={32}
+              className="text-white/20 group-hover:text-brand-400 group-hover:scale-110 transition-all duration-500"
+            />
           </div>
+          <div className="text-center space-y-2">
+            <p className="text-sm font-black text-white/40 uppercase tracking-[0.2em] group-hover:text-white transition-colors">
+              Initialize New Node
+            </p>
+            <p className="text-[10px] font-medium text-white/20 uppercase tracking-widest italic leading-relaxed px-6">
+              Establish a new operational vector within the workspace.
+            </p>
+          </div>
+          <div className="absolute inset-0 bg-brand-500/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-[2.5rem] blur-2xl" />
         </button>
-      ) : null}
+      )}
     </div>
   );
 }

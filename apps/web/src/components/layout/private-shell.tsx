@@ -12,7 +12,6 @@ import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { AssigneeAvatar } from '@/features/jira/components/task-badges';
 import { WorkspaceSwitcher } from '@/features/workspace/components/WorkspaceSwitcher';
 import {
-  Layout,
   MessageSquare,
   FileText,
   Settings,
@@ -20,6 +19,9 @@ import {
   Bell,
   LogOut,
   Search,
+  LayoutGrid,
+  PanelLeftClose,
+  PanelLeft,
 } from 'lucide-react';
 
 type PrivateShellProps = {
@@ -31,7 +33,7 @@ type PrivateShellProps = {
 };
 
 const NAV_ICONS: Record<NavItem['icon'], ReactNode> = {
-  projects: <Layout size={18} />,
+  projects: <LayoutGrid size={18} />,
   dashboard: <PieChart size={18} />,
   settings: <Settings size={18} />,
   notifications: <Bell size={18} />,
@@ -41,6 +43,7 @@ const NAV_ICONS: Record<NavItem['icon'], ReactNode> = {
 
 export function PrivateShell({ children, user, navItems, pathname, onLogout }: PrivateShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
   useKeyboardShortcuts([
@@ -57,54 +60,67 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
   ]);
 
   const sidebar = (
-    <div className="flex h-full flex-col bg-slate-950">
-      <div className="flex h-16 shrink-0 items-center justify-between px-6 border-b border-white/5">
-        <AppBrand subtitle="Workspace" variant="dark" />
-      </div>
+    <div className="flex h-full flex-col bg-slate-950/40 backdrop-blur-3xl border-r border-white/5 relative z-50">
+      {/* Rim Light */}
+      <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-brand-500/30 to-transparent" />
 
-      {/* Workspace Switcher */}
-      <WorkspaceSwitcher />
-
-      {/* Search Trigger */}
-      <div className="px-4 pt-6 pb-2">
+      <div className="flex h-20 shrink-0 items-center justify-between px-6 border-b border-white/5 bg-white/5">
+        {!sidebarCollapsed && <AppBrand subtitle="Workspace" variant="dark" />}
         <button
-          type="button"
-          onClick={() => setSearchOpen(true)}
-          className="group flex w-full items-center gap-3 rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3 text-[13px] text-white/40 transition-all hover:bg-white/[0.07] hover:border-white/10 hover:text-white/70"
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="p-2 rounded-xl text-white/20 hover:text-white hover:bg-white/5 transition-all hidden lg:flex"
         >
-          <Search size={16} />
-          <span className="font-medium text-[12px]">Tìm kiếm lệnh...</span>
-          <div className="ml-auto flex items-center gap-1">
-            <kbd className="rounded bg-white/5 px-1.5 py-0.5 text-[9px] font-black text-white/20 border border-white/5 group-hover:text-white/40">
-              ⌘
-            </kbd>
-            <kbd className="rounded bg-white/5 px-1.5 py-0.5 text-[9px] font-black text-white/20 border border-white/5 group-hover:text-white/40">
-              K
-            </kbd>
-          </div>
+          {sidebarCollapsed ? <PanelLeft size={20} /> : <PanelLeftClose size={20} />}
         </button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-1">
+      {/* Workspace Switcher */}
+      <div className={sidebarCollapsed ? 'px-2 py-4' : ''}>
+        <WorkspaceSwitcher showLabel={!sidebarCollapsed} />
+      </div>
+
+      {/* Search Trigger */}
+      <div className={`px-4 pt-6 pb-2 ${sidebarCollapsed ? 'flex justify-center' : ''}`}>
+        <button
+          type="button"
+          onClick={() => setSearchOpen(true)}
+          className={`group flex items-center gap-3 rounded-2xl bg-white/[0.02] border border-white/5 transition-all hover:bg-white/[0.08] hover:border-brand-500/30 hover:shadow-glow-brand ${
+            sidebarCollapsed ? 'p-3' : 'w-full px-4 py-3.5'
+          }`}
+        >
+          <Search size={16} className="text-white/30 group-hover:text-brand-400" />
+          {!sidebarCollapsed && (
+            <>
+              <span className="font-black text-[10px] uppercase tracking-widest text-white/20 group-hover:text-white/60">
+                Search Command
+              </span>
+              <div className="ml-auto flex items-center gap-1">
+                <kbd className="rounded-[4px] bg-slate-950 px-1.5 py-0.5 text-[8px] font-black text-white/20 border border-white/10 group-hover:text-brand-400">
+                  ⌘
+                </kbd>
+                <kbd className="rounded-[4px] bg-slate-950 px-1.5 py-0.5 text-[8px] font-black text-white/20 border border-white/10 group-hover:text-brand-400">
+                  K
+                </kbd>
+              </div>
+            </>
+          )}
+        </button>
+      </div>
+
+      <nav className="flex-1 overflow-y-auto px-4 py-8 space-y-2">
         {navItems.map((item) => {
           const isActive = !item.disabled && isNavItemActive(pathname, item.href);
-          const baseClasses =
-            'flex items-center gap-3.5 rounded-xl px-4 py-3 text-[13px] font-bold transition-all duration-300';
+          const baseClasses = `flex items-center gap-4 rounded-2xl px-4 py-3.5 text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-500`;
 
           if (item.disabled) {
             return (
               <span
                 key={item.label}
-                className={`${baseClasses} cursor-not-allowed text-white/20 opacity-50`}
-                title="Sắp ra mắt"
+                className={`${baseClasses} cursor-not-allowed text-white/10 opacity-40 justify-center lg:justify-start`}
+                title="Protocol Pending"
               >
-                {NAV_ICONS[item.icon]}
-                <span className="uppercase tracking-widest text-[11px] font-black">
-                  {item.label}
-                </span>
-                <span className="ml-auto rounded-full bg-white/5 px-2 py-0.5 text-[8px] font-black text-white/30 border border-white/5 uppercase">
-                  Soon
-                </span>
+                <div className="shrink-0">{NAV_ICONS[item.icon]}</div>
+                {!sidebarCollapsed && <span>{item.label}</span>}
               </span>
             );
           }
@@ -116,18 +132,18 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
               onClick={() => setSidebarOpen(false)}
               className={`${baseClasses} group ${
                 isActive
-                  ? 'bg-brand-600/10 text-brand-400 shadow-[inset_0_0_12px_rgba(37,99,235,0.05)] border border-brand-500/20'
-                  : 'text-white/40 hover:bg-white/[0.03] hover:text-white/70 border border-transparent'
-              }`}
+                  ? 'bg-brand-500/10 text-brand-400 border border-brand-500/20 shadow-glow-brand'
+                  : 'text-white/20 hover:bg-white/[0.04] hover:text-white/80 border border-transparent'
+              } ${sidebarCollapsed ? 'px-0 justify-center' : ''}`}
             >
               <div
-                className={`${isActive ? 'text-brand-500' : 'text-white/20 group-hover:text-white/40'} transition-colors`}
+                className={`${isActive ? 'text-brand-400 animate-pulse' : 'text-white/20 group-hover:text-brand-400'} transition-all duration-500 shrink-0`}
               >
                 {NAV_ICONS[item.icon]}
               </div>
-              <span className="uppercase tracking-widest text-[11px] font-black">{item.label}</span>
-              {isActive && (
-                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-brand-500 shadow-[0_0_8px_rgba(37,99,235,0.8)] animate-pulse" />
+              {!sidebarCollapsed && <span>{item.label}</span>}
+              {!sidebarCollapsed && isActive && (
+                <div className="ml-auto w-1 h-3 rounded-full bg-brand-500 shadow-glow-brand" />
               )}
             </Link>
           );
@@ -135,40 +151,57 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
       </nav>
 
       {/* Footer User Profile */}
-      <div className="shrink-0 p-4">
-        <div className="flex items-center gap-3 rounded-2xl bg-white/[0.03] border border-white/5 p-3 hover:bg-white/[0.06] transition-all group">
-          <AssigneeAvatar
-            name={user.fullName}
-            color={user.avatarColor}
-            src={user.avatarUrl}
-            size="md"
-          />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[13px] font-bold text-white/90">{user.fullName}</p>
-            <p className="truncate text-[10px] font-medium text-white/30 uppercase tracking-tighter italic">
-              Personal Space
-            </p>
+      <div className="shrink-0 p-4 border-t border-white/5 bg-white/2">
+        <div
+          className={`flex items-center gap-4 rounded-3xl bg-slate-950/50 border border-white/5 p-3 hover:bg-slate-950 transition-all group ${sidebarCollapsed ? 'justify-center' : ''}`}
+        >
+          <div className="relative shrink-0">
+            <AssigneeAvatar
+              name={user.fullName}
+              color={user.avatarColor}
+              src={user.avatarUrl}
+              size="md"
+            />
+            <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-emerald-500 border-2 border-slate-950 rounded-full shadow-glow-brand" />
           </div>
-          <div className="flex items-center gap-1 opacity-20 group-hover:opacity-100 transition-opacity">
-            <NotificationBell />
-            <button
-              type="button"
-              onClick={onLogout}
-              className="w-8 h-8 flex items-center justify-center rounded-xl text-white/40 transition-all hover:bg-rose-500/10 hover:text-rose-500 active:scale-90"
-              title="Đăng xuất"
-            >
-              <LogOut size={16} />
-            </button>
-          </div>
+          {!sidebarCollapsed && (
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[11px] font-black text-white uppercase tracking-wider">
+                {user.fullName}
+              </p>
+              <p className="truncate text-[9px] font-bold text-white/20 uppercase tracking-widest italic">
+                Personal Node
+              </p>
+            </div>
+          )}
+          {!sidebarCollapsed && (
+            <div className="flex items-center gap-2 opacity-20 group-hover:opacity-100 transition-opacity">
+              <NotificationBell />
+              <button
+                type="button"
+                onClick={onLogout}
+                className="w-8 h-8 flex items-center justify-center rounded-xl text-white/40 transition-all hover:bg-rose-500/10 hover:text-rose-500"
+                title="Terminate Signal"
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
+    <div className="flex h-screen overflow-hidden bg-slate-950 font-sans">
+      {/* Global Glows */}
+      <div className="fixed -top-[20%] -left-[10%] w-[50%] h-[50%] bg-brand-500/5 rounded-full blur-[200px] pointer-events-none" />
+      <div className="fixed -bottom-[20%] -right-[10%] w-[40%] h-[40%] bg-indigo-500/5 rounded-full blur-[180px] pointer-events-none" />
+
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex lg:w-72 lg:shrink-0 lg:flex-col shadow-2xl z-50">
+      <aside
+        className={`hidden lg:flex shrink-0 flex-col z-50 transition-all duration-700 ease-in-out ${sidebarCollapsed ? 'w-24' : 'w-80'}`}
+      >
         {sidebar}
       </aside>
 
@@ -176,13 +209,13 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
       {sidebarOpen && (
         <div className="fixed inset-0 z-[110] lg:hidden">
           <div
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300"
+            className="absolute inset-0 bg-slate-950/80 backdrop-blur-2xl animate-in fade-in duration-500"
             onClick={() => setSidebarOpen(false)}
             aria-hidden
           />
           <aside
             id="mobile-sidebar"
-            className="relative z-[120] h-full w-72 shadow-2xl animate-in slide-in-from-left duration-500"
+            className="relative z-[120] h-full w-80 shadow-glass animate-in slide-in-from-left duration-700"
           >
             {sidebar}
           </aside>
@@ -191,36 +224,38 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
 
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden relative">
-        {/* Background Decor */}
-        <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-gradient-to-bl from-brand-100/20 to-transparent pointer-events-none" />
-
         {/* Mobile top bar */}
-        <header className="flex h-16 shrink-0 items-center gap-4 border-b border-slate-200 bg-white px-6 lg:hidden z-10">
+        <header className="flex h-20 shrink-0 items-center gap-6 border-b border-white/5 bg-slate-950/40 backdrop-blur-3xl px-8 lg:hidden z-[60]">
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
-            className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all"
-            aria-label="Mở menu"
+            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/5 text-white/40 hover:text-white transition-all shadow-luxe"
+            aria-label="Access Command Menu"
             aria-expanded={sidebarOpen}
             aria-controls="mobile-sidebar"
           >
-            <Layout size={20} />
+            <PanelLeft size={22} />
           </button>
-          <AppBrand subtitle="Workspace" />
-          <div className="ml-auto flex items-center gap-2">
+          <AppBrand subtitle="Workspace" variant="dark" />
+          <div className="ml-auto flex items-center gap-3">
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-500 hover:bg-slate-100 transition-all"
-              aria-label="Tìm kiếm"
+              className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/5 text-white/40 hover:text-white transition-all shadow-luxe"
+              aria-label="Global Search"
             >
-              <Search size={20} />
+              <Search size={22} />
             </button>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-6 py-8 md:px-10 lg:px-12 relative z-0 transition-opacity duration-500">
-          <div className="max-w-[1600px] mx-auto">{children}</div>
+        <main className="flex-1 overflow-y-auto px-8 py-10 md:px-12 lg:px-16 relative z-0">
+          {/* Internal Grain Texture */}
+          <div className="absolute inset-0 bg-noise opacity-[0.02] pointer-events-none mix-blend-overlay" />
+
+          <div className="max-w-[1700px] mx-auto relative z-10 animate-in fade-in duration-1000">
+            {children}
+          </div>
         </main>
       </div>
 

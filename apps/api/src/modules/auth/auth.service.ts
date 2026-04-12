@@ -25,7 +25,7 @@ export class AuthService {
     password: string,
   ): Promise<{ accessToken: string; user: AuthUserDTO }> {
     const user = await this.prisma.user.findUnique({
-      where: { email: email.toLowerCase().trim(), deletedAt: null },
+      where: { email: email.toLowerCase().trim() },
     });
 
     if (!user || !user.isActive) {
@@ -61,7 +61,7 @@ export class AuthService {
     const token = authorizationHeader.slice('Bearer '.length).trim();
     const payload = this.verifyAccessToken(token);
 
-    const user = await this.prisma.user.findUnique({ where: { id: payload.sub, deletedAt: null } });
+    const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
     if (!user || !user.isActive) {
       throw new UnauthorizedException('Invalid token');
     }

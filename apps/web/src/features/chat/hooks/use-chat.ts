@@ -6,10 +6,8 @@ import {
   getChannelMessages,
   sendMessage,
   joinChannel,
-  summarizeThread,
 } from '@/features/chat/api/chat-service';
 import { chatSocket } from '@/lib/realtime/chat-socket';
-import { apiGet } from '@/lib/api-client';
 import { toast } from 'sonner';
 
 export function useChannels(workspaceId: string | undefined) {
@@ -22,7 +20,9 @@ export function useChannels(workspaceId: string | undefined) {
 
 export function useMessages(channelId: string | undefined) {
   const [realtimeMessages, setRealtimeMessages] = useState<Message[]>([]);
-  const [typingUsers, setTypingUsers] = useState<Record<string, { userId: string; isTyping: boolean }>>({});
+  const [typingUsers, setTypingUsers] = useState<
+    Record<string, { userId: string; isTyping: boolean }>
+  >({});
 
   const query = useInfiniteQuery({
     queryKey: ['messages', channelId],

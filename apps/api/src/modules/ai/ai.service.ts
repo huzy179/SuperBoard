@@ -1,6 +1,8 @@
-import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
+import { Injectable, OnModuleInit, Inject, Logger } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { firstValueFrom, Observable } from 'rxjs';
+import { RedisService } from '../../common/redis.service';
+import * as crypto from 'crypto';
 
 interface SummarizeRequest {
   task_id: string;
@@ -23,20 +25,36 @@ interface AIService {
 
 @Injectable()
 export class AiService implements OnModuleInit {
+  private readonly logger = new Logger(AiService.name);
   private aiServiceClient!: AIService;
 
-  constructor(@Inject('AI_PACKAGE') private client: ClientGrpc) {}
+  constructor(
+    @Inject('AI_PACKAGE') private client: ClientGrpc,
+    private redis: RedisService,
+  ) {}
 
   onModuleInit() {
     this.aiServiceClient = this.client.getService<AIService>('AIService');
   }
 
+  private generateCacheKey(prefix: string, ...parts: string[]): string {
+    const raw = parts.map((p) => p.trim()).join('|');
+    const hash = crypto.createHash('sha256').update(raw).digest('hex');
+    return `ai:${prefix}:${hash}`;
+  }
+
   async summarizeTask(taskId: string, title: string, description: string): Promise<string> {
+    const cacheKey = this.generateCacheKey('summary', title, description);
+    const cached = await this.redis.getJson<string>(cacheKey);
+    if (cached) return cached;
+
     try {
       const content = `Title: ${title}\nDescription: ${description}`;
       const result = await firstValueFrom(
         this.aiServiceClient.SummarizeTask({ task_id: taskId, content }),
       );
+
+      await this.redis.setJson(cacheKey, result.summary, 60 * 60 * 24 * 7); // 7 days TTL
       return result.summary;
     } catch (error) {
       console.error('AI Summarization failed:', error);
@@ -45,11 +63,17 @@ export class AiService implements OnModuleInit {
   }
 
   async getEmbedding(text: string): Promise<number[]> {
+    const cacheKey = this.generateCacheKey('embedding', text);
+    const cached = await this.redis.getJson<number[]>(cacheKey);
+    if (cached) return cached;
+
     try {
       const result = await firstValueFrom(this.aiServiceClient.GetEmbedding({ text }));
       if (!result?.embedding) {
         throw new Error('Invalid embedding response');
       }
+
+      await this.redis.setJson(cacheKey, result.embedding); // Deterministic, no TTL needed
       return result.embedding;
     } catch (error) {
       console.error('AI Embedding failed:', error);
@@ -58,12 +82,22 @@ export class AiService implements OnModuleInit {
   }
 
   async processText(text: string, mode: string): Promise<string> {
+    const cacheKey = this.generateCacheKey(`process:${mode}`, text);
+    const cached = await this.redis.getJson<string>(cacheKey);
+    if (cached) return cached;
+
     try {
       if (!this.aiServiceClient) throw new Error('gRPC client not initialized');
       const result = await firstValueFrom(this.aiServiceClient.ProcessText({ text, mode }));
+
+      // Cache for 24 hours for generalized text processing
+      await this.redis.setJson(cacheKey, result.result, 60 * 60 * 24);
       return result.result;
     } catch (error) {
-      logger.warn({ error, mode }, 'AI gRPC failed, using Local Intelligence fallback');
+      this.logger.warn(
+        { mode },
+        `AI gRPC failed, using Local Intelligence fallback. Error: ${error instanceof Error ? error.message : String(error)}`,
+      );
 
       // Elite Local Intelligence Fallback (Simulated High-Quality LLM)
       // In production, this would call OpenAI/Gemini directly if gRPC is down

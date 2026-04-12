@@ -30,7 +30,7 @@ export class RateLimitGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     const ip = request.ip;
-    
+
     // Create a unique key based on User ID or IP + Endpoint
     const identifier = user?.id || ip || 'anonymous';
     const handlerName = context.getHandler().name;
@@ -39,10 +39,10 @@ export class RateLimitGuard implements CanActivate {
 
     try {
       const redis = this.redisService.getClient();
-      
+
       // Use Redis INCR and handle TTL
       const current = await redis.incr(cacheKey);
-      
+
       if (current === 1) {
         // First request in this window, set expiration
         await redis.expire(cacheKey, options.ttl);
@@ -64,7 +64,7 @@ export class RateLimitGuard implements CanActivate {
       }
     } catch (err) {
       if (err instanceof HttpException) throw err;
-      
+
       // Fail-open strategy: Log error but allow request if Redis fails
       logger.error({ err, cacheKey }, 'Rate limiting error, failing open');
       return true;

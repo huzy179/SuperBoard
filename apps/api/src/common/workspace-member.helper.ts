@@ -18,7 +18,6 @@ function buildActiveMembershipWhere(input: WorkspaceUserScope) {
   return {
     workspaceId: input.workspaceId,
     userId: input.userId,
-    deletedAt: null,
   };
 }
 
@@ -34,7 +33,6 @@ async function findWorkspaceForUserByVisibility(
       members: {
         some: {
           userId: input.userId,
-          deletedAt: null,
         },
       },
     },
@@ -116,7 +114,6 @@ export async function findMutableWorkspaceMemberOrThrow(
     where: {
       id: input.memberId,
       workspaceId: input.workspaceId,
-      deletedAt: null,
     },
     select: { id: true, userId: true, role: true },
   });

@@ -1,0 +1,36 @@
+
+> superboard@0.1.0 lint
+> turbo run lint
+
+• turbo 2.8.17
+• Packages in scope: @superboard/ai-service, @superboard/api, @superboard/collab-service, @superboard/config-eslint, @superboard/config-ts, @superboard/shared, @superboard/ui, @superboard/web
+• Running lint in 8 packages
+• Remote caching disabled
+@superboard/web:lint: cache miss, executing 3fa2a5ef096fe68d
+@superboard/shared:lint: cache hit, replaying logs 965f94597b270d50
+@superboard/collab-service:lint: cache hit, replaying logs 697e6b873be59dac
+@superboard/shared:lint: 
+@superboard/shared:lint: 
+@superboard/shared:lint: > @superboard/shared@0.1.0 lint
+@superboard/shared:lint: > eslint src --ext .ts
+@superboard/shared:lint: 
+@superboard/collab-service:lint: 
+@superboard/collab-service:lint: 
+@superboard/collab-service:lint: > @superboard/collab-service@0.1.0 lint
+@superboard/collab-service:lint: > eslint src --ext .ts
+@superboard/collab-service:lint: 
+@superboard/api:lint: cache hit, replaying logs faa1493fa0350ccf
+@superboard/api:lint: 
+@superboard/api:lint: 
+@superboard/api:lint: > @superboard/api@0.1.0 lint
+@superboard/api:lint: > eslint .
+@superboard/api:lint: 
+@superboard/web:lint: 
+@superboard/web:lint: > @superboard/web@0.1.0 lint
+@superboard/web:lint: > eslint .
+@superboard/web:lint: 
+
+ Tasks:    4 successful, 4 total
+Cached:    3 cached, 4 total
+  Time:    1.314s 
+

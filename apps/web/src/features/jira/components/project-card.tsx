@@ -4,6 +4,18 @@ import { useState } from 'react';
 import type { ProjectItemDTO } from '@superboard/shared';
 import { formatDate } from '@/lib/format-date';
 import { percentOf } from '@/lib/helpers';
+import {
+  MoreHorizontal,
+  LayoutBoard,
+  List,
+  Calendar,
+  Star,
+  Settings,
+  History,
+  Archive,
+  ArrowUpRight,
+  Database,
+} from 'lucide-react';
 
 interface ProjectCardProps {
   project: ProjectItemDTO;
@@ -11,7 +23,6 @@ interface ProjectCardProps {
   onOpen: (href: string) => void;
   onOpenEdit: (project: ProjectItemDTO) => void;
   onArchive: (projectId: string) => void;
-  isArchivingProject: (projectId: string) => boolean;
   onToggleFavorite: (projectId: string) => void;
   isFavorite: (projectId: string) => boolean;
   getProjectOpenHref: (projectId: string) => string;
@@ -25,7 +36,6 @@ export function ProjectCard({
   onOpen,
   onOpenEdit,
   onArchive,
-  isArchivingProject,
   onToggleFavorite,
   isFavorite,
   getProjectOpenHref,
@@ -36,6 +46,7 @@ export function ProjectCard({
   const completionPercent =
     project.taskCount > 0 ? percentOf(project.doneTaskCount, project.taskCount) : 0;
   const openHref = getProjectOpenHref(project.id);
+  const isPriority = isFavorite(project.id);
 
   return (
     <div
@@ -48,179 +59,158 @@ export function ProjectCard({
           onOpen(openHref);
         }
       }}
-      className="animate-slide-up group relative cursor-pointer overflow-hidden rounded-xl bg-surface-card text-left transition-all hover:-translate-y-px"
+      className="group relative flex flex-col h-full rounded-[2.5rem] bg-slate-900 border border-white/5 overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] shadow-glass"
       style={{
         animationDelay: `${index * 50}ms`,
         animationFillMode: 'both',
-        boxShadow: 'var(--shadow-card)',
-        transition: 'transform 350ms var(--ease-spring), box-shadow 350ms var(--ease-spring)',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = 'var(--shadow-card-hover)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = 'var(--shadow-card)';
       }}
     >
-      <div
-        className="absolute left-0 top-0 h-1 w-full opacity-60 transition-opacity group-hover:opacity-100"
-        style={{ backgroundColor: project.color || 'var(--color-brand-500)' }}
-      />
+      {/* Rim Lighting */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent transition-opacity opacity-0 group-hover:opacity-100 duration-700" />
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-base">
-                {project.icon || '📊'}
-              </span>
-              <div className="min-w-0">
-                <h3 className="truncate text-sm font-semibold text-slate-900 transition-colors group-hover:text-brand-600">
-                  {project.name}
-                </h3>
-                {project.key ? (
-                  <span className="inline-block font-mono text-[11px] font-medium text-slate-500">
-                    {project.key}
-                  </span>
-                ) : null}
-              </div>
-            </div>
+      {/* Hero Visual */}
+      <div className="relative h-24 overflow-hidden bg-slate-950/50">
+        <div
+          className="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity duration-700 blur-2xl"
+          style={{ backgroundColor: project.color || 'var(--color-brand-500)' }}
+        />
+        <div className="absolute top-6 left-8">
+          <span className="text-4xl drop-shadow-luxe grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-110">
+            {project.icon || '🚀'}
+          </span>
+        </div>
+        <div className="absolute top-6 right-8">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite(project.id);
+            }}
+            className={`p-2 rounded-xl border transition-all ${
+              isPriority
+                ? 'bg-amber-500/20 border-amber-500/30 text-amber-400 shadow-glow-amber'
+                : 'bg-white/5 border-white/5 text-white/20 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <Star size={14} fill={isPriority ? 'currentColor' : 'transparent'} />
+          </button>
+        </div>
+      </div>
 
-            {project.description ? (
-              <p className="mt-2 line-clamp-2 text-sm text-slate-600">{project.description}</p>
-            ) : null}
+      <div className="flex-1 p-8 space-y-6 relative z-10">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-4">
+            <h3 className="text-xl font-black text-white uppercase tracking-tight leading-none group-hover:text-brand-400 transition-colors">
+              {project.name}
+            </h3>
+            <ArrowUpRight
+              size={18}
+              className="text-white/10 group-hover:text-brand-400 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-all"
+            />
           </div>
-
-          <div className="relative z-10 flex shrink-0 items-center gap-2">
-            {isFavorite(project.id) ? (
-              <span className="rounded-full bg-amber-100 px-2 py-1 text-[10px] font-semibold text-amber-700">
-                ⭐ Ưu tiên
-              </span>
-            ) : null}
-
-            <div
-              className="relative"
-              onClick={(event) => {
-                event.stopPropagation();
-              }}
-            >
-              <button
-                type="button"
-                aria-label="Mở menu thao tác"
-                aria-expanded={isMenuOpen}
-                onClick={() => setIsMenuOpen((prev) => !prev)}
-                className="flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-700"
-              >
-                <span className="text-sm">⋯</span>
-              </button>
-
-              {isMenuOpen ? (
-                <div className="absolute right-0 top-10 w-44 rounded-lg border border-slate-200 bg-white p-1 shadow-lg z-50">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onOpen(`${openHref}?view=board`);
-                      setIsMenuOpen(false);
-                    }}
-                    className="block w-full rounded-md px-2.5 py-1.5 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
-                  >
-                    Mở Board
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onOpen(`${openHref}?view=list`);
-                      setIsMenuOpen(false);
-                    }}
-                    className="block w-full rounded-md px-2.5 py-1.5 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
-                  >
-                    Mở Danh sách
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onOpen(`${openHref}?view=calendar`);
-                      setIsMenuOpen(false);
-                    }}
-                    className="block w-full rounded-md px-2.5 py-1.5 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
-                  >
-                    Mở Lịch
-                  </button>
-
-                  <div className="my-1 h-px bg-slate-200" />
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onToggleFavorite(project.id);
-                      setIsMenuOpen(false);
-                    }}
-                    className="block w-full rounded-md px-2.5 py-1.5 text-left text-xs font-medium text-amber-700 hover:bg-amber-50"
-                  >
-                    {isFavorite(project.id) ? 'Bỏ ghim' : 'Ghim dự án'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onOpenEdit(project);
-                      setIsMenuOpen(false);
-                    }}
-                    className="block w-full rounded-md px-2.5 py-1.5 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
-                  >
-                    Sửa dự án
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onClearRememberedContext(project.id);
-                      setIsMenuOpen(false);
-                    }}
-                    disabled={!hasRememberedContext(project.id)}
-                    className="block w-full rounded-md px-2.5 py-1.5 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    Reset ngữ cảnh
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isArchivingProject(project.id)}
-                    onClick={() => {
-                      onArchive(project.id);
-                      setIsMenuOpen(false);
-                    }}
-                    className="block w-full rounded-md px-2.5 py-1.5 text-left text-xs font-medium text-rose-700 hover:bg-rose-50 disabled:opacity-50"
-                  >
-                    {isArchivingProject(project.id) ? 'Đang lưu trữ...' : 'Lưu trữ'}
-                  </button>
-                </div>
-              ) : null}
-            </div>
-
-            {project.color ? (
-              <div
-                className="h-6 w-6 rounded-md border border-surface-border"
-                style={{ backgroundColor: project.color }}
-                title={project.color}
-              />
-            ) : null}
+          <div className="flex items-center gap-3">
+            <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/5 font-mono text-[9px] font-black text-white/30 tracking-widest uppercase italic">
+              {project.key || 'NODE_UNNAMED'}
+            </span>
+            <span className="text-[9px] font-bold text-white/20 uppercase tracking-widest">
+              • ACTIVE PROTOCOL
+            </span>
           </div>
         </div>
 
-        <div className="mt-4 rounded-lg bg-slate-50/80 p-3">
-          <div className="flex items-center justify-between text-xs text-slate-600">
-            <span>
-              {project.doneTaskCount}/{project.taskCount} hoàn thành
+        {project.description && (
+          <p className="line-clamp-2 text-xs font-medium text-white/40 leading-relaxed italic">
+            "{project.description}"
+          </p>
+        )}
+
+        {/* Completion Vector */}
+        <div className="space-y-3 pt-2">
+          <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
+            <span className="text-white/30 flex items-center gap-2">
+              <Database size={10} /> Sync Status
             </span>
-            <span className="tabular-nums font-semibold text-slate-700">{completionPercent}%</span>
+            <span className="text-brand-400 shadow-glow-brand">{completionPercent}%</span>
           </div>
-          <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+          <div className="h-2 w-full bg-slate-950 rounded-full border border-white/5 overflow-hidden">
             <div
-              className="h-1.5 rounded-full bg-linear-to-r from-brand-400 to-brand-600 transition-all duration-500"
+              className="h-full rounded-full bg-brand-500 shadow-glow-brand transition-all duration-1000"
               style={{ width: `${completionPercent}%` }}
             />
           </div>
-          <div className="mt-2 text-[11px] text-slate-500">
-            Cập nhật: <time>{formatDate(project.updatedAt)}</time>
+          <div className="flex items-center justify-between text-[9px] font-bold text-white/20 tracking-widest">
+            <span>{project.doneTaskCount} RESOLVED</span>
+            <span>{project.taskCount} TOTAL</span>
           </div>
+        </div>
+      </div>
+
+      {/* Footer Actions */}
+      <div className="px-8 pb-8 pt-2 flex items-center justify-between relative z-10">
+        <div className="text-[9px] font-black text-white/10 uppercase tracking-[0.3em]">
+          SYN_LATENCY: {formatDate(project.updatedAt)}
+        </div>
+
+        <div className="relative" onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+            className={`p-2 rounded-xl border transition-all ${
+              isMenuOpen
+                ? 'bg-white text-slate-950 shadow-luxe'
+                : 'bg-white/5 border-white/5 text-white/20 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <MoreHorizontal size={14} />
+          </button>
+
+          {isMenuOpen && (
+            <div className="absolute bottom-12 right-0 w-56 rounded-3xl border border-white/10 bg-slate-900/90 p-2 shadow-glass backdrop-blur-3xl z-50 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="px-3 py-2 text-[8px] font-black text-white/20 uppercase tracking-[0.3em] border-b border-white/5 mb-1">
+                Node Configuration
+              </div>
+              <button
+                onClick={() => onOpen(`${openHref}?view=board`)}
+                className="flex items-center gap-3 w-full rounded-2xl px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all"
+              >
+                <LayoutBoard size={14} className="text-brand-400" /> Open Tactical Board
+              </button>
+              <button
+                onClick={() => onOpen(`${openHref}?view=list`)}
+                className="flex items-center gap-3 w-full rounded-2xl px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all"
+              >
+                <List size={14} className="text-cyan-400" /> Open Mission List
+              </button>
+              <button
+                onClick={() => onOpen(`${openHref}?view=calendar`)}
+                className="flex items-center gap-3 w-full rounded-2xl px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all"
+              >
+                <Calendar size={14} className="text-indigo-400" /> Neural Chronos
+              </button>
+
+              <div className="my-1 h-px bg-white/5" />
+
+              <button
+                onClick={() => onOpenEdit(project)}
+                className="flex items-center gap-3 w-full rounded-2xl px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all"
+              >
+                <Settings size={14} /> Edit Mission Spec
+              </button>
+              <button
+                onClick={() => onClearRememberedContext(project.id)}
+                disabled={!hasRememberedContext(project.id)}
+                className="flex items-center gap-3 w-full rounded-2xl px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all disabled:opacity-20"
+              >
+                <History size={14} /> Deconstruct Context
+              </button>
+              <button
+                onClick={() => onArchive(project.id)}
+                className="flex items-center gap-3 w-full rounded-2xl px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-rose-400 hover:bg-rose-500/10 transition-all"
+              >
+                <Archive size={14} /> Terminate Node
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -33,7 +33,6 @@ export async function verifyActiveProjectInWorkspace(
       where: {
         id: input.projectId,
         workspaceId: input.workspaceId,
-        deletedAt: null,
       } as Prisma.ProjectWhereInput,
       select: { id: true },
     }),
@@ -55,7 +54,6 @@ export async function verifyProjectAndTaskInWorkspace(
       where: {
         id: input.taskId,
         projectId: input.projectId,
-        deletedAt: null,
       } as Prisma.TaskWhereInput,
       select: { id: true },
     }),
@@ -71,7 +69,6 @@ export async function verifyAssigneeInWorkspace(
     where: {
       workspaceId: input.workspaceId,
       userId: input.assigneeId,
-      deletedAt: null,
     },
     select: {
       id: true,
@@ -91,13 +88,11 @@ export async function verifyActiveTaskInWorkspace(
     prisma.task.findFirst({
       where: {
         id: input.taskId,
-        deletedAt: null,
+
         project: {
           workspaceId: input.workspaceId,
-          deletedAt: null,
-          workspace: {
-            deletedAt: null,
-          },
+
+          workspace: {},
         },
       } as Prisma.TaskWhereInput,
       select: {

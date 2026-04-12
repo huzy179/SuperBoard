@@ -4,6 +4,20 @@ import Link from 'next/link';
 import type { ProjectDetailDTO } from '@superboard/shared';
 import { formatDate } from '@/lib/format-date';
 import { getInitials } from '@/lib/helpers';
+import {
+  Brain,
+  Settings2,
+  LayoutBoard,
+  List,
+  Calendar as CalendarIcon,
+  Zap,
+  BarChart3,
+  Share2,
+  Plus,
+  History,
+  Activity,
+} from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 interface ProjectDetailHeaderProps {
   project: ProjectDetailDTO;
@@ -28,144 +42,226 @@ export function ProjectDetailHeader({
   isCopyLinkSuccess,
   onCopyFilterLink,
 }: ProjectDetailHeaderProps) {
+  const pathname = usePathname();
   const visibleMemberAvatars = project.members.slice(0, 5);
 
+  const navItems = [
+    { id: 'board', label: 'Tactical Board', icon: <LayoutBoard size={14} />, mode: 'board' },
+    { id: 'list', label: 'Mission List', icon: <List size={14} />, mode: 'list' },
+    { id: 'calendar', label: 'Chronos', icon: <CalendarIcon size={14} />, mode: 'calendar' },
+  ];
+
   return (
-    <header className="space-y-4 pb-4">
-      <div className="mb-2 px-2">
+    <header className="space-y-6 pb-8 animate-in fade-in slide-in-from-top-4 duration-700">
+      {/* Breadcrumbs */}
+      <div className="px-2">
         <nav
           aria-label="Breadcrumb"
-          className="flex items-center gap-2 text-[10px] uppercase font-black tracking-[0.2em] text-slate-400"
+          className="flex items-center gap-3 text-[10px] uppercase font-black tracking-[0.4em] text-white/30"
         >
-          <Link href="/jira" className="transition-colors hover:text-brand-600">
-            Dự án
-          </Link>
-          <span className="text-slate-200">/</span>
-          <span className="text-slate-400">{project.name}</span>
-          <span className="text-slate-200">/</span>
-          <span className="text-slate-900 border-b-2 border-brand-500 pb-0.5">
+          <a href="/jira" className="transition-colors hover:text-brand-400">
+            Project Nodes
+          </a>
+          <span className="text-white/10 opacity-50">/</span>
+          <span className="text-white/20">{project.name}</span>
+          <span className="text-white/10 opacity-50">/</span>
+          <span className="text-brand-400 border-b border-brand-500/50 pb-0.5 shadow-glow-brand">
             {currentViewLabel}
           </span>
         </nav>
       </div>
 
-      <div className="group relative overflow-hidden rounded-[2.5rem] border border-white/50 bg-white/40 p-8 shadow-glass backdrop-blur-2xl transition-all duration-500 hover:shadow-2xl hover:border-white/80">
-        {/* Rim Lighting Effect */}
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+      <div className="group relative overflow-hidden rounded-[3rem] border border-white/5 bg-slate-950/80 p-10 shadow-glass backdrop-blur-3xl transition-all duration-700">
+        {/* Rim Lighting & Aura */}
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent" />
+        <div className="absolute -right-20 -top-20 w-80 h-80 bg-brand-500/10 rounded-full blur-[100px] pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
 
-        <div className="flex flex-wrap items-start justify-between gap-8 relative z-10">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-baseline gap-3 mb-2 flex-wrap">
-              <span className="text-4xl drop-shadow-2xl filter transform transition group-hover:scale-110 duration-500">
-                {project.icon || '📊'}
-              </span>
-              <h1 className="text-4xl font-black tracking-tight text-luxe-gradient leading-tight">
-                {project.name}
-              </h1>
-              {projectKey ? (
-                <span className="rounded-xl bg-slate-900 px-3 py-1 font-mono text-[10px] font-black uppercase tracking-widest text-slate-100 shadow-xl border border-white/10">
-                  {projectKey}
-                </span>
-              ) : null}
-              <Link
-                href={`/jira/projects/${project.id}/settings/workflow`}
-                className="ml-2 rounded-xl bg-white/50 p-2 text-slate-400 backdrop-blur-md transition-all hover:bg-white hover:text-brand-600 hover:rotate-90 hover:shadow-lg"
-                title="Cấu hình quy trình (Workflow)"
-              >
-                ⚙️
-              </Link>
+        <div className="flex flex-wrap items-start justify-between gap-10 relative z-10">
+          <div className="flex-1 min-w-0 space-y-6">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
+                <div className="relative">
+                  <span className="text-5xl drop-shadow-luxe grayscale group-hover:grayscale-0 transition-all duration-700 cursor-default">
+                    {project.icon || '🚀'}
+                  </span>
+                  <div className="absolute -right-1 -top-1">
+                    <span className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-brand-500 shadow-glow-brand"></span>
+                    </span>
+                  </div>
+                </div>
+
+                <h1 className="text-5xl font-black tracking-tighter text-white uppercase leading-none">
+                  {project.name}
+                </h1>
+
+                {projectKey && (
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-xl border border-white/10 shadow-luxe transition-all hover:bg-white/10">
+                    <span className="font-mono text-[10px] font-black uppercase tracking-widest text-brand-400">
+                      NODE_ID: {projectKey}
+                    </span>
+                  </div>
+                )}
+
+                <Link
+                  href={`/jira/projects/${project.id}/settings/workflow`}
+                  className="p-3 bg-white/5 rounded-[1.25rem] text-white/20 hover:text-brand-400 hover:bg-white/10 transition-all hover:rotate-180 border border-white/5"
+                  title="Neural Workflow Architect"
+                >
+                  <Settings2 size={18} />
+                </Link>
+
+                <div className="group/intel relative flex items-center gap-2 px-4 py-2 bg-brand-500/5 rounded-2xl border border-brand-500/20 text-brand-400 cursor-pointer hover:bg-brand-500/10 transition-all active:scale-95">
+                  <Brain size={16} className="animate-pulse" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                    Intelligence Pulse
+                  </span>
+                  <div className="absolute top-12 left-0 w-64 p-4 bg-slate-900 border border-white/10 rounded-2xl shadow-glass opacity-0 group-hover/intel:opacity-100 translate-y-2 group-hover/intel:translate-y-0 transition-all pointer-events-none z-50">
+                    <p className="text-[9px] font-bold text-white/50 leading-relaxed italic">
+                      Project health is tracking at optimal levels. Resource allocation efficiency:
+                      94%.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="max-w-3xl text-sm font-medium leading-relaxed text-white/40 mb-2 italic">
+                "{project.description || 'Manifest objectives pending definition...'}"
+              </p>
             </div>
-            <p className="max-w-2xl text-[14px] font-medium leading-relaxed text-slate-600/80 mb-6">
-              {project.description || 'Chưa có mô tả cho dự án này.'}
-            </p>
 
-            <div className="flex items-center gap-6">
-              <div className="flex -space-x-3">
+            <div className="flex items-center gap-10">
+              <div className="flex -space-x-4">
                 {visibleMemberAvatars.map((member) => (
                   <div
                     key={member.id}
-                    className="group/avatar relative inline-flex h-10 w-10 items-center justify-center rounded-2xl border-2 border-white bg-slate-50 text-[11px] font-black text-slate-900 shadow-luxe transition-transform hover:z-20 hover:scale-110 active:scale-95"
+                    className="group/avatar relative inline-flex h-12 w-12 items-center justify-center rounded-[1.25rem] border-2 border-slate-950 bg-slate-900 text-[10px] font-black text-white transition-all hover:z-20 hover:scale-110 active:scale-95 shadow-luxe"
                     title={member.fullName}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 to-transparent opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-2xl" />
+                    <div className="absolute inset-0 bg-brand-500/10 opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-[1.25rem]" />
                     {getInitials(member.fullName)}
+                    <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-emerald-500 border-2 border-slate-950 rounded-full" />
                   </div>
                 ))}
                 {project.members.length > 5 && (
-                  <div className="relative inline-flex h-10 w-10 items-center justify-center rounded-2xl border-2 border-white bg-slate-900 text-[10px] font-black text-white shadow-luxe">
+                  <div className="relative inline-flex h-12 w-12 items-center justify-center rounded-[1.25rem] border-2 border-slate-950 bg-brand-500 text-[10px] font-black text-white shadow-luxe">
                     +{project.members.length - 5}
                   </div>
                 )}
               </div>
-              <div className="h-6 w-px bg-slate-200/50 mx-2" />
-              <div className="flex flex-col">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
-                  Cập nhật cuối
-                </span>
-                <span className="text-[12px] font-bold text-slate-800">
-                  {formatDate(project.updatedAt)}
-                </span>
+
+              <div className="h-10 w-px bg-white/5" />
+
+              <div className="flex items-center gap-8">
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-1.5 text-[9px] font-black text-white/20 uppercase tracking-widest leading-none mb-1.5">
+                    <History size={10} /> Sync Status
+                  </div>
+                  <span className="text-[11px] font-black text-white uppercase tracking-wider">
+                    MODIFIED {formatDate(project.updatedAt)}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-1.5 text-[9px] font-black text-white/20 uppercase tracking-widest leading-none mb-1.5">
+                    <Activity size={10} /> Active Operatives
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                    </span>
+                    <span className="text-[11px] font-black text-emerald-400 uppercase tracking-wider">
+                      {viewerCount} Live Status
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2 rounded-3xl border border-white/60 bg-white/20 p-2 backdrop-blur-md shadow-luxe">
-            <button
-              type="button"
-              onClick={() => setShowCreateTaskPanel((value) => !value)}
-              className="group relative flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-2.5 text-[12px] font-black uppercase tracking-widest text-white transition-all hover:bg-brand-600 hover:shadow-2xl hover:shadow-brand-500/40 active:scale-95 overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-brand-400 to-transparent opacity-0 group-hover:opacity-20 transition-opacity" />
-              <span className="relative">+ Tạo task</span>
-            </button>
-            <div className="flex items-center gap-2 px-4 py-2 bg-brand-50/50 rounded-2xl text-brand-700 font-black text-[10px] uppercase tracking-wider relative group/live">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]"></span>
-              </span>
-              <span>{viewerCount} Live</span>
-            </div>
 
-            <div className="h-6 w-px bg-slate-200/50 mx-1" />
-
-            {[
-              { id: 'board', label: 'Board' },
-              { id: 'list', label: 'Danh sách' },
-              { id: 'calendar', label: 'Lịch' },
-            ].map((v) => (
+          <div className="flex flex-col items-end gap-1.5">
+            <div className="flex items-center gap-4 p-3 bg-white/5 rounded-[2.5rem] border border-white/5 backdrop-blur-3xl shadow-glass">
               <button
-                key={v.id}
                 type="button"
-                onClick={() => setViewMode(v.id as 'board' | 'list' | 'calendar')}
-                className={`rounded-2xl px-5 py-2.5 text-[11px] font-black uppercase tracking-widest transition-all duration-300 ${
-                  viewMode === v.id
-                    ? 'bg-white text-brand-700 shadow-xl scale-105'
-                    : 'text-slate-500 hover:bg-white/50 hover:text-slate-900 hover:scale-105'
-                }`}
+                onClick={() => setShowCreateTaskPanel((value) => !value)}
+                className="group relative flex items-center gap-2 rounded-full bg-white px-8 py-3 text-[10px] font-black uppercase tracking-widest text-slate-950 transition-all hover:scale-105 active:scale-95 shadow-luxe overflow-hidden"
               >
-                {v.label}
+                <div className="absolute inset-0 bg-brand-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                <span className="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors">
+                  <Plus size={14} /> Initialize Mission
+                </span>
               </button>
-            ))}
 
-            <Link
-              href={`/jira/projects/${project.id}/automation`}
-              className="group flex items-center gap-1.5 rounded-2xl px-5 py-2.5 text-[11px] font-black uppercase tracking-widest text-brand-600 transition-all hover:bg-white hover:shadow-xl hover:scale-105"
-            >
-              <span className="group-hover:animate-pulse">⚡</span> Tự động
-            </Link>
+              <div className="h-6 w-px bg-white/10 mx-1" />
 
-            <div className="h-6 w-px bg-slate-200/50 mx-1" />
+              <div className="flex items-center gap-1 p-1 bg-slate-900 rounded-full border border-white/5">
+                {navItems.map((v) => (
+                  <button
+                    key={v.id}
+                    type="button"
+                    onClick={() => setViewMode(v.mode as 'board' | 'list' | 'calendar')}
+                    className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-[9px] font-black uppercase tracking-widest transition-all ${
+                      viewMode === v.mode
+                        ? 'bg-white text-slate-950 shadow-luxe scale-105'
+                        : 'text-white/40 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    {v.icon}
+                    <span>{v.label}</span>
+                  </button>
+                ))}
 
-            <button
-              type="button"
-              onClick={onCopyFilterLink}
-              className={`rounded-2xl px-5 py-2.5 text-[11px] font-black uppercase tracking-widest transition-all ${
-                isCopyLinkSuccess
-                  ? 'bg-emerald-50 text-emerald-700'
-                  : 'text-slate-500 hover:bg-white/50 hover:text-slate-900'
-              }`}
-            >
-              {isCopyLinkSuccess ? 'Đã sao chép' : 'Sao chép'}
-            </button>
+                <Link
+                  href={`/jira/projects/${project.id}/reports`}
+                  className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-[9px] font-black uppercase tracking-widest transition-all ${
+                    pathname?.endsWith('/reports')
+                      ? 'bg-indigo-500 text-white shadow-glow-brand scale-105'
+                      : 'text-white/40 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <BarChart3 size={14} />
+                  <span>Intelligence</span>
+                </Link>
+              </div>
+
+              <div className="h-6 w-px bg-white/10 mx-1" />
+
+              <div className="flex gap-2">
+                <Link
+                  href={`/jira/projects/${project.id}/automation`}
+                  className={`p-3 rounded-full transition-all border ${
+                    pathname?.endsWith('/automation')
+                      ? 'bg-amber-500/20 text-amber-500 border-amber-500/30 shadow-glow-amber'
+                      : 'bg-white/5 text-white/20 border-white/5 hover:text-white hover:bg-white/10'
+                  }`}
+                  title="Automation Gateway"
+                >
+                  <Zap
+                    size={16}
+                    className={pathname?.endsWith('/automation') ? 'animate-pulse' : ''}
+                  />
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={onCopyFilterLink}
+                  className={`p-3 rounded-full transition-all border ${
+                    isCopyLinkSuccess
+                      ? 'bg-emerald-500/20 text-emerald-500 border-emerald-500/30'
+                      : 'bg-white/5 text-white/20 border-white/5 hover:text-white hover:bg-white/10'
+                  }`}
+                  title="Synchronize Neural Link"
+                >
+                  <Share2 size={16} />
+                </button>
+              </div>
+            </div>
+            <div className="mr-6">
+              <span className="text-[8px] font-black text-white/10 uppercase tracking-[0.5em]">
+                Command Protocol V4.2
+              </span>
+            </div>
           </div>
         </div>
       </div>

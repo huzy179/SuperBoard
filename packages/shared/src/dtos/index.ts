@@ -6,3 +6,4 @@ export * from './workspace.dto';
 export * from './workflow.dto';
 export * from './search.dto';
 export * from './automation.dto';
+export * from './doc.dto';

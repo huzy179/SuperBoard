@@ -63,7 +63,7 @@ export class TaskService {
 
   async getTaskById(taskId: string) {
     return this.prisma.task.findUnique({
-      where: { id: taskId, deletedAt: null },
+      where: { id: taskId },
       select: {
         id: true,
         title: true,

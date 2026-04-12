@@ -36,7 +36,6 @@ export class CommentService {
     const comments = await this.prisma.comment.findMany({
       where: {
         taskId: input.taskId,
-        deletedAt: null,
       } as Prisma.CommentWhereInput,
       include: {
         author: {
@@ -94,7 +93,7 @@ export class CommentService {
 
     // Notify task assignee about new comment (if different from author)
     const task = await this.prisma.task.findFirst({
-      where: { id: input.taskId, deletedAt: null },
+      where: { id: input.taskId },
       select: {
         assigneeId: true,
         title: true,
@@ -187,7 +186,6 @@ export class CommentService {
       where: {
         id: input.commentId,
         taskId: input.taskId,
-        deletedAt: null,
       } as Prisma.CommentWhereInput,
       select: { id: true, authorId: true },
     });
@@ -252,7 +250,6 @@ export class CommentService {
       where: {
         id: input.commentId,
         taskId: input.taskId,
-        deletedAt: null,
       } as Prisma.CommentWhereInput,
       select: { id: true, authorId: true },
     });

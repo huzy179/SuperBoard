@@ -29,14 +29,18 @@ export class HttpExceptionFilter implements ExceptionFilter {
       logger.warn({ status, message }, 'Client request error');
     }
 
+    const correlationId = logger.bindings()?.correlationId || 'root';
+
     const payload: ApiResponse<never> = {
       success: false,
       error: {
-        code: `HTTP_${status}`,
+        code: `ERR_${status}`,
         message,
       },
       meta: {
         timestamp: new Date().toISOString(),
+        correlationId: String(correlationId),
+        trace: process.env.NODE_ENV === 'development' ? (exception as Error).stack : undefined,
       },
     };
 

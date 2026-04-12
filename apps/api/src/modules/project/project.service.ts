@@ -47,7 +47,7 @@ export class ProjectService {
     const projects = await this.prisma.project.findMany({
       where: {
         workspaceId,
-        ...(options?.showArchived ? {} : { deletedAt: null }),
+        ...(options?.showArchived ? {} : {}),
       } as Prisma.ProjectWhereInput,
       select: {
         id: true,
@@ -61,12 +61,12 @@ export class ProjectService {
         _count: {
           select: {
             tasks: {
-              where: { deletedAt: null },
+              where: {},
             },
           },
         },
         tasks: {
-          where: { deletedAt: null, status: 'done' },
+          where: { status: 'done' },
           select: { id: true },
         },
       },
@@ -91,7 +91,7 @@ export class ProjectService {
       where: {
         id: projectId,
         workspaceId,
-        ...(options?.showArchived ? {} : { deletedAt: null }),
+        ...(options?.showArchived ? {} : {}),
       } as Prisma.ProjectWhereInput,
       select: {
         id: true,
@@ -106,7 +106,7 @@ export class ProjectService {
         deletedAt: true,
         tasks: {
           where: {
-            ...(options?.showArchived ? {} : { deletedAt: null }),
+            ...(options?.showArchived ? {} : {}),
           } as Prisma.TaskWhereInput,
           orderBy: {
             createdAt: 'desc',
@@ -127,7 +127,7 @@ export class ProjectService {
             assignee: { select: { fullName: true, avatarColor: true } },
             labels: { select: { label: { select: { id: true, name: true, color: true } } } },
             attachments: {
-              where: { deletedAt: null },
+              where: {},
               select: {
                 id: true,
                 name: true,
@@ -151,7 +151,7 @@ export class ProjectService {
 
     // Fetch workspace members for assignee dropdown
     const workspaceMembers = await this.prisma.workspaceMember.findMany({
-      where: { workspaceId, deletedAt: null },
+      where: { workspaceId },
       select: {
         user: { select: { id: true, fullName: true, avatarColor: true } },
       },
@@ -233,6 +233,10 @@ export class ProjectService {
 
     const result = this.toProjectItemDTO(project);
     await this.clearDashboardCache(workspaceId);
+
+    // Trigger embedding sync in background
+    void this.syncProjectEmbedding(project.id, project.name, project.description || '');
+
     return result;
   }
 
@@ -255,6 +259,12 @@ export class ProjectService {
 
     const result = this.toProjectItemDTO(project);
     await this.clearDashboardCache(input.workspaceId);
+
+    // Trigger embedding sync in background if relevant fields changed
+    if (input.data.name !== undefined || input.data.description !== undefined) {
+      void this.syncProjectEmbedding(project.id, project.name, project.description || '');
+    }
+
     return result;
   }
 
@@ -313,7 +323,7 @@ export class ProjectService {
       where: { id: input.projectId },
       data: {
         deletedAt: null,
-      } as Prisma.ProjectUpdateInput,
+      },
     });
 
     await this.clearDashboardCache(input.workspaceId);
@@ -447,7 +457,6 @@ export class ProjectService {
       where: {
         id: input.taskId,
         projectId: input.projectId,
-        deletedAt: null,
       } as Prisma.TaskWhereInput,
       select: { status: true },
     });
@@ -524,7 +533,6 @@ export class ProjectService {
       where: {
         id: { in: input.taskIds },
         projectId: input.projectId,
-        deletedAt: null,
       },
       select: { id: true, status: true, assigneeId: true },
     });
@@ -553,7 +561,6 @@ export class ProjectService {
         where: {
           id: { in: input.taskIds },
           projectId: input.projectId,
-          deletedAt: null,
         },
         data: {
           deletedAt,
@@ -592,7 +599,6 @@ export class ProjectService {
       where: {
         id: { in: input.taskIds },
         projectId: input.projectId,
-        deletedAt: null,
       },
       data: updateData,
     });
@@ -682,7 +688,6 @@ export class ProjectService {
       where: {
         id: input.taskId,
         projectId: input.projectId,
-        deletedAt: null,
       } as Prisma.TaskWhereInput,
       select: {
         id: true,
@@ -933,7 +938,6 @@ export class ProjectService {
     const events = await this.prisma.taskEvent.findMany({
       where: {
         taskId: input.taskId,
-        deletedAt: null,
       },
       orderBy: {
         createdAt: 'desc',
@@ -980,8 +984,7 @@ export class ProjectService {
 
     const tasks = await this.prisma.task.findMany({
       where: {
-        project: { workspaceId, deletedAt: null },
-        deletedAt: null,
+        project: { workspaceId },
       },
       select: {
         id: true,
@@ -1051,7 +1054,7 @@ export class ProjectService {
 
     // Tasks by project
     const projects = await this.prisma.project.findMany({
-      where: { workspaceId, deletedAt: null },
+      where: { workspaceId },
       select: { id: true, name: true, key: true, color: true },
     });
     const projectTaskMap = new Map<string, { total: number; done: number }>();
@@ -1082,8 +1085,7 @@ export class ProjectService {
     // Recent activity
     const recentEvents = await this.prisma.taskEvent.findMany({
       where: {
-        task: { project: { workspaceId, deletedAt: null }, deletedAt: null },
-        deletedAt: null,
+        task: { project: { workspaceId } },
       },
       orderBy: { createdAt: 'desc' },
       take: 10,
@@ -1168,7 +1170,7 @@ export class ProjectService {
     assignee: { select: { fullName: true, avatarColor: true } },
     labels: { select: { label: { select: { id: true, name: true, color: true } } } },
     attachments: {
-      where: { deletedAt: null },
+      where: {},
       select: {
         id: true,
         name: true,
@@ -1250,7 +1252,6 @@ export class ProjectService {
       where: {
         id: input.parentTaskId,
         projectId: input.projectId,
-        deletedAt: null,
       },
       select: {
         id: true,
@@ -1280,7 +1281,6 @@ export class ProjectService {
     const tasks = await this.prisma.task.findMany({
       where: {
         projectId: input.projectId,
-        deletedAt: null,
       },
       select: this.taskSelect,
       orderBy: { createdAt: 'desc' },
@@ -1315,6 +1315,23 @@ export class ProjectService {
     } catch (err: unknown) {
       logger.error({ err, taskId }, 'Failed to sync task embedding');
       // We don't throw here to avoid failing the main task creation/update
+    }
+  }
+
+  private async syncProjectEmbedding(projectId: string, name: string, description: string) {
+    try {
+      const text = `${name}\n${description}`;
+      const embedding = await this.aiService.getEmbedding(text);
+      const vectorStr = `[${embedding.join(',')}]`;
+
+      await this.prisma.$executeRaw`
+        INSERT INTO "ProjectEmbedding" ("projectId", "vector", "updatedAt")
+        VALUES (${projectId}, ${vectorStr}::vector, NOW())
+        ON CONFLICT ("projectId") 
+        DO UPDATE SET "vector" = ${vectorStr}::vector, "updatedAt" = NOW();
+      `;
+    } catch (err: unknown) {
+      logger.error({ err, projectId }, 'Failed to sync project embedding');
     }
   }
 }

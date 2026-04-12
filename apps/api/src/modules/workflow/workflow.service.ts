@@ -435,7 +435,7 @@ export class WorkflowService {
 
   async syncWorkspaceToProjects(workspaceId: string): Promise<void> {
     const projects = await this.prisma.project.findMany({
-      where: { workspaceId, deletedAt: null },
+      where: { workspaceId },
     });
 
     for (const project of projects) {

@@ -4,13 +4,15 @@ import { FormEvent, type Dispatch, type SetStateAction, useState } from 'react';
 import {
   Sparkles,
   Brain,
-  Wand2,
   X,
   Archive,
   History,
-  CheckCircle2,
   ChevronDown,
   ListTree,
+  Target,
+  Terminal,
+  Cpu,
+  Zap,
 } from 'lucide-react';
 import type {
   ProjectTaskItemDTO,
@@ -140,13 +142,10 @@ export function TaskEditSlideOver({
     try {
       setShowAiMenu(false);
       const result = await decomposeMutation.mutateAsync(editingTask.id);
-      // For now, we show a success toast and the user can see suggested subtasks
-      // In a real elite app, we would show a "Neural Spread" of suggested cards
-      toast.info(`AI suggests ${result.subtasks.length} subtasks. Please add them as needed.`);
-      // We could also populate the subtask input with the first one
+      toast.info(`Neural Decomposition Complete: ${result.subtasks.length} sub-nodes suggested.`);
       if (result.subtasks.length > 0) setSubtaskTitle(result.subtasks[0]);
     } catch {
-      toast.error('AI Decomposition failed.');
+      toast.error('Neural Decomposition Interrupted.');
     }
   };
 
@@ -156,9 +155,9 @@ export function TaskEditSlideOver({
       const result = await refineMutation.mutateAsync(editingTask.id);
       setEditDescription(result.description);
       if (result.storyPoints) setEditStoryPoints(result.storyPoints.toString());
-      toast.success('Description & Story Points refined by AI.');
+      toast.success('Vector Refinement Successful.');
     } catch {
-      toast.error('AI Refinement failed.');
+      toast.error('Vector Refinement Failed.');
     }
   };
 
@@ -166,7 +165,7 @@ export function TaskEditSlideOver({
     summarizeMutation.isPending || decomposeMutation.isPending || refineMutation.isPending;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-500">
       <div
         ref={dialogRef}
         role="dialog"
@@ -174,105 +173,128 @@ export function TaskEditSlideOver({
         aria-labelledby="task-detail-title"
         tabIndex={-1}
         onKeyDown={handleDialogKeyDown}
-        className="h-full w-full max-w-2xl animate-in slide-in-from-right duration-500 border-l border-white/10 bg-slate-950/90 shadow-glass backdrop-blur-3xl outline-none overflow-hidden flex flex-col font-sans"
+        className="h-full w-full max-w-3xl animate-in slide-in-from-right duration-700 border-l border-white/5 bg-slate-950/95 shadow-glass backdrop-blur-3xl outline-none overflow-hidden flex flex-col font-sans relative"
       >
-        {/* Rim Lighting Effect */}
-        <div className="absolute inset-y-0 left-0 w-px bg-linear-to-b from-transparent via-brand-500/50 to-transparent" />
+        {/* Physical Noise Texture */}
+        <div className="absolute inset-0 bg-noise opacity-[0.02] pointer-events-none" />
 
-        {/* Background Aura */}
-        <div className="absolute -right-20 -top-20 w-80 h-80 bg-brand-500/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
+        {/* Static Rim Lighting */}
+        <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-brand-500/50 to-transparent" />
+
+        {/* Dynamic Background Auras */}
+        <div className="absolute -right-40 -top-40 w-[30rem] h-[30rem] bg-brand-500/5 rounded-full blur-[120px] pointer-events-none animate-pulse duration-[10s]" />
+        <div className="absolute -left-40 -bottom-40 w-[30rem] h-[30rem] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none animate-pulse duration-[8s]" />
 
         <div className="relative z-10 flex h-full flex-col">
-          {/* Header */}
-          <header className="flex items-center justify-between border-b border-white/5 px-8 py-6 bg-white/5">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-slate-900 rounded-2xl border border-white/5 shadow-luxe">
+          {/* Elite Specification Header */}
+          <header className="flex items-center justify-between border-b border-white/5 px-10 py-8 bg-white/[0.02] backdrop-blur-md">
+            <div className="flex items-center gap-6">
+              <div className="w-14 h-14 bg-slate-900 rounded-[1.5rem] border border-white/5 shadow-luxe flex items-center justify-center relative group">
+                <div className="absolute inset-0 bg-brand-500/10 rounded-[1.5rem] opacity-0 group-hover:opacity-100 transition-opacity" />
                 <TaskTypeIcon type={editingTask.type ?? 'task'} />
               </div>
-              <div>
-                {projectKey && editingTask.number && (
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
-                    {projectKey}-{editingTask.number}
+              <div className="space-y-1">
+                <div className="flex items-center gap-3">
+                  {projectKey && editingTask.number && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">
+                        {projectKey}-{editingTask.number}
+                      </span>
+                      <div className="h-1 w-1 rounded-full bg-white/10" />
+                    </div>
+                  )}
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-400">
+                    Mission Active
                   </span>
-                )}
+                </div>
                 <h2
                   id="task-detail-title"
-                  className="text-xl font-black text-white tracking-tight uppercase leading-none mt-1"
+                  className="text-2xl font-black text-white tracking-tighter uppercase leading-none"
                 >
-                  Task Protocol
+                  Unit Specification
                 </h2>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setShowAiMenu(!showAiMenu)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                  className={`group relative flex items-center gap-3 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all overflow-hidden ${
                     isAiThinking
                       ? 'bg-brand-500 text-white animate-pulse'
-                      : 'bg-white/5 text-brand-400 border border-brand-500/30 hover:bg-brand-500/10'
+                      : 'bg-white/[0.03] text-brand-400 border border-brand-500/30 hover:bg-brand-500/10 shadow-glow-brand/10'
                   }`}
                 >
-                  <Sparkles size={14} className={isAiThinking ? 'animate-spin' : ''} />
-                  <span>Intelligence Hub</span>
+                  <Sparkles
+                    size={16}
+                    className={isAiThinking ? 'animate-spin' : 'group-hover:animate-pulse'}
+                  />
+                  <span>Intelligence Terminal</span>
                   <ChevronDown
-                    size={12}
-                    className={`transition-transform ${showAiMenu ? 'rotate-180' : ''}`}
+                    size={14}
+                    className={`transition-transform duration-500 ${showAiMenu ? 'rotate-180' : ''}`}
                   />
                 </button>
 
                 {showAiMenu && (
-                  <div className="absolute right-0 mt-3 w-64 bg-slate-900/95 border border-white/10 rounded-2xl shadow-glass backdrop-blur-3xl overflow-hidden py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
+                  <div className="absolute right-0 mt-4 w-72 bg-slate-900/95 border border-white/5 rounded-[2rem] shadow-glass backdrop-blur-3xl overflow-hidden py-3 z-50 animate-in fade-in zoom-in-95 duration-300">
+                    <div className="px-5 py-2 mb-2">
+                      <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">
+                        Protocol Selection
+                      </span>
+                    </div>
                     <button
                       onClick={handleAiDecompose}
-                      className="w-full px-5 py-3 flex items-center gap-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors text-left group"
+                      className="w-full px-6 py-4 flex items-center gap-4 text-white/50 hover:text-white hover:bg-white/[0.03] transition-all text-left group"
                     >
-                      <ListTree
-                        size={16}
-                        className="text-brand-400 group-hover:scale-110 transition-transform"
-                      />
-                      <div className="flex flex-col">
-                        <span className="text-xs font-bold">Decompose Subtasks</span>
-                        <span className="text-[9px] text-white/30 font-medium">
-                          AI generated project breakdown
+                      <div className="p-2.5 bg-brand-500/10 rounded-xl text-brand-400 group-hover:bg-brand-500 group-hover:text-slate-950 transition-all">
+                        <ListTree size={16} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-xs font-black uppercase tracking-widest block">
+                          Neural Decompose
+                        </span>
+                        <span className="text-[9px] text-white/20 font-medium uppercase tracking-tight truncate mt-0.5">
+                          Analyze & generate sub-nodes
                         </span>
                       </div>
                     </button>
                     <button
                       onClick={handleAiRefine}
-                      className="w-full px-5 py-3 flex items-center gap-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors text-left group"
+                      className="w-full px-6 py-4 flex items-center gap-4 text-white/50 hover:text-white hover:bg-white/[0.03] transition-all text-left group"
                     >
-                      <Brain
-                        size={16}
-                        className="text-indigo-400 group-hover:scale-110 transition-transform"
-                      />
-                      <div className="flex flex-col">
-                        <span className="text-xs font-bold">Refine Intelligence</span>
-                        <span className="text-[9px] text-white/30 font-medium">
-                          Improve clarity & predict points
+                      <div className="p-2.5 bg-indigo-500/10 rounded-xl text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                        <Brain size={16} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-xs font-black uppercase tracking-widest block">
+                          Refine Payload
+                        </span>
+                        <span className="text-[9px] text-white/20 font-medium uppercase tracking-tight truncate mt-0.5">
+                          Optimize description & sizing
                         </span>
                       </div>
                     </button>
-                    <div className="border-t border-white/5 my-1" />
+                    <div className="border-t border-white/5 my-2" />
                     <button
                       onClick={async () => {
                         setShowAiMenu(false);
                         const res = await summarizeMutation.mutateAsync(editingTask.id);
                         setAiAnalysis(res.summary);
                       }}
-                      className="w-full px-5 py-3 flex items-center gap-3 text-white/70 hover:text-white hover:bg-white/5 transition-colors text-left group"
+                      className="w-full px-6 py-4 flex items-center gap-4 text-white/50 hover:text-white hover:bg-white/[0.03] transition-all text-left group"
                     >
-                      <Wand2
-                        size={16}
-                        className="text-purple-400 group-hover:scale-110 transition-transform"
-                      />
-                      <div className="flex flex-col">
-                        <span className="text-xs font-bold">Analytical Summary</span>
-                        <span className="text-[9px] text-white/30 font-medium">
-                          Get a high-level executive briefing
+                      <div className="p-2.5 bg-purple-500/10 rounded-xl text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all">
+                        <Terminal size={16} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-xs font-black uppercase tracking-widest block">
+                          Executive Brief
+                        </span>
+                        <span className="text-[9px] text-white/20 font-medium uppercase tracking-tight truncate mt-0.5">
+                          Generate status intelligence
                         </span>
                       </div>
                     </button>
@@ -283,7 +305,7 @@ export function TaskEditSlideOver({
               <button
                 type="button"
                 onClick={onClose}
-                className="p-2.5 text-white/40 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+                className="w-12 h-12 flex items-center justify-center text-white/20 hover:text-white hover:bg-white/[0.03] rounded-2xl transition-all border border-transparent hover:border-white/5"
               >
                 <X size={20} />
               </button>
@@ -295,37 +317,39 @@ export function TaskEditSlideOver({
             onSubmit={onSave}
             className="flex-1 overflow-y-auto elite-scrollbar custom-scrollbar"
           >
-            <div className="p-8 space-y-10">
-              {/* Intelligence Display */}
+            <div className="px-10 py-12 space-y-16">
+              {/* Intelligent Analytical Briefing */}
               {aiAnalysis && (
-                <div className="relative group overflow-hidden rounded-3xl border border-brand-500/20 bg-brand-500/5 p-6 animate-in slide-in-from-top-4 duration-500">
-                  <div className="absolute top-0 right-0 p-4">
+                <div className="relative group overflow-hidden rounded-[2.5rem] border border-brand-500/20 bg-brand-500/[0.02] p-8 shadow-glow-brand animate-in slide-in-from-top-6 duration-700">
+                  <div className="absolute top-6 right-6">
                     <button
                       onClick={() => setAiAnalysis(null)}
-                      className="text-white/20 hover:text-white transition-colors"
+                      className="w-8 h-8 flex items-center justify-center bg-white/5 rounded-full text-white/20 hover:text-white transition-colors"
                     >
-                      <X size={14} />
+                      <X size={12} />
                     </button>
                   </div>
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 bg-brand-500/10 rounded-2xl text-brand-400">
-                      <Sparkles size={20} className="animate-pulse" />
+                  <div className="flex items-start gap-6">
+                    <div className="p-4 bg-brand-500/10 rounded-2xl text-brand-400 border border-brand-500/20 shadow-glow-brand">
+                      <Cpu size={24} className="animate-pulse" />
                     </div>
-                    <div className="space-y-2">
-                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-400">
-                        Executive Briefing
-                      </h4>
-                      <p className="text-sm text-white/80 leading-relaxed font-medium italic">
+                    <div className="space-y-3 flex-1">
+                      <div className="flex items-center gap-3">
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-400">
+                          Intelligent Briefing
+                        </h4>
+                        <div className="h-px flex-1 bg-gradient-to-r from-brand-500/20 to-transparent" />
+                      </div>
+                      <p className="text-sm text-white/90 leading-relaxed font-bold italic tracking-tight">
                         "{aiAnalysis}"
                       </p>
                     </div>
                   </div>
-                  {/* Progress Visual */}
-                  <div className="absolute bottom-0 left-0 h-1 bg-brand-500/20 w-full" />
+                  <div className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-transparent via-brand-500/30 to-transparent w-full" />
                 </div>
               )}
 
-              <section className="space-y-12">
+              <section className="space-y-16">
                 <TaskPropertiesForm
                   editTitle={editTitle}
                   setEditTitle={setEditTitle}
@@ -347,28 +371,32 @@ export function TaskEditSlideOver({
                   initialStatus={editingTask.status}
                 />
 
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <div className="h-1 w-4 bg-brand-500 rounded-full" />
-                    <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">
-                      Operational Description
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4 px-2">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white/5" />
+                    <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
+                      Directives & Logic
                     </label>
+                    <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/5" />
                   </div>
                   <div className="relative group">
                     <textarea
                       value={editDescription}
                       onChange={(e) => setEditDescription(e.target.value)}
-                      rows={6}
-                      className="w-full rounded-[2rem] border border-white/5 bg-white/5 px-6 py-5 text-sm text-white focus:border-brand-500/50 focus:ring-4 focus:ring-brand-500/10 transition-all placeholder:text-white/20 elite-scrollbar"
-                      placeholder="Input core mission objectives..."
+                      rows={8}
+                      className="w-full rounded-[2.5rem] border border-white/5 bg-white/[0.01] px-8 py-8 text-sm font-bold text-white focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.02] transition-all placeholder:text-white/5 shadow-inner elite-scrollbar"
+                      placeholder="ESTABLISH_MISSION_PARAMETERS..."
                     />
-                    <div className="absolute bottom-4 right-4 text-[10px] font-bold text-white/10 uppercase tracking-widest group-hover:text-white/30 transition-colors">
-                      Encrypted Workspace
+                    <div className="absolute bottom-8 right-8 flex items-center gap-2">
+                      <span className="text-[9px] font-black text-white/5 uppercase tracking-[0.2em]">
+                        Secure Node
+                      </span>
+                      <Target size={12} className="text-white/5" />
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <TaskSubtaskManager
                     editingTask={editingTask}
                     subtasks={editingTaskSubtasks}
@@ -391,7 +419,13 @@ export function TaskEditSlideOver({
                 </div>
               </section>
 
-              <div className="border-t border-white/5 pt-8">
+              <div className="border-t border-white/5 pt-16">
+                <div className="flex items-center gap-4 px-2 mb-10">
+                  <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
+                    Signal Logs
+                  </label>
+                  <div className="h-px flex-1 bg-gradient-to-r from-white/5 to-transparent" />
+                </div>
                 <TaskCommentSection
                   projectId={projectId}
                   taskId={editingTask.id}
@@ -399,39 +433,48 @@ export function TaskEditSlideOver({
                 />
               </div>
 
-              <div className="flex flex-wrap items-center gap-6 text-[10px] font-black uppercase tracking-widest text-white/20">
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full">
-                  <History size={12} />
-                  <span>Created {formatDate(editingTask.createdAt)}</span>
+              {/* History Timeline Integration Proxy */}
+              <div className="flex flex-wrap items-center gap-8 py-4 px-6 border border-white/5 rounded-[2rem] bg-white/[0.01]">
+                <div className="flex items-center gap-3">
+                  <History size={14} className="text-brand-500" />
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">
+                    Established: {formatDate(editingTask.createdAt)}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full">
-                  <CheckCircle2 size={12} />
-                  <span>Modified {formatDate(editingTask.updatedAt)}</span>
+                <div className="h-4 w-px bg-white/5" />
+                <div className="flex items-center gap-3">
+                  <Zap size={14} className="text-cyan-500" />
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">
+                    Last Synced: {formatDate(editingTask.updatedAt)}
+                  </span>
                 </div>
               </div>
             </div>
 
             {taskUpdateError && (
-              <div className="px-8 pb-8">
-                <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-500 text-xs font-bold animate-pulse">
-                  {taskUpdateError}
+              <div className="px-10 pb-10">
+                <div className="p-6 bg-rose-500/5 border border-rose-500/20 rounded-[2rem] text-rose-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-4 animate-pulse">
+                  <div className="w-8 h-8 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0">
+                    <Terminal size={14} />
+                  </div>
+                  <span>PROTOCOL_SYNC_HEADER_ERROR: {taskUpdateError}</span>
                 </div>
               </div>
             )}
           </form>
 
-          {/* Footer Actions */}
-          <footer className="flex items-center justify-between border-t border-white/5 bg-white/5 px-8 py-6 backdrop-blur-xl">
+          {/* Secure Commitment Footer */}
+          <footer className="flex items-center justify-between border-t border-white/5 bg-white/[0.02] px-10 py-8 backdrop-blur-xl">
             {editingTask.deletedAt ? (
               <button
                 type="button"
                 onClick={onRestore}
                 disabled={isRestoring}
-                className="group relative px-6 py-3 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-50 overflow-hidden"
+                className="group relative px-10 py-4 bg-emerald-500 text-slate-950 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 overflow-hidden shadow-glow-emerald/20"
               >
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform" />
-                <span className="relative z-10 flex items-center gap-2">
-                  <Archive size={14} /> Restore Manifest
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+                <span className="relative z-10 flex items-center gap-3">
+                  <Archive size={16} /> Restore Vector
                 </span>
               </button>
             ) : (
@@ -439,30 +482,35 @@ export function TaskEditSlideOver({
                 type="button"
                 onClick={onDelete}
                 disabled={isDeleting}
-                className="group px-6 py-3 bg-slate-900 border border-rose-500/30 text-rose-500 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all disabled:opacity-50 flex items-center gap-2"
+                className="group px-8 py-4 bg-transparent border border-rose-500/20 text-rose-500/40 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all disabled:opacity-30 flex items-center gap-3"
               >
-                <Archive size={14} />
-                <span>Archive Protocol</span>
+                <Archive size={16} className="group-hover:animate-bounce" />
+                <span>Archive Manifest</span>
               </button>
             )}
 
-            <div className="flex gap-4">
+            <div className="flex gap-6">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-3 border border-white/10 text-white font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-white/5 transition-all"
+                className="px-8 py-4 border border-white/5 text-white/20 font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl hover:bg-white/5 hover:text-white transition-all"
               >
-                Abort
+                Abort Protocol
               </button>
               <button
                 type="submit"
                 form="task-edit-form"
                 disabled={isSaving}
-                className="group relative px-8 py-3 bg-white text-slate-950 rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-50 overflow-hidden shadow-luxe"
+                className="group relative px-12 py-4 bg-white text-slate-950 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 overflow-hidden shadow-luxe"
               >
-                <div className="absolute inset-0 bg-brand-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                <span className="relative z-10 group-hover:text-white transition-colors">
-                  {isSaving ? 'Synchronizing...' : 'Save Manifest'}
+                <div className="absolute inset-0 bg-brand-500 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+                <span className="relative z-10 flex items-center gap-3 group-hover:text-white transition-colors">
+                  {isSaving ? (
+                    <Cpu className="animate-spin" size={16} />
+                  ) : (
+                    <ShieldCheck className="size-4" />
+                  )}
+                  {isSaving ? 'Synchronizing...' : 'Commit Specification'}
                 </span>
               </button>
             </div>
@@ -470,5 +518,23 @@ export function TaskEditSlideOver({
         </div>
       </div>
     </div>
+  );
+}
+
+function ShieldCheck({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={3}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+      />
+    </svg>
   );
 }

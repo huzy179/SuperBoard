@@ -27,7 +27,7 @@ export class ReportService {
       where: { id: projectId },
       include: {
         tasks: {
-          where: { deletedAt: null },
+          where: {},
           include: {
             assignee: { select: { fullName: true } },
             events: {
@@ -243,7 +243,7 @@ export class ReportService {
 
   async exportProjectTasksCsv(projectId: string): Promise<string> {
     const tasks = await this.prisma.task.findMany({
-      where: { projectId, deletedAt: null },
+      where: { projectId },
       include: {
         assignee: { select: { fullName: true } },
         labels: { include: { label: true } },
@@ -282,7 +282,7 @@ export class ReportService {
 
   async exportProjectTasksJson(projectId: string): Promise<string> {
     const tasks = await this.prisma.task.findMany({
-      where: { projectId, deletedAt: null },
+      where: { projectId },
       include: {
         assignee: { select: { fullName: true, avatarColor: true } },
         labels: { include: { label: true } },

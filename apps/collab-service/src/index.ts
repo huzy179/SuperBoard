@@ -12,12 +12,13 @@ const server = Server.configure({
 
   async onAuthenticate(data) {
     const { token } = data;
-    
+
     if (!token) {
       throw new Error('Unauthorized');
     }
 
     try {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any;
       return {
         user: {
@@ -25,7 +26,7 @@ const server = Server.configure({
           name: decoded.fullName || 'Anonymous',
         },
       };
-    } catch (err) {
+    } catch {
       throw new Error('Unauthorized');
     }
   },
@@ -41,21 +42,21 @@ const server = Server.configure({
       throw new Error('Document not found');
     }
 
-    // Convert JSON content to Y.Doc if needed, 
+    // Convert JSON content to Y.Doc if needed,
     // but Hocuspocus handles the Y.Doc sync if we just return empty or the binary state.
     // For Tiptap, we usually send the field name "default".
-    return null; 
+    return null;
   },
 
   async onStoreDocument(data) {
-    const { documentName, document } = data;
-    
+    const { documentName } = data;
+
     // In Tiptap/Hocuspocus, we can extract the JSON from the Y.Doc
-    // However, it's easier to use a common pattern where we save the entire Y.Doc binary 
+    // However, it's easier to use a common pattern where we save the entire Y.Doc binary
     // OR we convert to JSON. For simplicity with existing schema, we'll convert to JSON.
-    // This requires @hocuspocus/transformer or similar, 
+    // This requires @hocuspocus/transformer or similar,
     // or just let the frontend handle the JSON save since we already have autosave there?
-    
+
     // BETTER: Hocuspocus should be the source of truth.
     // We'll just update the updatedAt for now to show activity.
     await prisma.doc.update({

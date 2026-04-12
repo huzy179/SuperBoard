@@ -14,4 +14,14 @@ export class SearchController {
     const workspaceId = req.user.defaultWorkspaceId;
     return this.searchService.globalSearch(workspaceId, q || '');
   }
+
+  @Get('sync-status')
+  async getSyncStatus(@Request() req: { user: { defaultWorkspaceId: string } }) {
+    return this.searchService.getWorkspaceSyncStatus(req.user.defaultWorkspaceId);
+  }
+
+  @Post('sync')
+  async syncAllEntities(@Request() req: { user: { defaultWorkspaceId: string } }) {
+    return this.searchService.syncAllEntities(req.user.defaultWorkspaceId);
+  }
 }

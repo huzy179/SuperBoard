@@ -23,7 +23,7 @@ export class UploadService {
   ): Promise<ProjectTaskAttachmentDTO> {
     // 1. Verify task existence
     const task = await this.prisma.task.findUnique({
-      where: { id: taskId, deletedAt: null },
+      where: { id: taskId },
     });
 
     if (!task) {

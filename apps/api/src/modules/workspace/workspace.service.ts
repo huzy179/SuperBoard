@@ -57,10 +57,9 @@ export class WorkspaceService {
       members: {
         some: {
           userId,
-          deletedAt: null,
         },
       },
-      ...(options?.showArchived ? {} : { deletedAt: null }),
+      ...(options?.showArchived ? {} : {}),
     };
 
     const workspaces = await this.prisma.workspace.findMany({
@@ -88,11 +87,10 @@ export class WorkspaceService {
     const workspace = await this.prisma.workspace.findFirst({
       where: {
         id: input.workspaceId,
-        ...(options?.showArchived ? {} : { deletedAt: null }),
+        ...(options?.showArchived ? {} : {}),
         members: {
           some: {
             userId: input.userId,
-            deletedAt: null,
           },
         },
       } as Prisma.WorkspaceWhereInput,
@@ -157,7 +155,7 @@ export class WorkspaceService {
       await tx.user.updateMany({
         where: {
           id: input.userId,
-          deletedAt: null,
+
           defaultWorkspaceId: null,
         },
         data: {
@@ -266,7 +264,7 @@ export class WorkspaceService {
     await verifyWorkspaceMembership(this.prisma, { workspaceId, userId });
 
     const members = await this.prisma.workspaceMember.findMany({
-      where: { workspaceId, deletedAt: null },
+      where: { workspaceId },
       select: {
         id: true,
         userId: true,
@@ -345,7 +343,6 @@ export class WorkspaceService {
     const user = await this.prisma.user.findFirst({
       where: {
         email: normalizedEmail,
-        deletedAt: null,
       },
       select: {
         id: true,
@@ -395,7 +392,6 @@ export class WorkspaceService {
       where: { id: existingMember.id },
       data: {
         role: nextRole,
-        deletedAt: null,
       },
     });
 
@@ -439,7 +435,6 @@ export class WorkspaceService {
     const existingUser = await this.prisma.user.findFirst({
       where: {
         email: normalizedEmail,
-        deletedAt: null,
       },
       select: {
         id: true,
@@ -451,7 +446,6 @@ export class WorkspaceService {
         where: {
           workspaceId: input.workspaceId,
           userId: existingUser.id,
-          deletedAt: null,
         },
         select: {
           id: true,
@@ -553,7 +547,6 @@ export class WorkspaceService {
     const user = await this.prisma.user.findFirst({
       where: {
         id: input.userId,
-        deletedAt: null,
       },
       select: {
         id: true,
@@ -623,7 +616,6 @@ export class WorkspaceService {
           where: { id: existingMembership.id },
           data: {
             role: invitation.role,
-            deletedAt: null,
           },
         });
       } else {
@@ -641,7 +633,7 @@ export class WorkspaceService {
       await tx.user.updateMany({
         where: {
           id: user.id,
-          deletedAt: null,
+
           defaultWorkspaceId: null,
         },
         data: {
@@ -781,7 +773,6 @@ export class WorkspaceService {
         where: {
           id: targetMember.userId,
           defaultWorkspaceId: input.workspaceId,
-          deletedAt: null,
         },
         data: {
           defaultWorkspaceId: null,
@@ -807,7 +798,6 @@ export class WorkspaceService {
       where: {
         workspaceId: input.workspaceId,
         userId: input.userId,
-        deletedAt: null,
       },
       select: {
         id: true,
@@ -835,7 +825,6 @@ export class WorkspaceService {
         where: {
           id: input.userId,
           defaultWorkspaceId: input.workspaceId,
-          deletedAt: null,
         },
         data: {
           defaultWorkspaceId: null,
@@ -866,7 +855,6 @@ export class WorkspaceService {
       where: {
         id: input.memberId,
         workspaceId: input.workspaceId,
-        deletedAt: null,
       },
       select: {
         id: true,
@@ -913,7 +901,6 @@ export class WorkspaceService {
     await this.prisma.user.updateMany({
       where: {
         id: input.userId,
-        deletedAt: null,
       },
       data: {
         defaultWorkspaceId: input.workspaceId,

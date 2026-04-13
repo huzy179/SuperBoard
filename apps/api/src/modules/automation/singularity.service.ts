@@ -25,22 +25,46 @@ export class SingularityService {
   async pulseConsciousness(workspaceId: string) {
     this.logger.log(`Singularity Pulse initiated for workspace ${workspaceId}`);
 
-    const operations = await Promise.all([
-      this.healStrategicDivergence(workspaceId),
-      this.detectAndNudgeInertia(workspaceId),
-      this.symbiosisService.generateStrategicProposals(workspaceId),
-    ]);
+    const thoughts: string[] = [];
 
-    const healingCount = operations[0];
-    const nudgeCount = operations[1];
+    // 1. Strategic Consciousness
+    thoughts.push('Analyzing workspace strategic integrity...');
+    const divergenceHealed = await this.healStrategicDivergence(workspaceId);
+    if (divergenceHealed > 0)
+      thoughts.push(`Self-healed ${divergenceHealed} strategic divergences.`);
 
-    this.logger.log(
-      `Singularity Pulse complete. Operations: ${healingCount} healings, ${nudgeCount} nudges dispatched.`,
-    );
+    // 2. Operational Inertia
+    thoughts.push('Scanning for tactical inertia pulses...');
+    const nudges = await this.detectAndNudgeInertia(workspaceId);
+    if (nudges > 0) thoughts.push(`Dispatched ${nudges} neural nudges to stagnant nodes.`);
+
+    // 3. Autonomous Optimization (New in Phase 55)
+    thoughts.push('Initiating autonomous load rebalancing...');
+    const optimizations = await this.performAutonomousOptimizations(workspaceId);
+    if (optimizations > 0)
+      thoughts.push(`Executed ${optimizations} autonomous micro-optimizations.`);
+
+    // 4. Strategic Proposals
+    thoughts.push('Projecting optimal structural convergences...');
+    await this.symbiosisService.generateStrategicProposals(workspaceId);
+
+    // Store the consciousness log
+    await this.prisma.agentAction.create({
+      data: {
+        workspaceId,
+        agentName: 'NeuralSingularity',
+        actionType: 'CONSCIOUSNESS_PULSE',
+        targetId: workspaceId,
+        reason: 'Periodic consciousness cycle.',
+        metadata: { thoughts, timestamp: new Date().toISOString() },
+      },
+    });
 
     return {
-      healed: healingCount,
-      nudged: nudgeCount,
+      thoughts,
+      healed: divergenceHealed,
+      nudged: nudges,
+      optimized: optimizations,
       timestamp: new Date().toISOString(),
     };
   }
@@ -53,11 +77,8 @@ export class SingularityService {
       intensity: number;
       nodes: { id: string; type: string }[];
     }[]) {
-      // Only auto-heal high intensity collisions (>0.9)
       if (collision.intensity >= 0.9) {
         const [nodeA, nodeB] = collision.nodes;
-
-        // Prevent duplicate links
         const existing = await this.prisma.taskLink.findFirst({
           where: {
             OR: [
@@ -80,7 +101,6 @@ export class SingularityService {
         }
       }
     }
-
     return healedCount;
   }
 
@@ -99,32 +119,50 @@ export class SingularityService {
     });
 
     let nudgeCount = 0;
-
     for (const task of stallingTasks) {
       if (!task.assigneeId) continue;
-
-      const prompt = `Task "${task.title}" in Project "${task.project?.name}" has been stalling for 7 days.
-      Assignee: ${task.assignee?.fullName || 'Unknown'}.
-      Status: ${task.status}.
-      
-      Generate a 1-sentence strategic "Neural Nudge" to encourage progress. Be encouraging but tactical.`;
-
+      const prompt = `Task "${task.title}" stalled. Generate nudge.`;
       const aiSummary = await this.aiService.processText(prompt, 'notification_prioritizer');
 
       await this.notificationService.createNotification({
         userId: task.assigneeId,
         title: 'Mission Inertia Detected',
-        message: `Task #${task.number} is stalling. Tactical alignment required.`,
+        message: `Task #${task.number} is stalling.`,
         type: 'SYSTEM',
         projectId: task.projectId,
         taskId: task.id,
         neuralPriority: 'STRATEGIC',
         aiSummary,
       });
-
       nudgeCount++;
     }
-
     return nudgeCount;
+  }
+
+  private async performAutonomousOptimizations(workspaceId: string): Promise<number> {
+    let optimizationCount = 0;
+    const criticalProjects = await this.prisma.project.findMany({
+      where: { workspaceId, deletedAt: null },
+      include: { tasks: { where: { status: { notIn: ['done', 'canceled'] }, deletedAt: null } } },
+    });
+
+    for (const project of criticalProjects) {
+      if (project.tasks.length > 20) {
+        const oldestTasks = project.tasks
+          .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+          .slice(0, 3);
+
+        for (const task of oldestTasks) {
+          if (task.priority !== 'high') {
+            await this.prisma.task.update({
+              where: { id: task.id },
+              data: { priority: 'high' },
+            });
+            optimizationCount++;
+          }
+        }
+      }
+    }
+    return optimizationCount;
   }
 }

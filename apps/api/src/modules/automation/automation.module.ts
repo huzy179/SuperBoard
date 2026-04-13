@@ -3,6 +3,7 @@ import { AutomationService } from './automation.service';
 import { AutomationController } from './automation.controller';
 import { AgentController } from './agent.controller';
 import { ConnectController } from './connect.controller';
+import { ConsciousnessController } from './consciousness.controller';
 import { NeuralAgentService } from './neural-agent.service';
 import { ConnectService } from './connect.service';
 import { NotificationModule } from '../notification/notification.module';
@@ -19,7 +20,7 @@ import { DocService } from '../doc/doc.service';
 
 @Module({
   imports: [NotificationModule, AiModule, TalentModule, ProjectModule],
-  controllers: [AutomationController, AgentController, ConnectController],
+  controllers: [AutomationController, AgentController, ConnectController, ConsciousnessController],
   providers: [
     AutomationService,
     NeuralAgentService,
@@ -31,13 +32,6 @@ import { DocService } from '../doc/doc.service';
     ChronologyService,
     DocService,
   ],
-  exports: [
-    AutomationService,
-    NeuralAgentService,
-    ConnectService,
-    SingularityService,
-    SymbiosisService,
-    ExecutiveService,
-  ],
+  exports: [AutomationService, SingularityService, SymbiosisService, ExecutiveService],
 })
 export class AutomationModule {}

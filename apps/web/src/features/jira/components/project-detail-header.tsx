@@ -16,8 +16,10 @@ import {
   Plus,
   History,
   Activity,
+  Sparkles,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { AiPlannerModal } from '@/features/ai/components/ai-planner-modal';
 
 interface ProjectDetailHeaderProps {
   project: ProjectDetailDTO;
@@ -31,6 +33,7 @@ interface ProjectDetailHeaderProps {
   onCopyFilterLink: () => void;
   onOpenAutomation: () => void;
   onOpenGraph: () => void;
+  onPlanExecuted?: () => void;
 }
 
 export function ProjectDetailHeader({
@@ -45,8 +48,10 @@ export function ProjectDetailHeader({
   onCopyFilterLink,
   onOpenAutomation,
   onOpenGraph,
+  onPlanExecuted,
 }: ProjectDetailHeaderProps) {
   const pathname = usePathname();
+  const [showAiPlanner, setShowAiPlanner] = useState(false);
   const visibleMemberAvatars = project.members.slice(0, 5);
 
   const navItems = [
@@ -197,6 +202,15 @@ export function ProjectDetailHeader({
                 </span>
               </button>
 
+              <button
+                type="button"
+                onClick={() => setShowAiPlanner(true)}
+                className="group relative flex items-center gap-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 px-6 py-3 text-[10px] font-black uppercase tracking-widest text-indigo-400 transition-all hover:bg-indigo-500 hover:text-white active:scale-95 shadow-glow-brand"
+              >
+                <Sparkles size={14} className="animate-pulse" />
+                <span>Plan with AI</span>
+              </button>
+
               <div className="h-6 w-px bg-white/10 mx-1" />
 
               <div className="flex items-center gap-1 p-1 bg-slate-900 rounded-full border border-white/5">
@@ -272,6 +286,12 @@ export function ProjectDetailHeader({
           </div>
         </div>
       </div>
+      <AiPlannerModal
+        projectId={project.id}
+        isOpen={showAiPlanner}
+        onClose={() => setShowAiPlanner(false)}
+        onPlanExecuted={() => onPlanExecuted?.()}
+      />
     </header>
   );
 }

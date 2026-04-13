@@ -203,6 +203,8 @@ model Task {
   comments    Comment[]
   attachments Attachment[]
   labels      TaskLabel[]
+  sourceLinks TaskLink[]   @relation("SourceTaskLinks")
+  targetLinks TaskLink[]   @relation("TargetTaskLinks")
   embedding   TaskEmbedding?
   summary     String?      // AI-generated scannability summary
   createdAt   DateTime     @default(now())
@@ -212,6 +214,27 @@ model Task {
   @@index([projectId, status, deletedAt])
   @@index([parentTaskId])
   @@index([assigneeId])
+}
+
+model TaskLink {
+  id           String       @id @default(cuid())
+  sourceTaskId String
+  targetTaskId String
+  type         TaskLinkType @default(relates_to)
+  createdAt    DateTime     @default(now())
+
+  sourceTask Task @relation("SourceTaskLinks", fields: [sourceTaskId], references: [id], onDelete: Cascade)
+  targetTask Task @relation("TargetTaskLinks", fields: [targetTaskId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceTaskId, targetTaskId, type])
+  @@index([sourceTaskId])
+  @@index([targetTaskId])
+}
+
+enum TaskLinkType {
+  blocks
+  relates_to
+  duplicates
 }
 
 model TaskEmbedding {

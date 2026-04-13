@@ -1121,6 +1121,22 @@ export class ProjectService {
     return stats;
   }
 
+  async planProjectWithAi(projectId: string, goal: string): Promise<Record<string, unknown>> {
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+      select: { name: true, description: true },
+    });
+    if (!project) throw new NotFoundException('Project not found');
+
+    const context = `Project: ${project.name}. Description: ${project.description}`;
+    const plan = await this.aiService.orchestrateGoal(goal, context);
+
+    return {
+      goal,
+      suggestedTasks: plan,
+    };
+  }
+
   private async clearDashboardCache(workspaceId: string) {
     const cacheKey = `dashboard:stats:${workspaceId}`;
     await this.redisService.del(cacheKey);

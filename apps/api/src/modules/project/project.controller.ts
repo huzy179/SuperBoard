@@ -178,6 +178,17 @@ export class ProjectController {
     return apiSuccess({ deleted: false });
   }
 
+  @Post(':projectId/plan')
+  async planProject(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+    @Body() body: { goal: string },
+  ) {
+    if (!body.goal) throw new BadRequestException('Goal is required');
+    const result = await this.projectService.planProjectWithAi(projectId, body.goal);
+    return apiSuccess(result);
+  }
+
   @Post(':projectId/tasks')
   async createTask(
     @CurrentUser() user: AuthUserDTO,

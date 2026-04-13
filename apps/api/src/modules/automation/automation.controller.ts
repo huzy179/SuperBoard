@@ -17,7 +17,20 @@ export class AutomationController {
     private neuralAgentService: NeuralAgentService,
     private singularityService: SingularityService,
     private symbiosisService: SymbiosisService,
+    private executiveService: ExecutiveService,
   ) {}
+
+  @Get('executive/directive')
+  async getDirective(@Query('workspaceId') workspaceId: string) {
+    const data = await this.executiveService.generateGlobalDirective(workspaceId);
+    return apiSuccess(data);
+  }
+
+  @Post('executive/directive/:id/execute')
+  async executeDirective(@Param('id') id: string) {
+    const data = await this.executiveService.executeDirective(id);
+    return apiSuccess(data);
+  }
 
   @Get('proposals')
   async getProposals(@Query('workspaceId') workspaceId: string) {

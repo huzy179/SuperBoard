@@ -11,12 +11,14 @@ import { TalentModule } from '../talent/talent.module';
 
 import { SingularityService } from './singularity.service';
 import { SymbiosisService } from './symbiosis.service';
+import { ExecutiveService } from './executive.service';
+import { ProjectModule } from '../project/project.module';
 import { DiagnosisService } from '../knowledge/diagnosis.service';
 import { ChronologyService } from '../project/chronology.service';
 import { DocService } from '../doc/doc.service';
 
 @Module({
-  imports: [NotificationModule, AiModule, TalentModule],
+  imports: [NotificationModule, AiModule, TalentModule, ProjectModule],
   controllers: [AutomationController, AgentController, ConnectController],
   providers: [
     AutomationService,
@@ -24,6 +26,7 @@ import { DocService } from '../doc/doc.service';
     ConnectService,
     SingularityService,
     SymbiosisService,
+    ExecutiveService,
     DiagnosisService,
     ChronologyService,
     DocService,
@@ -34,6 +37,7 @@ import { DocService } from '../doc/doc.service';
     ConnectService,
     SingularityService,
     SymbiosisService,
+    ExecutiveService,
   ],
 })
 export class AutomationModule {}

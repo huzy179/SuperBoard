@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Terminal, ShieldAlert, TrendingUp, Cpu, Eye, Zap, Activity } from 'lucide-react';
 import { StrategicSandbox } from './StrategicSandbox';
+import { ExecutiveDirective } from '@/features/automation/components/ExecutiveDirective';
 
 interface BriefingData {
   missionName: string;
@@ -40,6 +41,7 @@ export function MissionCommandBriefing({
   const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [simulatedForecast, setSimulatedForecast] = useState<ForecastData | null>(null);
   const [showSandbox, setShowSandbox] = useState(false);
+  const [showExecutive, setShowExecutive] = useState(false);
   const [displayText, setDisplayText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
@@ -61,6 +63,7 @@ export function MissionCommandBriefing({
       setForecast(null);
       setSimulatedForecast(null);
       setShowSandbox(false);
+      setShowExecutive(false);
     }
   }, [isOpen, projectId]);
 
@@ -220,54 +223,75 @@ export function MissionCommandBriefing({
               </div>
               <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none">
                 {data?.missionName || 'Mission'}{' '}
-                <span className="text-white/20 italic">Briefing</span>
+                <span className="text-white/20 italic">
+                  {showExecutive ? 'Directive' : 'Briefing'}
+                </span>
               </h2>
             </div>
 
-            <div className="relative min-h-[300px] p-8 rounded-[3rem] border border-brand-500/20 bg-brand-500/[0.02] shadow-glow-brand/5 overflow-hidden">
-              <div className="relative z-10 space-y-8">
-                <div className="flex items-center gap-4">
-                  <div className="h-2 w-2 rounded-full bg-brand-500 animate-pulse shadow-glow-brand" />
-                  <span className="text-[10px] font-black text-brand-400 uppercase tracking-widest">
-                    Sitrep Synthesis
-                  </span>
-                </div>
+            <div className="flex items-center gap-4 border-b border-white/5 pb-2">
+              <button
+                onClick={() => setShowExecutive(false)}
+                className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg transition-all ${!showExecutive ? 'bg-brand-500 text-white' : 'text-white/40 hover:text-white/60'}`}
+              >
+                Mission Sitrep
+              </button>
+              <button
+                onClick={() => setShowExecutive(true)}
+                className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg transition-all ${showExecutive ? 'bg-brand-500 text-white' : 'text-white/40 hover:text-white/60'}`}
+              >
+                Executive Directive
+              </button>
+            </div>
 
-                <div className="space-y-6">
-                  <p className="text-xl md:text-2xl font-bold text-white uppercase tracking-tight leading-relaxed italic border-l-4 border-brand-500 pl-8">
-                    {displayText}
-                    {isTyping && (
-                      <span className="inline-block w-2 h-6 bg-brand-500 animate-pulse ml-2" />
-                    )}
-                  </p>
+            {showExecutive ? (
+              <ExecutiveDirective workspaceId="default-workspace" />
+            ) : (
+              <div className="relative min-h-[300px] p-8 rounded-[3rem] border border-brand-500/20 bg-brand-500/[0.02] shadow-glow-brand/5 overflow-hidden">
+                <div className="relative z-10 space-y-8">
+                  <div className="flex items-center gap-4">
+                    <div className="h-2 w-2 rounded-full bg-brand-500 animate-pulse shadow-glow-brand" />
+                    <span className="text-[10px] font-black text-brand-400 uppercase tracking-widest">
+                      Sitrep Synthesis
+                    </span>
+                  </div>
 
-                  {!isTyping && data && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex items-center gap-6 pt-10"
-                    >
-                      <button className="px-8 py-4 bg-brand-500 rounded-2xl text-[10px] font-black text-white uppercase tracking-widest shadow-glow-brand hover:scale-105 transition-all">
-                        Execute Directives
-                      </button>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1">
-                          {[...Array(5)].map((_, i) => (
-                            <div
-                              key={i}
-                              className={`h-4 w-1 rounded-full ${i < data.latestIntensity * 5 ? 'bg-brand-500' : 'bg-white/10'}`}
-                            />
-                          ))}
+                  <div className="space-y-6">
+                    <p className="text-xl md:text-2xl font-bold text-white uppercase tracking-tight leading-relaxed italic border-l-4 border-brand-500 pl-8">
+                      {displayText}
+                      {isTyping && (
+                        <span className="inline-block w-2 h-6 bg-brand-500 animate-pulse ml-2" />
+                      )}
+                    </p>
+
+                    {!isTyping && data && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex items-center gap-6 pt-10"
+                      >
+                        <button className="px-8 py-4 bg-brand-500 rounded-2xl text-[10px] font-black text-white uppercase tracking-widest shadow-glow-brand hover:scale-105 transition-all">
+                          Execute Directives
+                        </button>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1">
+                            {[...Array(5)].map((_, i) => (
+                              <div
+                                key={i}
+                                className={`h-4 w-1 rounded-full ${i < data.latestIntensity * 5 ? 'bg-brand-500' : 'bg-white/10'}`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
+                            Pulse Intensity
+                          </span>
                         </div>
-                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                          Pulse Intensity
-                        </span>
-                      </div>
-                    </motion.div>
-                  )}
+                      </motion.div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="flex items-center justify-between py-6 px-4 bg-white/5 border border-white/10 rounded-3xl">
               <div className="flex items-center gap-4">

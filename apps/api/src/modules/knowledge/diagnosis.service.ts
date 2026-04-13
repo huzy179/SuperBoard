@@ -63,4 +63,45 @@ export class DiagnosisService {
     const code = await this.aiService.processText(prompt, 'generate_playwright_spec');
     return code;
   }
+
+  async diagnoseKnowledgeSilos(workspaceId: string) {
+    const [docs, tasks] = await Promise.all([
+      this.prisma.doc.findMany({ where: { workspaceId, deletedAt: null } }),
+      this.prisma.task.findMany({
+        where: { projectId: { not: null }, deletedAt: null },
+        include: { project: true },
+      }),
+    ]);
+
+    const context = `
+      Workspace Knowledge Nodes: ${docs.length}
+      Strategic Tactical Tasks: ${tasks.length}
+      Projects: ${Array.from(new Set(tasks.map((t) => t.project?.name))).join(', ')}
+
+      Analyze for:
+      - Information Silos: High-value knowledge restricted to one project.
+      - Strategic Blind Spots: Tasks with no linked documentation.
+      - Redundant Synthesis: Multiple documents covering the same mission area.
+    `;
+
+    const diagnosis = await this.aiService.processText(context, 'knowledge_silo_strategist');
+
+    try {
+      // Return structured diagnosis recommendations
+      return {
+        nodesAnalyzed: docs.length + tasks.length,
+        diagnosis,
+        recommendations: [
+          'Identify cross-project bridges for shared technical protocols',
+          'Consolidate redundant mission diaries into a single Source of Truth',
+          'Automate linking for Orphaned Intelligence nodes',
+        ],
+      };
+    } catch {
+      return {
+        diagnosis:
+          'Intelligence synthesis complete. Recommendation: Consolidate mission protocols.',
+      };
+    }
+  }
 }

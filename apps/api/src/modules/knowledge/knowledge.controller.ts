@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Param, UseGuards } from '@nestjs/common';
 import { GraphService } from './graph.service';
 import { DiaryService } from './diary.service';
+import { DiagnosisService } from './diagnosis.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthUserDTO } from '@superboard/shared';
@@ -12,11 +13,24 @@ export class KnowledgeController {
   constructor(
     private graphService: GraphService,
     private diaryService: DiaryService,
+    private diagnosisService: DiagnosisService,
   ) {}
 
   @Get('graph/:projectId')
   async getProjectGraph(@Param('projectId') projectId: string) {
     const data = await this.graphService.getProjectGraph(projectId);
+    return apiSuccess(data);
+  }
+
+  @Get('atlas')
+  async getGlobalVectorAtlas(@CurrentUser() user: AuthUserDTO) {
+    const data = await this.graphService.getGlobalVectorAtlas(user.workspaceId);
+    return apiSuccess(data);
+  }
+
+  @Get('diagnosis')
+  async getStrategicDiagnosis(@CurrentUser() user: AuthUserDTO) {
+    const data = await this.diagnosisService.diagnoseKnowledgeSilos(user.workspaceId);
     return apiSuccess(data);
   }
 

@@ -111,4 +111,81 @@ export class GraphService {
       confidence: 0.8, // In a real scenario, we'd use the vector distance
     }));
   }
+
+  async getGlobalVectorAtlas(workspaceId: string) {
+    const [docs, tasks] = await Promise.all([
+      this.prisma.doc.findMany({
+        where: { workspaceId, deletedAt: null },
+        include: { project: true },
+      }),
+      this.prisma.task.findMany({
+        where: { projectId: { not: null }, deletedAt: null },
+        include: { project: true },
+      }),
+    ]);
+
+    const nodes: (GraphNode & { group: string; projectName: string })[] = [];
+    const edges: GraphEdge[] = [];
+
+    // 1. Map all docs and tasks as nodes
+    docs.forEach((doc) => {
+      nodes.push({
+        id: doc.id,
+        type: 'doc',
+        label: doc.title,
+        group: doc.projectId || 'unassigned',
+        projectName: doc.project?.name || 'Workspace Core',
+      });
+    });
+
+    tasks.forEach((task) => {
+      nodes.push({
+        id: task.id,
+        type: 'task',
+        label: task.title,
+        group: task.projectId!,
+        projectName: task.project?.name || 'Unknown',
+      });
+    });
+
+    // 2. Compute Semantic Edges (Simplified for Demo Atlas)
+    // In a production system, we'd use vector clustering (K-Means/DBSCAN)
+    // Here we use semantic adjacency: if nodes share core keywords / common context
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const nodeA = nodes[i];
+        const nodeB = nodes[j];
+
+        // Heuristic for semantic similarity:
+        // - Same keywords in titles
+        // - Shared metadata context
+        const similarity = this.calculateHeuristicSimilarity(nodeA.label, nodeB.label);
+
+        if (similarity > 0.6) {
+          edges.push({
+            from: nodeA.id,
+            to: nodeB.id,
+            type: 'semantic_link',
+            strength: similarity,
+          });
+        }
+      }
+    }
+
+    return { nodes, edges };
+  }
+
+  private calculateHeuristicSimilarity(a: string, b: string): number {
+    const wordsA = new Set(a.toLowerCase().split(' '));
+    const wordsB = new Set(b.toLowerCase().split(' '));
+    const intersection = new Set([...wordsA].filter((x) => wordsB.has(x)));
+
+    // Filter out stop words for better clustering
+    const stopWords = new Set(['the', 'a', 'to', 'for', 'in', 'on', 'with', 'and']);
+    const meaningfulWords = Array.from(intersection).filter((w) => !stopWords.has(w));
+
+    if (meaningfulWords.length >= 2) return 0.9;
+    if (meaningfulWords.length >= 1) return 0.7;
+    return 0;
+  }
 }

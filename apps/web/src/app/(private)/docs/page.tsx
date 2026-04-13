@@ -54,6 +54,13 @@ export default function DocHomePage() {
             description="Làm việc cùng nhau trên cùng một tài liệu theo thời gian thực."
             disabled
           />
+          <FeatureCard
+            icon={<BookOpen className="text-indigo-600" />}
+            title="Vector Atlas"
+            description="Bản đồ tri thức Neural. Phân tích sự trùng lặp khái niệm và điểm mù tri thức."
+            onClick={() => router.push('/docs/atlas')}
+            variant="indigo"
+          />
         </div>
       </div>
 
@@ -90,6 +97,7 @@ function FeatureCard({
   onClick?: () => void;
   isPending?: boolean;
   disabled?: boolean;
+  variant?: 'brand' | 'indigo';
 }) {
   return (
     <button
@@ -98,10 +106,14 @@ function FeatureCard({
       className={`flex flex-col items-start p-6 rounded-2xl border transition-all text-left group ${
         disabled
           ? 'bg-slate-50 border-slate-100 cursor-not-allowed opacity-60'
-          : 'bg-white border-slate-200 hover:border-brand-500 hover:shadow-lg hover:shadow-brand-500/5 cursor-pointer'
+          : variant === 'indigo'
+            ? 'bg-indigo-50/10 border-indigo-500/20 hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/10 cursor-pointer'
+            : 'bg-white border-slate-200 hover:border-brand-500 hover:shadow-lg hover:shadow-brand-500/5 cursor-pointer'
       }`}
     >
-      <div className="p-2 rounded-lg bg-brand-50 mb-3 group-hover:scale-110 transition-transform">
+      <div
+        className={`p-2 rounded-lg mb-3 group-hover:scale-110 transition-transform ${variant === 'indigo' ? 'bg-indigo-500/10' : 'bg-brand-50'}`}
+      >
         {icon}
       </div>
       <h3 className="font-bold text-slate-900">{title}</h3>

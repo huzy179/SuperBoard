@@ -580,4 +580,29 @@ export class ReportService {
       ];
     }
   }
+
+  async getNavigationFocus(workspaceId: string) {
+    const briefing = await this.getNeuralDailyBriefing(workspaceId);
+
+    const prompt = `
+        Current Command Intent: ${briefing.commandIntent.join(', ')}
+        The Pulse: ${briefing.pulse}
+
+        Identify which navigation sectors should be highlighted to guide the user toward these priorities.
+        Available Sectors: DASHBOARD, PROJECTS, CHAT, DOCS, NOTIFICATIONS, SETTINGS
+
+        Return a JSON object: { highlights: [{ sector: string, reason: string }] }
+        Only include sectors with direct relevance to the current intent.
+    `;
+
+    const rawFocus = await this.aiService.processText(prompt, 'navigation_strategist');
+
+    try {
+      return JSON.parse(rawFocus);
+    } catch {
+      return {
+        highlights: [{ sector: 'DASHBOARD', reason: 'Review high-level strategic alignment' }],
+      };
+    }
+  }
 }

@@ -26,6 +26,12 @@ export class ExecutiveController {
     return apiSuccess(layout);
   }
 
+  @Get('navigation-focus')
+  async getNavigationFocus(@Query('workspaceId') workspaceId: string) {
+    const focus = await this.reportService.getNavigationFocus(workspaceId);
+    return apiSuccess(focus);
+  }
+
   @Post('projects/:projectId/simulate')
   async simulateProjectTrajectory(
     @Param('projectId') projectId: string,

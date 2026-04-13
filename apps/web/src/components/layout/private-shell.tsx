@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useState, type ReactNode, useEffect } from 'react';
 import Link from 'next/link';
 import type { AuthUserDTO } from '@superboard/shared';
 import type { NavItem } from '@/lib/navigation';
@@ -45,6 +45,14 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [navFocus, setNavFocus] = useState<Record<string, unknown>[]>([]);
+
+  useEffect(() => {
+    fetch('/api/v1/executive/navigation-focus')
+      .then((res) => res.json())
+      .then((body) => setNavFocus(body.data?.highlights ?? []))
+      .catch(() => {});
+  }, []);
 
   useKeyboardShortcuts([
     {
@@ -110,7 +118,13 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
       <nav className="flex-1 overflow-y-auto px-4 py-8 space-y-2">
         {navItems.map((item) => {
           const isActive = !item.disabled && isNavItemActive(pathname, item.href);
-          const baseClasses = `flex items-center gap-4 rounded-2xl px-4 py-3.5 text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-500`;
+          const focusData = navFocus.find(
+            (f) =>
+              typeof f.sector === 'string' && f.sector.toLowerCase() === item.label.toLowerCase(),
+          );
+          const isHighlighted = !!focusData && !isActive;
+
+          const baseClasses = `flex items-center gap-4 rounded-2xl px-4 py-3.5 text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-500 relative overflow-hidden`;
 
           if (item.disabled) {
             return (
@@ -133,17 +147,29 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
               className={`${baseClasses} group ${
                 isActive
                   ? 'bg-brand-500/10 text-brand-400 border border-brand-500/20 shadow-glow-brand'
-                  : 'text-white/20 hover:bg-white/[0.04] hover:text-white/80 border border-transparent'
+                  : isHighlighted
+                    ? 'bg-indigo-500/5 text-white/60 border border-indigo-500/20'
+                    : 'text-white/20 hover:bg-white/[0.04] hover:text-white/80 border border-transparent'
               } ${sidebarCollapsed ? 'px-0 justify-center' : ''}`}
             >
+              {isHighlighted && (
+                <div className="absolute inset-0 bg-indigo-500/5 animate-pulse pointer-events-none" />
+              )}
               <div
-                className={`${isActive ? 'text-brand-400 animate-pulse' : 'text-white/20 group-hover:text-brand-400'} transition-all duration-500 shrink-0`}
+                className={`${isActive ? 'text-brand-400 animate-pulse' : isHighlighted ? 'text-indigo-400' : 'text-white/20 group-hover:text-brand-400'} transition-all duration-500 shrink-0 relative z-10`}
               >
                 {NAV_ICONS[item.icon]}
               </div>
-              {!sidebarCollapsed && <span>{item.label}</span>}
+              {!sidebarCollapsed && (
+                <span className="relative z-10 flex items-center gap-2">
+                  {item.label}
+                  {isHighlighted && (
+                    <span className="flex h-1.5 w-1.5 rounded-full bg-indigo-500 shadow-glow-indigo animate-ping" />
+                  )}
+                </span>
+              )}
               {!sidebarCollapsed && isActive && (
-                <div className="ml-auto w-1 h-3 rounded-full bg-brand-500 shadow-glow-brand" />
+                <div className="ml-auto w-1 h-3 rounded-full bg-brand-500 shadow-glow-brand relative z-10" />
               )}
             </Link>
           );

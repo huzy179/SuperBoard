@@ -1,15 +1,29 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Inject,
+} from '@nestjs/common';
 import type { ApiResponse } from '@superboard/shared';
 import { logger } from '../logger';
+import { DiagnosisService } from '../../modules/knowledge/diagnosis.service';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  constructor(
+    @Inject(DiagnosisService)
+    private diagnosisService: DiagnosisService,
+  ) {}
+
   catch(exception: unknown, host: ArgumentsHost): void {
     const context = host.switchToHttp();
     const response = context.getResponse<{
       status: (code: number) => { json: (body: unknown) => void };
     }>();
 
+    const request = context.getRequest();
     const status =
       exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -25,6 +39,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
           ? { name: exception.name, message: exception.message, stack: exception.stack }
           : { exception };
       logger.error({ status, message, error }, 'Unhandled server error');
+
+      // Trigger Neural Diagnosis
+      if (exception instanceof Error) {
+        void this.diagnosisService.diagnose(exception, {
+          url: request.url,
+          method: request.method,
+          body: request.body,
+          workspaceId: request.headers['x-workspace-id'] || 'system',
+        });
+      }
     } else {
       logger.warn({ status, message }, 'Client request error');
     }

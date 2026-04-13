@@ -4,12 +4,31 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { apiSuccess } from '../../common/api-response';
 import type { AuthUserDTO, CreateWorkflowRuleDTO, UpdateWorkflowRuleDTO } from '@superboard/shared';
 
+import { NeuralAgentService } from './neural-agent.service';
+
 @Controller('automation')
 export class AutomationController {
   constructor(
     private prisma: PrismaService,
     private automationService: AutomationService,
+    private neuralAgentService: NeuralAgentService,
   ) {}
+
+  @Get('health')
+  async getHealth(@Query('workspaceId') workspaceId: string) {
+    const actions = await this.prisma.agentAction.findMany({
+      where: { workspaceId, agentName: 'AuditorAgent' },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+    return apiSuccess({ actions });
+  }
+
+  @Post('heal')
+  async triggerHeal(@Query('workspaceId') workspaceId: string) {
+    const result = await this.neuralAgentService.runAuditorAgent(workspaceId);
+    return apiSuccess(result);
+  }
 
   @Post('generate-rule')
   async generateRule(@CurrentUser() user: AuthUserDTO, @Body('prompt') prompt: string) {

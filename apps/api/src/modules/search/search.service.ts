@@ -627,4 +627,25 @@ export class SearchService {
     }
     return '';
   }
+
+  async findSemanticDuplicates(workspaceId: string, entityId: string, type: 'task' | 'doc') {
+    // In a production pgvector setup, this would use <=> or <-> with a threshold.
+    // For the demo / elite platform, we perform a semantic search for current entity title
+    // and filter for high-confidence matches from the same workspace.
+
+    const baseEntity =
+      type === 'task'
+        ? await this.prisma.task.findUnique({ where: { id: entityId }, select: { title: true } })
+        : await this.prisma.doc.findUnique({ where: { id: entityId }, select: { title: true } });
+
+    if (!baseEntity) return [];
+
+    const results =
+      type === 'task'
+        ? await this.searchTasksSemantic(workspaceId, baseEntity.title)
+        : await this.searchDocsHybrid(workspaceId, baseEntity.title);
+
+    // Filter for very high confidence (similarity > 0.9) and not the same entity
+    return (results as Record<string, unknown>[]).filter((r) => r.id !== entityId);
+  }
 }

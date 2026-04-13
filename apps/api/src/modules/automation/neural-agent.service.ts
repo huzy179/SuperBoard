@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
 import { TalentService } from '../talent/talent.service';
+import { SearchService } from '../search/search.service';
 
 @Injectable()
 export class NeuralAgentService {
@@ -11,7 +12,75 @@ export class NeuralAgentService {
     private prisma: PrismaService,
     private aiService: AiService,
     private talentService: TalentService,
+    private searchService: SearchService,
   ) {}
+
+  /**
+   * Proactive Auditor Agent: Scans workspace for health issues
+   */
+  async runAuditorAgent(workspaceId: string) {
+    this.logger.log(`Auditor Agent initiating health scan for workspace ${workspaceId}`);
+
+    // 1. Stale Task Archival (>30 days in 'done')
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const staleTasks = await this.prisma.task.findMany({
+      where: {
+        project: { workspaceId },
+        status: 'done',
+        updatedAt: { lt: thirtyDaysAgo },
+        deletedAt: null,
+      },
+    });
+
+    for (const task of staleTasks) {
+      await this.prisma.task.update({
+        where: { id: task.id },
+        data: { deletedAt: new Date() },
+      });
+
+      await this.logAction({
+        workspaceId,
+        projectId: task.projectId,
+        agentName: 'AuditorAgent',
+        actionType: 'AUTO_ARCHIVE',
+        targetId: task.id,
+        reason: `Mission completed >30 days ago. Automatically archived to maintain workspace clarity.`,
+      });
+    }
+
+    // 2. Redundancy Scanning
+    const recentTasks = await this.prisma.task.findMany({
+      where: { project: { workspaceId }, deletedAt: null },
+      take: 20,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    for (const task of recentTasks) {
+      const duplicates = await this.searchService.findSemanticDuplicates(
+        workspaceId,
+        task.id,
+        'task',
+      );
+      if (duplicates.length > 0) {
+        await this.logAction({
+          workspaceId,
+          projectId: task.projectId,
+          agentName: 'AuditorAgent',
+          actionType: 'SUGGEST_MERGE',
+          targetId: task.id,
+          reason: `Semantic similarity detected with Mission #${duplicates[0].number}. Suggesting structural consolidation.`,
+          metadata: { duplicateId: duplicates[0].id },
+        });
+      }
+    }
+
+    return {
+      archived: staleTasks.length,
+      healthOperations: staleTasks.length + recentTasks.length,
+    };
+  }
 
   async processEvent(event: {
     taskId: string;

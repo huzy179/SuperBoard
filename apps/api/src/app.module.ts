@@ -9,6 +9,7 @@ import { HealthController } from './health.controller';
 import { validateEnv } from './config/env';
 import { HealthService } from './health.service';
 import { QueueService } from './common/queue.service';
+import { WorkerService } from './common/worker.service';
 import { RedisService } from './common/redis.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -61,6 +62,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     HealthService,
     RedisService,
     QueueService,
+    WorkerService,
     {
       provide: APP_GUARD,
       useClass: BearerAuthGuard,

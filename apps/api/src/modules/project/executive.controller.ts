@@ -27,4 +27,16 @@ export class ExecutiveController {
     const forecast = await this.reportService.getVelocityForecasting(projectId, adjustments);
     return apiSuccess({ forecast });
   }
+
+  @Post('projects/:projectId/memoir')
+  async generateMemoir(@Param('projectId') projectId: string, @Body('persona') persona: string) {
+    const memoir = await this.reportService.generateProjectMemoir(projectId, persona);
+    return apiSuccess(memoir);
+  }
+
+  @Get('projects/:projectId/memoirs')
+  async getMemoirs(@Param('projectId') projectId: string) {
+    const memoirs = await this.reportService.getProjectMemoirs(projectId);
+    return apiSuccess(memoirs);
+  }
 }

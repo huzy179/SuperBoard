@@ -175,9 +175,22 @@ model Project {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   embedding   ProjectEmbedding?
+  memoirs     ProjectMemoir[]
 
   @@unique([workspaceId, key])
   @@index([workspaceId, deletedAt])
+}
+
+model ProjectMemoir {
+  id          String    @id @default(cuid())
+  projectId   String
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  content     String    @db.Text
+  persona     String    // e.g., 'executive', 'technical', 'celebratory'
+  createdAt   DateTime  @default(now())
+
+  @@index([projectId])
 }
 
 model Task {

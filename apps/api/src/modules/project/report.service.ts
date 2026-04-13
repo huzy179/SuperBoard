@@ -404,4 +404,80 @@ export class ReportService {
 
     return JSON.stringify(tasks, null, 2);
   }
+
+  async generateProjectMemoir(projectId: string, persona: string = 'executive') {
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+      include: {
+        tasks: {
+          include: {
+            comments: true,
+            events: true,
+          },
+        },
+      },
+    });
+
+    if (!project) throw new NotFoundException('Project not found');
+
+    // 1. Context Synthesis
+    const tasks = project.tasks;
+    const comments = tasks.flatMap((t) => t.comments);
+    const agentActions = await this.prisma.agentAction.findMany({
+      where: { projectId },
+      orderBy: { createdAt: 'asc' },
+    });
+    const signals = await this.prisma.signalLog.findMany({
+      where: { projectId },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    const missionLog = [
+      `Project: ${project.name}`,
+      `History:`,
+      ...tasks.map((t) => `[Task] ${t.title}: ${t.status} (Events: ${t.events.length})`),
+      ...comments
+        .slice(0, 50)
+        .map((c: { content: string }) => `[Comment] ${c.content.slice(0, 100)}`),
+      ...agentActions.map((a) => `[AI Action] ${a.agentName}: ${a.reason}`),
+      ...signals.map((s) => `[Signal] ${s.provider}: ${s.interpretation}`),
+    ].join('\n');
+
+    // 2. AI Narrative Generation
+    const prompt = `
+        Mission Context Log:
+        ${missionLog}
+
+        Target Persona: ${persona}
+
+        Generate a high-fidelity "Project Memoir" (Story-style chronicle) of this mission.
+        Focus on:
+        - The initial spark/goal.
+        - The unexpected obstacles (blockers/signals).
+        - The turning points (AI interventions/key comments).
+        - The resolution and future legacy.
+
+        Format: Professional Markdown with cinematic headers.
+    `;
+
+    const content = await this.aiService.processText(prompt, 'narrative_biographer');
+    const title = `Chronicle of ${project.name}: ${new Date().toLocaleDateString()}`;
+
+    // 3. Persist
+    return this.prisma.projectMemoir.create({
+      data: {
+        projectId,
+        title,
+        content,
+        persona,
+      },
+    });
+  }
+
+  async getProjectMemoirs(projectId: string) {
+    return this.prisma.projectMemoir.findMany({
+      where: { projectId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 }

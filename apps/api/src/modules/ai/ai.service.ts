@@ -136,6 +136,28 @@ export class AiService implements OnModuleInit {
     );
   }
 
+  async generateExecutiveSummary(
+    projectId: string,
+    metrics: Record<string, unknown>,
+  ): Promise<string> {
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+      select: { name: true, key: true },
+    });
+
+    if (!project) return 'Project not found';
+
+    const metricsStr = JSON.stringify(metrics, null, 2);
+    const prompt = `Project: ${project.name} (${project.key})\nMetrics:\n${metricsStr}\n\nGenerate a professional executive briefing. 
+    Include:
+    - Current Trajectory (Predictive)
+    - Key Operational Risks
+    - Recommended Strategic Adjustments
+    Keep it concise and high-level.`;
+
+    return this.processText(prompt, 'executive_brief');
+  }
+
   async orchestrateGoal(goal: string, context: string): Promise<Record<string, unknown>[]> {
     const prompt = `Goal: ${goal}\nProject Context: ${context}`;
     const result = await this.processText(prompt, 'orchestrate_plan');

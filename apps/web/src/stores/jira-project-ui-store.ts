@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 import type { SortDirection, TaskSortBy } from '@/lib/helpers/task-view';
 
-export type ViewMode = 'board' | 'list' | 'calendar';
+export type ViewMode = 'board' | 'list' | 'calendar' | 'insights';
 
 type StateUpdater<T> = T | ((prev: T) => T);
 

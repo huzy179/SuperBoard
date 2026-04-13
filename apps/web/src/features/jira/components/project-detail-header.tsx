@@ -58,6 +58,7 @@ export function ProjectDetailHeader({
     { id: 'board', label: 'Tactical Board', icon: <LayoutBoard size={14} />, mode: 'board' },
     { id: 'list', label: 'Mission List', icon: <List size={14} />, mode: 'list' },
     { id: 'calendar', label: 'Chronos', icon: <CalendarIcon size={14} />, mode: 'calendar' },
+    { id: 'insights', label: 'Strategic Insights', icon: <Sparkles size={14} />, mode: 'insights' },
   ];
 
   return (

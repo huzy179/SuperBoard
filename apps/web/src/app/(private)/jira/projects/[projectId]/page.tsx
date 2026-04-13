@@ -22,6 +22,7 @@ import { TaskBulkActionBar } from '@/features/jira/components/task-bulk-action-b
 import { AutomationSlideOver } from '@/features/automation/components/automation-slide-over';
 import { KnowledgeMap } from '@/features/search/components/knowledge-map';
 import { ProjectCopilot } from '@/features/ai/components/project-copilot';
+import { ExecutiveBriefingCard } from '@/features/reports/components/executive-briefing-card';
 
 import { useAuthSession } from '@/features/auth/hooks';
 import {
@@ -478,6 +479,10 @@ export default function ProjectDetailPage() {
           statusSelectLockReason={statusSelectLockReason}
           workflow={workflow}
         />
+      ) : viewMode === 'insights' ? (
+        <div className="animate-in fade-in zoom-in-95 duration-700">
+          <ExecutiveBriefingCard projectId={projectId} />
+        </div>
       ) : (
         <TaskCalendarView
           calendarMonthLabel={calendarMonthLabel}

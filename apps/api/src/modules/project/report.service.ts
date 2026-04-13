@@ -18,9 +18,14 @@ import type {
   HealthMetricsDTO,
 } from '@superboard/shared';
 
+import { AiService } from '../ai/ai.service';
+
 @Injectable()
 export class ReportService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private aiService: AiService,
+  ) {}
 
   async getProjectReport(projectId: string): Promise<ProjectReportDTO> {
     const project = await this.prisma.project.findUnique({
@@ -330,6 +335,36 @@ export class ReportService {
       velocityPerDay,
       predictions: predictiveResults,
       atRiskCount: predictiveResults.filter((p) => p.isAtRisk).length,
+    };
+  }
+
+  async getStrategicHealth(projectId: string) {
+    const report = await this.getProjectReport(projectId);
+    const forecast = await this.getVelocityForecasting(projectId);
+
+    // Calculate Neural Health Score (Heuristic)
+    // - 100% baseline
+    // - Minus 10% per at-risk prediction
+    // - Minus 5% if velocity < 1.0
+    // - Plus 10% if velocity > 5.0
+    let healthScore = 100;
+    healthScore -= forecast.atRiskCount * 10;
+    if (forecast.velocityPerDay < 1) healthScore -= 15;
+    if (forecast.velocityPerDay > 5) healthScore += 10;
+    healthScore = Math.max(0, Math.min(100, healthScore));
+
+    const executiveBrief = await this.aiService.generateExecutiveSummary(projectId, {
+      healthScore,
+      velocity: forecast.velocityPerDay,
+      atRiskCount: forecast.atRiskCount,
+      distribution: report.distribution,
+      topRisks: forecast.predictions.filter((p) => p.isAtRisk).slice(0, 3),
+    });
+
+    return {
+      healthScore,
+      executiveBrief,
+      forecast,
     };
   }
 

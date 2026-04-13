@@ -25,6 +25,7 @@ import { AuditModule } from './modules/audit/audit.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { DocModule } from './modules/doc/doc.module';
 import { AutomationModule } from './modules/automation/automation.module';
+import { KnowledgeModule } from './modules/knowledge/knowledge.module';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 @Module({
@@ -53,6 +54,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     ChatModule,
     DocModule,
     AutomationModule,
+    KnowledgeModule,
   ],
   controllers: [HealthController],
   providers: [

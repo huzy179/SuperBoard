@@ -411,8 +411,10 @@ model Notification {
   userId      String
   workspaceId String
   type        String
-  payload     Json
-  readAt      DateTime?
+  payload        Json
+  neuralPriority String    @default("AMBIENT")
+  aiSummary      String?   @db.Text
+  readAt         DateTime?
   deletedAt   DateTime?
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)

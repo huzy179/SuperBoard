@@ -250,6 +250,13 @@ export class AiService implements OnModuleInit {
           JSON.stringify({
             highlights: [{ sector: 'DASHBOARD', reason: 'Review high-level strategic alignment' }],
           }),
+        knowledge_silo_strategist: () =>
+          'Knowledge synthesis suggests consolidating redundant mission protocols across the legacy and current tactical sectors. No critical blind spots detected.',
+        notification_prioritizer: () =>
+          JSON.stringify({
+            priority: 'AMBIENT',
+            summary: 'System event processed with standard tactical weight.',
+          }),
       };
 
       return fallbacks[mode]?.(text) ?? text;

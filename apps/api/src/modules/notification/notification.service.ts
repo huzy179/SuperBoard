@@ -3,6 +3,7 @@ import type { Prisma, NotificationPreference } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { EmailService } from './email.service';
 import { NotificationGateway } from './notification.gateway';
+import { AiService } from '../ai/ai.service';
 import { logger } from '../../common/logger';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class NotificationService {
     private prisma: PrismaService,
     private emailService: EmailService,
     private gateway: NotificationGateway,
+    private aiService: AiService,
   ) {}
 
   async getNotifications(userId: string, workspaceId: string) {
@@ -22,6 +24,8 @@ export class NotificationService {
         id: true,
         type: true,
         payload: true,
+        neuralPriority: true,
+        aiSummary: true,
         readAt: true,
         createdAt: true,
       },
@@ -36,11 +40,42 @@ export class NotificationService {
         id: n.id,
         type: n.type,
         payload: n.payload as Record<string, unknown>,
+        neuralPriority: n.neuralPriority,
+        aiSummary: n.aiSummary,
         readAt: n.readAt?.toISOString() ?? null,
         createdAt: n.createdAt.toISOString(),
       })),
       unreadCount,
     };
+  }
+
+  private async analyzeStrategicWeight(
+    type: string,
+    payload: Record<string, unknown>,
+  ): Promise<{ neuralPriority: string; aiSummary: string | null }> {
+    try {
+      const context = `Notification Type: ${type}\nPayload: ${JSON.stringify(payload)}`;
+      const result = await this.aiService.processText(context, 'notification_prioritizer');
+
+      try {
+        const parsed = JSON.parse(result);
+        return {
+          neuralPriority: parsed.priority || 'AMBIENT',
+          aiSummary: parsed.summary || null,
+        };
+      } catch {
+        // High-confidence heuristic fallback
+        if (type.includes('mention') || (payload.priority === 'high' && type.includes('delayed'))) {
+          return {
+            neuralPriority: 'STRATEGIC',
+            aiSummary: 'Critical signal detected in Mission Sector.',
+          };
+        }
+        return { neuralPriority: 'AMBIENT', aiSummary: null };
+      }
+    } catch {
+      return { neuralPriority: 'AMBIENT', aiSummary: null };
+    }
   }
 
   async markAsRead(notificationId: string, userId: string) {
@@ -63,12 +98,19 @@ export class NotificationService {
     type: string;
     payload: Record<string, unknown>;
   }) {
+    const { neuralPriority, aiSummary } = await this.analyzeStrategicWeight(
+      input.type,
+      input.payload,
+    );
+
     const notification = await this.prisma.notification.create({
       data: {
         userId: input.userId,
         workspaceId: input.workspaceId,
         type: input.type,
         payload: input.payload as Prisma.InputJsonValue,
+        neuralPriority,
+        aiSummary,
       },
     });
 
@@ -77,6 +119,8 @@ export class NotificationService {
       id: notification.id,
       type: notification.type,
       payload: notification.payload,
+      neuralPriority: notification.neuralPriority,
+      aiSummary: notification.aiSummary,
       createdAt: notification.createdAt.toISOString(),
     });
 

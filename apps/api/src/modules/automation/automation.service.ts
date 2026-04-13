@@ -5,23 +5,29 @@ import { AiService } from '../ai/ai.service';
 import { logger } from '../../common/logger';
 import type { TaskEventType } from '@prisma/client';
 
+import { NeuralAgentService } from './neural-agent.service';
+
 @Injectable()
 export class AutomationService {
   constructor(
     private prisma: PrismaService,
     private notificationService: NotificationService,
     private aiService: AiService,
+    private neuralAgentService: NeuralAgentService,
   ) {}
 
   async handleTaskEvent(event: {
     taskId: string;
     workspaceId: string;
     projectId: string;
-    type: TaskEventType;
+    type: TaskEventType | 'created';
     actorId?: string | null;
     payload: Record<string, unknown>;
   }) {
     try {
+      // Trigger Neural Agents in background
+      void this.neuralAgentService.processEvent(event);
+
       // Fetch active rules for this workspace/project
       const rules = await this.prisma.workflowRule.findMany({
         where: {

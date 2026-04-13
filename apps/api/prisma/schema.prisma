@@ -602,25 +602,37 @@ enum ChannelType {
 }
 
 model WorkflowRule {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   workspaceId String
-  projectId   String?  // If null, it's workspace-wide
+  projectId   String?   // If null, it's workspace-wide
   name        String
   description String?
-  isActive    Boolean  @default(true)
-  
-  // JSON trigger configuration: { type: "task_created" } or { type: "status_changed", from: "todo", to: "done" }
-  trigger     Json     
-  
-  // JSON actions configuration: [{ type: "send_notification", message: "Task {{title}} was completed!" }]
-  actions     Json     
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  isActive    Boolean   @default(true)
+  trigger     Json
+  actions     Json
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   project     Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([workspaceId, isActive])
   @@index([projectId, isActive])
+}
+
+model AgentAction {
+  id          String   @id @default(cuid())
+  workspaceId String
+  projectId   String?
+  agentName   String
+  actionType  String
+  targetId    String
+  reason      String   @db.Text
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@index([projectId])
 }

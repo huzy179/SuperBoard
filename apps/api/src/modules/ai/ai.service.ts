@@ -62,7 +62,7 @@ export class AiService implements OnModuleInit {
       await this.redis.setJson(cacheKey, result.summary, 60 * 60 * 24 * 7); // 7 days TTL
       return result.summary;
     } catch (error) {
-      console.error('AI Summarization failed:', error);
+      this.logger.error('AI Summarization failed', error);
       return 'Không thể tạo bản tóm tắt lúc này.';
     }
   }
@@ -81,7 +81,7 @@ export class AiService implements OnModuleInit {
       await this.redis.setJson(cacheKey, result.embedding); // Deterministic, no TTL needed
       return result.embedding;
     } catch (error) {
-      console.error('AI Embedding failed:', error);
+      this.logger.error('AI Embedding failed', error);
       throw error; // Rethrow because this is critical for search/sync
     }
   }
@@ -257,6 +257,8 @@ export class AiService implements OnModuleInit {
             priority: 'AMBIENT',
             summary: 'System event processed with standard tactical weight.',
           }),
+        mission_chronology_synthesizer: () =>
+          'A series of tactical shifts and mission adjustments have established a new baseline for strategic progress.',
       };
 
       return fallbacks[mode]?.(text) ?? text;
@@ -308,7 +310,7 @@ export class AiService implements OnModuleInit {
       }
       return [];
     } catch (error) {
-      console.error('AI Decomposition failed:', error);
+      this.logger.error('AI Decomposition failed', error);
       return [];
     }
   }

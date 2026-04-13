@@ -25,6 +25,16 @@ export class AutomationService {
     payload: Record<string, unknown>;
   }) {
     try {
+      // 0. Persist Event for Neural Mission Timeline
+      await this.prisma.taskEvent.create({
+        data: {
+          taskId: event.taskId,
+          actorId: event.actorId,
+          type: event.type === 'created' ? 'created' : (event.type as TaskEventType),
+          payload: event.payload as Record<string, unknown>,
+        },
+      });
+
       // Trigger Neural Agents in background
       void this.neuralAgentService.processEvent(event);
 

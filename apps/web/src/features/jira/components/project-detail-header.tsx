@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import type { ProjectDetailDTO } from '@superboard/shared';
 import { formatDate } from '@/lib/format-date';
 import { getInitials } from '@/lib/helpers';
+import { MissionTimeline } from './MissionTimeline';
 import {
   Brain,
   Settings2,
@@ -287,6 +289,10 @@ export function ProjectDetailHeader({
           </div>
         </div>
       </div>
+
+      {/* Neural Mission Timeline */}
+      <MissionTimeline projectId={project.id} />
+
       <AiPlannerModal
         projectId={project.id}
         isOpen={showAiPlanner}

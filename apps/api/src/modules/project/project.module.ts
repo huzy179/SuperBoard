@@ -9,6 +9,7 @@ import { MentionService } from './mention.service';
 import { ReportService } from './report.service';
 import { ReportController } from './report.controller';
 import { WorkflowAutomationService } from './workflow-automation.service';
+import { ChronologyService } from './chronology.service';
 
 import { WorkflowModule } from '../workflow/workflow.module';
 import { AiModule } from '../ai/ai.module';
@@ -24,6 +25,7 @@ import { AutomationModule } from '../automation/automation.module';
     MentionService,
     ReportService,
     WorkflowAutomationService,
+    ChronologyService,
   ],
   exports: [ProjectService, ReportService],
 })

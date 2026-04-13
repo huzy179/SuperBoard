@@ -44,6 +44,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { CommentService } from './comment.service';
 import { ProjectGateway } from './project.gateway';
 import { ProjectService } from './project.service';
+import { ChronologyService } from './chronology.service';
 
 @Controller('projects')
 export class ProjectController {
@@ -51,7 +52,25 @@ export class ProjectController {
     private projectService: ProjectService,
     private commentService: CommentService,
     private projectGateway: ProjectGateway,
+    private chronologyService: ChronologyService,
   ) {}
+
+  @Get(':projectId/chronology')
+  async getProjectChronology(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+  ) {
+    const workspaceId = requireWorkspace(user);
+
+    // Verify project access
+    await findOrThrow(
+      this.projectService.getProjectByIdForWorkspace(projectId, workspaceId),
+      'Project',
+    );
+
+    const timeline = await this.chronologyService.getProjectTimeline(projectId);
+    return apiSuccess(timeline);
+  }
 
   @Get()
   async getProjects(

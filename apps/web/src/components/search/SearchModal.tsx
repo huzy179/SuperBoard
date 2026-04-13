@@ -20,14 +20,6 @@ export function SearchModal({ onClose }: SearchModalProps) {
   const projects = data?.projects ?? [];
   const totalResults = tasks.length + projects.length;
 
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [query]);
-
   function handleSelect(item: { type: 'task' | 'project'; id: string; projectId?: string }) {
     if (item.type === 'project') {
       router.push(`/projects/${item.id}`);
@@ -68,47 +60,140 @@ export function SearchModal({ onClose }: SearchModalProps) {
     }
   }
 
+  const [answer, setAnswer] = useState<{
+    answer: string;
+    citations: { id: string; type: string; title: string }[];
+  } | null>(null);
+  const [isAnswering, setIsAnswering] = useState(false);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [query]);
+
+  useEffect(() => {
+    if (query.length > 5) {
+      const timer = setTimeout(() => fetchAnswer(), 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setAnswer(null);
+    }
+  }, [query]);
+
+  async function fetchAnswer() {
+    setIsAnswering(true);
+    try {
+      const res = await fetch(`/api/v1/search/answer?q=${encodeURIComponent(query)}`);
+      const body = await res.json();
+      if (res.ok) setAnswer(body.data);
+    } catch {
+      // Silently fail for neural answers
+    } finally {
+      setIsAnswering(false);
+    }
+  }
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-slate-900/40 backdrop-blur-sm pt-24"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-slate-900/60 backdrop-blur-md pt-24 animate-in fade-in duration-300"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/5 animate-in fade-in zoom-in duration-200"
+        className="w-full max-w-2xl overflow-hidden rounded-[2.5rem] bg-white border border-white/20 shadow-glass-xl ring-1 ring-black/5 animate-in zoom-in-95 duration-500 relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center border-b border-slate-100 px-4 py-3">
-          <span className="text-slate-400 mr-3">🔍</span>
+        {/* Rim Light */}
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/40 to-transparent" />
+
+        <div className="flex items-center px-8 py-6 relative">
+          <span className="text-2xl drop-shadow-md mr-4">🔍</span>
           <input
             ref={inputRef}
             type="text"
-            className="flex-1 text-sm text-slate-900 outline-none placeholder:text-slate-400"
-            placeholder="Tìm kiếm dự án, công việc (CMD+K)..."
+            className="flex-1 text-xl font-bold text-slate-900 outline-none placeholder:text-slate-400 tracking-tight"
+            placeholder="Search missions, cross-platform signals..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
           />
-          {isLoading && (
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+          {(isLoading || isAnswering) && (
+            <div className="h-5 w-5 animate-spin rounded-full border-[3px] border-brand-500 border-t-transparent" />
           )}
-          <kbd className="ml-3 hidden rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-400 sm:block">
-            ESC
-          </kbd>
         </div>
 
-        <div className="max-h-[400px] overflow-y-auto py-2">
+        <div className="max-h-[600px] overflow-y-auto py-2 scrollbar-hide">
+          {/* Neural Answer Section */}
+          {(isAnswering || answer) && (
+            <div className="px-6 pb-6">
+              <div
+                className={`p-8 rounded-[2rem] border transition-all duration-700 ${
+                  isAnswering
+                    ? 'bg-brand-500/5 border-brand-500/10 animate-pulse'
+                    : 'bg-brand-500/5 border-brand-500/20 shadow-glow-brand'
+                }`}
+              >
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-8 h-8 rounded-xl bg-brand-500 flex items-center justify-center text-white shadow-glow-brand">
+                    <span className="text-xs font-black">AI</span>
+                  </div>
+                  <span className="text-[10px] font-black text-brand-600 uppercase tracking-[0.3em]">
+                    Neural Synthesis
+                  </span>
+                </div>
+
+                {isAnswering ? (
+                  <div className="space-y-3">
+                    <div className="h-3 w-3/4 bg-brand-500/10 rounded-full" />
+                    <div className="h-3 w-1/2 bg-brand-500/10 rounded-full" />
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <p className="text-[14px] leading-relaxed text-slate-800 font-medium">
+                      {answer?.answer}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {answer?.citations.map((citation) => (
+                        <button
+                          key={citation.id}
+                          onClick={() =>
+                            handleSelect({
+                              type: citation.type as 'task' | 'project',
+                              id: citation.id,
+                            })
+                          }
+                          className="px-3 py-1.5 rounded-xl bg-white/60 border border-brand-500/10 text-[10px] font-bold text-brand-600 hover:bg-brand-500/10 transition-colors flex items-center gap-2"
+                        >
+                          <span className="opacity-40 uppercase">{citation.type}</span>
+                          {citation.title}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {query.length < 2 ? (
-            <div className="px-4 py-12 text-center">
-              <p className="text-sm text-slate-500">Nhập tối thiểu 2 ký tự để tìm kiếm</p>
+            <div className="px-4 py-20 text-center flex flex-col items-center gap-4">
+              <div className="h-20 w-20 bg-slate-50 rounded-[2rem] flex items-center justify-center text-4xl opacity-50 shadow-inner">
+                🔍
+              </div>
+              <p className="text-xs font-black text-slate-400 uppercase tracking-[0.4em]">
+                Initialize Neural Search
+              </p>
             </div>
           ) : totalResults > 0 ? (
-            <>
+            <div className="space-y-6 px-4 pb-6">
               {projects.length > 0 && (
-                <div className="px-3 pb-2 pt-1">
-                  <h3 className="px-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Dự án
+                <div>
+                  <h3 className="px-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-3">
+                    Mission Nodes
                   </h3>
-                  <div className="mt-1 space-y-0.5">
+                  <div className="grid grid-cols-1 gap-2">
                     {projects.map((p: ProjectItemDTO, i: number) => (
                       <SearchResultItem
                         key={p.id}
@@ -123,11 +208,11 @@ export function SearchModal({ onClose }: SearchModalProps) {
                 </div>
               )}
               {tasks.length > 0 && (
-                <div className="px-3 pb-2 pt-1 border-t border-slate-50 mt-1">
-                  <h3 className="px-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Công việc
+                <div className="border-t border-slate-50 pt-6">
+                  <h3 className="px-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-3">
+                    Tactical Items
                   </h3>
-                  <div className="mt-1 space-y-0.5">
+                  <div className="grid grid-cols-1 gap-2">
                     {tasks.map((t: ProjectTaskItemDTO, i: number) => (
                       <SearchResultItem
                         key={t.id}
@@ -147,12 +232,17 @@ export function SearchModal({ onClose }: SearchModalProps) {
                   </div>
                 </div>
               )}
-            </>
+            </div>
           ) : (
-            !isLoading && (
-              <div className="px-4 py-12 text-center">
-                <p className="text-sm text-slate-500">
-                  Không tìm thấy kết quả nào cho &quot;{query}&quot;
+            !isLoading &&
+            !isAnswering &&
+            !answer && (
+              <div className="px-4 py-20 text-center flex flex-col items-center gap-4">
+                <div className="h-20 w-20 bg-slate-50 rounded-[2rem] flex items-center justify-center text-4xl opacity-50 shadow-inner grayscale">
+                  👻
+                </div>
+                <p className="text-xs font-black text-slate-400 uppercase tracking-[0.4em]">
+                  Null Reference
                 </p>
               </div>
             )

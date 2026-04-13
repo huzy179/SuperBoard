@@ -662,3 +662,29 @@ model ExternalIntegration {
   @@index([workspaceId])
   @@index([projectId])
 }
+
+model SignalLog {
+  id            String              @id @default(cuid())
+  workspaceId   String
+  projectId     String?
+  integrationId String
+  provider      IntegrationProvider
+  payload       Json
+  interpretation String             @db.Text
+  createdAt     DateTime            @default(now())
+
+  workspace     Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project       Project?            @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  integration   ExternalIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  embedding     SignalEmbedding?
+
+  @@index([workspaceId])
+  @@index([projectId])
+}
+
+model SignalEmbedding {
+  signalId  String                      @id
+  signal    SignalLog                   @relation(fields: [signalId], references: [id], onDelete: Cascade)
+  vector    Unsupported("vector(768)")
+  updatedAt DateTime                    @updatedAt
+}

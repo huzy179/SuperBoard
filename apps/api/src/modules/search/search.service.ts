@@ -491,6 +491,52 @@ export class SearchService {
     };
   }
 
+  async generateNeuralAnswer(workspaceId: string, query: string) {
+    // 1. Unified Multi-Vector Retrieval
+    const [tasks, docs, signals] = await Promise.all([
+      this.searchTasksSemantic(workspaceId, query),
+      this.searchDocsHybrid(workspaceId, query),
+      this.findRelevantSignals(workspaceId, query),
+    ]);
+
+    // 2. Context Construction
+    const context = [
+      ...tasks.slice(0, 3).map((t) => `[Task] ${t.title}: ${t.description || 'No description'}`),
+      ...docs.slice(0, 3).map((d) => `[Doc] ${d.title}`),
+      ...(signals ?? []).slice(0, 3).map((s) => `[Signal] ${s.provider}: ${s.interpretation}`),
+    ].join('\n\n');
+
+    if (!context)
+      return { answer: "I couldn't find enough context to answer this query.", citations: [] };
+
+    // 3. AI Synthesis (RAG)
+    const answer = await this.aiService.processText(
+      `Context:\n${context}\n\nQuery: ${query}\n\nProvide a definitive, strategic answer based ONLY on the context above. Include citations in [Source] format.`,
+      'neural_rag_synthesis',
+    );
+
+    const citations = [
+      ...tasks.slice(0, 3).map((t) => ({ id: t.id, type: 'task', title: t.title })),
+      ...docs.slice(0, 3).map((d) => ({ id: d.id, type: 'doc', title: d.title })),
+      ...(signals ?? [])
+        .slice(0, 3)
+        .map((s) => ({ id: s.id, type: 'signal', title: `Signal from ${s.provider}` })),
+    ];
+
+    return { answer, citations };
+  }
+
+  private async findRelevantSignals(workspaceId: string, query: string) {
+    return this.prisma.signalLog.findMany({
+      where: {
+        workspaceId,
+        OR: [{ interpretation: { contains: query, mode: 'insensitive' } }],
+      },
+      take: 5,
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   async syncAllEntities(workspaceId: string) {
     // This is a background task. We trigger it and return a message.
     void this.performSync(workspaceId);

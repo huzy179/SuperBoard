@@ -78,11 +78,31 @@ export class ConnectService {
     this.logger.log(`Incoming signal received from ${provider}`);
 
     // Logic to map external events to SuperBoard updates
-    // For the demo/elite platform, we use AI to interpret the signal payload
     const interpretation = await this.aiService.processText(
       `Provider: ${provider}\nPayload: ${JSON.stringify(payload)}\nInterpret this as a project update. Suggest any task status changes or mission progress updates.`,
       'interpret_signal',
     );
+
+    // Persist signal for RAG
+    const integration = await this.prisma.externalIntegration.findFirst({
+      where: { provider: provider.toUpperCase() as IntegrationProvider },
+    });
+
+    if (integration) {
+      await this.prisma.signalLog.create({
+        data: {
+          workspaceId: integration.workspaceId,
+          projectId: integration.projectId,
+          integrationId: integration.id,
+          provider: integration.provider,
+          payload: payload as Prisma.InputJsonValue,
+          interpretation,
+        },
+      });
+
+      // In a real scenario, we'd trigger background embedding here
+      this.logger.log(`Signal persisted for workspace ${integration.workspaceId}`);
+    }
 
     this.logger.log(`Signal Interpretation: ${interpretation}`);
 

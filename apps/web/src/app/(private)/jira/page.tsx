@@ -4,6 +4,8 @@ import { SectionError, SectionSkeleton } from '@/components/ui/page-states';
 import { ProjectCardsGrid } from '@/features/jira/components/project-cards-grid';
 import { ProjectForm } from '@/features/jira/components/project-form';
 import { useJiraProjectsPage } from '@/features/jira/hooks';
+import { useAuthSession } from '@/features/auth/hooks/use-auth-session';
+import { NeuralWorkspaceDigest } from '@/features/ai/components/neural-workspace-digest';
 import { Search, Star, SortAsc, Zap, Plus, LayoutGrid, History, Activity } from 'lucide-react';
 
 export default function JiraHomePage() {
@@ -59,6 +61,7 @@ export default function JiraHomePage() {
     toggleFavoriteProject,
     isFavoriteProject,
   } = useJiraProjectsPage();
+  const { user } = useAuthSession();
 
   return (
     <div className="relative min-h-screen bg-slate-950 overflow-x-hidden pt-10 pb-24 px-8 md:px-12 font-sans">
@@ -97,6 +100,13 @@ export default function JiraHomePage() {
             </span>
           </button>
         </header>
+
+        {/* Global Neural Digest */}
+        {user?.defaultWorkspaceId && (
+          <div className="animate-in fade-in zoom-in-95 duration-700">
+            <NeuralWorkspaceDigest workspaceId={user.defaultWorkspaceId} />
+          </div>
+        )}
 
         {/* Command Gateway - Search & Filters */}
         <section className="p-2 bg-white/5 rounded-[2.5rem] border border-white/5 backdrop-blur-3xl shadow-glass">

@@ -44,8 +44,51 @@ export class AutomationService {
           await this.executeActions(rule.actions, event);
         }
       }
+
+      // Hardcoded Neural Automation: Cross-Project Blocker Resolution
+      if (event.type === 'status_changed' && event.payload.to === 'done') {
+        await this.checkBlockerResolutions(event.taskId, event.workspaceId);
+      }
     } catch (err) {
       logger.error({ err, taskId: event.taskId }, 'Automation engine error');
+    }
+  }
+
+  private async checkBlockerResolutions(taskId: string, workspaceId: string) {
+    const task = await this.prisma.task.findUnique({
+      where: { id: taskId },
+      include: {
+        sourceLinks: {
+          where: { type: 'blocks' },
+          include: {
+            targetTask: {
+              select: {
+                id: true,
+                title: true,
+                assigneeId: true,
+                project: { select: { name: true } },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!task || task.sourceLinks.length === 0) return;
+
+    for (const link of task.sourceLinks) {
+      const target = link.targetTask;
+      if (target.assigneeId) {
+        await this.notificationService.createNotification({
+          userId: target.assigneeId,
+          workspaceId,
+          type: 'task_updated',
+          payload: {
+            taskId: target.id,
+            message: `Blocker resolved: "${task.title}" is now DONE. You can proceed with "${target.title}" in project ${target.project.name}.`,
+          },
+        });
+      }
     }
   }
 

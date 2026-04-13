@@ -104,6 +104,12 @@ export class AiController {
     return apiSuccess({ briefing });
   }
 
+  @Get('workspace/:workspaceId/digest')
+  async getWorkspaceDigest(@Param('workspaceId') workspaceId: string) {
+    const digest = await this.aiService.getWorkspaceDigest(workspaceId);
+    return apiSuccess({ digest });
+  }
+
   @Post('projects/:projectId/chat')
   async chatWithProject(
     @CurrentUser() user: AuthUserDTO,

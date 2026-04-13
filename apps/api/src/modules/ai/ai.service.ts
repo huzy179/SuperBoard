@@ -112,6 +112,30 @@ export class AiService implements OnModuleInit {
     return this.processText(fullPrompt, 'chat');
   }
 
+  async getWorkspaceDigest(workspaceId: string): Promise<string> {
+    const projects = await this.prisma.project.findMany({
+      where: { workspaceId, deletedAt: null },
+      include: {
+        tasks: {
+          where: { deletedAt: null },
+          select: { title: true, status: true, priority: true },
+        },
+      },
+    });
+
+    const context = projects
+      .map(
+        (p) =>
+          `Project: ${p.name}. Tasks: ${p.tasks.length} (${p.tasks.filter((t) => t.status === 'done').length} done).`,
+      )
+      .join('\n');
+
+    return this.processText(
+      `Workspace Context:\n${context}\n\nSummarize workspace velocity and health.`,
+      'workspace_digest',
+    );
+  }
+
   async orchestrateGoal(goal: string, context: string): Promise<Record<string, unknown>[]> {
     const prompt = `Goal: ${goal}\nProject Context: ${context}`;
     const result = await this.processText(prompt, 'orchestrate_plan');

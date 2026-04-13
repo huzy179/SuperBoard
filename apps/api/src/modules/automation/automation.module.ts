@@ -8,10 +8,23 @@ import { NotificationModule } from '../notification/notification.module';
 import { AiModule } from '../ai/ai.module';
 import { TalentModule } from '../talent/talent.module';
 
+import { SingularityService } from './singularity.service';
+import { DiagnosisService } from '../knowledge/diagnosis.service';
+import { ChronologyService } from '../project/chronology.service';
+import { DocService } from '../doc/doc.service';
+
 @Module({
   imports: [NotificationModule, AiModule, TalentModule],
   controllers: [AutomationController, AgentController, ConnectController],
-  providers: [AutomationService, NeuralAgentService, ConnectService],
-  exports: [AutomationService, NeuralAgentService, ConnectService],
+  providers: [
+    AutomationService,
+    NeuralAgentService,
+    ConnectService,
+    SingularityService,
+    DiagnosisService,
+    ChronologyService,
+    DocService,
+  ],
+  exports: [AutomationService, NeuralAgentService, ConnectService, SingularityService],
 })
 export class AutomationModule {}

@@ -259,6 +259,14 @@ export class AiService implements OnModuleInit {
           }),
         mission_chronology_synthesizer: () =>
           'A series of tactical shifts and mission adjustments have established a new baseline for strategic progress.',
+        mission_alignment_auditor: (text: string) => {
+          if (text.includes('Documentation') || text.includes('Specs')) {
+            return 'Resolution Protocol: Consolidate architectural blueprints into a singular Source of Truth to prevent logic fragmentation.';
+          }
+          return 'Resolution Protocol: Synchronize mission parameters across project boundaries to achieve semantic convergence.';
+        },
+        commander_briefing: () =>
+          'Mission Briefing Protocol Active. Tactical alignment is within nominal ranges. Recent strategic pulses indicate a positive trajectory toward mission objectives.',
       };
 
       return fallbacks[mode]?.(text) ?? text;

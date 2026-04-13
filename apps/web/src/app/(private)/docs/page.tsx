@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus, BookOpen, Share2, Shield } from 'lucide-react';
+import { Plus, BookOpen, Share2, Shield, ShieldAlert } from 'lucide-react';
 import { useWorkspaces } from '@/features/workspace/hooks/use-workspaces';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createDoc } from '@/features/docs/api/doc-service';
@@ -60,6 +60,13 @@ export default function DocHomePage() {
             description="Bản đồ tri thức Neural. Phân tích sự trùng lặp khái niệm và điểm mù tri thức."
             onClick={() => router.push('/docs/atlas')}
             variant="indigo"
+          />
+          <FeatureCard
+            icon={<ShieldAlert className="text-red-600" />}
+            title="Divergence Audit"
+            description="Kiểm toán Va chạm Chiến lược. Phát hiện sự trùng lặp và mâu thuẫn giữa các dự án."
+            onClick={() => router.push('/docs/divergence')}
+            variant="brand"
           />
         </div>
       </div>

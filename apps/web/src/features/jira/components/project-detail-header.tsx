@@ -6,6 +6,7 @@ import type { ProjectDetailDTO } from '@superboard/shared';
 import { formatDate } from '@/lib/format-date';
 import { getInitials } from '@/lib/helpers';
 import { MissionTimeline } from './MissionTimeline';
+import { MissionCommandBriefing } from './MissionCommandBriefing';
 import {
   Brain,
   Settings2,
@@ -54,6 +55,7 @@ export function ProjectDetailHeader({
 }: ProjectDetailHeaderProps) {
   const pathname = usePathname();
   const [showAiPlanner, setShowAiPlanner] = useState(false);
+  const [showBriefing, setShowBriefing] = useState(false);
   const visibleMemberAvatars = project.members.slice(0, 5);
 
   const navItems = [
@@ -214,7 +216,15 @@ export function ProjectDetailHeader({
                 <span>Plan with AI</span>
               </button>
 
-              <div className="h-6 w-px bg-white/10 mx-1" />
+              <button
+                onClick={() => setShowBriefing(true)}
+                className="flex items-center gap-2 rounded-xl bg-white/5 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-brand-500 hover:shadow-glow-brand"
+              >
+                <Mic size={16} />
+                <span>Mission Briefing</span>
+              </button>
+
+              <div className="h-8 w-px bg-white/10" />
 
               <div className="flex items-center gap-1 p-1 bg-slate-900 rounded-full border border-white/5">
                 {navItems.map((v) => (
@@ -292,6 +302,12 @@ export function ProjectDetailHeader({
 
       {/* Neural Mission Timeline */}
       <MissionTimeline projectId={project.id} />
+
+      <MissionCommandBriefing
+        projectId={project.id}
+        isOpen={showBriefing}
+        onClose={() => setShowBriefing(false)}
+      />
 
       <AiPlannerModal
         projectId={project.id}

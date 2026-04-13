@@ -10,13 +10,26 @@ import { ReportService } from './report.service';
 import { ReportController } from './report.controller';
 import { WorkflowAutomationService } from './workflow-automation.service';
 import { ChronologyService } from './chronology.service';
+import { CommandService } from './command.service';
+import { DiagnosisService } from '../knowledge/diagnosis.service';
+import { DocService } from '../doc/doc.service';
+import { KnowledgeModule } from '../knowledge/knowledge.module';
 
 import { WorkflowModule } from '../workflow/workflow.module';
 import { AiModule } from '../ai/ai.module';
 import { AutomationModule } from '../automation/automation.module';
+import { DocModule } from '../doc/doc.module';
 
 @Module({
-  imports: [AuthModule, NotificationModule, WorkflowModule, AiModule, AutomationModule],
+  imports: [
+    AuthModule,
+    NotificationModule,
+    WorkflowModule,
+    AiModule,
+    AutomationModule,
+    KnowledgeModule,
+    DocModule,
+  ],
   controllers: [ProjectController, ReportController],
   providers: [
     ProjectService,
@@ -26,7 +39,10 @@ import { AutomationModule } from '../automation/automation.module';
     ReportService,
     WorkflowAutomationService,
     ChronologyService,
+    CommandService,
+    DiagnosisService,
+    DocService,
   ],
-  exports: [ProjectService, ReportService],
+  exports: [ProjectService, ReportService, CommandService],
 })
 export class ProjectModule {}

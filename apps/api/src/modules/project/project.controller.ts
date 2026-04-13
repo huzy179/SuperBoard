@@ -45,15 +45,26 @@ import { CommentService } from './comment.service';
 import { ProjectGateway } from './project.gateway';
 import { ProjectService } from './project.service';
 import { ChronologyService } from './chronology.service';
+import { CommandService } from './command.service';
 
-@Controller('projects')
+@Controller('v1/projects')
 export class ProjectController {
   constructor(
     private projectService: ProjectService,
     private commentService: CommentService,
     private projectGateway: ProjectGateway,
     private chronologyService: ChronologyService,
+    private commandService: CommandService,
   ) {}
+
+  @Get(':projectId/briefing')
+  async getMissionBriefing(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+  ) {
+    const data = await this.commandService.getMissionBriefing(projectId);
+    return apiSuccess(data);
+  }
 
   @Get(':projectId/chronology')
   async getProjectChronology(

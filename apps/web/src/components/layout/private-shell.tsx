@@ -11,6 +11,7 @@ import { CommandPalette } from '@/components/search/CommandPalette';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { AssigneeAvatar } from '@/features/jira/components/task-badges';
 import { WorkspaceSwitcher } from '@/features/workspace/components/WorkspaceSwitcher';
+import { SingularityPulse } from './SingularityPulse';
 import {
   MessageSquare,
   FileText,
@@ -73,7 +74,17 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
       <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-brand-500/30 to-transparent" />
 
       <div className="flex h-20 shrink-0 items-center justify-between px-6 border-b border-white/5 bg-white/5">
-        {!sidebarCollapsed && <AppBrand subtitle="Workspace" variant="dark" />}
+        {!sidebarCollapsed && (
+          <div className="flex items-center gap-4">
+            <AppBrand subtitle="Workspace" variant="dark" />
+            <SingularityPulse />
+          </div>
+        )}
+        {sidebarCollapsed && (
+          <div className="w-full flex justify-center">
+            <div className="h-2 w-2 rounded-full bg-brand-500 animate-pulse" />
+          </div>
+        )}
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           className="p-2 rounded-xl text-white/20 hover:text-white hover:bg-white/5 transition-all hidden lg:flex"

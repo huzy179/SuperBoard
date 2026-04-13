@@ -5,14 +5,22 @@ import { apiSuccess } from '../../common/api-response';
 import type { AuthUserDTO, CreateWorkflowRuleDTO, UpdateWorkflowRuleDTO } from '@superboard/shared';
 
 import { NeuralAgentService } from './neural-agent.service';
+import { SingularityService } from './singularity.service';
 
-@Controller('automation')
+@Controller('v1/automation')
 export class AutomationController {
   constructor(
     private prisma: PrismaService,
     private automationService: AutomationService,
     private neuralAgentService: NeuralAgentService,
+    private singularityService: SingularityService,
   ) {}
+
+  @Post('pulse')
+  async triggerPulse(@Query('workspaceId') workspaceId: string) {
+    const result = await this.singularityService.pulseConsciousness(workspaceId);
+    return apiSuccess(result);
+  }
 
   @Get('health')
   async getHealth(@Query('workspaceId') workspaceId: string) {

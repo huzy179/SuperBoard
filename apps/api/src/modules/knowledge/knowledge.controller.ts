@@ -34,6 +34,12 @@ export class KnowledgeController {
     return apiSuccess(data);
   }
 
+  @Get('diagnosis/divergence')
+  async detectStrategicDivergence(@CurrentUser() user: AuthUserDTO) {
+    const data = await this.diagnosisService.detectStrategicDivergence(user.workspaceId);
+    return apiSuccess(data);
+  }
+
   @Post('autolink/:docId')
   async suggestLinks(@Param('docId') docId: string) {
     const suggestions = await this.graphService.suggestLinks(docId);

@@ -33,7 +33,7 @@ export class DiagnosisService {
 
       // Create a Troubleshooting Doc in the workspace knowledge base
       // Use the workspaceId from context if available, otherwise fallback to system workspace
-      const workspaceId = context.workspaceId || 'system';
+      const workspaceId = (context.workspaceId as string) || 'system';
       const systemUser = await this.prisma.user.findFirst({ where: { role: 'admin' } });
 
       if (!systemUser) return;
@@ -103,5 +103,105 @@ export class DiagnosisService {
           'Intelligence synthesis complete. Recommendation: Consolidate mission protocols.',
       };
     }
+  }
+
+  async detectStrategicDivergence(workspaceId: string) {
+    const [docs, tasks] = await Promise.all([
+      this.prisma.doc.findMany({
+        where: { workspaceId, deletedAt: null },
+        include: { project: true },
+      }),
+      this.prisma.task.findMany({
+        where: { projectId: { not: null }, deletedAt: null },
+        include: { project: true, taskLinks: true },
+      }),
+    ]);
+
+    const nodes = [
+      ...docs.map((d) => ({
+        id: d.id,
+        type: 'doc',
+        title: d.title,
+        projectId: d.projectId,
+        projectName: d.project?.name || 'Workspace Core',
+      })),
+      ...tasks.map((t) => ({
+        id: t.id,
+        type: 'task',
+        title: t.title,
+        projectId: t.projectId,
+        projectName: t.project?.name || 'Unknown',
+        hasLinks: t.taskLinks.length > 0,
+      })),
+    ];
+
+    const collisions: unknown[] = [];
+
+    // Analyze Similarity across Projects
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const nodeA = nodes[i];
+        const nodeB = nodes[j];
+
+        if (nodeA.projectId === nodeB.projectId) continue;
+
+        const similarity = this.calculateHeuristicSimilarity(nodeA.title, nodeB.title);
+
+        if (similarity > 0.8) {
+          collisions.push({
+            id: `collision-${nodeA.id}-${nodeB.id}`,
+            nodes: [nodeA, nodeB],
+            intensity: similarity,
+            type: 'semantic_collision',
+          });
+        }
+      }
+    }
+
+    const results = [];
+    for (const collision of collisions.slice(0, 5)) {
+      const prompt = `Strategic Collision Detected:
+        Node A: [${collision.nodes[0].type}] ${collision.nodes[0].title} in Project "${collision.nodes[0].projectName}"
+        Node B: [${collision.nodes[1].type}] ${collision.nodes[1].title} in Project "${collision.nodes[1].projectName}"
+        
+        Suggest a resolution protocol to align these efforts. Provide a 1-sentence tactical directive.`;
+
+      const protocol = await this.aiService.processText(prompt, 'mission_alignment_auditor');
+      results.push({ ...collision, protocol });
+    }
+
+    return results;
+  }
+
+  private calculateHeuristicSimilarity(a: string, b: string): number {
+    const wordsA = new Set(
+      a
+        .toLowerCase()
+        .split(' ')
+        .filter((w) => w.length > 2),
+    );
+    const wordsB = new Set(
+      b
+        .toLowerCase()
+        .split(' ')
+        .filter((w) => w.length > 2),
+    );
+    const intersection = new Set([...wordsA].filter((x) => wordsB.has(x)));
+    const stopWords = new Set([
+      'the',
+      'and',
+      'for',
+      'with',
+      'system',
+      'implement',
+      'build',
+      'layer',
+      'core',
+    ]);
+    const meaningfulWords = Array.from(intersection).filter((w) => !stopWords.has(w));
+
+    if (meaningfulWords.length >= 2) return 0.9;
+    if (meaningfulWords.length >= 1) return 0.7;
+    return 0;
   }
 }

@@ -1,3 +1,4 @@
+import { Module } from '@nestjs/common';
 import { AutomationService } from './automation.service';
 import { AutomationController } from './automation.controller';
 import { AgentController } from './agent.controller';
@@ -9,6 +10,7 @@ import { AiModule } from '../ai/ai.module';
 import { TalentModule } from '../talent/talent.module';
 
 import { SingularityService } from './singularity.service';
+import { SymbiosisService } from './symbiosis.service';
 import { DiagnosisService } from '../knowledge/diagnosis.service';
 import { ChronologyService } from '../project/chronology.service';
 import { DocService } from '../doc/doc.service';
@@ -21,10 +23,17 @@ import { DocService } from '../doc/doc.service';
     NeuralAgentService,
     ConnectService,
     SingularityService,
+    SymbiosisService,
     DiagnosisService,
     ChronologyService,
     DocService,
   ],
-  exports: [AutomationService, NeuralAgentService, ConnectService, SingularityService],
+  exports: [
+    AutomationService,
+    NeuralAgentService,
+    ConnectService,
+    SingularityService,
+    SymbiosisService,
+  ],
 })
 export class AutomationModule {}

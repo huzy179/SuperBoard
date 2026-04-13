@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { DiagnosisService } from '../knowledge/diagnosis.service';
 import { ChronologyService } from '../project/chronology.service';
 import { NotificationService } from '../notification/notification.service';
+import { SymbiosisService } from './symbiosis.service';
 import { AiService } from '../ai/ai.service';
 
 @Injectable()
@@ -14,6 +15,7 @@ export class SingularityService {
     private diagnosisService: DiagnosisService,
     private chronologyService: ChronologyService,
     private notificationService: NotificationService,
+    private symbiosisService: SymbiosisService,
     private aiService: AiService,
   ) {}
 
@@ -26,6 +28,7 @@ export class SingularityService {
     const operations = await Promise.all([
       this.healStrategicDivergence(workspaceId),
       this.detectAndNudgeInertia(workspaceId),
+      this.symbiosisService.generateStrategicProposals(workspaceId),
     ]);
 
     const healingCount = operations[0];
@@ -46,7 +49,10 @@ export class SingularityService {
     const collisions = await this.diagnosisService.detectStrategicDivergence(workspaceId);
     let healedCount = 0;
 
-    for (const collision of collisions) {
+    for (const collision of collisions as {
+      intensity: number;
+      nodes: { id: string; type: string }[];
+    }[]) {
       // Only auto-heal high intensity collisions (>0.9)
       if (collision.intensity >= 0.9) {
         const [nodeA, nodeB] = collision.nodes;

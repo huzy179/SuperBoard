@@ -4,8 +4,10 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { apiSuccess } from '../../common/api-response';
 import type { AuthUserDTO, CreateWorkflowRuleDTO, UpdateWorkflowRuleDTO } from '@superboard/shared';
 
+import { AutomationService } from './automation.service';
 import { NeuralAgentService } from './neural-agent.service';
 import { SingularityService } from './singularity.service';
+import { SymbiosisService } from './symbiosis.service';
 
 @Controller('v1/automation')
 export class AutomationController {
@@ -14,7 +16,20 @@ export class AutomationController {
     private automationService: AutomationService,
     private neuralAgentService: NeuralAgentService,
     private singularityService: SingularityService,
+    private symbiosisService: SymbiosisService,
   ) {}
+
+  @Get('proposals')
+  async getProposals(@Query('workspaceId') workspaceId: string) {
+    const data = await this.symbiosisService.getPendingProposals(workspaceId);
+    return apiSuccess(data);
+  }
+
+  @Post('proposals/:id/approve')
+  async approveProposal(@Param('id') id: string) {
+    const data = await this.symbiosisService.approveProposal(id);
+    return apiSuccess(data);
+  }
 
   @Post('pulse')
   async triggerPulse(@Query('workspaceId') workspaceId: string) {

@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Activity, ShieldCheck, Zap } from 'lucide-react';
+import { Sparkles, Activity, ShieldCheck, Zap, ExternalLink } from 'lucide-react';
 import { useWorkspaces } from '@/features/workspace/hooks/use-workspaces';
+import Link from 'next/link';
 
 type ConsciousnessState = 'observing' | 'analyzing' | 'correcting';
 
 export function SingularityPulse() {
   const [state, setState] = useState<ConsciousnessState>('observing');
   const [stats, setStats] = useState({ healed: 0, nudged: 0 });
+  const [hasProposals, setHasProposals] = useState(false);
   const { data: workspaces } = useWorkspaces();
   const activeWorkspace = workspaces?.[0];
 
@@ -41,8 +43,23 @@ export function SingularityPulse() {
       }
     };
 
-    const interval = setInterval(cycle, 60000); // Pulse every minute
+    const checkProposals = async () => {
+      try {
+        const res = await fetch(`/api/v1/automation/proposals?workspaceId=${activeWorkspace.id}`);
+        const result = await res.json();
+        setHasProposals(result.data?.length > 0);
+      } catch (e) {
+        console.error('Failed to fetch proposals', e);
+      }
+    };
+
+    const interval = setInterval(() => {
+      cycle();
+      checkProposals();
+    }, 60000); // Pulse every minute
+
     cycle(); // Initial pulse
+    checkProposals();
 
     return () => clearInterval(interval);
   }, [activeWorkspace?.id]);
@@ -112,8 +129,8 @@ export function SingularityPulse() {
           </span>
 
           {/* Hover Stats Tooltip */}
-          <div className="absolute top-full left-0 mt-3 w-48 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
-            <div className="p-4 bg-slate-900/90 border border-white/10 rounded-2xl backdrop-blur-2xl shadow-2xl space-y-3">
+          <div className="absolute top-full left-0 mt-3 w-48 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
+            <div className="p-4 bg-slate-900/90 border border-white/10 rounded-2xl backdrop-blur-2xl shadow-2xl space-y-3 pointer-events-auto">
               <div className="flex items-center gap-2">
                 <Sparkles size={12} className="text-brand-400" />
                 <span className="text-[10px] font-black text-white uppercase tracking-widest">
@@ -129,6 +146,16 @@ export function SingularityPulse() {
                 <StatRow icon={<Zap size={10} />} label="Strategic Nudges" value={stats.nudged} />
                 <StatRow icon={<Activity size={10} />} label="System Consciousness" value="High" />
               </div>
+
+              {hasProposals && activeWorkspace && (
+                <Link
+                  href={`/automation/symbiosis?workspaceId=${activeWorkspace.id}`}
+                  className="mt-4 flex items-center justify-center gap-2 w-full p-2.5 bg-brand-500/20 border border-brand-500/40 rounded-xl text-[10px] font-black text-brand-400 uppercase tracking-widest hover:bg-brand-500 hover:text-white transition-all"
+                >
+                  <ExternalLink size={12} />
+                  Review Proposals
+                </Link>
+              )}
             </div>
           </div>
         </motion.div>

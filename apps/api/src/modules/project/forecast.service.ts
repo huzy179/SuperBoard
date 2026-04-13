@@ -15,7 +15,14 @@ export class ForecastService {
     private prisma: PrismaService,
   ) {}
 
-  async getMissionForecast(projectId: string) {
+  async getMissionForecast(
+    projectId: string,
+    overrides?: {
+      velocityMultiplier?: number;
+      addedPoints?: number;
+      driftIntensityModifier?: number;
+    },
+  ) {
     const project = await this.prisma.project.findUnique({
       where: { id: projectId },
       select: { name: true, workspaceId: true },
@@ -30,16 +37,23 @@ export class ForecastService {
     ]);
 
     // 1. Completion Trajectory
-    const remainingPoints = report.metrics.totalStoryPoints - report.metrics.completedStoryPoints;
+    const remainingPoints =
+      report.metrics.totalStoryPoints -
+      report.metrics.completedStoryPoints +
+      (overrides?.addedPoints || 0);
     const avgVelocity =
-      report.velocity.reduce((sum, v) => sum + v.points, 0) / report.velocity.length || 1;
+      (report.velocity.reduce((sum, v) => sum + v.points, 0) / report.velocity.length || 1) *
+      (overrides?.velocityMultiplier || 1);
     const daysToCompletion = Math.ceil(remainingPoints / (avgVelocity / 30)); // Rough estimate in days
 
     // 2. Architectural Drift
     const drifters = (
       collisions as { intensity: number; nodes: { projectName: string }[] }[]
     ).filter((c) => c.intensity > 0.7 && c.nodes.some((n) => n.projectName === project.name));
-    const driftIntensity = drifters.length / 10; // Normalized drift (max 1.0)
+    const driftIntensity = Math.min(
+      1.0,
+      drifters.length / 10 + (overrides?.driftIntensityModifier || 0),
+    ); // Normalized drift (max 1.0)
 
     // 3. Chronology Stability
     const pulsesLast7Days = pulses.filter((p) => {

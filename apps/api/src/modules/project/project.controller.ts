@@ -13,51 +13,46 @@ import {
 } from '@nestjs/common';
 import type {
   AuthUserDTO,
-  BulkTaskOperationRequestDTO,
-  BulkTaskOperationResponseDTO,
-  CommentListResponseDTO,
-  CreateCommentRequestDTO,
-  CreateCommentResponseDTO,
   CreateProjectRequestDTO,
   CreateProjectResponseDTO,
   CreateTaskRequestDTO,
   CreateTaskResponseDTO,
   DashboardStatsResponseDTO,
-  DeleteCommentResponseDTO,
   DeleteProjectResponseDTO,
-  DeleteTaskResponseDTO,
   ProjectDetailResponseDTO,
   ProjectsResponseDTO,
-  TaskHistoryResponseDTO,
-  UpdateCommentRequestDTO,
-  UpdateCommentResponseDTO,
   UpdateProjectRequestDTO,
   UpdateProjectResponseDTO,
-  UpdateTaskRequestDTO,
-  UpdateTaskResponseDTO,
-  UpdateTaskStatusRequestDTO,
-  UpdateTaskStatusResponseDTO,
 } from '@superboard/shared';
 import { apiSuccess } from '../../common/api-response';
 import { requireWorkspace, findOrThrow, parseBooleanQuery } from '../../common/helpers';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { CommentService } from './comment.service';
-import { ProjectGateway } from './project.gateway';
 import { ProjectService } from './project.service';
 import { ChronologyService } from './chronology.service';
 import { CommandService } from './command.service';
 import { ForecastService } from './forecast.service';
+import { SimulationService } from './simulation.service';
 
 @Controller('v1/projects')
 export class ProjectController {
   constructor(
     private projectService: ProjectService,
-    private commentService: CommentService,
-    private projectGateway: ProjectGateway,
     private chronologyService: ChronologyService,
     private commandService: CommandService,
     private forecastService: ForecastService,
+    private simulationService: SimulationService,
   ) {}
+
+  @Post(':projectId/simulate')
+  async runSimulation(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+    @Body()
+    params: { velocityMultiplier: number; addedPoints: number; driftIntensityModifier: number },
+  ) {
+    const data = await this.simulationService.runMissionSimulation(projectId, params);
+    return apiSuccess(data);
+  }
 
   @Get(':projectId/forecast')
   async getMissionForecast(

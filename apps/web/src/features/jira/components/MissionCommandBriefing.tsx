@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Terminal, ShieldAlert, TrendingUp, Cpu, Eye } from 'lucide-react';
+import { X, Terminal, ShieldAlert, TrendingUp, Cpu, Eye, Zap, Activity } from 'lucide-react';
+import { StrategicSandbox } from './StrategicSandbox';
 
 interface BriefingData {
   missionName: string;
@@ -37,6 +38,8 @@ export function MissionCommandBriefing({
 }) {
   const [data, setData] = useState<BriefingData | null>(null);
   const [forecast, setForecast] = useState<ForecastData | null>(null);
+  const [simulatedForecast, setSimulatedForecast] = useState<ForecastData | null>(null);
+  const [showSandbox, setShowSandbox] = useState(false);
   const [displayText, setDisplayText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
@@ -56,6 +59,8 @@ export function MissionCommandBriefing({
       setDisplayText('');
       setData(null);
       setForecast(null);
+      setSimulatedForecast(null);
+      setShowSandbox(false);
     }
   }, [isOpen, projectId]);
 
@@ -125,6 +130,12 @@ export function MissionCommandBriefing({
                       The Oracle
                     </span>
                   </div>
+                  <button
+                    onClick={() => setShowSandbox(!showSandbox)}
+                    className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest transition-all ${showSandbox ? 'bg-brand-500 text-white' : 'bg-white/5 text-white/40 hover:bg-white/10'}`}
+                  >
+                    Simulate Scenario
+                  </button>
                   <div className="flex items-center gap-1.5">
                     <div
                       className={`h-1.5 w-1.5 rounded-full ${forecast.trajectory === 'POSITIVE' ? 'bg-emerald-500 shadow-glow-emerald' : 'bg-red-500 shadow-glow-red'}`}
@@ -141,20 +152,22 @@ export function MissionCommandBriefing({
                       Confidence
                     </span>
                     <span className="text-[10px] font-black text-brand-400">
-                      {(forecast.confidence * 100).toFixed(0)}%
+                      {((simulatedForecast?.confidence || forecast.confidence) * 100).toFixed(0)}%
                     </span>
                   </div>
                   <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{ width: `${forecast.confidence * 100}%` }}
-                      className="h-full bg-brand-500"
+                      animate={{
+                        width: `${(simulatedForecast?.confidence || forecast.confidence) * 100}%`,
+                      }}
+                      className={`h-full ${simulatedForecast ? 'bg-amber-400 shadow-glow-amber' : 'bg-brand-500 shadow-glow-brand'}`}
                     />
                   </div>
                 </div>
 
                 <p className="text-[11px] font-bold text-white uppercase tracking-tight italic leading-relaxed opacity-60">
-                  "{forecast.prediction}"
+                  "{simulatedForecast?.prediction || forecast.prediction}"
                 </p>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -162,9 +175,22 @@ export function MissionCommandBriefing({
                     <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">
                       Est. Days
                     </span>
-                    <p className="text-lg font-black text-white">
-                      {forecast.metrics.completionDays}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-lg font-black text-white">
+                        {simulatedForecast?.metrics.completionDays ||
+                          forecast.metrics.completionDays}
+                      </p>
+                      {simulatedForecast && (
+                        <span
+                          className={`text-[10px] font-black ${simulatedForecast.metrics.completionDays < forecast.metrics.completionDays ? 'text-emerald-400' : 'text-red-400'}`}
+                        >
+                          {simulatedForecast.metrics.completionDays <
+                          forecast.metrics.completionDays
+                            ? '↓'
+                            : '↑'}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="space-y-1">
                     <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">
@@ -199,11 +225,6 @@ export function MissionCommandBriefing({
             </div>
 
             <div className="relative min-h-[300px] p-8 rounded-[3rem] border border-brand-500/20 bg-brand-500/[0.02] shadow-glow-brand/5 overflow-hidden">
-              {/* Animated Circuitry Background */}
-              <div className="absolute inset-0 opacity-20 pointer-events-none">
-                <Circuitry />
-              </div>
-
               <div className="relative z-10 space-y-8">
                 <div className="flex items-center gap-4">
                   <div className="h-2 w-2 rounded-full bg-brand-500 animate-pulse shadow-glow-brand" />
@@ -267,6 +288,23 @@ export function MissionCommandBriefing({
           </div>
         </div>
       </motion.div>
+
+      <AnimatePresence>
+        {showSandbox && (
+          <motion.div
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 100 }}
+            className="fixed inset-y-0 right-0 w-[400px] z-[120]"
+          >
+            <StrategicSandbox
+              projectId={projectId}
+              onClose={() => setShowSandbox(false)}
+              onResultUpdate={(res) => setSimulatedForecast(res as ForecastData)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AnimatePresence>
   );
 }
@@ -307,27 +345,5 @@ function SlantCard({
         <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest">{sub}</p>
       </div>
     </div>
-  );
-}
-
-function Circuitry() {
-  return (
-    <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-      <path
-        d="M0 20 L20 20 L30 30 L60 30 L70 40 L100 40"
-        fill="transparent"
-        stroke="currentColor"
-        strokeWidth="0.1"
-      />
-      <path
-        d="M0 60 L40 60 L50 70 L80 70 L90 80 L100 80"
-        fill="transparent"
-        stroke="currentColor"
-        strokeWidth="0.1"
-      />
-      <circle cx="20" cy="20" r="0.5" fill="currentColor" />
-      <circle cx="60" cy="30" r="0.5" fill="currentColor" />
-      <circle cx="50" cy="70" r="0.5" fill="currentColor" />
-    </svg>
   );
 }

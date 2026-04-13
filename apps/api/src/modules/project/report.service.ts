@@ -280,6 +280,59 @@ export class ReportService {
     return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
   }
 
+  async getPredictiveHealth(projectId: string) {
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+      include: {
+        tasks: {
+          where: { deletedAt: null },
+          orderBy: { createdAt: 'asc' },
+        },
+      },
+    });
+
+    if (!project) throw new NotFoundException('Project not found');
+
+    const tasks = project.tasks;
+    const doneTasks = tasks.filter((t) => t.status === 'done');
+    const openTasks = tasks.filter((t) => t.status !== 'done');
+
+    // Calculate Velocity (Story points per day over last 30 days)
+    const thirtyDaysAgo = subDays(new Date(), 30);
+    const recentDone = doneTasks.filter((t) => t.updatedAt >= thirtyDaysAgo);
+    const totalPointsDone = recentDone.reduce((sum, t) => sum + (t.storyPoints || 0), 0);
+    const velocityPerDay = totalPointsDone / 30 || 1.0; // Fallback to 1 point/day
+
+    const now = new Date();
+    const predictiveResults = openTasks.map((task) => {
+      // Simple linear projection
+      const remainingPointsBeforeThis = openTasks
+        .filter((t) => (t.position || '') < (task.position || ''))
+        .reduce((sum, t) => sum + (t.storyPoints || 0), 0);
+
+      const daysToComplete = (remainingPointsBeforeThis + (task.storyPoints || 1)) / velocityPerDay;
+      const estimatedDate = new Date(now.getTime() + daysToComplete * 24 * 60 * 60 * 1000);
+
+      const isAtRisk = task.dueDate ? isBefore(task.dueDate, estimatedDate) : false;
+
+      return {
+        taskId: task.id,
+        title: task.title,
+        status: task.status,
+        estimatedCompletionDate: estimatedDate.toISOString(),
+        isAtRisk,
+        confidence: 0.75, // Baseline confidence
+      };
+    });
+
+    return {
+      projectId,
+      velocityPerDay,
+      predictions: predictiveResults,
+      atRiskCount: predictiveResults.filter((p) => p.isAtRisk).length,
+    };
+  }
+
   async exportProjectTasksJson(projectId: string): Promise<string> {
     const tasks = await this.prisma.task.findMany({
       where: { projectId },

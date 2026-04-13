@@ -17,6 +17,15 @@ export class ReportController {
     };
   }
 
+  @Get(':projectId/predictive-health')
+  async getPredictiveHealth(@Param('projectId') projectId: string) {
+    const data = await this.reportService.getPredictiveHealth(projectId);
+    return {
+      success: true,
+      data,
+    };
+  }
+
   @Get(':projectId/export')
   async exportProjectTasks(@Param('projectId') projectId: string, @Res() res: Response) {
     const csv = await this.reportService.exportProjectTasksCsv(projectId);

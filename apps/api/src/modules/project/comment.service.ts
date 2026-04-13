@@ -12,6 +12,7 @@ import { NotificationService } from '../notification/notification.service';
 import type { CommentItemDTO } from '@superboard/shared';
 import { ProjectGateway } from './project.gateway';
 import { MentionService } from './mention.service';
+import { WorkflowAutomationService } from './workflow-automation.service';
 
 @Injectable()
 export class CommentService {
@@ -20,6 +21,7 @@ export class CommentService {
     private notificationService: NotificationService,
     private projectGateway: ProjectGateway,
     private mentionService: MentionService,
+    private workflowAutomation: WorkflowAutomationService,
   ) {}
 
   async getCommentsByTask(input: {
@@ -162,6 +164,15 @@ export class CommentService {
       authorName: dto.authorName,
       content: dto.content,
       createdAt: dto.createdAt,
+    });
+
+    // Trigger Autonomous Workflow Analysis
+    void this.workflowAutomation.processCommentIntent({
+      taskId: input.taskId,
+      projectId: input.projectId,
+      workspaceId: input.workspaceId,
+      authorId: input.authorId,
+      content: trimmed,
     });
 
     return dto;

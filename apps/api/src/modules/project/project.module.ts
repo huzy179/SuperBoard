@@ -8,6 +8,7 @@ import { ProjectGateway } from './project.gateway';
 import { MentionService } from './mention.service';
 import { ReportService } from './report.service';
 import { ReportController } from './report.controller';
+import { WorkflowAutomationService } from './workflow-automation.service';
 
 import { WorkflowModule } from '../workflow/workflow.module';
 import { AiModule } from '../ai/ai.module';
@@ -16,7 +17,14 @@ import { AutomationModule } from '../automation/automation.module';
 @Module({
   imports: [AuthModule, NotificationModule, WorkflowModule, AiModule, AutomationModule],
   controllers: [ProjectController, ReportController],
-  providers: [ProjectService, CommentService, ProjectGateway, MentionService, ReportService],
+  providers: [
+    ProjectService,
+    CommentService,
+    ProjectGateway,
+    MentionService,
+    ReportService,
+    WorkflowAutomationService,
+  ],
   exports: [ProjectService],
 })
 export class ProjectModule {}

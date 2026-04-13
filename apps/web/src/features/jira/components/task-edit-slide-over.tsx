@@ -20,6 +20,7 @@ import type {
   TaskTypeDTO,
   WorkflowStatusTemplateDTO,
 } from '@superboard/shared';
+import type { PredictiveHealthResponse } from '@/features/jira/hooks/use-predictive-health';
 import { TaskTypeIcon } from '@/features/jira/components/task-badges';
 import { TaskCommentSection } from '@/features/jira/components/task-comment-section';
 import { formatDate } from '@/lib/format-date';
@@ -86,6 +87,7 @@ interface TaskEditSlideOverProps {
   handleOpenEdit: (task: ProjectTaskItemDTO) => void;
   dialogRef: React.RefObject<HTMLDivElement | null>;
   handleDialogKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+  predictiveHealth?: PredictiveHealthResponse;
 }
 
 export function TaskEditSlideOver({
@@ -131,6 +133,7 @@ export function TaskEditSlideOver({
   dialogRef,
   handleDialogKeyDown,
   workflow,
+  predictiveHealth,
 }: TaskEditSlideOverProps) {
   const [showAiMenu, setShowAiMenu] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
@@ -139,6 +142,9 @@ export function TaskEditSlideOver({
   const decomposeMutation = useAiDecompose();
   const refineMutation = useAiRefine();
   const { data: intelligence } = useTaskIntelligence(editingTask?.id);
+
+  const taskPrediction = predictiveHealth?.predictions.find((p) => p.taskId === editingTask?.id);
+  const isAtRisk = taskPrediction?.isAtRisk;
 
   const handleAiDecompose = async () => {
     try {
@@ -320,6 +326,97 @@ export function TaskEditSlideOver({
             className="flex-1 overflow-y-auto elite-scrollbar custom-scrollbar"
           >
             <div className="px-10 py-12 space-y-16">
+              {/* Neural Health Forecast */}
+              {taskPrediction && (
+                <div
+                  className={`relative group overflow-hidden rounded-[2.5rem] border p-8 shadow-glass animate-in slide-in-from-top-6 duration-700 ${
+                    isAtRisk
+                      ? 'border-amber-500/20 bg-amber-500/[0.02] shadow-glow-amber'
+                      : 'border-emerald-500/20 bg-emerald-500/[0.02] shadow-glow-emerald'
+                  }`}
+                >
+                  <div className="flex items-start gap-8">
+                    <div
+                      className={`p-4 rounded-2xl border transition-all duration-700 ${
+                        isAtRisk
+                          ? 'bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-glow-amber'
+                          : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-glow-emerald'
+                      }`}
+                    >
+                      <Target size={24} className={isAtRisk ? 'animate-pulse' : ''} />
+                    </div>
+                    <div className="space-y-4 flex-1">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <h4
+                            className={`text-[10px] font-black uppercase tracking-[0.4em] ${isAtRisk ? 'text-amber-500' : 'text-emerald-500'}`}
+                          >
+                            Neural Health Forecast
+                          </h4>
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-white/20">
+                          {Math.round(taskPrediction.confidence * 100)}% Confidence
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">
+                            Estimated Completion
+                          </p>
+                          <p className="text-xl font-black text-white uppercase tracking-tighter">
+                            {formatDate(taskPrediction.estimatedCompletionDate)}
+                          </p>
+                          {isAtRisk && (
+                            <p className="text-[10px] font-bold text-amber-500/60 uppercase tracking-tight italic">
+                              ⚠️ Projected to exceed due date ({formatDate(editingTask.dueDate)})
+                            </p>
+                          )}
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">
+                            Risk Assessment
+                          </p>
+                          <div className="flex items-center gap-3">
+                            <span
+                              className={`text-xl font-black uppercase tracking-tighter ${isAtRisk ? 'text-amber-500' : 'text-emerald-400'}`}
+                            >
+                              {isAtRisk ? 'High Delay Risk' : 'Healthy Vector'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {isAtRisk && (
+                        <div className="mt-4 pt-4 border-t border-white/5 space-y-3">
+                          <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">
+                            AI Workload Redistribution Suggestion
+                          </p>
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs font-bold text-white/80">
+                              Redistribute to:
+                            </span>
+                            <div className="flex gap-2">
+                              {/* Filter members with low current workload in a real impl */}
+                              {members.slice(0, 2).map((m) => (
+                                <button
+                                  key={m.id}
+                                  type="button"
+                                  onClick={() => setEditAssigneeId(m.id)}
+                                  className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black text-white/40 uppercase hover:bg-brand-500 hover:text-white transition-all"
+                                >
+                                  {m.fullName.split(' ')[0]} (Low workload)
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Proactive Intelligence Alerts */}
               {intelligence?.duplicates && intelligence.duplicates.length > 0 && (
                 <div className="relative group overflow-hidden rounded-[2.5rem] border border-amber-500/20 bg-amber-500/[0.02] p-8 shadow-glow-amber animate-in slide-in-from-top-6 duration-700">

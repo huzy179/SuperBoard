@@ -37,6 +37,7 @@ import {
   useTaskEditPanel,
   useTaskDragDrop,
   useProjectWorkflow,
+  usePredictiveHealth,
 } from '@/features/jira/hooks';
 import { BOARD_COLUMNS, PRIORITY_OPTIONS, TASK_TYPE_OPTIONS } from '@/lib/constants/task';
 import {
@@ -244,6 +245,13 @@ export default function ProjectDetailPage() {
   const handleCloseQuickSearch = useCallback(() => setShowQuickSearch(false), []);
 
   const { data: workflow } = useProjectWorkflow(projectId);
+  const { data: predictiveHealth } = usePredictiveHealth(projectId);
+
+  const atRiskTaskIds = useMemo(() => {
+    return new Set(
+      (predictiveHealth?.predictions ?? []).filter((p) => p.isAtRisk).map((p) => p.taskId),
+    );
+  }, [predictiveHealth]);
 
   const dynamicColumns = useMemo(() => {
     if (workflow?.statuses && workflow.statuses.length > 0) {
@@ -446,6 +454,7 @@ export default function ProjectDetailPage() {
           columns={dynamicColumns}
           workflow={workflow}
           draggedTaskId={draggedTaskId}
+          atRiskTaskIds={atRiskTaskIds}
         />
       ) : viewMode === 'list' ? (
         <TaskListView
@@ -519,6 +528,7 @@ export default function ProjectDetailPage() {
           dialogRef={dialogRef}
           handleDialogKeyDown={handleDialogKeyDown}
           workflow={workflow}
+          predictiveHealth={predictiveHealth}
         />
       ) : null}
 

@@ -36,6 +36,7 @@ interface TaskBoardViewProps {
   columns: Array<{ key: string; label: string }>;
   workflow?: WorkflowStatusTemplateDTO | undefined;
   draggedTaskId: string | null;
+  atRiskTaskIds?: Set<string>;
 }
 export function TaskBoardView({
   boardData,
@@ -56,6 +57,7 @@ export function TaskBoardView({
   columns,
   workflow,
   draggedTaskId,
+  atRiskTaskIds,
 }: TaskBoardViewProps) {
   const getCategoryColor = (category: string | undefined) => {
     switch (category) {
@@ -252,6 +254,14 @@ export function TaskBoardView({
                         className="h-4 w-4 rounded-md border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer shadow-sm"
                       />
                     </div>
+                    {atRiskTaskIds?.has(task.id) && (
+                      <div className="absolute top-2 left-2 flex items-center gap-1.5 px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded-md animate-pulse">
+                        <div className="h-1.5 w-1.5 rounded-full bg-amber-500 shadow-glow-amber scale-110" />
+                        <span className="text-[9px] font-black uppercase tracking-widest text-amber-600">
+                          At Risk
+                        </span>
+                      </div>
+                    )}
                     <div className="flex items-center justify-between gap-1 mb-2">
                       <div className="flex items-center gap-1.5">
                         <TaskTypeIcon type={task.type ?? 'task'} />

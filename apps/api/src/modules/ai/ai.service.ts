@@ -112,6 +112,14 @@ export class AiService implements OnModuleInit {
         improve: (t) =>
           `[Đã cải thiện]: ${t} (Văn phong đã được chuyển sang hướng chuyên nghiệp và cuốn hút hơn)`,
         shorten: (t) => `[Đã rút gọn]: ${t.slice(0, Math.floor(t.length * 0.6))}...`,
+        detect_transition: (t) => {
+          const lower = t.toLowerCase();
+          if (lower.includes('ready') || lower.includes('review') || lower.includes('xong'))
+            return JSON.stringify({ targetStatus: 'review', confidence: 0.9 });
+          if (lower.includes('done') || lower.includes('hoàn thành'))
+            return JSON.stringify({ targetStatus: 'done', confidence: 0.95 });
+          return JSON.stringify({ targetStatus: null, confidence: 0 });
+        },
       };
 
       return fallbacks[mode]?.(text) ?? text;

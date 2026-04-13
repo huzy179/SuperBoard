@@ -30,6 +30,7 @@ interface ProjectDetailHeaderProps {
   isCopyLinkSuccess: boolean;
   onCopyFilterLink: () => void;
   onOpenAutomation: () => void;
+  onOpenGraph: () => void;
 }
 
 export function ProjectDetailHeader({
@@ -43,6 +44,7 @@ export function ProjectDetailHeader({
   isCopyLinkSuccess,
   onCopyFilterLink,
   onOpenAutomation,
+  onOpenGraph,
 }: ProjectDetailHeaderProps) {
   const pathname = usePathname();
   const visibleMemberAvatars = project.members.slice(0, 5);
@@ -237,6 +239,15 @@ export function ProjectDetailHeader({
                   title="Automation Gateway"
                 >
                   <Zap size={16} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onOpenGraph}
+                  className="p-3 rounded-full transition-all border bg-white/5 text-white/20 border-white/5 hover:text-brand-400 hover:bg-brand-500/10 hover:border-brand-500/20 shadow-glow-brand"
+                  title="Neural Knowledge Map"
+                >
+                  <Activity size={16} />
                 </button>
 
                 <button

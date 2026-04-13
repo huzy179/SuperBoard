@@ -1,10 +1,14 @@
-import { Controller, Get, Query, Request } from '@nestjs/common';
+import { Controller, Get, Post, Query, Request, Param } from '@nestjs/common';
 import { SearchService } from './search.service';
-import { SearchResponseDTO } from '@superboard/shared';
+import { GraphService } from './graph.service';
+import { SearchResponseDTO, NeuralGraphResponseDTO } from '@superboard/shared';
 
 @Controller('search')
 export class SearchController {
-  constructor(private searchService: SearchService) {}
+  constructor(
+    private searchService: SearchService,
+    private graphService: GraphService,
+  ) {}
 
   @Get()
   async search(
@@ -23,5 +27,11 @@ export class SearchController {
   @Post('sync')
   async syncAllEntities(@Request() req: { user: { defaultWorkspaceId: string } }) {
     return this.searchService.syncAllEntities(req.user.defaultWorkspaceId);
+  }
+
+  @Get('graph/:projectId')
+  async getGraph(@Param('projectId') projectId: string): Promise<NeuralGraphResponseDTO> {
+    const graph = await this.graphService.getNeuralGraph(projectId);
+    return { data: graph };
   }
 }

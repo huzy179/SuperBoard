@@ -20,6 +20,7 @@ import { TaskCreateForm } from '@/features/jira/components/task-create-form';
 import { TaskFilterBar } from '@/features/jira/components/task-filter-bar';
 import { TaskBulkActionBar } from '@/features/jira/components/task-bulk-action-bar';
 import { AutomationSlideOver } from '@/features/automation/components/automation-slide-over';
+import { KnowledgeMap } from '@/features/search/components/knowledge-map';
 
 import { useAuthSession } from '@/features/auth/hooks';
 import {
@@ -97,6 +98,7 @@ export default function ProjectDetailPage() {
   const [sortBy, setSortBy] = useState<TaskSortBy>('');
   const [sortDir, setSortDir] = useState<SortDirection>('asc');
   const [showAutomationPanel, setShowAutomationPanel] = useState(false);
+  const [showKnowledgeMap, setShowKnowledgeMap] = useState(false);
 
   // Sync state with URL
   useProjectUrlState({
@@ -352,6 +354,7 @@ export default function ProjectDetailPage() {
         onCopyFilterLink={onCopyFilterLink}
         onOpenFilterInNewTab={onOpenFilterInNewTab}
         onOpenAutomation={() => setShowAutomationPanel(true)}
+        onOpenGraph={() => setShowKnowledgeMap(true)}
       />
 
       <div className="flex flex-col gap-4">
@@ -553,6 +556,22 @@ export default function ProjectDetailPage() {
           workspaceId={project?.workspaceId ?? ''}
           projectId={projectId}
           onClose={() => setShowAutomationPanel(false)}
+        />
+      )}
+
+      {showKnowledgeMap && (
+        <KnowledgeMap
+          projectId={projectId}
+          onClose={() => setShowKnowledgeMap(false)}
+          onSelectNode={(node) => {
+            if (node.type === 'task') {
+              const task = tasks.find((t) => t.id === node.id);
+              if (task) {
+                setShowKnowledgeMap(false);
+                handleOpenEdit(task);
+              }
+            }
+          }}
         />
       )}
     </section>

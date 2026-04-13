@@ -174,4 +174,27 @@ export class DocService {
       logger.error({ err, docId }, 'Failed to sync doc embedding');
     }
   }
+
+  async proposeTaskLabels(docId: string, taskId: string) {
+    const [doc, task] = await Promise.all([
+      this.prisma.doc.findUnique({ where: { id: docId }, select: { summary: true, title: true } }),
+      this.prisma.task.findUnique({
+        where: { id: taskId },
+        include: { project: { select: { workspaceId: true } } },
+      }),
+    ]);
+
+    if (!doc || !task) return [];
+
+    const workspaceId = task.project.workspaceId;
+    const existingLabels = await this.prisma.label.findMany({
+      where: { workspaceId },
+      select: { id: true, name: true },
+    });
+
+    const context = `Document Title: ${doc.title}\nDocument Summary: ${doc.summary}`;
+    const suggested = await this.aiService.suggestLabels(task.title, context, existingLabels);
+
+    return suggested;
+  }
 }

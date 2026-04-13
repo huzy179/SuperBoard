@@ -132,6 +132,9 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
       list.push(...matchedActions);
     }
 
+    const lowerQuery = query.toLowerCase();
+    const filterAssigneeMe = lowerQuery.includes('assignee:me') || lowerQuery.includes('@me');
+
     projects.forEach((p: ProjectItemDTO) => {
       list.push({
         id: `project-${p.id}`,
@@ -155,28 +158,45 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
       });
     });
 
-    tasks.forEach((t: ProjectTaskItemDTO) => {
-      list.push({
-        id: `task-${t.id}`,
-        type: 'task',
-        title: t.title,
-        subtitle: `VECTOR #${t.number} · STATUS: ${t.status.toUpperCase()}`,
-        icon: <CheckCircle2 size={16} className="text-cyan-400" />,
-        handler: () => {
-          saveToRecent({
-            id: `task-${t.id}`,
-            type: 'task',
-            title: t.title,
-            icon: <CheckCircle2 size={16} />,
-            handler: () => {},
-            category: 'Mission Vectors',
-          });
-          router.push(`/projects/${t.projectId}?task=${t.id}`);
-          onClose();
-        },
-        category: 'Mission Vectors',
+    tasks
+      .filter((t) => (filterAssigneeMe ? t.assigneeName === 'Tôi' || t.assigneeId === 'me' : true)) // Simplified for demo
+      .forEach((t: ProjectTaskItemDTO) => {
+        list.push({
+          id: `task-${t.id}`,
+          type: 'task',
+          title: t.title,
+          subtitle: `VECTOR #${t.number} · STATUS: ${t.status.toUpperCase()}`,
+          icon: (
+            <div className="relative">
+              <CheckCircle2 size={16} className="text-cyan-400" />
+              {t.recentCollaborators && t.recentCollaborators.length > 0 && (
+                <div className="absolute -top-1 -right-1 flex -space-x-1">
+                  {t.recentCollaborators.slice(0, 2).map((c, i) => (
+                    <div
+                      key={i}
+                      className="w-2.5 h-2.5 rounded-full border border-slate-900 bg-brand-500 shadow-glow-brand"
+                      title={`Collaborator: ${c}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          ),
+          handler: () => {
+            saveToRecent({
+              id: `task-${t.id}`,
+              type: 'task',
+              title: t.title,
+              icon: <CheckCircle2 size={16} />,
+              handler: () => {},
+              category: 'Mission Vectors',
+            });
+            router.push(`/projects/${t.projectId}?task=${t.id}`);
+            onClose();
+          },
+          category: 'Mission Vectors',
+        });
       });
-    });
 
     docs.forEach((d: DocItemDTO) => {
       list.push({
@@ -386,6 +406,17 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
                       Synchronizing Vectors...
                     </span>
                   )}
+                </div>
+              </div>
+              <div className="h-4 w-px bg-white/5" />
+              <div className="flex flex-col">
+                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">
+                  Recent Neural Activity
+                </span>
+                <div className="flex gap-1.5 mt-0.5">
+                  <div className="h-1 w-4 bg-brand-500/40 rounded-full" title="Task Sync" />
+                  <div className="h-1 w-2 bg-emerald-500/40 rounded-full" title="Doc Index" />
+                  <div className="h-1 w-3 bg-cyan-500/40 rounded-full" title="Embedding Vector" />
                 </div>
               </div>
             </div>

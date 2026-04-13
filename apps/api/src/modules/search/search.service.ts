@@ -52,6 +52,15 @@ export class SearchService {
     createdAt: true,
     updatedAt: true,
     deletedAt: true,
+    summary: true,
+    comments: {
+      where: { deletedAt: null },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      include: {
+        author: { select: { fullName: true } },
+      },
+    },
   } as const;
 
   private readonly docSelect = {
@@ -445,6 +454,14 @@ export class SearchService {
       assigneeName: t.assignee?.fullName ?? null,
       assigneeAvatarColor: t.assignee?.avatarColor ?? null,
       subtaskProgress: null,
+      summary: (task as { summary?: string | null }).summary ?? null,
+      recentCollaborators: Array.from(
+        new Set(
+          (task as { comments?: { author?: { fullName: string } }[] }).comments
+            ?.map((c) => c.author?.fullName)
+            .filter((name): name is string => !!name) || [],
+        ),
+      ).slice(0, 3),
       createdAt: t.createdAt.toISOString(),
       updatedAt: t.updatedAt.toISOString(),
       deletedAt: t.deletedAt ? t.deletedAt.toISOString() : null,

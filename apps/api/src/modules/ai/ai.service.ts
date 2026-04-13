@@ -230,6 +230,26 @@ export class AiService implements OnModuleInit {
           const lower = t.toLowerCase();
           return keywords.some((k) => lower.includes(k)) ? 'true' : 'false';
         },
+        executive_daily_briefing: () =>
+          JSON.stringify({
+            pulse: 'Operational rhythm is steady and localized.',
+            commandIntent: [
+              'Review active project metrics',
+              'Audit signal stream',
+              'Optimize trajectories',
+            ],
+            highlights: ['Local Intelligence active', 'System health nominal'],
+          }),
+        ui_layout_orchestrator: () =>
+          JSON.stringify([
+            { id: 'STATS', order: 0, focus: false },
+            { id: 'VECTORS', order: 1, focus: true },
+            { id: 'SIGNALS', order: 2, focus: false },
+          ]),
+        navigation_strategist: () =>
+          JSON.stringify({
+            highlights: [{ sector: 'DASHBOARD', reason: 'Review high-level strategic alignment' }],
+          }),
       };
 
       return fallbacks[mode]?.(text) ?? text;

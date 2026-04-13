@@ -620,18 +620,44 @@ model WorkflowRule {
 }
 
 model AgentAction {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   workspaceId String
   projectId   String?
   agentName   String
   actionType  String
   targetId    String
-  reason      String   @db.Text
+  reason      String    @db.Text
   metadata    Json?
-  createdAt   DateTime @default(now())
-
+  createdAt   DateTime  @default(now())
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@index([projectId])
+}
+
+enum IntegrationProvider {
+  SLACK
+  DISCORD
+  GITHUB
+  GITLAB
+  ZAPIER
+}
+
+model ExternalIntegration {
+  id          String              @id @default(cuid())
+  workspaceId String
+  projectId   String?
+  name        String
+  provider    IntegrationProvider
+  type        String              // "webhook_out", "webhook_in", "oauth"
+  config      Json                // { url: "...", token: "..." }
+  status      String              @default("active") // "active", "error", "disabled"
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project     Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([workspaceId])
   @@index([projectId])

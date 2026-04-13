@@ -21,6 +21,7 @@ import { TaskFilterBar } from '@/features/jira/components/task-filter-bar';
 import { TaskBulkActionBar } from '@/features/jira/components/task-bulk-action-bar';
 import { AutomationSlideOver } from '@/features/automation/components/automation-slide-over';
 import { KnowledgeMap } from '@/features/search/components/knowledge-map';
+import { ProjectCopilot } from '@/features/ai/components/project-copilot';
 
 import { useAuthSession } from '@/features/auth/hooks';
 import {
@@ -574,6 +575,8 @@ export default function ProjectDetailPage() {
           }}
         />
       )}
+
+      <ProjectCopilot projectId={projectId} />
     </section>
   );
 }

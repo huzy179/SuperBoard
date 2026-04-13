@@ -1,8 +1,10 @@
-import { Controller, Post, Param, NotFoundException, Body } from '@nestjs/common';
+import { Controller, Post, Get, Param, NotFoundException, Body } from '@nestjs/common';
 import { AiService } from './ai.service';
 import { TaskService } from '../task/task.service';
 import { DocService } from '../doc/doc.service';
 import { ChatService } from '../chat/chat.service';
+import { ProjectService } from '../project/project.service';
+import { ReportService } from '../project/report.service';
 import { apiSuccess } from '../../common/api-response';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { AuthUserDTO } from '@superboard/shared';
@@ -14,6 +16,8 @@ export class AiController {
     private readonly taskService: TaskService,
     private readonly docService: DocService,
     private readonly chatService: ChatService,
+    private readonly projectService: ProjectService,
+    private readonly reportService: ReportService,
   ) {}
 
   @Post('tasks/:taskId/summarize')
@@ -77,5 +81,44 @@ export class AiController {
   async generateAutomationRule(@CurrentUser() user: AuthUserDTO, @Body() body: { prompt: string }) {
     const result = await this.aiService.generateAutomationRule(body.prompt);
     return apiSuccess(result);
+  }
+
+  @Get('projects/:projectId/briefing')
+  async getProjectBriefing(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+  ) {
+    const project = await this.projectService.getProjectByIdForWorkspace(
+      projectId,
+      user.defaultWorkspaceId,
+    );
+    if (!project) throw new NotFoundException('Project not found');
+
+    const health = await this.reportService.getPredictiveHealth(projectId);
+    const briefing = await this.aiService.getProjectBriefing(
+      projectId,
+      project.tasks,
+      health.health,
+    );
+
+    return apiSuccess({ briefing });
+  }
+
+  @Post('projects/:projectId/chat')
+  async chatWithProject(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+    @Body() body: { message: string },
+  ) {
+    const project = await this.projectService.getProjectByIdForWorkspace(
+      projectId,
+      user.defaultWorkspaceId,
+    );
+    if (!project) throw new NotFoundException('Project not found');
+
+    const context = `Project: ${project.name}. Tasks: ${project.tasks.length}. Members: ${project.members.length}.`;
+    const response = await this.aiService.chatWithProject(body.message, context);
+
+    return apiSuccess({ response });
   }
 }

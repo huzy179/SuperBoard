@@ -25,6 +25,6 @@ import { AutomationModule } from '../automation/automation.module';
     ReportService,
     WorkflowAutomationService,
   ],
-  exports: [ProjectService],
+  exports: [ProjectService, ReportService],
 })
 export class ProjectModule {}

@@ -86,6 +86,32 @@ export class AiService implements OnModuleInit {
     }
   }
 
+  async getProjectBriefing(
+    projectId: string,
+    tasks: { title: string; status: string; isAtRisk?: boolean }[],
+    health: { score: number },
+  ): Promise<string> {
+    const atRiskCount = tasks.filter((t) => t.isAtRisk).length;
+    const taskSummary = tasks
+      .slice(0, 5)
+      .map((t) => `- ${t.title} (${t.status})`)
+      .join('\n');
+
+    const context = `
+      Project Health Score: ${health?.score ?? 'Unknown'}
+      Tasks At Risk: ${atRiskCount}
+      Recent Tasks:
+      ${taskSummary}
+    `;
+
+    return this.processText(context, 'summarize_briefing');
+  }
+
+  async chatWithProject(text: string, context: string): Promise<string> {
+    const fullPrompt = `Context: ${context}\nUser: ${text}`;
+    return this.processText(fullPrompt, 'chat');
+  }
+
   async processText(text: string, mode: string): Promise<string> {
     const cacheKey = this.generateCacheKey(`process:${mode}`, text);
     const cached = await this.redis.getJson<string>(cacheKey);

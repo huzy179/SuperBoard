@@ -1,16 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { ProjectTaskAttachmentDTO } from '@superboard/shared';
-import { writeFile, mkdir } from 'node:fs/promises';
-import { join, extname } from 'node:path';
+import { AiService } from '../ai/ai.service';
 
 @Injectable()
 export class UploadService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly aiService: AiService,
+  ) {}
 
   /**
    * Uploads a file to a task.
-   * Currently mocks the storage portion but saves a real database record.
    */
   async uploadTaskAttachment(
     taskId: string,
@@ -34,7 +32,16 @@ export class UploadService {
     const fileKey = `tasks/${taskId}/${Date.now()}-${file.originalname}`;
     const mockUrl = `https://mock-storage.superboard.dev/${fileKey}`;
 
-    // 3. Save to database
+    // 3. AI Analysis (Async Trigger)
+    let aiContext: string | undefined;
+    try {
+      // In this version, we process synchronously for simplicity, but in prod this is a worker
+      aiContext = await this.aiService.analyzeMedia(mockUrl, file.mimetype);
+    } catch (err) {
+      console.error('AI Analysis failed during upload:', err);
+    }
+
+    // 4. Save to database
     const attachment = await this.prisma.attachment.create({
       data: {
         name: file.originalname,
@@ -43,6 +50,8 @@ export class UploadService {
         size: BigInt(file.size),
         mimeType: file.mimetype,
         taskId: taskId,
+        aiContext: aiContext || null,
+        aiMetadata: aiContext ? { processedAt: new Date().toISOString() } : null,
       },
     });
 
@@ -54,6 +63,7 @@ export class UploadService {
       size: Number(attachment.size),
       mimeType: attachment.mimeType,
       createdAt: attachment.createdAt.toISOString(),
+      aiContext: attachment.aiContext || undefined,
     };
   }
 

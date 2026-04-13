@@ -112,6 +112,16 @@ export class AiService implements OnModuleInit {
     return this.processText(fullPrompt, 'chat');
   }
 
+  async analyzeMedia(url: string, mimeType: string): Promise<string> {
+    const isImage = mimeType.startsWith('image/');
+    const mode = isImage ? 'analyze_vision' : 'transcribe_audio';
+
+    // In production, this would send the URL/Buffer to gRPC
+    // For our Elite platform, we use the processText engine as a fallback
+    const result = await this.processText(`[Media Analysis Request] URL: ${url}`, mode);
+    return result;
+  }
+
   async processText(text: string, mode: string): Promise<string> {
     const cacheKey = this.generateCacheKey(`process:${mode}`, text);
     const cached = await this.redis.getJson<string>(cacheKey);

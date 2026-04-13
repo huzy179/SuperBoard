@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import type { FormEvent } from 'react';
+import { Mic, MicOff } from 'lucide-react';
 import type {
   ProjectMemberDTO,
   ProjectTaskItemDTO,
@@ -35,6 +36,10 @@ export function TaskCreateForm({
   onCancel,
   workflow,
 }: TaskCreateFormProps) {
+  const [isListening, setIsListening] = useState(false);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+
   const defaultStatus = useMemo(() => {
     if (workflow?.statuses && workflow.statuses.length > 0) {
       return (workflow.statuses[0] as { key: string }).key;
@@ -42,8 +47,6 @@ export function TaskCreateForm({
     return 'todo' as string;
   }, [workflow?.statuses]);
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
   const [status, setStatus] = useState<ProjectTaskItemDTO['status']>(
     initialStatus || defaultStatus,
   );
@@ -52,6 +55,35 @@ export function TaskCreateForm({
   const [dueDate, setDueDate] = useState('');
   const [assigneeId, setAssigneeId] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  const toggleListening = () => {
+    if (typeof window === 'undefined') return;
+
+    // @ts-expect-error - Web Speech API is not globally typed in some environments
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Trình duyệt của bạn không hỗ trợ nhận diện giọng nói');
+      return;
+    }
+
+    if (isListening) {
+      setIsListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'vi-VN';
+    recognition.continuous = false;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onresult = (event: { results: { transcript: string }[][] }) => {
+      const transcript = event.results[0][0].transcript;
+      setTitle((prev) => (prev ? `${prev} ${transcript}` : transcript));
+    };
+
+    recognition.start();
+  };
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -89,17 +121,32 @@ export function TaskCreateForm({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
-          Tiêu đề task
-          <input
-            type="text"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            placeholder="Ví dụ: Thiết kế flow login mới"
-            className="mt-1.5 w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500"
-            required
-          />
-        </label>
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-medium text-slate-700">Tiêu đề task</label>
+          <div className="mt-1.5 relative flex items-center">
+            <input
+              type="text"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              placeholder="Ví dụ: Thiết kế flow login mới"
+              className="w-full rounded-lg border border-slate-300 bg-slate-50 pl-3 pr-10 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-brand-500 transition-all font-medium"
+              required
+            />
+            <button
+              type="button"
+              onClick={toggleListening}
+              className={`absolute right-2 p-1.5 rounded-md transition-all ${
+                isListening
+                  ? 'bg-rose-100 text-rose-600 animate-pulse'
+                  : 'bg-slate-100 text-slate-500 hover:text-brand-600 hover:bg-brand-50'
+              }`}
+              title="Nhập bằng giọng nói"
+            >
+              {isListening ? <Mic size={16} /> : <MicOff size={16} />}
+            </button>
+          </div>
+        </div>
+
         <label className="block text-sm font-medium text-slate-700">
           Trạng thái
           <select

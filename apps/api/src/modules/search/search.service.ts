@@ -156,6 +156,7 @@ export class SearchService {
         OR: [
           { title: { contains: q, mode: 'insensitive' } },
           { description: { contains: q, mode: 'insensitive' } },
+          { attachments: { some: { aiContext: { contains: q, mode: 'insensitive' } } } },
           ...(taskNumber !== undefined ? [{ number: taskNumber }] : []),
         ],
       },

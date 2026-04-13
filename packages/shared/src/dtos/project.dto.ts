@@ -53,6 +53,7 @@ export interface ProjectTaskAttachmentDTO {
   size: number;
   mimeType: string;
   createdAt: string;
+  aiContext?: string;
 }
 
 export interface ProjectTaskItemDTO {

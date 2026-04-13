@@ -556,6 +556,8 @@ export function TaskEditSlideOver({
                   editAssigneeId={editAssigneeId}
                   setEditAssigneeId={setEditAssigneeId}
                   members={members}
+                  taskId={editingTask.id}
+                  workspaceId={editingTask.project.workspaceId}
                   labels={editingTask.labels}
                   workflow={workflow}
                   initialStatus={editingTask.status}

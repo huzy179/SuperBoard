@@ -11,6 +11,7 @@ import {
   type TaskPriority,
 } from '@/lib/constants/task';
 import type { WorkflowStatusTemplateDTO } from '@superboard/shared';
+import { SmartAssigneeSuggestion } from '@/features/talent/components/smart-assignee-suggestion';
 
 interface TaskPropertiesFormProps {
   editTitle: string;
@@ -28,6 +29,8 @@ interface TaskPropertiesFormProps {
   editAssigneeId: string;
   setEditAssigneeId: (val: string) => void;
   members: ProjectMemberDTO[];
+  taskId?: string;
+  workspaceId?: string;
   labels?: ProjectTaskItemDTO['labels'];
   workflow?: WorkflowStatusTemplateDTO | undefined;
   initialStatus?: string;
@@ -49,6 +52,8 @@ export function TaskPropertiesForm({
   editAssigneeId,
   setEditAssigneeId,
   members,
+  taskId,
+  workspaceId,
   labels,
   workflow,
   initialStatus,
@@ -244,6 +249,16 @@ export function TaskPropertiesForm({
               <ChevronDown size={14} />
             </div>
           </div>
+          {taskId && workspaceId && (
+            <div className="mt-4 animate-in fade-in duration-500">
+              <SmartAssigneeSuggestion
+                taskId={taskId}
+                workspaceId={workspaceId}
+                onAssign={(id) => setEditAssigneeId(id)}
+                currentAssigneeId={editAssigneeId}
+              />
+            </div>
+          )}
         </label>
       </div>
 

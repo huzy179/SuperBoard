@@ -57,6 +57,7 @@ model User {
   preferences        NotificationPreference?
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
+  aiSkillProfile     Json?             // Inferred skills and velocity tokens
   auditLogs          AuditLog[]
   channelMembers     ChannelMember[]
   messages           Message[]

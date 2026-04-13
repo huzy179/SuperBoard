@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Terminal, Zap, ShieldAlert, TrendingUp, Activity, Cpu } from 'lucide-react';
+import { X, Terminal, ShieldAlert, TrendingUp, Cpu, Eye } from 'lucide-react';
 
 interface BriefingData {
   missionName: string;
@@ -15,6 +15,17 @@ interface BriefingData {
   latestIntensity: number;
 }
 
+interface ForecastData {
+  prediction: string;
+  confidence: number;
+  metrics: {
+    completionDays: number;
+    driftIndex: number;
+    stability: number;
+  };
+  trajectory: 'POSITIVE' | 'NEUTRAL' | 'CRITICAL';
+}
+
 export function MissionCommandBriefing({
   projectId,
   isOpen,
@@ -25,6 +36,7 @@ export function MissionCommandBriefing({
   onClose: () => void;
 }) {
   const [data, setData] = useState<BriefingData | null>(null);
+  const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [displayText, setDisplayText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
@@ -36,9 +48,14 @@ export function MissionCommandBriefing({
           setData(res.data);
           startBriefing(res.data.sitrep);
         });
+
+      fetch(`/api/v1/projects/${projectId}/forecast`)
+        .then((res) => res.json())
+        .then((res) => setForecast(res.data));
     } else {
       setDisplayText('');
       setData(null);
+      setForecast(null);
     }
   }, [isOpen, projectId]);
 
@@ -94,6 +111,74 @@ export function MissionCommandBriefing({
               value={data?.metrics.velocity || 0}
               sub="Strategic Units / Pulse"
             />
+
+            {forecast && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="p-6 bg-brand-500/5 border border-brand-500/20 rounded-[2.5rem] space-y-6"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Eye size={14} className="text-brand-400" />
+                    <span className="text-[10px] font-black text-white uppercase tracking-widest">
+                      The Oracle
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div
+                      className={`h-1.5 w-1.5 rounded-full ${forecast.trajectory === 'POSITIVE' ? 'bg-emerald-500 shadow-glow-emerald' : 'bg-red-500 shadow-glow-red'}`}
+                    />
+                    <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">
+                      {forecast.trajectory} Trajectory
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-bold text-white/20 uppercase tracking-widest">
+                      Confidence
+                    </span>
+                    <span className="text-[10px] font-black text-brand-400">
+                      {(forecast.confidence * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${forecast.confidence * 100}%` }}
+                      className="h-full bg-brand-500"
+                    />
+                  </div>
+                </div>
+
+                <p className="text-[11px] font-bold text-white uppercase tracking-tight italic leading-relaxed opacity-60">
+                  "{forecast.prediction}"
+                </p>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">
+                      Est. Days
+                    </span>
+                    <p className="text-lg font-black text-white">
+                      {forecast.metrics.completionDays}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">
+                      Drift Index
+                    </span>
+                    <p
+                      className={`text-lg font-black ${forecast.metrics.driftIndex > 0.5 ? 'text-red-400' : 'text-emerald-400'}`}
+                    >
+                      {forecast.metrics.driftIndex.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
           </div>
 
           {/* Center: Command Feed */}

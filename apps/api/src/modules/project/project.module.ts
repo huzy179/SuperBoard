@@ -11,6 +11,7 @@ import { ReportController } from './report.controller';
 import { WorkflowAutomationService } from './workflow-automation.service';
 import { ChronologyService } from './chronology.service';
 import { CommandService } from './command.service';
+import { ForecastService } from './forecast.service';
 import { DiagnosisService } from '../knowledge/diagnosis.service';
 import { DocService } from '../doc/doc.service';
 import { KnowledgeModule } from '../knowledge/knowledge.module';
@@ -40,9 +41,10 @@ import { DocModule } from '../doc/doc.module';
     WorkflowAutomationService,
     ChronologyService,
     CommandService,
+    ForecastService,
     DiagnosisService,
     DocService,
   ],
-  exports: [ProjectService, ReportService, CommandService],
+  exports: [ProjectService, ReportService, CommandService, ForecastService],
 })
 export class ProjectModule {}

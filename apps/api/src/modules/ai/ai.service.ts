@@ -267,6 +267,8 @@ export class AiService implements OnModuleInit {
         },
         commander_briefing: () =>
           'Mission Briefing Protocol Active. Tactical alignment is within nominal ranges. Recent strategic pulses indicate a positive trajectory toward mission objectives.',
+        strategic_oracle: () =>
+          'Oracle Prediction Initialized. Mission trajectory is currently stable, though minor architectural drift is detected. Expect mission completion within the projected 30-day window.',
       };
 
       return fallbacks[mode]?.(text) ?? text;

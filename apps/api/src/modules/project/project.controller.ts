@@ -46,6 +46,7 @@ import { ProjectGateway } from './project.gateway';
 import { ProjectService } from './project.service';
 import { ChronologyService } from './chronology.service';
 import { CommandService } from './command.service';
+import { ForecastService } from './forecast.service';
 
 @Controller('v1/projects')
 export class ProjectController {
@@ -55,7 +56,17 @@ export class ProjectController {
     private projectGateway: ProjectGateway,
     private chronologyService: ChronologyService,
     private commandService: CommandService,
+    private forecastService: ForecastService,
   ) {}
+
+  @Get(':projectId/forecast')
+  async getMissionForecast(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+  ) {
+    const data = await this.forecastService.getMissionForecast(projectId);
+    return apiSuccess(data);
+  }
 
   @Get(':projectId/briefing')
   async getMissionBriefing(

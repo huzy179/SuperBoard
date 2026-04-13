@@ -29,6 +29,7 @@ interface ProjectDetailHeaderProps {
   setShowCreateTaskPanel: (show: boolean | ((val: boolean) => boolean)) => void;
   isCopyLinkSuccess: boolean;
   onCopyFilterLink: () => void;
+  onOpenAutomation: () => void;
 }
 
 export function ProjectDetailHeader({
@@ -41,6 +42,7 @@ export function ProjectDetailHeader({
   setShowCreateTaskPanel,
   isCopyLinkSuccess,
   onCopyFilterLink,
+  onOpenAutomation,
 }: ProjectDetailHeaderProps) {
   const pathname = usePathname();
   const visibleMemberAvatars = project.members.slice(0, 5);
@@ -228,20 +230,14 @@ export function ProjectDetailHeader({
               <div className="h-6 w-px bg-white/10 mx-1" />
 
               <div className="flex gap-2">
-                <Link
-                  href={`/jira/projects/${project.id}/automation`}
-                  className={`p-3 rounded-full transition-all border ${
-                    pathname?.endsWith('/automation')
-                      ? 'bg-amber-500/20 text-amber-500 border-amber-500/30 shadow-glow-amber'
-                      : 'bg-white/5 text-white/20 border-white/5 hover:text-white hover:bg-white/10'
-                  }`}
+                <button
+                  type="button"
+                  onClick={onOpenAutomation}
+                  className="p-3 rounded-full transition-all border bg-white/5 text-white/20 border-white/5 hover:text-white hover:bg-white/10"
                   title="Automation Gateway"
                 >
-                  <Zap
-                    size={16}
-                    className={pathname?.endsWith('/automation') ? 'animate-pulse' : ''}
-                  />
-                </Link>
+                  <Zap size={16} />
+                </button>
 
                 <button
                   type="button"

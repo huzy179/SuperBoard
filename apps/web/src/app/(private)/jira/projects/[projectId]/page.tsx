@@ -19,6 +19,7 @@ import { TaskCalendarView } from '@/features/jira/components/task-calendar-view'
 import { TaskCreateForm } from '@/features/jira/components/task-create-form';
 import { TaskFilterBar } from '@/features/jira/components/task-filter-bar';
 import { TaskBulkActionBar } from '@/features/jira/components/task-bulk-action-bar';
+import { AutomationSlideOver } from '@/features/automation/components/automation-slide-over';
 
 import { useAuthSession } from '@/features/auth/hooks';
 import {
@@ -95,6 +96,7 @@ export default function ProjectDetailPage() {
   const [filterTypes, setFilterTypes] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<TaskSortBy>('');
   const [sortDir, setSortDir] = useState<SortDirection>('asc');
+  const [showAutomationPanel, setShowAutomationPanel] = useState(false);
 
   // Sync state with URL
   useProjectUrlState({
@@ -349,6 +351,7 @@ export default function ProjectDetailPage() {
         isCopyLinkSuccess={isCopyLinkSuccess}
         onCopyFilterLink={onCopyFilterLink}
         onOpenFilterInNewTab={onOpenFilterInNewTab}
+        onOpenAutomation={() => setShowAutomationPanel(true)}
       />
 
       <div className="flex flex-col gap-4">
@@ -544,6 +547,14 @@ export default function ProjectDetailPage() {
           }}
         />
       ) : null}
+
+      {showAutomationPanel && (
+        <AutomationSlideOver
+          workspaceId={project?.workspaceId ?? ''}
+          projectId={projectId}
+          onClose={() => setShowAutomationPanel(false)}
+        />
+      )}
     </section>
   );
 }

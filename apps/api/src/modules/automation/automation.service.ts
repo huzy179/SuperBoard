@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationService } from '../notification/notification.service';
+import { AiService } from '../ai/ai.service';
 import { logger } from '../../common/logger';
 import type { TaskEventType } from '@prisma/client';
 
@@ -9,6 +10,7 @@ export class AutomationService {
   constructor(
     private prisma: PrismaService,
     private notificationService: NotificationService,
+    private aiService: AiService,
   ) {}
 
   async handleTaskEvent(event: {
@@ -68,6 +70,19 @@ export class AutomationService {
       if (to && payload.to !== to) return false;
     }
 
+    if (triggerObj.type === 'SEMANTIC_MATCH' && triggerObj.config) {
+      const task = (eventObj.payload as { task?: { title: string; description: string } })?.task;
+      if (!task) return false;
+
+      // Use AI to check if task content matches semantic prompt
+      const result = this.aiService.processText(
+        `Task: ${task.title}\nDesc: ${task.description}`,
+        'semantic_compare',
+      );
+      // Synchronous for now for simpler rule engine flow (assuming processing is fast or cached)
+      return result === 'true';
+    }
+
     return true;
   }
 
@@ -109,6 +124,27 @@ export class AutomationService {
               },
             });
             break;
+
+          case 'AI_EVALUATE': {
+            const task = await this.prisma.task.findUnique({
+              where: { id: event.taskId as string },
+            });
+            if (!task) break;
+
+            const evaluation = await this.aiService.processText(
+              `Task Title: ${task.title}\nDescription: ${task.description}`,
+              'evaluate_automation_condition',
+            );
+
+            if (evaluation === 'false') {
+              logger.warn(
+                { taskId: event.taskId, ruleId: 'AI_GUARDRAIL' },
+                'AI Guardrail triggered: evaluation failed. Halting rule.',
+              );
+              return; // Halt subsequent actions in this rule
+            }
+            break;
+          }
 
           case 'SEND_WEBHOOK': {
             const webhookUrl = (action.config as Record<string, unknown>)?.url as string;

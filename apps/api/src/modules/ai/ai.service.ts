@@ -120,6 +120,18 @@ export class AiService implements OnModuleInit {
             return JSON.stringify({ targetStatus: 'done', confidence: 0.95 });
           return JSON.stringify({ targetStatus: null, confidence: 0 });
         },
+        evaluate_automation_condition: (t) => {
+          // Rule: If task has description and title, it's generally good.
+          // For demo, we simulate complex AI evaluation.
+          const hasDesc = t.length > 50;
+          return hasDesc ? 'true' : 'false';
+        },
+        semantic_compare: (t) => {
+          // Simplified embedding-less comparison for demo fallback
+          const keywords = ['bug', 'error', 'security', 'vulnerability', 'fail'];
+          const lower = t.toLowerCase();
+          return keywords.some((k) => lower.includes(k)) ? 'true' : 'false';
+        },
       };
 
       return fallbacks[mode]?.(text) ?? text;

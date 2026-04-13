@@ -11,14 +11,24 @@ export interface WorkflowRuleDTO {
   updatedAt: string;
 }
 
-export type WorkflowTriggerType = 'TASK_CREATED' | 'STATUS_CHANGED' | 'ASSIGNEE_CHANGED';
+export type WorkflowTriggerType =
+  | 'TASK_CREATED'
+  | 'STATUS_CHANGED'
+  | 'ASSIGNEE_CHANGED'
+  | 'SEMANTIC_MATCH';
 
 export interface WorkflowTrigger {
   type: WorkflowTriggerType;
   config?: Record<string, unknown>; // e.g., { from: "todo", to: "done" }
 }
 
-export type WorkflowActionType = 'SEND_NOTIFICATION' | 'UPDATE_TASK_FIELD' | 'ADD_LABEL';
+export type WorkflowActionType =
+  | 'SEND_NOTIFICATION'
+  | 'UPDATE_TASK_FIELD'
+  | 'ADD_LABEL'
+  | 'AI_EVALUATE'
+  | 'AUTO_ASSIGN'
+  | 'SEND_WEBHOOK';
 
 export interface WorkflowAction {
   type: WorkflowActionType;

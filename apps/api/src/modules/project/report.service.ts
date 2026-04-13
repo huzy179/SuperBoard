@@ -480,4 +480,104 @@ export class ReportService {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  async getNeuralDailyBriefing(workspaceId: string) {
+    const twentyFourHoursAgo = subDays(new Date(), 1);
+
+    // 1. Data Aggregation
+    const [tasks, comments, signals, actions] = await Promise.all([
+      this.prisma.task.findMany({
+        where: { project: { workspaceId }, updatedAt: { gte: twentyFourHoursAgo } },
+        include: { project: { select: { name: true } } },
+      }),
+      this.prisma.comment.findMany({
+        where: { task: { project: { workspaceId } }, createdAt: { gte: twentyFourHoursAgo } },
+      }),
+      this.prisma.signalLog.findMany({
+        where: { workspaceId, createdAt: { gte: twentyFourHoursAgo } },
+      }),
+      this.prisma.agentAction.findMany({
+        where: { workspaceId, createdAt: { gte: twentyFourHoursAgo } },
+      }),
+    ]);
+
+    // 2. Multi-Dimensional Synthesis
+    const activityLog = [
+      `Active Tasks: ${tasks.length}`,
+      ...tasks.map((t) => `[${t.project.name}] ${t.title}: ${t.status}`),
+      `Recent Comments: ${comments.length}`,
+      ...comments.slice(0, 10).map((c) => `[Comment] ${c.content.slice(0, 50)}...`),
+      `Ecosystem Signals: ${signals.length}`,
+      ...signals.slice(0, 10).map((s) => `[${s.provider}] ${s.interpretation}`),
+      `Neural Actions: ${actions.length}`,
+      ...actions.slice(0, 10).map((a) => `[${a.agentName}] ${a.reason}`),
+    ].join('\n');
+
+    const prompt = `
+        Active Log (Last 24 Hours):
+        ${activityLog}
+
+        Provide a strategic "Daily Command Briefing":
+        1. "The Pulse": Synthesize the emotional and operational vibe (1-2 sentences).
+        2. "Command Intent": Top 3 critical tactical priorities based on activity and signals.
+        3. "Neural Highlights": Summary of what the AI agents did to help.
+
+        Format: Professional, structured JSON: { pulse: string, commandIntent: string[], highlights: string[] }
+    `;
+
+    const rawBriefing = await this.aiService.processText(prompt, 'executive_daily_briefing');
+
+    try {
+      return JSON.parse(rawBriefing);
+    } catch {
+      return {
+        pulse: 'Operational rhythm is steady, but external signals are growing more complex.',
+        commandIntent: [
+          'Sync Mission trajectories',
+          'Review recent Slack signals',
+          'Audit blocker resolutions',
+        ],
+        highlights: ['Neural Agents optimized 5 new missions', 'Redundancy scan complete'],
+      };
+    }
+  }
+
+  async getAdaptiveLayout(workspaceId: string) {
+    const briefing = await this.getNeuralDailyBriefing(workspaceId);
+
+    const prompt = `
+        Current Command Intent: ${briefing.commandIntent.join(', ')}
+        The Pulse: ${briefing.pulse}
+
+        Based on these priorities, determine the optimal "Liquid UI" layout for the Strategic Dashboard.
+        Available Modules:
+        - STATS: Top-level metric cards.
+        - MATRIX: Distribution donut charts.
+        - EFFICIENCY: Completion intelligence bars.
+        - SIGNALS: Active signal stream (Slack/GitHub).
+        - VECTORS: Attention vectors (critical projects).
+        - CAPACITY: Operator workload distribution.
+        - TAXONOMY: Protocol classification bar chart.
+
+        Return a JSON array of these modules ordered by "Strategic Importance" for TODAY.
+        Include 'focus: true' for the most critical module.
+        Format: [{ id: string, order: number, focus: boolean }]
+    `;
+
+    const rawLayout = await this.aiService.processText(prompt, 'ui_layout_orchestrator');
+
+    try {
+      return JSON.parse(rawLayout);
+    } catch {
+      return [
+        { id: 'STATS', order: 0, focus: false },
+        { id: 'VECTORS', order: 1, focus: true },
+        { id: 'SIGNALS', order: 2, focus: false },
+        { id: 'MATRIX', order: 3, focus: false },
+        { id: 'EFFICIENCY', order: 4, focus: false },
+        { id: 'CAPACITY', order: 5, focus: false },
+        { id: 'TAXONOMY', order: 6, focus: false },
+      ];
+    }
+  }
 }

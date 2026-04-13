@@ -14,6 +14,18 @@ export class ExecutiveController {
     return apiSuccess(data);
   }
 
+  @Get('daily-briefing')
+  async getDailyBriefing(@Query('workspaceId') workspaceId: string) {
+    const briefing = await this.reportService.getNeuralDailyBriefing(workspaceId);
+    return apiSuccess(briefing);
+  }
+
+  @Get('adaptive-layout')
+  async getAdaptiveLayout(@Query('workspaceId') workspaceId: string) {
+    const layout = await this.reportService.getAdaptiveLayout(workspaceId);
+    return apiSuccess(layout);
+  }
+
   @Post('projects/:projectId/simulate')
   async simulateProjectTrajectory(
     @Param('projectId') projectId: string,

@@ -285,12 +285,22 @@ export class ReportService {
     return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
   }
 
-  async getPredictiveHealth(projectId: string) {
+  async getVelocityForecasting(
+    projectId: string,
+    adjustments?: {
+      velocityBoost?: number;
+      excludedTaskIds?: string[];
+      priorityShiftIds?: string[];
+    },
+  ) {
     const project = await this.prisma.project.findUnique({
       where: { id: projectId },
       include: {
         tasks: {
-          where: { deletedAt: null },
+          where: {
+            deletedAt: null,
+            id: { notIn: adjustments?.excludedTaskIds ?? [] },
+          },
           orderBy: { createdAt: 'asc' },
         },
       },
@@ -300,19 +310,32 @@ export class ReportService {
 
     const tasks = project.tasks;
     const doneTasks = tasks.filter((t) => t.status === 'done');
-    const openTasks = tasks.filter((t) => t.status !== 'done');
+    let openTasks = tasks.filter((t) => t.status !== 'done');
 
-    // Calculate Velocity (Story points per day over last 30 days)
+    // Apply priority shift simulation
+    if (adjustments?.priorityShiftIds) {
+      const shifted = adjustments.priorityShiftIds
+        .map((id) => openTasks.find((t) => t.id === id))
+        .filter((t): t is (typeof openTasks)[0] => !!t);
+      const others = openTasks.filter((t) => !adjustments.priorityShiftIds?.includes(t.id));
+      openTasks = [...shifted, ...others];
+    }
+
+    // Calculate Velocity
     const thirtyDaysAgo = subDays(new Date(), 30);
     const recentDone = doneTasks.filter((t) => t.updatedAt >= thirtyDaysAgo);
     const totalPointsDone = recentDone.reduce((sum, t) => sum + (t.storyPoints || 0), 0);
-    const velocityPerDay = totalPointsDone / 30 || 1.0; // Fallback to 1 point/day
+    let velocityPerDay = totalPointsDone / 30 || 1.0;
+
+    // Apply Velocity Boost Simulation
+    if (adjustments?.velocityBoost) {
+      velocityPerDay *= 1 + adjustments.velocityBoost;
+    }
 
     const now = new Date();
-    const predictiveResults = openTasks.map((task) => {
-      // Simple linear projection
+    const predictiveResults = openTasks.map((task, index) => {
       const remainingPointsBeforeThis = openTasks
-        .filter((t) => (t.position || '') < (task.position || ''))
+        .slice(0, index)
         .reduce((sum, t) => sum + (t.storyPoints || 0), 0);
 
       const daysToComplete = (remainingPointsBeforeThis + (task.storyPoints || 1)) / velocityPerDay;
@@ -326,7 +349,7 @@ export class ReportService {
         status: task.status,
         estimatedCompletionDate: estimatedDate.toISOString(),
         isAtRisk,
-        confidence: 0.75, // Baseline confidence
+        confidence: 0.75 + (adjustments ? -0.1 : 0),
       };
     });
 

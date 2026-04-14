@@ -87,7 +87,9 @@ interface TaskEditSlideOverProps {
   handleOpenEdit: (task: ProjectTaskItemDTO) => void;
   dialogRef: React.RefObject<HTMLDivElement | null>;
   handleDialogKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
-  predictiveHealth?: PredictiveHealthResponse;
+  predictiveHealth?: PredictiveHealthResponse | undefined;
+  workspaceId: string;
+  tasks?: ProjectTaskItemDTO[];
 }
 
 export function TaskEditSlideOver({
@@ -134,6 +136,8 @@ export function TaskEditSlideOver({
   handleDialogKeyDown,
   workflow,
   predictiveHealth,
+  workspaceId,
+  tasks = [],
 }: TaskEditSlideOverProps) {
   const [showAiMenu, setShowAiMenu] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
@@ -151,7 +155,7 @@ export function TaskEditSlideOver({
       setShowAiMenu(false);
       const result = await decomposeMutation.mutateAsync(editingTask.id);
       toast.info(`Neural Decomposition Complete: ${result.subtasks.length} sub-nodes suggested.`);
-      if (result.subtasks.length > 0) setSubtaskTitle(result.subtasks[0]);
+      if (result.subtasks.length > 0 && result.subtasks[0]) setSubtaskTitle(result.subtasks[0]);
     } catch {
       toast.error('Neural Decomposition Interrupted.');
     }
@@ -369,7 +373,8 @@ export function TaskEditSlideOver({
                           </p>
                           {isAtRisk && (
                             <p className="text-[10px] font-bold text-amber-500/60 uppercase tracking-tight italic">
-                              ⚠️ Projected to exceed due date ({formatDate(editingTask.dueDate)})
+                              ⚠️ Projected to exceed due date (
+                              {formatDate(editingTask.dueDate || '')})
                             </p>
                           )}
                         </div>
@@ -441,7 +446,7 @@ export function TaskEditSlideOver({
                             key={dup.id}
                             type="button"
                             onClick={() => {
-                              const task = (projectTasks ?? []).find((t) => t.id === dup.id);
+                              const task = tasks.find((t) => t.id === dup.id);
                               if (task) handleOpenEdit(task);
                             }}
                             className="flex items-center justify-between px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-amber-500/40 hover:bg-white/[0.05] transition-all group/dup"
@@ -557,7 +562,7 @@ export function TaskEditSlideOver({
                   setEditAssigneeId={setEditAssigneeId}
                   members={members}
                   taskId={editingTask.id}
-                  workspaceId={editingTask.project.workspaceId}
+                  workspaceId={workspaceId}
                   labels={editingTask.labels}
                   workflow={workflow}
                   initialStatus={editingTask.status}

@@ -66,7 +66,7 @@ export function NeuralWorkspaceDigest({ workspaceId }: NeuralWorkspaceDigestProp
       <div className="relative border border-white/5 bg-slate-950/80 backdrop-blur-3xl rounded-[2.9rem] p-8 overflow-hidden">
         {/* Background Accents */}
         <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-20 transition-opacity">
-          <Brain size={120} weight="thin" />
+          <Brain size={120} strokeWidth={0.5} />
         </div>
 
         <div className="flex flex-col md:flex-row gap-10">

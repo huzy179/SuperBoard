@@ -6,6 +6,8 @@ export interface NotificationItemDTO {
   payload: Record<string, unknown>;
   readAt: string | null;
   createdAt: string;
+  neuralPriority?: 'high' | 'medium' | 'low' | 'STRATEGIC';
+  aiSummary?: string;
 }
 
 export interface NotificationListDataDTO {

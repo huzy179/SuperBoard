@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.3",
+    "axios": "^1.8.1",
     "@grpc/proto-loader": "^0.8.0",
     "@nestjs/common": "^11.1.16",
     "@nestjs/config": "^4.0.3",

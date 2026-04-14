@@ -12,6 +12,7 @@ import {
   Play,
 } from 'lucide-react';
 import { TwinPulseVisualizer } from './twin-pulse-visualizer';
+import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
 interface ForecastData {
@@ -95,7 +96,7 @@ export function ProjectDigitalTwin({ projectId }: { projectId: string }) {
     currentForecast.predictions.length > 0
       ? new Date(
           currentForecast.predictions[currentForecast.predictions.length - 1]
-            .estimatedCompletionDate,
+            ?.estimatedCompletionDate || new Date().toISOString(),
         )
       : new Date();
 

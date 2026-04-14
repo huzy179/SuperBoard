@@ -7,6 +7,12 @@ import {
   deleteProjectStatus,
   updateProjectTransitions,
   ProjectWorkflowDTO,
+  getWorkspaceWorkflow,
+  createWorkspaceStatus,
+  updateWorkspaceStatus,
+  deleteWorkspaceStatus,
+  updateWorkspaceTransitions,
+  syncWorkspaceWorkflow,
 } from '../api/workflow-service';
 import { WorkflowStatusCategory } from '@superboard/shared';
 

@@ -6,7 +6,7 @@ import { formatDate } from '@/lib/format-date';
 import { percentOf } from '@/lib/helpers';
 import {
   MoreHorizontal,
-  LayoutBoard,
+  LayoutGrid,
   List,
   Calendar,
   Star,
@@ -25,6 +25,7 @@ interface ProjectCardProps {
   onArchive: (projectId: string) => void;
   onToggleFavorite: (projectId: string) => void;
   isFavorite: (projectId: string) => boolean;
+  isArchiving?: boolean;
   getProjectOpenHref: (projectId: string) => string;
   onClearRememberedContext: (projectId: string) => void;
   hasRememberedContext: (projectId: string) => boolean;
@@ -173,7 +174,7 @@ export function ProjectCard({
                 onClick={() => onOpen(`${openHref}?view=board`)}
                 className="flex items-center gap-3 w-full rounded-2xl px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all"
               >
-                <LayoutBoard size={14} className="text-brand-400" /> Open Tactical Board
+                <LayoutGrid size={14} className="text-brand-400" /> Open Tactical Board
               </button>
               <button
                 onClick={() => onOpen(`${openHref}?view=list`)}

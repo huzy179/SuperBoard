@@ -6,6 +6,8 @@ import {
   getChannelMessages,
   sendMessage,
   joinChannel,
+  getThreadMessages,
+  summarizeThread,
 } from '@/features/chat/api/chat-service';
 import { chatSocket } from '@/lib/realtime/chat-socket';
 import { toast } from 'sonner';
@@ -121,5 +123,19 @@ export function useJoinChannel() {
     onError: (error: Error) => {
       toast.error(error.message || 'Lỗi khi tham gia kênh');
     },
+  });
+}
+
+export function useThreadMessages(messageId: string | undefined) {
+  return useQuery<Message[]>({
+    queryKey: ['messages', 'thread', messageId],
+    queryFn: () => getThreadMessages(messageId!),
+    enabled: !!messageId,
+  });
+}
+
+export function useSummarizeThread() {
+  return useMutation({
+    mutationFn: (messageId: string) => summarizeThread(messageId),
   });
 }

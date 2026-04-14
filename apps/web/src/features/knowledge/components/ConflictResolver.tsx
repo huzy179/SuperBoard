@@ -100,12 +100,12 @@ export function ConflictResolver() {
                 </div>
 
                 <div className="flex items-center gap-4 mb-10">
-                  <CollisionNodeCard node={collision.nodes[0]} />
+                  {collision.nodes[0] && <CollisionNodeCard node={collision.nodes[0]} />}
                   <div className="flex-shrink-0 p-3 bg-white/5 rounded-full border border-white/10 relative">
                     <ArrowRightLeft className="text-white/40 h-4 w-4" />
                     <div className="absolute inset-0 animate-ping rounded-full border border-red-500/20 opacity-20" />
                   </div>
-                  <CollisionNodeCard node={collision.nodes[1]} />
+                  {collision.nodes[1] && <CollisionNodeCard node={collision.nodes[1]} />}
                 </div>
 
                 <div className="flex-1 space-y-4">

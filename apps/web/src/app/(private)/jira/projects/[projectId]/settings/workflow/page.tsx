@@ -63,7 +63,8 @@ export default function WorkflowSettingsPage() {
       </nav>
 
       <WorkflowEditor
-        data={workflow}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        data={workflow as any}
         isLoading={isLoading}
         title="Workflow & Trạng thái"
         description="Tùy chỉnh các bước trong quy trình làm việc và quy tắc chuyển đổi trạng thái cho dự án này."

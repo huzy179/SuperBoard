@@ -19,18 +19,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const context = host.switchToHttp();
-    const response = context.getResponse<{
-      status: (code: number) => { json: (body: unknown) => void };
-    }>();
-
-    const request = context.getRequest();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const response = context.getResponse<any>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const request = context.getRequest<any>();
     const status =
       exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const message =
       exception instanceof HttpException
         ? this.getHttpExceptionMessage(exception)
-        : 'Internal server error';
+        : exception instanceof Error
+          ? exception.message
+          : 'Internal server error';
 
     // Log non-HTTP errors (5xx) for observability
     if (status >= 500) {
@@ -53,7 +54,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       logger.warn({ status, message }, 'Client request error');
     }
 
-    const correlationId = logger.bindings()?.correlationId || 'root';
+    const correlationId = request.headers['x-correlation-id'] || 'root';
 
     const payload: ApiResponse<never> = {
       success: false,
@@ -63,9 +64,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
       },
       meta: {
         timestamp: new Date().toISOString(),
-        correlationId: String(correlationId),
-        trace: process.env.NODE_ENV === 'development' ? (exception as Error).stack : undefined,
-      },
+        correlationId: String(correlationId || 'root'),
+        trace:
+          process.env.NODE_ENV === 'development' && exception instanceof Error
+            ? exception.stack
+            : undefined,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any,
     };
 
     response.status(status).json(payload);

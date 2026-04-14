@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Query } from '@nestjs/common';
 import { ReportService } from './report.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { apiSuccess } from '../../common/api-response.helper';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { apiSuccess } from '../../common/api-response';
 
 @Controller('v1/executive')
 @UseGuards(JwtAuthGuard)

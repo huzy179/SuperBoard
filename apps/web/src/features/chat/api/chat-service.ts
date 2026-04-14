@@ -46,6 +46,10 @@ export async function sendMessage(
   );
 }
 
+export async function getThreadMessages(messageId: string): Promise<Message[]> {
+  return apiGet<Message[]>(API_ENDPOINTS.chat.threadMessages(messageId), { auth: true });
+}
+
 export async function summarizeThread(messageId: string): Promise<{ summary: string }> {
   return apiPost<{ summary: string }>(`/ai/messages/${messageId}/summarize`, {}, { auth: true });
 }

@@ -19,7 +19,20 @@ interface Edge {
   type: string;
 }
 
-export function KnowledgeGraphView({ projectId }: { projectId: string }) {
+interface GraphData {
+  nodes: { id: string; type: 'task' | 'doc' | 'user'; label: string }[];
+  edges: Edge[];
+}
+
+export function KnowledgeGraphView({
+  projectId,
+  onSelectNode,
+}: {
+  projectId: string;
+  onSelectNode?:
+    | ((nodeId: string, type: 'task' | 'doc' | 'user', label: string) => void)
+    | undefined;
+}) {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,9 +41,9 @@ export function KnowledgeGraphView({ projectId }: { projectId: string }) {
     setIsLoading(true);
     try {
       const res = await fetch(`/api/v1/knowledge/graph/${projectId}`);
-      const body = await res.json();
+      const body = (await res.json()) as { data: GraphData };
 
-      const initialNodes = body.data.nodes.map((n: Record<string, unknown>) => ({
+      const initialNodes = body.data.nodes.map((n) => ({
         ...n,
         x: Math.random() * 800,
         y: Math.random() * 600,
@@ -59,10 +72,13 @@ export function KnowledgeGraphView({ projectId }: { projectId: string }) {
       // Forces
       for (let i = 0; i < nextNodes.length; i++) {
         const nodeA = nextNodes[i];
+        if (!nodeA) continue;
 
         // Repulsion
         for (let j = i + 1; j < nextNodes.length; j++) {
           const nodeB = nextNodes[j];
+          if (!nodeB) continue;
+
           const dx = nodeB.x - nodeA.x;
           const dy = nodeB.y - nodeA.y;
           const dist = Math.sqrt(dx * dx + dy * dy) || 1;
@@ -93,8 +109,8 @@ export function KnowledgeGraphView({ projectId }: { projectId: string }) {
 
       // Edge attraction
       edges.forEach((edge) => {
-        const from = nextNodes.find((n) => n.id === edge.from);
-        const to = nextNodes.find((n) => n.id === edge.to);
+        const from = nextNodes.find((n) => n?.id === edge.from);
+        const to = nextNodes.find((n) => n?.id === edge.to);
         if (from && to) {
           const dx = to.x - from.x;
           const dy = to.y - from.y;
@@ -173,6 +189,7 @@ export function KnowledgeGraphView({ projectId }: { projectId: string }) {
           {nodes.map((node) => (
             <div
               key={node.id}
+              onClick={() => onSelectNode?.(node.id, node.type, node.label)}
               className="absolute group/node cursor-pointer"
               style={{
                 left: node.id === 'center' ? 400 : node.x,

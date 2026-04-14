@@ -11,7 +11,16 @@ import {
 } from '@/features/jira/hooks';
 import { formatRelativeTime } from '@/lib/format-date';
 import { subscribeTaskPresence } from '@/lib/realtime/project-socket';
-import { UsersIcon, MessageSquare, History, Terminal, Send, Clock, Sparkles } from 'lucide-react';
+import {
+  UsersIcon,
+  MessageSquare,
+  History,
+  Terminal,
+  Send,
+  Clock,
+  Sparkles,
+  Trash2,
+} from 'lucide-react';
 
 export function TaskCommentSection({
   projectId,

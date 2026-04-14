@@ -57,8 +57,8 @@ export function VectorAtlas() {
             if (!from || !to) return null;
 
             // Fixed positions for demo constellations
-            const fromPos = getNodePosition(from.id, data.nodes.length);
-            const toPos = getNodePosition(to.id, data.nodes.length);
+            const fromPos = getNodePosition(from.id);
+            const toPos = getNodePosition(to.id);
 
             return (
               <motion.line

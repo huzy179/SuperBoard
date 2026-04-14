@@ -1,4 +1,9 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
+import type { ProjectTaskAttachmentDTO } from '@superboard/shared';
+import { join, extname } from 'path';
+import { mkdir, writeFile } from 'fs/promises';
 
 @Injectable()
 export class UploadService {
@@ -51,7 +56,9 @@ export class UploadService {
         mimeType: file.mimetype,
         taskId: taskId,
         aiContext: aiContext || null,
-        aiMetadata: aiContext ? { processedAt: new Date().toISOString() } : null,
+        aiMetadata: (aiContext
+          ? { processedAt: new Date().toISOString() }
+          : null) as unknown as object,
       },
     });
 
@@ -63,7 +70,7 @@ export class UploadService {
       size: Number(attachment.size),
       mimeType: attachment.mimeType,
       createdAt: attachment.createdAt.toISOString(),
-      aiContext: attachment.aiContext || undefined,
+      aiContext: attachment.aiContext || '',
     };
   }
 

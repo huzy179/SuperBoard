@@ -1,10 +1,9 @@
-import { api } from '@/lib/api';
+import { apiGet } from '@/lib/api-client';
 import type { ProjectReportResponseDTO } from '@superboard/shared';
 
 export const reportService = {
   getProjectReport: async (projectId: string): Promise<ProjectReportResponseDTO> => {
-    const response = await api.get<ProjectReportResponseDTO>(`/v1/projects/${projectId}/reports`);
-    return response.data;
+    return apiGet<ProjectReportResponseDTO>(`/v1/projects/${projectId}/reports`, { auth: true });
   },
 
   exportTasksCsv: (projectId: string) => {

@@ -19,6 +19,14 @@ interface TimelinePulse {
   events: TimelineEvent[];
 }
 
+interface TimelineEventSource {
+  id: string;
+  type: string;
+  task: { title: string };
+  actor: { fullName: string } | null;
+  createdAt: Date;
+}
+
 @Injectable()
 export class ChronologyService {
   constructor(
@@ -27,7 +35,7 @@ export class ChronologyService {
   ) {}
 
   async getProjectTimeline(projectId: string): Promise<TimelinePulse[]> {
-    const events = await this.prisma.taskEvent.findMany({
+    const events = (await this.prisma.taskEvent.findMany({
       where: {
         task: { projectId },
         deletedAt: null,
@@ -38,10 +46,10 @@ export class ChronologyService {
           select: { title: true, status: true },
         },
         actor: {
-          select: { name: true },
+          select: { fullName: true },
         },
       },
-    });
+    })) as TimelineEventSource[];
 
     // Group events by day
     const grouped = events.reduce(
@@ -51,7 +59,7 @@ export class ChronologyService {
         acc[day].push(event);
         return acc;
       },
-      {} as Record<string, typeof events>,
+      {} as Record<string, TimelineEventSource[]>,
     );
 
     const pulses: TimelinePulse[] = [];
@@ -68,7 +76,7 @@ export class ChronologyService {
           id: e.id,
           type: e.type,
           title: e.task.title,
-          actor: e.actor?.name || 'Automated System',
+          actor: e.actor?.fullName || 'Automated System',
           time: format(e.createdAt, 'HH:mm'),
         })),
       });
@@ -77,16 +85,11 @@ export class ChronologyService {
     return pulses;
   }
 
-  private async generatePulseNarrative(events: unknown[]): Promise<string> {
-    const typedEvents = events as ((typeof events)[0] & {
-      actor: { name: string };
-      task: { title: string };
-      type: string;
-    })[];
+  private async generatePulseNarrative(events: TimelineEventSource[]): Promise<string> {
     try {
-      const eventSummary = typedEvents
+      const eventSummary = events
         .slice(0, 5)
-        .map((e) => `${e.actor?.name || 'System'} ${e.type} task "${e.task.title}"`)
+        .map((e) => `${e.actor?.fullName || 'System'} ${e.type} task "${e.task.title}"`)
         .join('\n');
 
       const context = `Chronology Activity:\n${eventSummary}`;

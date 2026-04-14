@@ -235,8 +235,7 @@ export default function ProjectDetailPage() {
   const [taskStatus, setTaskStatus] = useState<ProjectTaskItemDTO['status'] | undefined>();
   const [showQuickSearch, setShowQuickSearch] = useState(false);
 
-  const { viewerCount, isCopyLinkSuccess, onCopyFilterLink, onOpenFilterInNewTab } =
-    useProjectHeaderActions(projectId);
+  const { viewerCount, isCopyLinkSuccess, onCopyFilterLink } = useProjectHeaderActions(projectId);
 
   const {
     dueTasksByDate,
@@ -345,7 +344,7 @@ export default function ProjectDetailPage() {
   return (
     <section className="flex flex-col gap-6 p-6">
       <ProjectDetailHeader
-        project={project}
+        project={project!}
         projectKey={projectKey}
         currentViewLabel={currentViewLabel}
         viewMode={viewMode}
@@ -354,7 +353,6 @@ export default function ProjectDetailPage() {
         setShowCreateTaskPanel={setShowCreateTaskPanel}
         isCopyLinkSuccess={isCopyLinkSuccess}
         onCopyFilterLink={onCopyFilterLink}
-        onOpenFilterInNewTab={onOpenFilterInNewTab}
         onOpenAutomation={() => setShowAutomationPanel(true)}
         onOpenGraph={() => setShowKnowledgeMap(true)}
       />
@@ -409,8 +407,6 @@ export default function ProjectDetailPage() {
           onBulkAssigneeIdChange={setBulkAssigneeId}
           isStatusPending={bulkUpdatePending}
           isPriorityPending={bulkPriorityPending}
-          isTypePending={bulkTypePending}
-          isDueDatePending={bulkDueDatePending}
           isAssignPending={bulkAssignPending}
           isDeletePending={bulkDeletePending}
           onToggleSelectAllVisible={toggleSelectAllVisible}
@@ -541,6 +537,8 @@ export default function ProjectDetailPage() {
           handleDialogKeyDown={handleDialogKeyDown}
           workflow={workflow}
           predictiveHealth={predictiveHealth}
+          workspaceId={project?.workspaceId ?? ''}
+          tasks={tasks}
         />
       ) : null}
 
@@ -569,9 +567,9 @@ export default function ProjectDetailPage() {
         <KnowledgeMap
           projectId={projectId}
           onClose={() => setShowKnowledgeMap(false)}
-          onSelectNode={(node) => {
-            if (node.type === 'task') {
-              const task = tasks.find((t) => t.id === node.id);
+          onSelectNode={(nodeId, type) => {
+            if (type === 'task') {
+              const task = tasks.find((t) => t.id === nodeId);
               if (task) {
                 setShowKnowledgeMap(false);
                 handleOpenEdit(task);

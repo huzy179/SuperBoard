@@ -16,3 +16,4 @@ export * from './use-task-selection';
 export * from './use-jira-projects-page';
 export * from './use-project-calendar';
 export * from './use-workflow';
+export * from './use-predictive-health';

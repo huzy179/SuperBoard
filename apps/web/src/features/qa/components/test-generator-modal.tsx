@@ -31,7 +31,7 @@ export function TestGeneratorModal({ onClose }: TestGeneratorModalProps) {
     } catch {
       toast.error('Test generation failed');
     } finally {
-      setIsGenerating(null);
+      setIsGenerating(false);
     }
   };
 

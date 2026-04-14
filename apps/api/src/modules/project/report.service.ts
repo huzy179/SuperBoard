@@ -27,6 +27,10 @@ export class ReportService {
     private aiService: AiService,
   ) {}
 
+  async getPredictiveHealth(projectId: string) {
+    return this.getStrategicHealth(projectId);
+  }
+
   async getProjectReport(projectId: string): Promise<ProjectReportDTO> {
     const project = await this.prisma.project.findUnique({
       where: { id: projectId },
@@ -149,8 +153,10 @@ export class ReportService {
     };
 
     // 6. Burndown & CFD (Last 14 days)
-    const burndown = this.calculateBurndown(tasks, 14);
-    const cumulativeFlow = this.calculateCumulativeFlow(tasks, 14);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const burndown = this.calculateBurndown(tasks as any, 14);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cumulativeFlow = this.calculateCumulativeFlow(tasks as any, 14);
 
     return {
       velocity,
@@ -170,7 +176,14 @@ export class ReportService {
     };
   }
 
-  private calculateBurndown(tasks: Record<string, unknown>[], days: number): BurndownPointDTO[] {
+  private calculateBurndown(
+    tasks: {
+      storyPoints: number | null;
+      status: string;
+      events: { payload: Record<string, unknown>; createdAt: Date }[];
+    }[],
+    days: number,
+  ): BurndownPointDTO[] {
     const points: BurndownPointDTO[] = [];
     const totalPoints = tasks.reduce((sum, t) => sum + (t.storyPoints || 0), 0);
 
@@ -180,9 +193,9 @@ export class ReportService {
       // Points remaining on this date
       // A task is considered "not done" if it was not 'done' OR it became 'done' AFTER this date
       const remainingPoints = tasks.reduce((sum, t) => {
-        const doneEvent = t.events.find((e: Record<string, unknown>) => {
-          const payload = e.payload as Record<string, unknown>;
-          return payload?.to === 'done' && isBefore(e.createdAt as Date, endOfDay(date));
+        const doneEvent = t.events.find((e) => {
+          const payload = e.payload;
+          return payload?.to === 'done' && isBefore(e.createdAt, endOfDay(date));
         });
 
         // If task is currently done AND it was done before/on this date, it doesn't count towards remaining
@@ -205,7 +218,11 @@ export class ReportService {
   }
 
   private calculateCumulativeFlow(
-    tasks: Record<string, unknown>[],
+    tasks: {
+      status: string;
+      events: { payload: Record<string, unknown>; createdAt: Date }[];
+      createdAt: Date;
+    }[],
     days: number,
   ): CumulativeFlowPointDTO[] {
     const points: CumulativeFlowPointDTO[] = [];
@@ -218,26 +235,25 @@ export class ReportService {
       const point: CumulativeFlowPointDTO = { date: format(date, 'MMM dd') };
 
       // Initialize counts
-      statuses.forEach((s) => (point[s] = 0));
+      statuses.forEach((s) => (point[s as keyof CumulativeFlowPointDTO] = 0));
 
       tasks.forEach((t) => {
         // Find the status of this task at the end of 'date'
         // We look at events before 'date' and take the last one
-        const statusEvents = t.events.filter((e: Record<string, unknown>) =>
-          isBefore(e.createdAt as Date, date),
-        );
+        const statusEvents = t.events.filter((e) => isBefore(e.createdAt, date));
         let statusAtDate = 'todo'; // Default starting status (could be improved by checking project defaults)
 
         if (statusEvents.length > 0) {
-          statusAtDate = (statusEvents[statusEvents.length - 1].payload as Record<string, unknown>)
-            .to as string;
-        } else if (isAfter(t.createdAt as Date, date)) {
+          const lastEvent = statusEvents[statusEvents.length - 1];
+          const lastPayload = lastEvent?.payload as Record<string, unknown>;
+          statusAtDate = (lastPayload?.to as string) || 'todo';
+        } else if (isAfter(t.createdAt, date)) {
           // Task didn't exist yet
           return;
         }
 
-        if (point[statusAtDate] !== undefined) {
-          (point[statusAtDate] as number)++;
+        if (point[statusAtDate as keyof CumulativeFlowPointDTO] !== undefined) {
+          (point[statusAtDate as keyof CumulativeFlowPointDTO] as number)++;
         }
       });
 
@@ -277,7 +293,7 @@ export class ReportService {
       t.priority,
       t.storyPoints || 0,
       t.assignee?.fullName || 'Unassigned',
-      `"${((t.labels as unknown as Record<string, unknown>[]) || []).map((l) => (l.label as Record<string, unknown>).name).join(', ')}"`,
+      `"${((t.labels as unknown as { label: { name: string } }[]) || []).map((l) => l.label.name).join(', ')}"`,
       format(t.createdAt as Date, 'yyyy-MM-dd HH:mm'),
       t.dueDate ? format(t.dueDate, 'yyyy-MM-dd') : '',
     ]);

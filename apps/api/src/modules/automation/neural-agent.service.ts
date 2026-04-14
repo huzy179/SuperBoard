@@ -4,6 +4,14 @@ import { AiService } from '../ai/ai.service';
 import { TalentService } from '../talent/talent.service';
 import { SearchService } from '../search/search.service';
 
+interface AgentEvent {
+  taskId: string;
+  workspaceId: string;
+  projectId: string;
+  type: string;
+  payload: Record<string, unknown>;
+}
+
 @Injectable()
 export class NeuralAgentService {
   private readonly logger = new Logger(NeuralAgentService.name);
@@ -70,8 +78,8 @@ export class NeuralAgentService {
           agentName: 'AuditorAgent',
           actionType: 'SUGGEST_MERGE',
           targetId: task.id,
-          reason: `Semantic similarity detected with Mission #${duplicates[0].number}. Suggesting structural consolidation.`,
-          metadata: { duplicateId: duplicates[0].id },
+          reason: `Semantic similarity detected with Mission "${duplicates[0]!.label}". Suggesting structural consolidation.`,
+          metadata: { duplicateId: duplicates[0]!.id },
         });
       }
     }
@@ -82,13 +90,7 @@ export class NeuralAgentService {
     };
   }
 
-  async processEvent(event: {
-    taskId: string;
-    workspaceId: string;
-    projectId: string;
-    type: string;
-    payload: Record<string, unknown>;
-  }) {
+  async processEvent(event: AgentEvent) {
     this.logger.log(`Agent Brain observing event: ${event.type} on task ${event.taskId}`);
 
     try {
@@ -104,7 +106,7 @@ export class NeuralAgentService {
     }
   }
 
-  private async runTriageAgent(event: Record<string, unknown>) {
+  private async runTriageAgent(event: AgentEvent) {
     const task = await this.prisma.task.findUnique({
       where: { id: event.taskId },
       select: { title: true, description: true },
@@ -122,7 +124,7 @@ export class NeuralAgentService {
       // Autonomous Action: Assign User
       await this.prisma.task.update({
         where: { id: event.taskId },
-        data: { assigneeId: topPick.id },
+        data: { assigneeId: topPick!.id },
       });
 
       await this.logAction({
@@ -131,7 +133,7 @@ export class NeuralAgentService {
         agentName: 'TriageAgent',
         actionType: 'AUTO_ASSIGN',
         targetId: event.taskId,
-        reason: `Automatically assigned Operator ${topPick.fullName} due to superior skill match (Score: ${topPick.score}).`,
+        reason: `Automatically assigned Operator ${topPick!.fullName} due to superior skill match (Score: ${topPick!.score}).`,
       });
     }
 
@@ -144,7 +146,7 @@ export class NeuralAgentService {
     this.logger.log(`Triage Agent suggested labels: ${labelsStr}`);
   }
 
-  private async runSheriffAgent(event: Record<string, unknown>) {
+  private async runSheriffAgent(event: AgentEvent) {
     const { to } = event.payload as { from: string; to: string };
     if (to === 'blocked') {
       const task = await this.prisma.task.findUnique({
@@ -161,8 +163,12 @@ export class NeuralAgentService {
       );
 
       // In a real scenario, we'd have a CommentService. For now, we use prisma directly.
-      const systemUser = await this.prisma.user.findFirst({ where: { role: 'admin' } });
-      if (systemUser) {
+      const adminMember = await this.prisma.workspaceMember.findFirst({
+        where: { workspaceId: event.workspaceId, role: 'admin' },
+        include: { user: true },
+      });
+      if (adminMember) {
+        const systemUser = adminMember.user;
         await this.prisma.comment.create({
           data: {
             taskId: event.taskId,
@@ -190,6 +196,7 @@ export class NeuralAgentService {
     actionType: string;
     targetId: string;
     reason: string;
+    metadata?: Record<string, unknown>;
   }) {
     await this.prisma.agentAction.create({
       data: {
@@ -199,6 +206,8 @@ export class NeuralAgentService {
         actionType: data.actionType,
         targetId: data.targetId,
         reason: data.reason,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        metadata: (data.metadata as any) || {},
       },
     });
   }

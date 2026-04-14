@@ -23,7 +23,7 @@ export class GraphService {
 
       // 2. Fetch Nodes (Docs)
       const docs = await this.prisma.doc.findMany({
-        where: { projects: { some: { id: projectId } }, deletedAt: null },
+        where: { projectId, deletedAt: null },
         select: {
           id: true,
           title: true,

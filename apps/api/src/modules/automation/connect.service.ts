@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
+import { IntegrationProvider } from '@prisma/client';
 import axios from 'axios';
 
 @Injectable()
@@ -18,11 +19,25 @@ export class ConnectService {
     });
   }
 
-  async createIntegration(workspaceId: string, data: Record<string, unknown>) {
+  async createIntegration(
+    workspaceId: string,
+    data: {
+      projectId?: string | null;
+      name: string;
+      provider: IntegrationProvider;
+      type: string;
+      config?: Record<string, unknown>;
+    },
+  ) {
     return this.prisma.externalIntegration.create({
       data: {
-        ...data,
         workspaceId,
+        projectId: data.projectId as unknown as string,
+        name: data.name,
+        provider: data.provider,
+        type: data.type,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        config: (data.config as any) || {},
       },
     });
   }
@@ -40,7 +55,7 @@ export class ConnectService {
     const integrations = await this.prisma.externalIntegration.findMany({
       where: {
         workspaceId,
-        projectId: { in: [projectId, null] },
+        projectId: { in: [projectId, null as unknown as string] },
         provider: 'SLACK',
         type: 'webhook_out',
       },
@@ -95,7 +110,8 @@ export class ConnectService {
           projectId: integration.projectId,
           integrationId: integration.id,
           provider: integration.provider,
-          payload: payload as Prisma.InputJsonValue,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          payload: payload as any,
           interpretation,
         },
       });

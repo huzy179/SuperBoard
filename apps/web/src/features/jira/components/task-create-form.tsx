@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Mic, MicOff } from 'lucide-react';
 import type {
@@ -16,6 +16,7 @@ import {
   TASK_TYPE_OPTIONS,
   type TaskPriority,
 } from '@/lib/constants/task';
+import { toast } from 'sonner';
 
 type TaskCreateFormProps = {
   initialStatus?: ProjectTaskItemDTO['status'] | undefined;
@@ -36,33 +37,29 @@ export function TaskCreateForm({
   onCancel,
   workflow,
 }: TaskCreateFormProps) {
-  const [isListening, setIsListening] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-
-  const defaultStatus = useMemo(() => {
-    if (workflow?.statuses && workflow.statuses.length > 0) {
-      return (workflow.statuses[0] as { key: string }).key;
-    }
-    return 'todo' as string;
-  }, [workflow?.statuses]);
-
   const [status, setStatus] = useState<ProjectTaskItemDTO['status']>(
-    initialStatus || defaultStatus,
+    initialStatus || workflow?.statuses?.[0]?.key || 'todo',
   );
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [type, setType] = useState<TaskTypeDTO>('task');
-  const [dueDate, setDueDate] = useState('');
-  const [assigneeId, setAssigneeId] = useState('');
+  const [dueDate, setDueDate] = useState<string>('');
+  const [assigneeId, setAssigneeId] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
 
   const toggleListening = () => {
     if (typeof window === 'undefined') return;
 
-    // @ts-expect-error - Web Speech API is not globally typed in some environments
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as unknown as { SpeechRecognition: any }).SpeechRecognition ||
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as unknown as { webkitSpeechRecognition: any }).webkitSpeechRecognition;
+
     if (!SpeechRecognition) {
-      alert('Trình duyệt của bạn không hỗ trợ nhận diện giọng nói');
+      toast.error('Trình duyệt không hỗ trợ nhận diện giọng nói');
       return;
     }
 
@@ -77,9 +74,17 @@ export function TaskCreateForm({
 
     recognition.onstart = () => setIsListening(true);
     recognition.onend = () => setIsListening(false);
-    recognition.onresult = (event: { results: { transcript: string }[][] }) => {
-      const transcript = event.results[0][0].transcript;
-      setTitle((prev) => (prev ? `${prev} ${transcript}` : transcript));
+    recognition.onresult = (event: {
+      results: {
+        [key: number]: {
+          [key: number]: { transcript: string };
+        };
+      };
+    }) => {
+      const transcript = event.results?.[0]?.[0]?.transcript;
+      if (transcript) {
+        setTitle((prev) => (prev ? `${prev} ${transcript}` : transcript));
+      }
     };
 
     recognition.start();

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, MotionStyle } from 'framer-motion';
 
 interface PulseData {
   healthScore: number;
@@ -71,6 +71,7 @@ export function TwinPulseVisualizer({ data }: { data: PulseData }) {
         {Array.from({ length: 12 }).map((_, i) => {
           const orbitIndex = i % orbits.length;
           const orbit = orbits[orbitIndex];
+          if (!orbit) return null;
 
           return (
             <motion.g
@@ -82,7 +83,7 @@ export function TwinPulseVisualizer({ data }: { data: PulseData }) {
                 ease: 'linear',
                 delay: orbit.delay,
               }}
-              style={{ originX: '200px', originY: '200px' }}
+              style={{ transformOrigin: '200px 200px' } as MotionStyle}
             >
               <circle
                 cx={200 + orbit.radius}

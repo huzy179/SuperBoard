@@ -26,11 +26,13 @@ interface RichTextEditorProps {
   content: JSONContent | null;
   onChange: (content: JSONContent) => void;
   editable?: boolean;
-  user?: {
-    id: string;
-    fullName: string;
-    avatarColor?: string;
-  };
+  user?:
+    | {
+        id: string;
+        fullName: string;
+        avatarColor?: string | undefined;
+      }
+    | undefined;
 }
 
 export function RichTextEditor({
@@ -119,7 +121,6 @@ export function RichTextEditor({
     {
       extensions: [
         StarterKit.configure({
-          history: false,
           heading: {
             levels: [1, 2, 3],
             HTMLAttributes: {
@@ -131,16 +132,16 @@ export function RichTextEditor({
           document: ydoc,
         }),
         CollaborationCursor.configure({
-          provider: provider as unknown as Parameters<
-            typeof CollaborationCursor.configure
-          >[0]['provider'],
+          provider: provider,
           user: {
             name: user?.fullName || 'Operative',
             color: user?.avatarColor || '#6366f1',
           },
-        }),
-      ],
-      content: provider ? undefined : content,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ] as any[],
+      content: provider ? null : content,
       editable: editable,
       onUpdate: ({ editor }) => {
         onChange(editor.getJSON());
@@ -326,7 +327,7 @@ export function RichTextEditor({
               <div
                 onClick={() => {
                   const icons = ['📑', '💾', '🛡️', '⚡', '📊', '🏛️', '🎯'];
-                  setIcon(icons[Math.floor(Math.random() * icons.length)]);
+                  setIcon(icons[Math.floor(Math.random() * icons.length)] ?? '📑');
                 }}
                 className="w-32 h-32 bg-slate-900 rounded-[2.5rem] shadow-glow-brand/5 flex items-center justify-center text-6xl border border-white/10 transform transition hover:scale-110 cursor-pointer active:scale-95 group/icon"
               >

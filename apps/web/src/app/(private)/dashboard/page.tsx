@@ -39,9 +39,17 @@ const EMPTY_DASHBOARD_STATS: DashboardStatsDTO = {
   recentActivity: [],
 };
 
+interface DashboardModule {
+  id: string;
+  order: number;
+  focus: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
 export default function DashboardPage() {
   const { data: stats, isLoading, isError, error } = useDashboardStats();
-  const [adaptiveLayout, setAdaptiveLayout] = useState<Record<string, unknown>[]>([]);
+  const [adaptiveLayout, setAdaptiveLayout] = useState<DashboardModule[]>([]);
 
   useEffect(() => {
     fetch('/api/v1/executive/adaptive-layout')

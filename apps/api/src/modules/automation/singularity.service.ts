@@ -82,22 +82,22 @@ export class SingularityService {
         const existing = await this.prisma.taskLink.findFirst({
           where: {
             OR: [
-              { sourceTaskId: nodeA.id, targetTaskId: nodeB.id },
-              { sourceTaskId: nodeB.id, targetTaskId: nodeA.id },
+              { sourceTaskId: nodeA!.id, targetTaskId: nodeB!.id },
+              { sourceTaskId: nodeB!.id, targetTaskId: nodeA!.id },
             ],
           },
         });
 
-        if (!existing && nodeA.type === 'task' && nodeB.type === 'task') {
+        if (!existing && nodeA!.type === 'task' && nodeB!.type === 'task') {
           await this.prisma.taskLink.create({
             data: {
-              sourceTaskId: nodeA.id,
-              targetTaskId: nodeB.id,
-              type: 'related',
+              sourceTaskId: nodeA!.id,
+              targetTaskId: nodeB!.id,
+              type: 'relates_to',
             },
           });
           healedCount++;
-          this.logger.log(`Autonomous Tactical Healing: Linked ${nodeA.id} <-> ${nodeB.id}`);
+          this.logger.log(`Autonomous Tactical Healing: Linked ${nodeA!.id} <-> ${nodeB!.id}`);
         }
       }
     }
@@ -126,13 +126,16 @@ export class SingularityService {
 
       await this.notificationService.createNotification({
         userId: task.assigneeId,
-        title: 'Mission Inertia Detected',
-        message: `Task #${task.number} is stalling.`,
-        type: 'SYSTEM',
-        projectId: task.projectId,
-        taskId: task.id,
-        neuralPriority: 'STRATEGIC',
-        aiSummary,
+        workspaceId,
+        type: 'system',
+        payload: {
+          title: 'Mission Inertia Detected',
+          message: `Task #${task.number} is stalling.`,
+          projectId: task.projectId,
+          taskId: task.id,
+          neuralPriority: 'STRATEGIC',
+          aiSummary,
+        },
       });
       nudgeCount++;
     }

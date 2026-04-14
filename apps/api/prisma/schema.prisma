@@ -29,6 +29,9 @@ model Workspace {
   channels      Channel[]
   docs          Doc[]
   workflowRules WorkflowRule[]
+  agentActions  AgentAction[]
+  externalIntegrations ExternalIntegration[]
+  signalLogs    SignalLog[]
 
   @@index([deletedAt])
 }
@@ -176,6 +179,10 @@ model Project {
   updatedAt   DateTime  @updatedAt
   embedding   ProjectEmbedding?
   memoirs     ProjectMemoir[]
+  docs        Doc[]
+  agentActions AgentAction[]
+  externalIntegrations ExternalIntegration[]
+  signalLogs  SignalLog[]
 
   @@unique([workspaceId, key])
   @@index([workspaceId, deletedAt])
@@ -219,6 +226,7 @@ model Task {
   labels      TaskLabel[]
   sourceLinks TaskLink[]   @relation("SourceTaskLinks")
   targetLinks TaskLink[]   @relation("TargetTaskLinks")
+  docLinks    TaskDocLink[]
   embedding   TaskEmbedding?
   summary     String?      // AI-generated scannability summary
   createdAt   DateTime     @default(now())
@@ -673,6 +681,7 @@ model ExternalIntegration {
 
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   project     Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  signalLogs  SignalLog[]
 
   @@index([workspaceId])
   @@index([projectId])

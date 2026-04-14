@@ -56,6 +56,7 @@ export class ProjectService {
         color: true,
         icon: true,
         key: true,
+        workspaceId: true,
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -430,7 +431,7 @@ export class ProjectService {
       workspaceId: input.workspaceId,
       projectId: input.projectId,
       type: 'created',
-      actorId: input.actorId,
+      actorId: input.actorId ?? null,
       payload: {
         title: task.title,
         status: task.status,
@@ -503,7 +504,7 @@ export class ProjectService {
       workspaceId: input.workspaceId,
       projectId: input.projectId,
       type: 'status_changed',
-      actorId: input.actorId,
+      actorId: input.actorId ?? null,
       payload: {
         from: existingTask.status,
         to: input.status,
@@ -657,7 +658,7 @@ export class ProjectService {
           workspaceId: input.workspaceId,
           projectId: input.projectId,
           type: input.status ? 'status_changed' : 'updated',
-          actorId: input.actorId,
+          actorId: input.actorId ?? null,
           payload: {
             action: 'bulk_update',
             status: input.status,
@@ -876,7 +877,7 @@ export class ProjectService {
       workspaceId: input.workspaceId,
       projectId: task.projectId,
       type: 'updated',
-      actorId: input.actorId,
+      actorId: input.actorId ?? null,
       payload: {
         changedFields,
         status: task.status,
@@ -1150,12 +1151,14 @@ export class ProjectService {
     color: string | null;
     icon: string | null;
     key?: string | null;
+    workspaceId: string;
     createdAt: Date;
     updatedAt: Date;
     deletedAt?: Date | null;
   }): ProjectItemDTO {
     return {
       id: project.id,
+      workspaceId: project.workspaceId,
       name: project.name,
       description: project.description,
       color: project.color,

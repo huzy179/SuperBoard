@@ -289,12 +289,14 @@ export default function SettingsPage() {
                         onClick={() => {
                           if (preferences?.emailEnabled) {
                             updatePrefs.mutate({
-                              [item.id]: !(preferences as Record<string, unknown>)?.[item.id],
+                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                              [item.id]: !(preferences as any)?.[item.id],
                             });
                           }
                         }}
                         className={`flex items-center justify-between p-6 rounded-[2rem] border transition-all cursor-pointer group ${
-                          (preferences as Record<string, unknown>)?.[item.id]
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          (preferences as any)?.[item.id]
                             ? 'bg-white/[0.04] border-white/10'
                             : 'bg-transparent border-white/5 opacity-40 grayscale'
                         }`}
@@ -302,7 +304,8 @@ export default function SettingsPage() {
                         <div className="flex items-center gap-6">
                           <div
                             className={`p-4 rounded-2xl transition-all ${
-                              (preferences as Record<string, unknown>)?.[item.id]
+                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                              (preferences as any)?.[item.id]
                                 ? 'bg-brand-500 text-slate-950 shadow-glow-brand'
                                 : 'bg-white/5 text-white/20'
                             }`}
@@ -320,14 +323,14 @@ export default function SettingsPage() {
                         </div>
                         <div
                           className={`h-5 w-5 rounded-lg border-2 transition-all flex items-center justify-center ${
-                            (preferences as Record<string, unknown>)?.[item.id]
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            (preferences as any)?.[item.id]
                               ? 'border-brand-500 bg-brand-500 text-slate-950'
                               : 'border-white/10'
                           }`}
                         >
-                          {(preferences as Record<string, unknown>)?.[item.id] && (
-                            <Check size={14} />
-                          )}
+                          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                          {(preferences as any)?.[item.id] && <Check size={14} />}
                         </div>
                       </div>
                     ))}
@@ -342,7 +345,8 @@ export default function SettingsPage() {
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <section className="relative rounded-[3rem] border border-white/5 bg-slate-900/40 shadow-glass backdrop-blur-3xl overflow-hidden group">
               <WorkflowEditor
-                data={workflow}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                data={workflow as any}
                 isLoading={isWorkflowLoading}
                 title="Universal Protocol Manifest"
                 description="Establish default status vectors and transition logic for all workspace mission blocks."
@@ -350,10 +354,11 @@ export default function SettingsPage() {
                 onUpdateStatus={(statusId, data) =>
                   updateWorkspaceStatus.mutateAsync({ statusId, data })
                 }
-                onDeleteStatus={(statusId) =>
-                  confirm('De-authorize mission status status?') &&
-                  deleteWorkspaceStatus.mutateAsync({ statusId })
-                }
+                onDeleteStatus={async (statusId) => {
+                  if (confirm('De-authorize mission status status?')) {
+                    await deleteWorkspaceStatus.mutateAsync({ statusId });
+                  }
+                }}
                 onSaveTransitions={(transitions) =>
                   updateWorkspaceTransitions.mutateAsync({ transitions })
                 }

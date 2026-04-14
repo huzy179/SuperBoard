@@ -29,7 +29,10 @@ interface TaskBoardViewProps {
   ) => void;
   onOpenEdit: (task: ProjectTaskItemDTO) => void;
   selectedTaskIds: Set<string>;
-  onSelectTask: (taskId: string, event: React.MouseEvent | React.KeyboardEvent) => void;
+  onSelectTask: (
+    taskId: string,
+    event: React.MouseEvent | React.KeyboardEvent | React.ChangeEvent,
+  ) => void;
   isUpdatePending: boolean;
   updatingTaskId: string | undefined;
   onAddTask: (status: ProjectTaskItemDTO['status']) => void;

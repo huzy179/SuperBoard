@@ -23,6 +23,20 @@ import type {
   ProjectsResponseDTO,
   UpdateProjectRequestDTO,
   UpdateProjectResponseDTO,
+  UpdateTaskRequestDTO,
+  UpdateTaskResponseDTO,
+  UpdateTaskStatusRequestDTO,
+  UpdateTaskStatusResponseDTO,
+  BulkTaskOperationRequestDTO,
+  BulkTaskOperationResponseDTO,
+  DeleteTaskResponseDTO,
+  TaskHistoryResponseDTO,
+  CommentListResponseDTO,
+  CreateCommentRequestDTO,
+  CreateCommentResponseDTO,
+  UpdateCommentRequestDTO,
+  UpdateCommentResponseDTO,
+  DeleteCommentResponseDTO,
 } from '@superboard/shared';
 import { apiSuccess } from '../../common/api-response';
 import { requireWorkspace, findOrThrow, parseBooleanQuery } from '../../common/helpers';
@@ -32,6 +46,8 @@ import { ChronologyService } from './chronology.service';
 import { CommandService } from './command.service';
 import { ForecastService } from './forecast.service';
 import { SimulationService } from './simulation.service';
+import { ProjectGateway } from './project.gateway';
+import { CommentService } from './comment.service';
 
 @Controller('v1/projects')
 export class ProjectController {
@@ -41,6 +57,8 @@ export class ProjectController {
     private commandService: CommandService,
     private forecastService: ForecastService,
     private simulationService: SimulationService,
+    private projectGateway: ProjectGateway,
+    private commentService: CommentService,
   ) {}
 
   @Post(':projectId/simulate')

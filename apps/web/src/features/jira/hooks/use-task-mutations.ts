@@ -16,6 +16,7 @@ import {
   summarizeProjectTask,
   aiDecomposeTask,
   aiRefineTask,
+  updateProjectTask,
   updateProjectTaskStatus,
   getTaskIntelligence,
 } from '@/features/jira/api/task-service';

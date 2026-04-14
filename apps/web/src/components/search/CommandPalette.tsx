@@ -246,8 +246,9 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
   const categories = useMemo(() => {
     const groups: Record<string, CommandItem[]> = {};
     results.forEach((item) => {
-      if (!groups[item.category]) groups[item.category] = [];
-      groups[item.category].push(item);
+      const category = item.category || 'Miscellaneous';
+      if (!groups[category]) groups[category] = [];
+      groups[category].push(item);
     });
     return groups;
   }, [results]);

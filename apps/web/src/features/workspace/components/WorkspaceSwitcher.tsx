@@ -5,7 +5,7 @@ import { ChevronDown, Check, Plus, Settings } from 'lucide-react';
 import { useWorkspaces, useWorkspace } from '@/features/workspace/hooks';
 import Link from 'next/link';
 
-export function WorkspaceSwitcher() {
+export function WorkspaceSwitcher({ showLabel = true }: { showLabel?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const { data: workspaces, isLoading } = useWorkspaces();
   const currentWorkspaceId = workspaces?.[0]?.id; // Simplification for demo
@@ -14,26 +14,32 @@ export function WorkspaceSwitcher() {
   if (isLoading) return <div className="h-10 w-full bg-white/5 animate-pulse rounded-xl" />;
 
   return (
-    <div className="relative px-3 py-4 border-b border-white/5">
+    <div
+      className={`relative ${showLabel ? 'px-3 py-4 border-b border-white/5' : 'flex justify-center'}`}
+    >
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="group w-full flex items-center gap-3 p-2 rounded-xl transition-all hover:bg-white/5 bg-transparent border border-transparent hover:border-white/10"
+        className={`group flex items-center gap-3 rounded-xl transition-all hover:bg-white/5 bg-transparent border border-transparent hover:border-white/10 ${showLabel ? 'w-full p-2' : 'p-1'}`}
       >
-        <div className="w-9 h-9 bg-brand-600 rounded-lg flex items-center justify-center text-white font-black text-sm shadow-lg shadow-brand-600/20">
+        <div className="w-9 h-9 bg-brand-600 rounded-lg flex items-center justify-center text-white font-black text-sm shadow-lg shadow-brand-600/20 shrink-0">
           {currentWorkspace?.name?.charAt(0) || 'S'}
         </div>
-        <div className="flex-1 text-left min-w-0">
-          <p className="text-[13px] font-black text-white/90 truncate leading-tight uppercase tracking-tight">
-            {currentWorkspace?.name || 'SuperBoard'}
-          </p>
-          <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest leading-none mt-1">
-            Pro Plan
-          </p>
-        </div>
-        <ChevronDown
-          size={14}
-          className={`text-white/20 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-        />
+        {showLabel && (
+          <div className="flex-1 text-left min-w-0">
+            <p className="text-[13px] font-black text-white/90 truncate leading-tight uppercase tracking-tight">
+              {currentWorkspace?.name || 'SuperBoard'}
+            </p>
+            <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest leading-none mt-1">
+              Pro Plan
+            </p>
+          </div>
+        )}
+        {showLabel && (
+          <ChevronDown
+            size={14}
+            className={`text-white/20 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+          />
+        )}
       </button>
 
       {isOpen && (
@@ -58,7 +64,7 @@ export function WorkspaceSwitcher() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-white/90 truncate">{ws.name}</p>
                       <p className="text-[10px] text-white/40 truncate">
-                        {ws.membersCount || 1} members
+                        {ws.memberCount || 1} members
                       </p>
                     </div>
                     {isActive && <Check size={14} className="text-brand-500" />}

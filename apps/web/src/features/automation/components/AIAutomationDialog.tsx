@@ -35,7 +35,8 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
       apiPost('/automation/generate-rule', { prompt: text }, { auth: true }),
     onSuccess: (data) => {
       if (data) {
-        setGeneratedRule(data);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setGeneratedRule(data as any);
         toast.success('Neural Logic Synthesis Complete');
       } else {
         toast.error('Synthesis Failed');

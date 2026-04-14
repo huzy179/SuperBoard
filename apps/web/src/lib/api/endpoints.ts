@@ -90,6 +90,7 @@ export const API_ENDPOINTS = {
     joinChannel: (channelId: string) => `/api/v1/chat/channels/${channelId}/join`,
     messages: (channelId: string) => `/api/v1/chat/channels/${channelId}/messages`,
     sendMessage: (channelId: string) => `/api/v1/chat/channels/${channelId}/messages`,
+    threadMessages: (messageId: string) => `/api/v1/chat/messages/${messageId}/thread`,
   },
   docs: {
     list: (workspaceId: string) => `/api/v1/docs?workspaceId=${workspaceId}`,

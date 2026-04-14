@@ -8,11 +8,15 @@ import { requestContextMiddleware } from './common/request-context.middleware';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(requestContextMiddleware);
+
+  // Apply Neural Diagnosis Global Filter
+  const exceptionFilter = app.get(HttpExceptionFilter);
+  app.useGlobalFilters(exceptionFilter);
+
   app.enableCors({
     origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
     credentials: true,
   });
-  app.useGlobalFilters(new HttpExceptionFilter());
   app.setGlobalPrefix('api/v1');
   const port = process.env.PORT ? Number(process.env.PORT) : 4000;
 

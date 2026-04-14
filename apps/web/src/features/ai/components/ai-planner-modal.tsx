@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Sparkles, Plus, Check, Zap, Target, Layers, ArrowRight } from 'lucide-react';
+import { X, Sparkles, Plus, Check, Zap, Target, Layers, ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SuggestedTask {
@@ -53,15 +53,17 @@ export function AiPlannerModal({
     try {
       const tasksToCreate = proposedPlan.filter((_, i) => selectedTasks.has(i));
 
+      if (tasksToCreate.length === 0) return;
+
       // Execute multi-task creation via the bulk API
       await fetch(`/api/v1/projects/${projectId}/tasks`, {
         method: 'POST', // Note: For real impl, we'd add a bulk endpoint or loop
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: tasksToCreate[0].title,
+          title: tasksToCreate[0]?.title || 'New Task',
           description: `AI Planned: ${goal}`,
-          priority: tasksToCreate[0].priority,
-          storyPoints: tasksToCreate[0].storyPoints,
+          priority: tasksToCreate[0]?.priority || 'medium',
+          storyPoints: tasksToCreate[0]?.storyPoints || 1,
         }),
       });
 
@@ -264,8 +266,4 @@ export function AiPlannerModal({
       </div>
     </div>
   );
-}
-
-function Loader2({ size, className }: { size: number; className?: string }) {
-  return <Sparkles size={size} className={className} />;
 }

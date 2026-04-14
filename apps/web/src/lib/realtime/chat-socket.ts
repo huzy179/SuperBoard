@@ -3,7 +3,9 @@ import { getAccessToken } from '../auth-storage';
 import type { Message } from '@superboard/shared';
 
 export type ChatSocketEvents = {
-  'message:sent': (message: Message) => void;
+  'message:new': (message: Message) => void;
+  'message:updated': (message: Message) => void;
+  'message:deleted': (data: { messageId: string }) => void;
   'chat:typing': (data: { channelId: string; userId: string; isTyping: boolean }) => void;
 };
 

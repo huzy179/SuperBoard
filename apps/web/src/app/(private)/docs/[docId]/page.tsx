@@ -243,7 +243,7 @@ export default function DocDetailPage() {
                     ? {
                         id: user.id,
                         fullName: user.fullName,
-                        avatarColor: user.avatarColor,
+                        avatarColor: user.avatarColor ?? undefined,
                       }
                     : undefined
                 }

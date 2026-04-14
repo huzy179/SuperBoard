@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { SymbiosisService } from './symbiosis.service';
+import { ForecastService } from '../project/forecast.service';
 import { AiService } from '../ai/ai.service';
 
 interface DirectiveMetadata {
@@ -84,7 +85,7 @@ export class ExecutiveService {
       throw new Error('Valid directive not found');
     }
 
-    const metadata = directive.metadata as DirectiveMetadata;
+    const metadata = directive.metadata as unknown as DirectiveMetadata;
     const actions = metadata.actions;
 
     this.logger.log(`Executing Global Directive: ${metadata.title}`);

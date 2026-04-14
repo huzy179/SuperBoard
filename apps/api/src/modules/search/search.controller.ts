@@ -2,7 +2,7 @@ import { Controller, Get, Post, Query, Request, Param } from '@nestjs/common';
 import { SearchService } from './search.service';
 import { GraphService } from './graph.service';
 import { SearchResponseDTO, NeuralGraphResponseDTO } from '@superboard/shared';
-import { apiSuccess } from '../../common/api-response.helper';
+import { apiSuccess } from '../../common/api-response';
 
 @Controller('search')
 export class SearchController {
@@ -33,7 +33,7 @@ export class SearchController {
   @Get('graph/:projectId')
   async getGraph(@Param('projectId') projectId: string): Promise<NeuralGraphResponseDTO> {
     const graph = await this.graphService.getNeuralGraph(projectId);
-    return { data: graph };
+    return apiSuccess(graph);
   }
 
   @Get('answer')

@@ -6,6 +6,7 @@ import { FullPageLoader } from '@/components/ui/page-states';
 import { useRedirectAuthenticated } from '@/features/auth/hooks';
 import { setAccessToken } from '@/lib/auth-storage';
 import { login } from '@/lib/services/auth-service';
+import { AppBrand } from '@/components/layout/app-brand';
 
 function LoginContent() {
   const router = useRouter();

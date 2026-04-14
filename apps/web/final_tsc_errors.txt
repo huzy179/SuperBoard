@@ -1,0 +1,117 @@
+
+> @superboard/web@0.1.0 typecheck
+> tsc --noEmit
+
+playwright.config.ts(3,29): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '{ testDir: string; fullyParallel: true; forbidOnly: boolean; retries: number; workers: number | undefined; reporter: "html"; use: { baseURL: string; trace: "on-first-retry"; viewport: { width: number; height: number; }; }; projects: { ...; }[]; webServer: { ...; }; }' is not assignable to parameter of type 'PlaywrightTestConfig<unknown, unknown>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+      Types of property 'workers' are incompatible.
+        Type 'number | undefined' is not assignable to type 'string | number'.
+          Type 'undefined' is not assignable to type 'string | number'.
+src/app/(private)/docs/[docId]/page.tsx(241,17): error TS2412: Type '{ id: string; fullName: string; avatarColor: string | null | undefined; } | undefined' is not assignable to type '{ id: string; fullName: string; avatarColor?: string; } | undefined' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+src/app/(private)/docs/page.tsx(116,13): error TS2304: Cannot find name 'variant'.
+src/app/(private)/docs/page.tsx(122,86): error TS2304: Cannot find name 'variant'.
+src/app/(private)/jira/page.tsx(284,21): error TS2322: Type '{ projects: ProjectItemDTO[]; onOpenCreate: () => void; onOpenEdit: (project: ProjectItemDTO) => void; onArchive: (projectId: string) => void; isArchivingProject: (projectId: string) => boolean; ... 5 more ...; showCreateCard: boolean; }' is not assignable to type 'IntrinsicAttributes & ProjectCardsGridProps'.
+  Property 'isArchivingProject' does not exist on type 'IntrinsicAttributes & ProjectCardsGridProps'.
+src/app/(private)/jira/page.tsx(314,21): error TS2322: Type '{ projects: ProjectItemDTO[]; onOpenCreate: () => void; onOpenEdit: (project: ProjectItemDTO) => void; onArchive: (projectId: string) => void; isArchivingProject: (projectId: string) => boolean; ... 5 more ...; showCreateCard: true; }' is not assignable to type 'IntrinsicAttributes & ProjectCardsGridProps'.
+  Property 'isArchivingProject' does not exist on type 'IntrinsicAttributes & ProjectCardsGridProps'.
+src/app/(private)/jira/projects/[projectId]/page.tsx(44,3): error TS2305: Module '"@/features/jira/hooks"' has no exported member 'usePredictiveHealth'.
+src/app/(private)/jira/projects/[projectId]/page.tsx(258,53): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/(private)/jira/projects/[projectId]/page.tsx(258,76): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/(private)/jira/projects/[projectId]/page.tsx(353,9): error TS2322: Type '{ project: ProjectDetailDTO; projectKey: string | null; currentViewLabel: string; viewMode: ViewMode; setViewMode: Dispatch<SetStateAction<ViewMode>>; ... 6 more ...; onOpenGraph: () => void; }' is not assignable to type 'IntrinsicAttributes & ProjectDetailHeaderProps'.
+  Property 'viewerCount' does not exist on type 'IntrinsicAttributes & ProjectDetailHeaderProps'.
+src/app/(private)/jira/projects/[projectId]/page.tsx(408,21): error TS2304: Cannot find name 'bulkType'.
+src/app/(private)/jira/projects/[projectId]/page.tsx(409,11): error TS2322: Type '{ members: ProjectMemberDTO[]; selectedCount: number; selectedVisibleCount: number; totalVisibleCount: number; bulkStatus: string; onBulkStatusChange: Dispatch<SetStateAction<string>>; ... 22 more ...; workflow: ProjectWorkflowDTO | undefined; }' is not assignable to type 'IntrinsicAttributes & TaskBulkActionBarProps'.
+  Property 'onBulkTypeChange' does not exist on type 'IntrinsicAttributes & TaskBulkActionBarProps'.
+src/app/(private)/jira/projects/[projectId]/page.tsx(409,29): error TS2304: Cannot find name 'setBulkType'.
+src/app/(private)/jira/projects/[projectId]/page.tsx(410,24): error TS2304: Cannot find name 'bulkDueDate'.
+src/app/(private)/jira/projects/[projectId]/page.tsx(411,32): error TS2304: Cannot find name 'setBulkDueDate'.
+src/app/(private)/jira/projects/[projectId]/page.tsx(416,26): error TS2552: Cannot find name 'bulkTypePending'. Did you mean 'bulkUpdatePending'?
+src/app/(private)/jira/projects/[projectId]/page.tsx(417,29): error TS2552: Cannot find name 'bulkDueDatePending'. Did you mean 'bulkUpdatePending'?
+src/app/(private)/jira/projects/[projectId]/page.tsx(424,30): error TS2552: Cannot find name 'handleBulkUpdateType'. Did you mean 'handleBulkUpdateStatus'?
+src/app/(private)/jira/projects/[projectId]/page.tsx(425,33): error TS2552: Cannot find name 'handleBulkUpdateDueDate'. Did you mean 'handleBulkUpdateStatus'?
+src/app/(private)/jira/projects/[projectId]/page.tsx(471,11): error TS2322: Type 'Set<unknown>' is not assignable to type 'Set<string>'.
+  Type 'unknown' is not assignable to type 'string'.
+src/app/(private)/jira/projects/[projectId]/page.tsx(580,11): error TS2322: Type '{ projectId: string; onClose: () => void; onSelectNode: (node: any) => void; }' is not assignable to type 'IntrinsicAttributes & KnowledgeMapProps'.
+  Property 'onSelectNode' does not exist on type 'IntrinsicAttributes & KnowledgeMapProps'.
+src/app/(private)/jira/projects/[projectId]/page.tsx(580,26): error TS7006: Parameter 'node' implicitly has an 'any' type.
+src/app/(private)/jira/projects/[projectId]/reports/page.tsx(314,68): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: Props<{ remainingPoints: any; } & { remainingPoints: any; } & { remainingPoints: any; }, any>): ReactElement<unknown, string | JSXElementConstructor<any>>', gave the following error.
+    Object literal may only specify known properties, and 'shadow' does not exist in type '((props: ActiveDotProps) => ReactNode) | Partial<ActiveDotProps> | ReactElement<SVGProps<SVGElement>, string | JSXElementConstructor<...>>'.
+  Overload 2 of 2, '(props: Props<any, any>): ReactElement<unknown, string | JSXElementConstructor<any>>', gave the following error.
+    Object literal may only specify known properties, and 'shadow' does not exist in type '((props: ActiveDotProps) => ReactNode) | Partial<ActiveDotProps> | ReactElement<SVGProps<SVGElement>, string | JSXElementConstructor<...>>'.
+src/app/(private)/jira/projects/[projectId]/settings/workflow/page.tsx(65,8): error TS2375: Type '{ data: ProjectWorkflowDTO | undefined; isLoading: boolean; title: string; description: string; onAddStatus: (data: { key: string; name: string; category: WorkflowStatusCategory; position: number; }) => Promise<...>; ... 4 more ...; extraActions: Element; }' is not assignable to type 'WorkflowEditorProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'data' are incompatible.
+    Type 'ProjectWorkflowDTO | undefined' is not assignable to type 'WorkflowData'.
+      Type 'undefined' is not assignable to type 'WorkflowData'.
+src/app/(private)/settings/page.tsx(292,44): error TS2352: Conversion of type 'NotificationPreferenceDTO' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Index signature for type 'string' is missing in type 'NotificationPreferenceDTO'.
+src/app/(private)/settings/page.tsx(297,28): error TS2352: Conversion of type 'NotificationPreferenceDTO | undefined' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'NotificationPreferenceDTO' is not comparable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'NotificationPreferenceDTO'.
+src/app/(private)/settings/page.tsx(305,32): error TS2352: Conversion of type 'NotificationPreferenceDTO | undefined' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'NotificationPreferenceDTO' is not comparable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'NotificationPreferenceDTO'.
+src/app/(private)/settings/page.tsx(323,30): error TS2352: Conversion of type 'NotificationPreferenceDTO | undefined' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'NotificationPreferenceDTO' is not comparable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'NotificationPreferenceDTO'.
+src/app/(private)/settings/page.tsx(328,27): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/app/(private)/settings/page.tsx(328,29): error TS2352: Conversion of type 'NotificationPreferenceDTO | undefined' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'NotificationPreferenceDTO' is not comparable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'NotificationPreferenceDTO'.
+src/app/(private)/settings/page.tsx(354,19): error TS2322: Type 'false | Promise<void>' is not assignable to type 'Promise<void>'.
+  Type 'boolean' is not assignable to type 'Promise<void>'.
+src/components/layout/private-shell.tsx(98,28): error TS2322: Type '{ showLabel: boolean; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'showLabel' does not exist on type 'IntrinsicAttributes'.
+src/components/notifications/notification-bell.tsx(136,22): error TS2339: Property 'neuralPriority' does not exist on type 'NotificationItemDTO'.
+src/components/notifications/notification-bell.tsx(148,26): error TS2339: Property 'aiSummary' does not exist on type 'NotificationItemDTO'.
+src/components/notifications/notification-bell.tsx(150,30): error TS2339: Property 'aiSummary' does not exist on type 'NotificationItemDTO'.
+src/components/notifications/notification-bell.tsx(159,24): error TS2339: Property 'neuralPriority' does not exist on type 'NotificationItemDTO'.
+src/components/search/CommandPalette.tsx(65,23): error TS2339: Property 'tasks' does not exist on type 'SearchResponseDTO'.
+src/components/search/CommandPalette.tsx(66,26): error TS2339: Property 'projects' does not exist on type 'SearchResponseDTO'.
+src/components/search/CommandPalette.tsx(67,22): error TS2339: Property 'docs' does not exist on type 'SearchResponseDTO'.
+src/components/search/CommandPalette.tsx(162,16): error TS7006: Parameter 't' implicitly has an 'any' type.
+src/components/search/CommandPalette.tsx(250,7): error TS2532: Object is possibly 'undefined'.
+src/components/search/SearchModal.tsx(19,23): error TS2339: Property 'tasks' does not exist on type 'SearchResponseDTO'.
+src/components/search/SearchModal.tsx(20,26): error TS2339: Property 'projects' does not exist on type 'SearchResponseDTO'.
+src/features/ai/components/ai-planner-modal.tsx(61,18): error TS2532: Object is possibly 'undefined'.
+src/features/ai/components/ai-planner-modal.tsx(63,21): error TS2532: Object is possibly 'undefined'.
+src/features/ai/components/ai-planner-modal.tsx(64,24): error TS2532: Object is possibly 'undefined'.
+src/features/ai/components/neural-workspace-digest.tsx(69,29): error TS2322: Type '{ size: number; weight: string; }' is not assignable to type 'IntrinsicAttributes & Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>'.
+  Property 'weight' does not exist on type 'IntrinsicAttributes & Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>'. Did you mean 'height'?
+src/features/automation/components/AIAutomationDialog.tsx(38,26): error TS2345: Argument of type '{}' is not assignable to parameter of type 'SetStateAction<{ name: string; trigger: { type: string; config: Record<string, unknown>; }; actions: { type: string; config: Record<string, unknown>; }[]; } | null>'.
+src/features/automation/components/connect-hub.tsx(6,3): error TS2305: Module '"lucide-react"' has no exported member 'Slack'.
+src/features/automation/components/connect-hub.tsx(7,3): error TS2305: Module '"lucide-react"' has no exported member 'Github'.
+src/features/docs/components/RichTextEditor.tsx(119,5): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(options: Partial<EditorOptions> & { immediatelyRender?: boolean; shouldRerenderOnTransaction?: boolean; } & { immediatelyRender: false; }, deps?: DependencyList | undefined): Editor | null', gave the following error.
+    Argument of type '{ extensions: any[]; content: JSONContent | null | undefined; editable: boolean; onUpdate: ({ editor }: { editor: Editor; transaction: Transaction; appendedTransactions: Transaction[]; }) => void; editorProps: { ...; }; }' is not assignable to parameter of type 'Partial<EditorOptions> & { immediatelyRender?: boolean; shouldRerenderOnTransaction?: boolean; } & { immediatelyRender: false; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+      Type '{ extensions: any[]; content: JSONContent | null | undefined; editable: boolean; onUpdate: ({ editor }: { editor: Editor; transaction: Transaction; appendedTransactions: Transaction[]; }) => void; editorProps: { ...; }; }' is not assignable to type 'Partial<EditorOptions>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+        Types of property 'content' are incompatible.
+          Type 'JSONContent | null | undefined' is not assignable to type 'Content'.
+            Type 'undefined' is not assignable to type 'Content'.
+  Overload 2 of 2, '(options: UseEditorOptions, deps?: DependencyList | undefined): Editor', gave the following error.
+    Argument of type '{ extensions: any[]; content: JSONContent | null | undefined; editable: boolean; onUpdate: ({ editor }: { editor: Editor; transaction: Transaction; appendedTransactions: Transaction[]; }) => void; editorProps: { ...; }; }' is not assignable to parameter of type 'UseEditorOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+      Type '{ extensions: any[]; content: JSONContent | null | undefined; editable: boolean; onUpdate: ({ editor }: { editor: Editor; transaction: Transaction; appendedTransactions: Transaction[]; }) => void; editorProps: { ...; }; }' is not assignable to type 'Partial<EditorOptions>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+        Types of property 'content' are incompatible.
+          Type 'JSONContent | null | undefined' is not assignable to type 'Content'.
+            Type 'undefined' is not assignable to type 'Content'.
+src/features/docs/components/RichTextEditor.tsx(326,27): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'SetStateAction<string>'.
+  Type 'undefined' is not assignable to type 'SetStateAction<string>'.
+src/features/jira/components/project-detail-header.tsx(187,24): error TS2304: Cannot find name 'viewerCount'.
+src/features/jira/components/project-detail-header.tsx(199,32): error TS2304: Cannot find name 'setShowCreateTaskPanel'.
+src/features/jira/components/project-detail-header.tsx(199,56): error TS7006: Parameter 'value' implicitly has an 'any' type.
+src/features/jira/components/project-detail-header.tsx(280,28): error TS2304: Cannot find name 'onCopyFilterLink'.
+src/features/jira/components/project-detail-header.tsx(282,21): error TS2304: Cannot find name 'isCopyLinkSuccess'.
+src/features/jira/components/task-edit-slide-over.tsx(158,55): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/features/jira/components/task-edit-slide-over.tsx(376,76): error TS2345: Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/features/project/components/project-digital-twin.tsx(97,11): error TS2532: Object is possibly 'undefined'.
+src/features/project/components/project-digital-twin.tsx(176,22): error TS2552: Cannot find name 'motion'. Did you mean 'Option'?
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 1
+npm error path /Users/maitranhuy/SuperBoard/apps/web
+npm error workspace @superboard/web@0.1.0
+npm error location /Users/maitranhuy/SuperBoard/apps/web
+npm error command failed
+npm error command sh -c tsc --noEmit

@@ -32,11 +32,14 @@ export class DiagnosisService {
       const diagnosis = await this.aiService.processText(prompt, 'diagnose_error');
 
       // Create a Troubleshooting Doc in the workspace knowledge base
-      // Use the workspaceId from context if available, otherwise fallback to system workspace
       const workspaceId = (context.workspaceId as string) || 'system';
-      const systemUser = await this.prisma.user.findFirst({ where: { role: 'admin' } });
+      const adminMember = await this.prisma.workspaceMember.findFirst({
+        where: { workspaceId, role: 'admin' },
+        include: { user: true },
+      });
 
-      if (!systemUser) return;
+      if (!adminMember) return;
+      const systemUser = adminMember.user;
 
       const doc = await this.docService.createDoc(workspaceId, systemUser.id, {
         title: `🚨 AI Diagnosis: ${error.name} at ${context.url}`,
@@ -68,7 +71,7 @@ export class DiagnosisService {
     const [docs, tasks] = await Promise.all([
       this.prisma.doc.findMany({ where: { workspaceId, deletedAt: null } }),
       this.prisma.task.findMany({
-        where: { projectId: { not: null }, deletedAt: null },
+        where: { deletedAt: null },
         include: { project: true },
       }),
     ]);
@@ -112,12 +115,21 @@ export class DiagnosisService {
         include: { project: true },
       }),
       this.prisma.task.findMany({
-        where: { projectId: { not: null }, deletedAt: null },
-        include: { project: true, taskLinks: true },
+        where: { project: { workspaceId }, deletedAt: null },
+        include: { project: true, docLinks: true },
       }),
     ]);
 
-    const nodes = [
+    interface StrategicNode {
+      id: string;
+      type: string;
+      title: string;
+      projectId: string | null;
+      projectName: string;
+      hasLinks?: boolean;
+    }
+
+    const nodes: StrategicNode[] = [
       ...docs.map((d) => ({
         id: d.id,
         type: 'doc',
@@ -130,20 +142,31 @@ export class DiagnosisService {
         type: 'task',
         title: t.title,
         projectId: t.projectId,
-        projectName: t.project?.name || 'Unknown',
-        hasLinks: t.taskLinks.length > 0,
+        projectName: (t as { project?: { name: string } }).project?.name || 'Unknown',
+        hasLinks: (t as { docLinks: unknown[] }).docLinks.length > 0,
       })),
     ];
 
-    const collisions: unknown[] = [];
+    interface StrategicCollision {
+      id: string;
+      nodes: StrategicNode[];
+      sourceTaskId: string;
+      targetTaskId: string;
+      type: string;
+      intensity: number;
+      category: string;
+      protocol?: string;
+    }
+
+    const collisions: StrategicCollision[] = [];
 
     // Analyze Similarity across Projects
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
-        const nodeA = nodes[i];
-        const nodeB = nodes[j];
+        const nodeA = nodes[i]!;
+        const nodeB = nodes[j]!;
 
-        if (nodeA.projectId === nodeB.projectId) continue;
+        if (!nodeA.projectId || !nodeB.projectId || nodeA.projectId === nodeB.projectId) continue;
 
         const similarity = this.calculateHeuristicSimilarity(nodeA.title, nodeB.title);
 
@@ -151,18 +174,21 @@ export class DiagnosisService {
           collisions.push({
             id: `collision-${nodeA.id}-${nodeB.id}`,
             nodes: [nodeA, nodeB],
+            sourceTaskId: nodeA.id,
+            targetTaskId: nodeB.id,
+            type: 'relates_to',
             intensity: similarity,
-            type: 'semantic_collision',
+            category: 'semantic_collision',
           });
         }
       }
     }
 
-    const results = [];
+    const results: StrategicCollision[] = [];
     for (const collision of collisions.slice(0, 5)) {
       const prompt = `Strategic Collision Detected:
-        Node A: [${collision.nodes[0].type}] ${collision.nodes[0].title} in Project "${collision.nodes[0].projectName}"
-        Node B: [${collision.nodes[1].type}] ${collision.nodes[1].title} in Project "${collision.nodes[1].projectName}"
+        Node A: [${collision.nodes[0]!.type}] ${collision.nodes[0]!.title} in Project "${collision.nodes[0]!.projectName}"
+        Node B: [${collision.nodes[1]!.type}] ${collision.nodes[1]!.title} in Project "${collision.nodes[1]!.projectName}"
         
         Suggest a resolution protocol to align these efforts. Provide a 1-sentence tactical directive.`;
 

@@ -310,4 +310,23 @@ export class AiService implements OnModuleInit {
       return null;
     }
   }
+
+  async analyzeMedia(url: string, mimeType: string): Promise<string> {
+    const text = `Analyze media at URL: ${url} (MimeType: ${mimeType})`;
+    return this.processText(text, 'analyze_media');
+  }
+
+  async generateExecutiveSummary(projectId: string, data: unknown): Promise<string> {
+    const text = `Generate executive summary for project ${projectId} with data: ${JSON.stringify(data)}`;
+    return this.processText(text, 'executive_summary');
+  }
+
+  async orchestrateGoal(goal: string, context: string): Promise<string> {
+    const text = `Goal: ${goal}\nContext: ${context}`;
+    return this.processText(text, 'mission_orchestration');
+  }
+
+  async getWorkspaceDigest(workspaceId: string): Promise<string> {
+    return this.processText(`Workspace: ${workspaceId}`, 'executive_daily_briefing');
+  }
 }

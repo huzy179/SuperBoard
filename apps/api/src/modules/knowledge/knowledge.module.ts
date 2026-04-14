@@ -1,3 +1,4 @@
+import { Module } from '@nestjs/common';
 import { KnowledgeController } from './knowledge.controller';
 import { QaController } from './qa.controller';
 import { GraphService } from './graph.service';

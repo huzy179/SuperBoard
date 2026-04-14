@@ -37,7 +37,8 @@ export class ChatController {
   ) {
     const message = await this.chatService.createMessage(channelId, user.id, dto);
     const messageDTO = this.chatService.mapMessageToDTO(message);
-    this.chatGateway.broadcastMessage(channelId, messageDTO);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.chatGateway.broadcastMessage(channelId, messageDTO as any);
     return messageDTO;
   }
 
@@ -49,7 +50,8 @@ export class ChatController {
   ) {
     const message = await this.chatService.updateMessage(messageId, user.id, dto);
     const messageDTO = this.chatService.mapMessageToDTO(message);
-    this.chatGateway.broadcastUpdate(message.channelId, messageDTO);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.chatGateway.broadcastUpdate(message.channelId, messageDTO as any);
     return messageDTO;
   }
 

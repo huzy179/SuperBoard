@@ -9,6 +9,7 @@ import {
 } from '@/features/docs/api/doc-service';
 import { toast } from 'sonner';
 import type { Doc, DocVersion } from '@superboard/shared';
+import type { JSONContent } from '@tiptap/react';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useEffect, useRef, useState } from 'react';
 
@@ -23,7 +24,7 @@ export function useWorkspaceDocs(workspaceId: string | undefined) {
 export function useDoc(docId: string | undefined) {
   const queryClient = useQueryClient();
   const [localTitle, setLocalTitle] = useState('');
-  const [localContent, setLocalContent] = useState<unknown>(null);
+  const [localContent, setLocalContent] = useState<JSONContent | null>(null);
   const lastSavedRef = useRef<string | null>(null);
 
   const query = useQuery<Doc>({

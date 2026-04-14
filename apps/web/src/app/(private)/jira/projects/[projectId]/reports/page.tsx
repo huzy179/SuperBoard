@@ -311,7 +311,7 @@ export default function ProjectReportsPage() {
                   stroke="url(#lineGradient)"
                   strokeWidth={5}
                   dot={{ r: 5, fill: '#3b82f6', strokeWidth: 0 }}
-                  activeDot={{ r: 8, strokeWidth: 0, fill: '#fff', shadow: '0 0 20px #3b82f6' }}
+                  activeDot={{ r: 8, strokeWidth: 0, fill: '#fff' }}
                 />
                 <Line
                   type="monotone"

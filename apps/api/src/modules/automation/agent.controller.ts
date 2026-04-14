@@ -1,7 +1,7 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { apiSuccess } from '../../common/api-response.helper';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { apiSuccess } from '../../common/api-response';
 
 @Controller('v1/automation/agents')
 @UseGuards(JwtAuthGuard)

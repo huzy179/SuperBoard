@@ -8,6 +8,7 @@ import { AutomationService } from './automation.service';
 import { NeuralAgentService } from './neural-agent.service';
 import { SingularityService } from './singularity.service';
 import { SymbiosisService } from './symbiosis.service';
+import { ExecutiveService } from './executive.service';
 
 @Controller('v1/automation')
 export class AutomationController {
@@ -101,8 +102,10 @@ export class AutomationController {
         projectId: dto.projectId || null,
         name: dto.name,
         description: dto.description || null,
-        trigger: dto.trigger as unknown as Record<string, unknown>,
-        actions: dto.actions as unknown as Record<string, unknown>[],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        trigger: dto.trigger as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        actions: dto.actions as any,
       },
     });
     return apiSuccess(rule);
@@ -121,10 +124,12 @@ export class AutomationController {
         ...(dto.description !== undefined ? { description: dto.description } : {}),
         ...(dto.isActive !== undefined ? { isActive: dto.isActive } : {}),
         ...(dto.trigger !== undefined
-          ? { trigger: dto.trigger as unknown as Record<string, unknown> }
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            { trigger: dto.trigger as any }
           : {}),
         ...(dto.actions !== undefined
-          ? { actions: dto.actions as unknown as Record<string, unknown>[] }
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            { actions: dto.actions as any }
           : {}),
       },
     });

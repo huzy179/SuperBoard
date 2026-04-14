@@ -36,8 +36,8 @@ export class SymbiosisService {
       intensity: number;
       nodes: { projectName: string }[];
     }[]) {
-      const p1 = collision.nodes[0].projectName;
-      const p2 = collision.nodes[1].projectName;
+      const p1 = collision.nodes[0]!.projectName;
+      const p2 = collision.nodes[1]!.projectName;
       const key = [p1, p2].sort().join('||');
       projectOverlaps[key] = (projectOverlaps[key] || 0) + collision.intensity;
     }

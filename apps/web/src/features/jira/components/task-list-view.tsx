@@ -15,7 +15,10 @@ interface TaskListViewProps {
   projectKey: string | null;
   selectedTaskIds: Set<string>;
   selectedVisibleCount: number;
-  onSelectTask: (taskId: string, event: React.MouseEvent | React.KeyboardEvent) => void;
+  onSelectTask: (
+    taskId: string,
+    event: React.MouseEvent | React.KeyboardEvent | React.ChangeEvent,
+  ) => void;
   toggleSelectAllVisible: () => void;
   onOpenEdit: (task: ProjectTaskItemDTO) => void;
   onUpdateTaskStatus: (taskId: string, status: ProjectTaskItemDTO['status']) => void;

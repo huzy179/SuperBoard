@@ -3,14 +3,13 @@
 import { useState, useEffect } from 'react';
 import {
   Share2,
-  Slack,
-  Github,
   Plus,
   Terminal,
   Trash2,
   ExternalLink,
   Zap,
   Globe,
+  MessageCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -60,9 +59,9 @@ export function ConnectHub({ workspaceId }: { workspaceId: string }) {
   const getProviderIcon = (provider: string) => {
     switch (provider) {
       case 'SLACK':
-        return <Slack className="text-[#4A154B]" />;
+        return <MessageCircle className="text-[#4A154B]" />;
       case 'GITHUB':
-        return <Github className="text-white" />;
+        return <Globe className="text-white" />;
       case 'DISCORD':
         return <MessageCircle className="text-[#5865F2]" />;
       default:

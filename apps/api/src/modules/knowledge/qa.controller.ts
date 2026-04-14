@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { DiagnosisService } from './diagnosis.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { apiSuccess } from '../../common/api-response.helper';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { apiSuccess } from '../../common/api-response';
 
 @Controller('v1/qa')
 @UseGuards(JwtAuthGuard)

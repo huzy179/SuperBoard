@@ -10,7 +10,7 @@ import { MissionCommandBriefing } from './MissionCommandBriefing';
 import {
   Brain,
   Settings2,
-  LayoutBoard,
+  LayoutGrid,
   List,
   Calendar as CalendarIcon,
   Zap,
@@ -20,6 +20,7 @@ import {
   History,
   Activity,
   Sparkles,
+  Mic,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { AiPlannerModal } from '@/features/ai/components/ai-planner-modal';
@@ -28,8 +29,8 @@ interface ProjectDetailHeaderProps {
   project: ProjectDetailDTO;
   projectKey: string | null;
   currentViewLabel: string;
-  viewMode: 'board' | 'list' | 'calendar';
-  setViewMode: (mode: 'board' | 'list' | 'calendar') => void;
+  viewMode: 'board' | 'list' | 'calendar' | 'insights';
+  setViewMode: (mode: 'board' | 'list' | 'calendar' | 'insights') => void;
   viewerCount: number;
   setShowCreateTaskPanel: (show: boolean | ((val: boolean) => boolean)) => void;
   isCopyLinkSuccess: boolean;
@@ -59,7 +60,7 @@ export function ProjectDetailHeader({
   const visibleMemberAvatars = project.members.slice(0, 5);
 
   const navItems = [
-    { id: 'board', label: 'Tactical Board', icon: <LayoutBoard size={14} />, mode: 'board' },
+    { id: 'board', label: 'Tactical Board', icon: <LayoutGrid size={14} />, mode: 'board' },
     { id: 'list', label: 'Mission List', icon: <List size={14} />, mode: 'list' },
     { id: 'calendar', label: 'Chronos', icon: <CalendarIcon size={14} />, mode: 'calendar' },
     { id: 'insights', label: 'Strategic Insights', icon: <Sparkles size={14} />, mode: 'insights' },
@@ -231,7 +232,9 @@ export function ProjectDetailHeader({
                   <button
                     key={v.id}
                     type="button"
-                    onClick={() => setViewMode(v.mode as 'board' | 'list' | 'calendar')}
+                    onClick={() =>
+                      setViewMode(v.mode as 'board' | 'list' | 'calendar' | 'insights')
+                    }
                     className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-[9px] font-black uppercase tracking-widest transition-all ${
                       viewMode === v.mode
                         ? 'bg-white text-slate-950 shadow-luxe scale-105'

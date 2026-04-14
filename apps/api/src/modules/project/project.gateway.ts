@@ -90,6 +90,22 @@ export class ProjectGateway implements OnGatewayConnection, OnGatewayDisconnect 
     });
   }
 
+  emitTaskUpdated(payload: {
+    projectId: string;
+    taskId: string;
+    aiContext?: string | null;
+    updatedAt: string;
+  }) {
+    this.server.to(toProjectRoom(payload.projectId)).emit('task:updated', {
+      projectId: payload.projectId,
+      taskId: payload.taskId,
+      aiContext: payload.aiContext || null,
+      aiMetadata: payload.aiContext ? { processedAt: new Date().toISOString() } : null,
+      updatedAt: payload.updatedAt,
+      at: Date.now(),
+    });
+  }
+
   emitCommentAdded(payload: {
     projectId: string;
     taskId: string;

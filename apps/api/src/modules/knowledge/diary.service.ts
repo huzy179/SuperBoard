@@ -26,7 +26,7 @@ export class DiaryService {
     const weeklyStart = startOfWeek(new Date());
     const title = `Dev Diary: ${project.name} - Week of ${format(weeklyStart, 'MMM dd, yyyy')}`;
 
-    const context = `Project: ${project.name}\nStats: ${JSON.stringify(report.distribution)}\nRecent Activity: ${JSON.stringify(report.burnDownData.slice(-7))}`;
+    const context = `Project: ${project.name}\nStats: ${JSON.stringify(report.distribution)}\nRecent Activity: ${JSON.stringify(report.burndown.slice(-7))}`;
 
     // Use AI to generate a professional developer diary content
     const summary = await this.aiService.processText(

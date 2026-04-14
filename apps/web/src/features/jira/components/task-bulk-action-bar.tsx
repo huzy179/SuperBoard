@@ -2,13 +2,7 @@
 
 import { useState } from 'react';
 import { X, Check, Trash2, User, Flag, Loader2, SquareCheck, MousePointer2 } from 'lucide-react';
-import type {
-  ProjectMemberDTO,
-  ProjectTaskItemDTO,
-  TaskPriorityDTO,
-  TaskTypeDTO,
-  WorkflowStatusTemplateDTO,
-} from '@superboard/shared';
+import type { ProjectMemberDTO, ProjectTaskItemDTO, TaskPriorityDTO } from '@superboard/shared';
 import { BOARD_COLUMNS, PRIORITY_OPTIONS } from '@/lib/constants/task';
 
 type TaskBulkActionBarProps = {
@@ -18,13 +12,9 @@ type TaskBulkActionBarProps = {
   totalVisibleCount: number;
   bulkStatus: ProjectTaskItemDTO['status'];
   bulkPriority: TaskPriorityDTO;
-  bulkType: TaskTypeDTO;
-  bulkDueDate: string;
   bulkAssigneeId: string;
   isStatusPending: boolean;
   isPriorityPending: boolean;
-  isTypePending: boolean;
-  isDueDatePending: boolean;
   isAssignPending: boolean;
   isDeletePending: boolean;
   onBulkStatusChange: (value: ProjectTaskItemDTO['status']) => void;
@@ -36,7 +26,11 @@ type TaskBulkActionBarProps = {
   onApplyPriority: () => void;
   onApplyAssignee: () => void;
   onDeleteSelected: () => void;
-  workflow?: WorkflowStatusTemplateDTO | undefined;
+  workflow?:
+    | {
+        statuses: { key: string; label?: string; name?: string }[];
+      }
+    | undefined;
 };
 
 export function TaskBulkActionBar(props: TaskBulkActionBarProps) {
@@ -103,22 +97,23 @@ export function TaskBulkActionBar(props: TaskBulkActionBarProps) {
               {activeMenu === 'status' && (
                 <div className="absolute bottom-full mb-4 left-0 glass-panel p-1 rounded-2xl w-56 shadow-2xl animate-in fade-in slide-in-from-bottom-2">
                   <div className="bg-slate-800 rounded-xl overflow-hidden py-1">
-                    {(workflow?.statuses || BOARD_COLUMNS).map(
-                      (s: { key: string; label?: string; name?: string }) => (
-                        <button
-                          key={s.key}
-                          onClick={() => {
-                            onBulkStatusChange(s.key);
-                            onApplyStatus();
-                            setActiveMenu(null);
-                          }}
-                          className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-xs font-bold transition-all ${bulkStatus === s.key ? 'text-brand-400 bg-brand-500/5' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}
-                        >
-                          <span>{s.label || s.name}</span>
-                          {bulkStatus === s.key && <Check size={14} />}
-                        </button>
-                      ),
-                    )}
+                    {(workflow?.statuses || BOARD_COLUMNS).map((s) => (
+                      <button
+                        key={s.key}
+                        onClick={() => {
+                          onBulkStatusChange(s.key);
+                          onApplyStatus();
+                          setActiveMenu(null);
+                        }}
+                        className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-xs font-bold transition-all ${bulkStatus === s.key ? 'text-brand-400 bg-brand-500/5' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}
+                      >
+                        <span>
+                          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                          {(s as any).label || (s as any).name}
+                        </span>
+                        {bulkStatus === s.key && <Check size={14} />}
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}

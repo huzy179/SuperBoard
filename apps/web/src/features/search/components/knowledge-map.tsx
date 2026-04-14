@@ -8,9 +8,10 @@ import { toast } from 'sonner';
 interface KnowledgeMapProps {
   projectId: string;
   onClose: () => void;
+  onSelectNode?: (nodeId: string, type: 'task' | 'doc' | 'user', label: string) => void;
 }
 
-export function KnowledgeMap({ projectId, onClose }: KnowledgeMapProps) {
+export function KnowledgeMap({ projectId, onClose, onSelectNode }: KnowledgeMapProps) {
   const [isGeneratingDiary, setIsGeneratingDiary] = useState(false);
 
   const handleGenerateDiary = async () => {
@@ -85,7 +86,7 @@ export function KnowledgeMap({ projectId, onClose }: KnowledgeMapProps) {
 
       {/* Main Graph View */}
       <div className="flex-1 p-10 relative">
-        <KnowledgeGraphView projectId={projectId} />
+        <KnowledgeGraphView projectId={projectId} onSelectNode={onSelectNode} />
 
         {/* Semantic Sidebar / Overlay Hint */}
         <div className="absolute bottom-20 right-20 max-w-sm p-8 rounded-[2.5rem] bg-black/60 border border-white/5 backdrop-blur-2xl space-y-4">

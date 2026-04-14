@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
   SearchResponseDTO,
+  NeuralNodeDTO,
   ProjectTaskItemDTO,
   ProjectItemDTO,
   DocItemDTO,
@@ -79,7 +80,7 @@ export class SearchService {
   async globalSearch(workspaceId: string, query: string): Promise<SearchResponseDTO> {
     const q = query.trim();
     if (!q) {
-      return { tasks: [], projects: [] };
+      return { tasks: [], projects: [], docs: [] };
     }
 
     const [traditionalTasks, semanticTasks, traditionalProjects, semanticProjects, docs] =
@@ -139,7 +140,24 @@ export class SearchService {
       .map((item) => item.project)
       .slice(0, 5);
 
-    return { tasks, projects, docs };
+    const results: NeuralNodeDTO[] = [
+      ...tasks.map((t) => ({
+        id: t.id,
+        label: t.title,
+        type: 'task' as const,
+        category: t.status,
+        priority: t.priority,
+      })),
+      ...projects.map((p) => ({ id: p.id, label: p.name, type: 'project' as const })),
+      ...docs.map((d) => ({ id: d.id, label: d.title, type: 'doc' as const })),
+    ];
+
+    return {
+      tasks,
+      projects,
+      docs,
+      neuralGraph: { nodes: results, links: [] },
+    };
   }
 
   private async searchTasksTraditional(
@@ -226,6 +244,7 @@ export class SearchService {
         color: true,
         icon: true,
         key: true,
+        workspaceId: true,
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -267,6 +286,7 @@ export class SearchService {
           color: true,
           icon: true,
           key: true,
+          workspaceId: true,
           createdAt: true,
           updatedAt: true,
           _count: { select: { tasks: { where: {} } } },
@@ -369,6 +389,7 @@ export class SearchService {
   private toProjectDTO(p: any): ProjectItemDTO {
     return {
       id: p.id,
+      workspaceId: p.workspaceId,
       name: p.name,
       description: p.description ?? '',
       color: p.color ?? null,
@@ -555,7 +576,8 @@ export class SearchService {
 
       // 2. Sync Docs
       const docs = await this.prisma.doc.findMany({
-        where: { workspaceId, embedding: { is: null } },
+        where: { project: { workspaceId }, deletedAt: null },
+        select: { id: true, title: true, content: true },
       });
       for (const d of docs) {
         const textContent = d.content ? this.extractTextFromJSON(d.content) : '';
@@ -645,7 +667,12 @@ export class SearchService {
         ? await this.searchTasksSemantic(workspaceId, baseEntity.title)
         : await this.searchDocsHybrid(workspaceId, baseEntity.title);
 
-    // Filter for very high confidence (similarity > 0.9) and not the same entity
-    return (results as Record<string, unknown>[]).filter((r) => r.id !== entityId);
+    // Map to include label for agent compatibility (using title as label)
+    return (results as unknown as { id: string; title?: string; name?: string }[])
+      .map((r) => ({
+        id: r.id,
+        label: r.title || r.name || 'Unknown Entity',
+      }))
+      .filter((r) => r.id !== entityId);
   }
 }

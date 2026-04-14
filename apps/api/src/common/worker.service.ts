@@ -110,6 +110,6 @@ export class WorkerService implements OnModuleInit, OnModuleDestroy {
     if (!projectId) return;
 
     console.log(`[WorkerService] Generating dynamic Memoir for project ${projectId}...`);
-    await this.reportService.generateProjectMemoir(projectId, 'executive');
+    await this.reportService.generateProjectMemoir(projectId as string, 'executive');
   }
 }

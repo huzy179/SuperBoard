@@ -67,7 +67,7 @@ export class WorkflowAutomationService {
       this.projectGateway.emitTaskUpdated({
         projectId: input.projectId,
         taskId: input.taskId,
-        status: prediction.targetStatus,
+        updatedAt: new Date().toISOString(),
       });
 
       logger.info(

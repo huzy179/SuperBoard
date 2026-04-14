@@ -97,6 +97,7 @@ function FeatureCard({
   onClick,
   isPending,
   disabled = false,
+  variant,
 }: {
   icon: React.ReactNode;
   title: string;

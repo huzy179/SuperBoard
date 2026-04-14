@@ -155,7 +155,7 @@ export class TaskService {
 
     if (!taskWithEmbed?.embedding) return [];
 
-    const embedding = taskWithEmbed.embedding as { vector: number[] };
+    const embedding = taskWithEmbed.embedding as unknown as { vector: number[] };
     const vectorStr = `[${embedding.vector.join(',')}]`;
 
     const similar = await this.prisma.$queryRaw<{ id: string; title: string; score: number }[]>`
@@ -170,6 +170,8 @@ export class TaskService {
       LIMIT 3;
     `;
 
-    return similar.filter((s) => s.score > 0.85); // Only high similarity duplicates
+    return (similar as unknown as { id: string; title: string; score: number }[]).filter(
+      (r) => r.id !== taskId,
+    );
   }
 }

@@ -20,7 +20,7 @@ export function WorkspaceCreateModal({ onClose, onSuccess }: WorkspaceCreateModa
     try {
       const result = await createMutation.mutateAsync({
         name: name.trim(),
-        slug: slug.trim() || undefined,
+        ...(slug.trim() ? { slug: slug.trim() } : {}),
       });
       onSuccess?.(result.id);
       onClose();

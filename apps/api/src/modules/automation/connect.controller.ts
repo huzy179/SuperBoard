@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { ConnectService } from './connect.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { apiSuccess } from '../../common/api-response.helper';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { apiSuccess } from '../../common/api-response';
 
 @Controller('v1/connect')
 export class ConnectController {
@@ -20,7 +20,8 @@ export class ConnectController {
     @Query('workspaceId') workspaceId: string,
     @Body() data: Record<string, unknown>,
   ) {
-    const integration = await this.connectService.createIntegration(workspaceId, data);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const integration = await this.connectService.createIntegration(workspaceId, data as any);
     return apiSuccess({ integration });
   }
 

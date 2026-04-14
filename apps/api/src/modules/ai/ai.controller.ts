@@ -7,6 +7,7 @@ import { ProjectService } from '../project/project.service';
 import { ReportService } from '../project/report.service';
 import { apiSuccess } from '../../common/api-response';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { requireWorkspace } from '../../common/helpers';
 import type { AuthUserDTO } from '@superboard/shared';
 
 @Controller('ai')
@@ -67,7 +68,7 @@ export class AiController {
     const replies = await this.chatService.getThreadMessages(messageId);
 
     const allMessages = [parent, ...replies].map((m) => ({
-      author: m.author.fullName,
+      author: m.author?.fullName || 'Unknown',
       content: m.content,
       created_at: m.createdAt.toISOString(),
     }));
@@ -88,17 +89,17 @@ export class AiController {
     @CurrentUser() user: AuthUserDTO,
     @Param('projectId') projectId: string,
   ) {
-    const project = await this.projectService.getProjectByIdForWorkspace(
-      projectId,
-      user.defaultWorkspaceId,
-    );
+    const workspaceId = requireWorkspace(user);
+    const project = await this.projectService.getProjectByIdForWorkspace(projectId, workspaceId);
     if (!project) throw new NotFoundException('Project not found');
 
     const health = await this.reportService.getPredictiveHealth(projectId);
     const briefing = await this.aiService.getProjectBriefing(
       projectId,
-      project.tasks,
-      health.health,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (project as any).tasks || [],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (health as any).healthScore || (health as any).health || 0,
     );
 
     return apiSuccess({ briefing });
@@ -116,13 +117,11 @@ export class AiController {
     @Param('projectId') projectId: string,
     @Body() body: { message: string },
   ) {
-    const project = await this.projectService.getProjectByIdForWorkspace(
-      projectId,
-      user.defaultWorkspaceId,
-    );
+    const workspaceId = requireWorkspace(user);
+    const project = await this.projectService.getProjectByIdForWorkspace(projectId, workspaceId);
     if (!project) throw new NotFoundException('Project not found');
 
-    const context = `Project: ${project.name}. Tasks: ${project.tasks.length}. Members: ${project.members.length}.`;
+    const context = `Project: ${project.name}. Tasks: ${(project as unknown as { tasks: unknown[] }).tasks?.length || 0}. Members: ${(project as unknown as { members: unknown[] }).members?.length || 0}.`;
     const response = await this.aiService.chatWithProject(body.message, context);
 
     return apiSuccess({ response });

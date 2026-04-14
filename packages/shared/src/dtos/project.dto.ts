@@ -3,7 +3,15 @@ import type { ApiResponse } from '../types/common.types';
 
 export type ProjectItemDTO = Pick<
   Project,
-  'id' | 'name' | 'description' | 'color' | 'icon' | 'key' | 'createdAt' | 'updatedAt'
+  | 'id'
+  | 'name'
+  | 'description'
+  | 'color'
+  | 'icon'
+  | 'key'
+  | 'workspaceId'
+  | 'createdAt'
+  | 'updatedAt'
 > & {
   taskCount: number;
   doneTaskCount: number;

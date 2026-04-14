@@ -27,9 +27,12 @@ export function useTaskSelection(
 
   const [lastSelectedTaskId, setLastSelectedTaskId] = useState<string | null>(null);
 
-  function handleSelectTask(taskId: string, event: React.MouseEvent | React.KeyboardEvent) {
-    const isModifierPressed = event.metaKey || event.ctrlKey;
-    const isShiftPressed = event.shiftKey;
+  function handleSelectTask(
+    taskId: string,
+    event: React.MouseEvent | React.KeyboardEvent | React.ChangeEvent,
+  ) {
+    const isModifierPressed = 'metaKey' in event ? event.metaKey || event.ctrlKey : false;
+    const isShiftPressed = 'shiftKey' in event ? event.shiftKey : false;
 
     setSelectedTaskIds((previous) => {
       const next = new Set(previous);

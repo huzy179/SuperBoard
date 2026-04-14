@@ -29,9 +29,10 @@ export class AutomationService {
       await this.prisma.taskEvent.create({
         data: {
           taskId: event.taskId,
-          actorId: event.actorId,
+          actorId: event.actorId ?? null,
           type: event.type === 'created' ? 'created' : (event.type as TaskEventType),
-          payload: event.payload as Record<string, unknown>,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          payload: event.payload as any,
         },
       });
 
@@ -52,7 +53,7 @@ export class AutomationService {
       logger.info({ ruleCount: rules.length, taskId: event.taskId }, 'Evaluating automation rules');
 
       for (const rule of rules) {
-        if (this.matchesTrigger(rule.trigger, event)) {
+        if (await this.matchesTrigger(rule.trigger, event)) {
           logger.info(
             { ruleId: rule.id, ruleName: rule.name },
             'Rule triggered! Executing actions...',
@@ -108,7 +109,7 @@ export class AutomationService {
     }
   }
 
-  private matchesTrigger(trigger: unknown, event: Record<string, unknown>): boolean {
+  private async matchesTrigger(trigger: unknown, event: Record<string, unknown>): Promise<boolean> {
     const typeMap: Record<string, string | undefined> = {
       TASK_CREATED: 'created',
       STATUS_CHANGED: 'status_changed',
@@ -134,11 +135,10 @@ export class AutomationService {
       if (!task) return false;
 
       // Use AI to check if task content matches semantic prompt
-      const result = this.aiService.processText(
+      const result = await this.aiService.processText(
         `Task: ${task.title}\nDesc: ${task.description}`,
         'semantic_compare',
       );
-      // Synchronous for now for simpler rule engine flow (assuming processing is fast or cached)
       return result === 'true';
     }
 

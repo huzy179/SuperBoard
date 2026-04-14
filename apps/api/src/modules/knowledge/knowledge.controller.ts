@@ -2,10 +2,11 @@ import { Controller, Get, Post, Param, UseGuards } from '@nestjs/common';
 import { GraphService } from './graph.service';
 import { DiaryService } from './diary.service';
 import { DiagnosisService } from './diagnosis.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { AuthUserDTO } from '@superboard/shared';
-import { apiSuccess } from '../../common/api-response.helper';
+import { apiSuccess } from '../../common/api-response';
+import { requireWorkspace } from '../../common/helpers';
 
 @Controller('v1/knowledge')
 @UseGuards(JwtAuthGuard)
@@ -24,19 +25,22 @@ export class KnowledgeController {
 
   @Get('atlas')
   async getGlobalVectorAtlas(@CurrentUser() user: AuthUserDTO) {
-    const data = await this.graphService.getGlobalVectorAtlas(user.workspaceId);
+    const workspaceId = requireWorkspace(user);
+    const data = await this.graphService.getGlobalVectorAtlas(workspaceId);
     return apiSuccess(data);
   }
 
-  @Get('diagnosis')
-  async getStrategicDiagnosis(@CurrentUser() user: AuthUserDTO) {
-    const data = await this.diagnosisService.diagnoseKnowledgeSilos(user.workspaceId);
+  @Get('silo-check')
+  async diagnoseKnowledgeSilos(@CurrentUser() user: AuthUserDTO) {
+    const workspaceId = requireWorkspace(user);
+    const data = await this.diagnosisService.diagnoseKnowledgeSilos(workspaceId);
     return apiSuccess(data);
   }
 
-  @Get('diagnosis/divergence')
+  @Get('strategic-divergence')
   async detectStrategicDivergence(@CurrentUser() user: AuthUserDTO) {
-    const data = await this.diagnosisService.detectStrategicDivergence(user.workspaceId);
+    const workspaceId = requireWorkspace(user);
+    const data = await this.diagnosisService.detectStrategicDivergence(workspaceId);
     return apiSuccess(data);
   }
 

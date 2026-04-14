@@ -6,6 +6,7 @@ import { getCurrentUser } from '@/lib/services/auth-service';
 
 type UseAuthSessionResult = {
   loading: boolean;
+  status: 'loading' | 'authenticated' | 'unauthenticated';
   error: string | null;
   user: AuthUserDTO | null;
   logout: () => void;
@@ -16,6 +17,8 @@ export function useAuthSession(): UseAuthSessionResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<AuthUserDTO | null>(null);
+
+  const status = loading ? 'loading' : user ? 'authenticated' : 'unauthenticated';
 
   useEffect(() => {
     const token = getAccessToken();
@@ -44,5 +47,5 @@ export function useAuthSession(): UseAuthSessionResult {
     router.push('/login');
   }
 
-  return { loading, error, user, logout };
+  return { loading, status, error, user, logout };
 }

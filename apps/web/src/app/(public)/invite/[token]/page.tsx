@@ -96,9 +96,9 @@ export default function AcceptInvitePage() {
               Lời mời tham gia
             </h1>
             <p className="text-lg text-slate-500 font-medium">
-              <span className="text-slate-900 font-black">{invitation.inviterName}</span> mời bạn
+              <span className="text-slate-900 font-black">{invitation?.inviterName}</span> mời bạn
               gia nhập công ty
-              <span className="text-brand-600 font-black"> {invitation.workspaceName}</span>
+              <span className="text-brand-600 font-black"> {invitation?.workspaceName}</span>
             </p>
           </div>
 
@@ -110,7 +110,7 @@ export default function AcceptInvitePage() {
               <p className="text-xs font-black text-slate-400 uppercase tracking-widest">
                 Workspace
               </p>
-              <h3 className="font-bold text-slate-900">{invitation.workspaceName}</h3>
+              <h3 className="font-bold text-slate-900">{invitation?.workspaceName}</h3>
             </div>
           </div>
 

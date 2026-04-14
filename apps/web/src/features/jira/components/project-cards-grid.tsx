@@ -15,6 +15,7 @@ type ProjectCardsGridProps = {
   getProjectOpenHref: (projectId: string) => string;
   onClearRememberedContext: (projectId: string) => void;
   hasRememberedContext: (projectId: string) => boolean;
+  isArchivingProject: (projectId: string) => boolean;
   showCreateCard?: boolean;
 };
 
@@ -28,6 +29,7 @@ export function ProjectCardsGrid({
   getProjectOpenHref,
   onClearRememberedContext,
   hasRememberedContext,
+  isArchivingProject,
   showCreateCard = true,
 }: ProjectCardsGridProps) {
   const router = useRouter();
@@ -44,6 +46,7 @@ export function ProjectCardsGrid({
           onArchive={onArchive}
           onToggleFavorite={onToggleFavorite}
           isFavorite={isFavorite}
+          isArchiving={isArchivingProject(project.id)}
           getProjectOpenHref={getProjectOpenHref}
           onClearRememberedContext={onClearRememberedContext}
           hasRememberedContext={hasRememberedContext}

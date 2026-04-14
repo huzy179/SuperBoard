@@ -27,7 +27,7 @@ export class GraphService {
     const [tasks, docs] = await Promise.all([
       this.prisma.task.findMany({
         where: { projectId, deletedAt: null },
-        include: { assignee: true, taskLinks: true },
+        include: { assignee: true, docLinks: true, project: true },
       }),
       this.prisma.doc.findMany({
         where: { projectId, deletedAt: null },
@@ -53,7 +53,11 @@ export class GraphService {
       }
 
       // Add Doc Links
-      task.taskLinks.forEach((link) => {
+      interface DocLink {
+        docId: string;
+        strength: number;
+      }
+      (task.docLinks as unknown as DocLink[]).forEach((link) => {
         edges.push({
           from: task.id,
           to: link.docId,
@@ -105,10 +109,10 @@ export class GraphService {
     // Search for semantically related tasks
     const relevantTasks = await this.searchService.globalSearch(doc.workspaceId, query);
 
-    return relevantTasks.tasks.slice(0, 5).map((task) => ({
+    return (relevantTasks.tasks || []).slice(0, 5).map((task) => ({
       taskId: task.id,
       title: task.title,
-      confidence: 0.8, // In a real scenario, we'd use the vector distance
+      confidence: 0.8,
     }));
   }
 
@@ -119,7 +123,7 @@ export class GraphService {
         include: { project: true },
       }),
       this.prisma.task.findMany({
-        where: { projectId: { not: null }, deletedAt: null },
+        where: { deletedAt: null },
         include: { project: true },
       }),
     ]);
@@ -143,8 +147,8 @@ export class GraphService {
         id: task.id,
         type: 'task',
         label: task.title,
-        group: task.projectId!,
-        projectName: task.project?.name || 'Unknown',
+        group: task.projectId ?? 'unassigned',
+        projectName: (task as { project?: { name: string } }).project?.name || 'Unknown',
       });
     });
 
@@ -153,8 +157,8 @@ export class GraphService {
     // Here we use semantic adjacency: if nodes share core keywords / common context
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
-        const nodeA = nodes[i];
-        const nodeB = nodes[j];
+        const nodeA = nodes[i]!;
+        const nodeB = nodes[j]!;
 
         // Heuristic for semantic similarity:
         // - Same keywords in titles

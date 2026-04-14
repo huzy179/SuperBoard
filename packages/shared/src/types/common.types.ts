@@ -8,6 +8,8 @@ export interface ApiError {
 
 export interface ApiMeta {
   requestId?: string;
+  correlationId?: string;
+  trace?: string;
   timestamp: string;
 }
 

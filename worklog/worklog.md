@@ -9,19 +9,24 @@ Tài liệu này theo dõi tiến độ phát triển của dự án SuperBoard.
 - [x] **v2.0**: Khởi động Multi-pillar (Slack + Notion). Thiết lập Schema & Backend Foundation.
 - [x] **v2.1**: Phát triển Frontend UI cho Chat Sidebar và Doc Tree.
 - [x] **v2.2**: Tích hợp TipTap editor cho Notion Pillar & Real-time Typing cho Chat.
+- [x] **v3.0**: Neural OS Evolution (The Singularity).
 
 ---
 
 ## 📅 Sắp tới (Todo)
 
-- [x] Triển khai Backend ChatModule, ChatService, ChatGateway (Real-time).
-- [x] Triển khai Backend DocModule, DocService (Hierarchy & Versioning).
-- [x] Xây dựng giao diện Chat (Message Stream, Channel Sidebar, TypingIndicator).
-- [x] Xây dựng giao diện Docs (Editor, Document Tree, Sub-doc creation).
+- [ ] **v4.0**: Universal Workspace Synchronization & Cross-platform Bridge.
+- [ ] Optimizing Neural Consciousness latency.
 
 ---
 
 ## ✅ Đã hoàn thành (Done)
+
+### Phase 53-55
+
+- [x] **v2.90**: Neural Core Integration & Latency Optimization.
+- [x] **v2.95**: Multi-dimensional Data Sync.
+- [x] **v2.99**: Core Optimization & Stability Patch.
 
 ### Jira Core MVP
 

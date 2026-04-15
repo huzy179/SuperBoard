@@ -75,10 +75,10 @@ export function AgentActivityLog({ workspaceId, projectId }: AgentActivityLogPro
           </div>
           <div>
             <h3 className="text-xl font-black text-white uppercase italic tracking-tighter">
-              Agency Audit Log
+              Nhật ký tác vụ Agent
             </h3>
             <p className="text-[10px] font-black text-white/20 uppercase tracking-widest leading-none mt-1">
-              Autonomous Interventions
+              Can thiệp tự động
             </p>
           </div>
         </div>
@@ -96,19 +96,19 @@ export function AgentActivityLog({ workspaceId, projectId }: AgentActivityLogPro
       <div className="grid grid-cols-3 gap-6">
         <div className="p-6 rounded-3xl bg-white/5 border border-white/5 flex flex-col gap-2">
           <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
-            Active Agents
+            Agent đang hoạt động
           </span>
           <span className="text-2xl font-black text-white tabular-nums">04</span>
         </div>
         <div className="p-6 rounded-3xl bg-indigo-500/5 border border-indigo-500/10 flex flex-col gap-2 shadow-glow-indigo">
           <span className="text-[9px] font-black text-indigo-400/40 uppercase tracking-widest">
-            Autonomous Decisions
+            Quyết định tự động
           </span>
           <span className="text-2xl font-black text-indigo-400 tabular-nums">{logs.length}</span>
         </div>
         <div className="p-6 rounded-3xl bg-white/5 border border-white/5 flex flex-col gap-2 text-white/20">
           <span className="text-[9px] font-black uppercase tracking-widest">
-            Human Override Rate
+            Tỷ lệ ghi đè thủ công
           </span>
           <span className="text-2xl font-black tabular-nums">1.2%</span>
         </div>
@@ -134,7 +134,7 @@ export function AgentActivityLog({ workspaceId, projectId }: AgentActivityLogPro
                   </span>
                 </div>
                 <span className="text-[9px] font-bold text-white/20 uppercase tabular-nums">
-                  {formatDistanceToNow(new Date(log.createdAt))} ago
+                  {formatDistanceToNow(new Date(log.createdAt), { addSuffix: true })}
                 </span>
               </div>
 
@@ -142,7 +142,7 @@ export function AgentActivityLog({ workspaceId, projectId }: AgentActivityLogPro
                 <div className="flex items-center gap-2 text-white/60 mb-1">
                   <AlertCircle size={12} className="text-indigo-400/60" />
                   <span className="text-[10px] font-black uppercase tracking-tighter italic">
-                    Reasoning Output
+                    Đầu ra suy luận
                   </span>
                 </div>
                 <p className="text-[11px] font-medium text-white/40 leading-relaxed italic border-l-2 border-indigo-500/20 pl-4 py-1">
@@ -160,7 +160,7 @@ export function AgentActivityLog({ workspaceId, projectId }: AgentActivityLogPro
                   </span>
                 </div>
                 <button className="flex items-center gap-2 text-[10px] font-black text-indigo-400/60 uppercase tracking-widest hover:text-indigo-400 transition-colors">
-                  View Mission <ChevronRight size={10} />
+                  Xem công việc <ChevronRight size={10} />
                 </button>
               </div>
             </div>
@@ -169,7 +169,7 @@ export function AgentActivityLog({ workspaceId, projectId }: AgentActivityLogPro
           <div className="h-60 flex flex-col items-center justify-center opacity-20 filter grayscale gap-4">
             <History size={48} className="text-white/10" />
             <span className="text-[11px] font-black text-white uppercase tracking-[0.5em]">
-              No Agent Activity Detected
+              Không có hoạt động Agent
             </span>
           </div>
         )}

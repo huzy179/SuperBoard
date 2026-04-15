@@ -9,6 +9,7 @@ import {
   RefreshCw,
   ShieldCheck,
   Target,
+  Layers,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -97,7 +98,7 @@ export function ExecutiveBriefingCard({ projectId }: ExecutiveBriefingCardProps)
                 {data.healthScore}%
               </span>
               <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">
-                Neural Health
+                Tình trạng dự án
               </span>
             </div>
           </div>
@@ -123,11 +124,11 @@ export function ExecutiveBriefingCard({ projectId }: ExecutiveBriefingCardProps)
               <div className="flex items-center gap-2">
                 <Sparkles size={14} className="text-indigo-400 animate-pulse" />
                 <h3 className="text-[10px] font-black text-white uppercase tracking-[0.4em]">
-                  Strategic Foresight
+                  Strategic Briefing
                 </h3>
               </div>
               <h4 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">
-                Executive Briefing
+                Báo cáo tổng quan
               </h4>
             </div>
             <button
@@ -145,10 +146,10 @@ export function ExecutiveBriefingCard({ projectId }: ExecutiveBriefingCardProps)
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8 pt-8 border-t border-white/5">
-            <Stat icon={<ShieldCheck size={14} />} label="Stability" value="High" />
-            <Stat icon={<Target size={14} />} label="Accuracy" value="92%" />
-            <Stat icon={<Activity size={14} />} label="Pace" value="Accelerating" />
-            <Stat icon={<Layers size={14} />} label="Integrity" value="Verified" />
+            <Stat icon={<ShieldCheck size={14} />} label="Ổn định" value="Cao" />
+            <Stat icon={<Target size={14} />} label="Độ chính xác" value="92%" />
+            <Stat icon={<Activity size={14} />} label="Tiến độ" value="Tăng tốc" />
+            <Stat icon={<Layers size={14} />} label="Toàn vẹn" value="Đã kiểm tra" />
           </div>
         </div>
       </div>
@@ -181,24 +182,5 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
       </div>
       <div className="text-[10px] font-black text-white uppercase">{value}</div>
     </div>
-  );
-}
-
-function Layers({ size }: { size: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polygon points="12 2 2 7 12 12 22 7 12 2" />
-      <polyline points="2 17 12 22 22 17" />
-      <polyline points="2 12 12 17 22 12" />
-    </svg>
   );
 }

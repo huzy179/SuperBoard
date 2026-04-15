@@ -115,12 +115,12 @@ export function ProjectCopilot({ projectId }: ProjectCopilotProps) {
           </div>
           <div>
             <h3 className="text-sm font-black text-white uppercase tracking-wider">
-              Project Copilot
+              Copilot dự án
             </h3>
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-glow-emerald" />
               <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest leading-none">
-                Context Aware Active
+                AI đang hoạt động
               </span>
             </div>
           </div>
@@ -162,7 +162,7 @@ export function ProjectCopilot({ projectId }: ProjectCopilotProps) {
                   <div className="flex items-center gap-2 mb-3 px-2 py-1 bg-white/5 rounded-lg w-fit">
                     <Sparkles size={12} className="text-brand-400" />
                     <span className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-400">
-                      Mission Briefing
+                      Tóm tắt dự án
                     </span>
                   </div>
                 )}
@@ -209,15 +209,15 @@ export function ProjectCopilot({ projectId }: ProjectCopilotProps) {
           <div className="flex items-center gap-2">
             <Zap size={10} className="text-brand-400" />
             <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">
-              Neural Engine v4
+              Engine AI v4
             </span>
           </div>
           <div className="flex items-center gap-3">
             <button className="text-[9px] font-bold text-white/30 hover:text-white uppercase tracking-widest transition-colors">
-              Clears History
+              Xóa lịch sử
             </button>
             <button className="text-[9px] font-bold text-white/30 hover:text-white uppercase tracking-widest transition-colors">
-              Settings
+              Cài đặt
             </button>
           </div>
         </div>

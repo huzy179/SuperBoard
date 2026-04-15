@@ -48,16 +48,16 @@ export function TaskFilterBar({
   workflow,
 }: TaskFilterBarProps) {
   return (
-    <div className="mb-4 rounded-xl border border-slate-200 bg-white p-3 shadow-xs">
+    <div className="mb-4 rounded-[1.5rem] border border-white/5 bg-slate-950/80 p-3 backdrop-blur-3xl shadow-glass">
       <div className="mb-2 flex items-center justify-between">
-        <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
+        <p className="text-[11px] font-semibold tracking-widest text-white/40 uppercase">
           Bộ lọc nhanh
         </p>
         {hasActiveFilters ? (
           <button
             type="button"
             onClick={onClearFilters}
-            className="rounded-md px-2 py-1 text-[11px] font-medium text-rose-600 hover:bg-rose-50"
+            className="rounded-md px-2 py-1 text-[11px] font-medium text-rose-400 hover:bg-rose-500/10"
           >
             Xoá bộ lọc
           </button>
@@ -70,14 +70,14 @@ export function TaskFilterBar({
           value={filterQuery}
           onChange={(event) => onFilterQueryChange(event.target.value)}
           placeholder="Tìm task..."
-          className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-xs text-slate-700 sm:w-56"
+          className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white placeholder:text-white/20 sm:w-56"
           aria-label="Tìm kiếm task"
         />
 
-        <div className="h-5 w-px bg-slate-200" />
+        <div className="h-5 w-px bg-white/5" />
 
-        <div className="flex flex-wrap items-center gap-1 rounded-lg bg-slate-50 px-2 py-1">
-          <span className="text-[11px] text-slate-500">Trạng thái</span>
+        <div className="flex flex-wrap items-center gap-1 rounded-lg bg-white/[0.02] px-2 py-1">
+          <span className="text-[11px] text-white/40">Trạng thái</span>
           {workflow?.statuses
             ? workflow.statuses.map((s) => (
                 <button
@@ -86,8 +86,8 @@ export function TaskFilterBar({
                   onClick={() => onToggleStatus(s.key)}
                   className={`rounded-md px-2 py-1 text-[11px] font-medium transition-colors ${
                     filterStatuses.has(s.key)
-                      ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-300'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-brand-500/10 text-brand-400 ring-1 ring-brand-500/30'
+                      : 'bg-slate-800 text-white/40 hover:bg-slate-700 hover:text-white'
                   }`}
                 >
                   {s.name}
@@ -100,8 +100,8 @@ export function TaskFilterBar({
                   onClick={() => onToggleStatus(column.key)}
                   className={`rounded-md px-2 py-1 text-[11px] font-medium transition-colors ${
                     filterStatuses.has(column.key)
-                      ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-300'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-brand-500/10 text-brand-400 ring-1 ring-brand-500/30'
+                      : 'bg-slate-800 text-white/40 hover:bg-slate-700 hover:text-white'
                   }`}
                 >
                   {column.label}
@@ -109,12 +109,12 @@ export function TaskFilterBar({
               ))}
         </div>
 
-        <div className="h-5 w-px bg-slate-200" />
+        <div className="h-5 w-px bg-white/5" />
 
         <select
           value={filterAssignee}
           onChange={(event) => onFilterAssigneeChange(event.target.value)}
-          className="rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-2 text-xs text-slate-700"
+          className="rounded-xl border border-white/10 bg-white/[0.03] px-2.5 py-2 text-xs text-white placeholder:text-white/20"
           aria-label="Lọc theo người thực hiện"
         >
           <option value="">Người thực hiện</option>
@@ -125,10 +125,10 @@ export function TaskFilterBar({
           ))}
         </select>
 
-        <div className="h-5 w-px bg-slate-200" />
+        <div className="h-5 w-px bg-white/5" />
 
-        <div className="flex flex-wrap items-center gap-1 rounded-lg bg-slate-50 px-2 py-1">
-          <span className="text-[11px] text-slate-500">Ưu tiên</span>
+        <div className="flex flex-wrap items-center gap-1 rounded-lg bg-white/[0.02] px-2 py-1">
+          <span className="text-[11px] text-white/40">Ưu tiên</span>
           {PRIORITY_OPTIONS.map((priority) => (
             <button
               key={priority.key}
@@ -136,8 +136,8 @@ export function TaskFilterBar({
               onClick={() => onTogglePriority(priority.key)}
               className={`rounded-md px-2 py-1 text-[11px] font-medium transition-colors ${
                 filterPriorities.has(priority.key)
-                  ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-300'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  ? 'bg-brand-500/10 text-brand-400 ring-1 ring-brand-500/30'
+                  : 'bg-slate-800 text-white/40 hover:bg-slate-700 hover:text-white'
               }`}
             >
               {priority.label}
@@ -145,10 +145,10 @@ export function TaskFilterBar({
           ))}
         </div>
 
-        <div className="h-5 w-px bg-slate-200" />
+        <div className="h-5 w-px bg-white/5" />
 
-        <div className="flex flex-wrap items-center gap-1 rounded-lg bg-slate-50 px-2 py-1">
-          <span className="text-[11px] text-slate-500">Loại</span>
+        <div className="flex flex-wrap items-center gap-1 rounded-lg bg-white/[0.02] px-2 py-1">
+          <span className="text-[11px] text-white/40">Loại</span>
           {TASK_TYPE_OPTIONS.map((taskType) => (
             <button
               key={taskType.key}
@@ -156,8 +156,8 @@ export function TaskFilterBar({
               onClick={() => onToggleType(taskType.key)}
               className={`rounded-md px-2 py-1 text-[11px] font-medium transition-colors ${
                 filterTypes.has(taskType.key)
-                  ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-300'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  ? 'bg-brand-500/10 text-brand-400 ring-1 ring-brand-500/30'
+                  : 'bg-slate-800 text-white/40 hover:bg-slate-700 hover:text-white'
               }`}
             >
               {taskType.label}
@@ -165,14 +165,14 @@ export function TaskFilterBar({
           ))}
         </div>
 
-        <div className="h-5 w-px bg-slate-200" />
+        <div className="h-5 w-px bg-white/5" />
 
-        <div className="flex flex-wrap items-center gap-1 rounded-lg bg-slate-50 px-2 py-1">
-          <span className="text-[11px] text-slate-500">Sắp xếp</span>
+        <div className="flex flex-wrap items-center gap-1 rounded-lg bg-white/[0.02] px-2 py-1">
+          <span className="text-[11px] text-white/40">Sắp xếp</span>
           <select
             value={sortBy}
             onChange={(event) => onSortByChange(event.target.value as TaskSortBy)}
-            className="rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-2 text-[11px] text-slate-700"
+            className="rounded-xl border border-white/10 bg-white/[0.03] px-2.5 py-2 text-[11px] text-white"
             aria-label="Sắp xếp theo"
           >
             <option value="">Mặc định</option>
@@ -185,7 +185,7 @@ export function TaskFilterBar({
             <button
               type="button"
               onClick={onToggleSortDir}
-              className="rounded-md bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-200"
+              className="rounded-md bg-slate-800 px-2 py-1 text-[11px] font-medium text-white/40 hover:bg-slate-700 hover:text-white"
               aria-label={sortDir === 'asc' ? 'Tăng dần' : 'Giảm dần'}
             >
               {sortDir === 'asc' ? '↑ Tăng' : '↓ Giảm'}
@@ -193,19 +193,19 @@ export function TaskFilterBar({
           ) : null}
         </div>
 
-        <div className="h-5 w-px bg-slate-200" />
+        <div className="h-5 w-px bg-white/5" />
 
         <button
           type="button"
           onClick={onToggleShowArchived}
           className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
             showArchived
-              ? 'border-amber-200 bg-amber-50 text-amber-700'
-              : 'border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100'
+              ? 'border-amber-500/30 bg-amber-500/10 text-amber-400'
+              : 'border-white/10 bg-white/[0.03] text-white/40 hover:bg-white/[0.06]'
           }`}
         >
           <div
-            className={`h-2 w-2 rounded-full ${showArchived ? 'bg-amber-500' : 'bg-slate-300'}`}
+            className={`h-2 w-2 rounded-full ${showArchived ? 'bg-amber-400' : 'bg-white/20'}`}
           />
           {showArchived ? 'Đang hiện mục lưu trữ' : 'Hiện mục lưu trữ'}
         </button>

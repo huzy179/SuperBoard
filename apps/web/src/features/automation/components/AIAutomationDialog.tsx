@@ -37,9 +37,9 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
       if (data) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setGeneratedRule(data as any);
-        toast.success('Neural Logic Synthesis Complete');
+        toast.success('Tổng hợp logic hoàn tất');
       } else {
-        toast.error('Synthesis Failed');
+        toast.error('Xử lý thất bại');
       }
     },
   });
@@ -49,7 +49,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
       apiPost(`/automation/rules?workspaceId=${workspaceId}`, data, { auth: true }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
-      toast.success('Protocol Activated');
+      toast.success('Giao thức đã kích hoạt');
       onClose();
     },
   });
@@ -91,12 +91,12 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
             </div>
             <div>
               <h3 className="font-black text-xl uppercase tracking-widest text-white">
-                Neural Logic Engine
+                Tổng hợp logic AI
               </h3>
               <div className="flex items-center gap-2">
                 <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shadow-glow-emerald" />
                 <p className="text-white/20 text-[9px] font-black uppercase tracking-[0.3em]">
-                  Synthesis_Module_Online // v2.4.0
+                  Module tổng hợp đang hoạt động // v2.4.0
                 </p>
               </div>
             </div>
@@ -115,7 +115,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
             <div className="flex items-center justify-between px-2">
               <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] flex items-center gap-3">
                 <Terminal size={14} className="text-brand-500" />
-                <span>Protocol_Definition_Stream</span>
+                <span>Luồng định nghĩa giao thức</span>
               </label>
               <div className="flex items-center gap-2">
                 <div className="h-1 w-8 bg-white/5 rounded-full overflow-hidden">
@@ -129,7 +129,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="DEFINE_OBJECTIVE_SEQUENCE..."
+                placeholder="MÔ TẢ QUY TẮC BẠN MUỐN..."
                 className="relative w-full px-8 py-8 bg-white/[0.02] border border-white/5 rounded-[2rem] focus:bg-white/[0.04] focus:border-brand-500/30 outline-none transition-all font-black text-lg text-white min-h-[160px] resize-none placeholder:text-white/5 tracking-tight"
               />
 
@@ -148,7 +148,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
                   ) : (
                     <Zap size={16} className={prompt.trim() ? 'animate-pulse' : ''} />
                   )}
-                  <span>{generateMutation.isPending ? 'Synthesizing...' : 'Run_Analysis'}</span>
+                  <span>{generateMutation.isPending ? 'Đang xử lý...' : 'Chạy phân tích'}</span>
                 </button>
               </div>
             </form>
@@ -160,7 +160,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
               <div className="flex items-center gap-4">
                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
                 <span className="text-[9px] font-black text-white/10 uppercase tracking-[0.5em]">
-                  Sequence_Visualization
+                  Luồng xử lý
                 </span>
                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
               </div>
@@ -178,14 +178,14 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
                       </div>
                       <div className="space-y-1">
                         <span className="text-[9px] font-black text-brand-500/60 uppercase tracking-widest">
-                          Initialization
+                          Khởi tạo
                         </span>
                         <p className="text-sm font-black text-white uppercase tracking-wider">
                           {generatedRule.trigger.type}
                         </p>
                       </div>
                       <div className="px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-[9px] font-black text-brand-400 uppercase tracking-widest">
-                        Trigger_Active
+                        Đã kích hoạt
                       </div>
                     </div>
                   </div>
@@ -210,14 +210,14 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
                       </div>
                       <div className="space-y-1">
                         <span className="text-[9px] font-black text-indigo-500/60 uppercase tracking-widest">
-                          Execution
+                          Thực thi
                         </span>
                         <p className="text-sm font-black text-white uppercase tracking-wider">
                           {generatedRule.actions[0]?.type || 'ACTION'}
                         </p>
                       </div>
                       <div className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[9px] font-black text-indigo-400 uppercase tracking-widest">
-                        Payload_Ready
+                        Sẵn sàng
                       </div>
                     </div>
                   </div>
@@ -231,7 +231,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
                   <div className="flex items-center gap-3">
                     <ShieldCheck size={16} className="text-brand-500" />
                     <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">
-                      Verified_Protocol_Blueprint
+                      Thiết kế đã xác minh
                     </span>
                   </div>
                   <span className="text-[12px] font-black text-white tracking-widest bg-brand-500/10 border border-brand-500/20 px-3 py-1 rounded-lg">
@@ -242,11 +242,11 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   <div className="space-y-4">
                     <span className="text-[9px] font-black text-white/10 uppercase tracking-widest">
-                      Technical_Definition
+                      Định nghĩa kỹ thuật
                     </span>
                     <p className="text-sm text-white/60 leading-relaxed font-medium italic">
-                      "Deploy automation rule '{generatedRule.name}' to monitor and respond to{' '}
-                      {generatedRule.trigger.type} events within the primary execution cluster."
+                      Triển khai quy tắc tự động '{generatedRule.name}' để giám sát và phản hồi các
+                      sự kiện {generatedRule.trigger.type} trong cụm thực thi chính.
                     </p>
                   </div>
                   <div className="bg-black/40 rounded-2xl p-6 border border-white/5 font-mono group-hover:border-brand-500/20 transition-colors">
@@ -260,7 +260,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
                         {
                           trigger: generatedRule.trigger.type,
                           action_count: generatedRule.actions.length,
-                          priority_level: 'ELITE',
+                          priority_level: 'TIÊU CHUẨN',
                         },
                         null,
                         2,
@@ -278,7 +278,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
           <div className="flex items-center gap-3 opacity-30">
             <AlertCircle size={16} className="text-amber-500" />
             <p className="text-[9px] font-black text-white uppercase tracking-widest">
-              Audit sequence before protocol activation
+              Kiểm tra chuỗi trước khi kích hoạt giao thức
             </p>
           </div>
           <div className="flex items-center gap-6">
@@ -286,7 +286,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
               onClick={onClose}
               className="font-black text-white/20 hover:text-white transition-all uppercase text-[10px] tracking-[0.2em]"
             >
-              Terminate
+              Hủy bỏ
             </button>
             <button
               onClick={handleSave}
@@ -302,7 +302,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
               ) : (
                 <>
                   <Check size={18} className="group-hover/btn:scale-125 transition-transform" />
-                  <span>Activate_Protocol</span>
+                  <span>Kích hoạt giao thức</span>
                 </>
               )}
             </button>

@@ -45,9 +45,6 @@ export function RichTextEditor({
   const [provider, setProvider] = useState<HocuspocusProvider | null>(null);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0, show: false });
   const [isAiProcessing, setIsAiProcessing] = useState(false);
-  const [coverImage, setCoverImage] = useState(
-    'https://images.unsplash.com/photo-1635776062127-d379bfcba9f8?auto=format&fit=crop&q=80&w=2000',
-  );
   const [icon, setIcon] = useState('📑');
   const [slashMenu, setSlashMenu] = useState({ show: false, top: 0, left: 0 });
   const menuRef = useRef<HTMLDivElement>(null);
@@ -91,9 +88,9 @@ export function RichTextEditor({
     try {
       const { result } = await processText(selectedText, mode);
       editor.chain().focus().insertContentAt({ from, to }, result).run();
-      toast.success('Neural Synthesis Complete');
+      toast.success('Đã xử lý xong');
     } catch {
-      toast.error('Synthesis Interrupted');
+      toast.error('Lỗi xử lý');
     } finally {
       setIsAiProcessing(false);
       setMenuPos((prev) => ({ ...prev, show: false }));
@@ -134,7 +131,7 @@ export function RichTextEditor({
         CollaborationCursor.configure({
           provider: provider,
           user: {
-            name: user?.fullName || 'Operative',
+            name: user?.fullName || 'Người dùng',
             color: user?.avatarColor || '#6366f1',
           },
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -200,19 +197,19 @@ export function RichTextEditor({
             <>
               <BubbleItem
                 icon={<Sparkles size={14} />}
-                label="Improve"
+                label="Cải thiện"
                 onClick={() => handleAiAction('improve')}
                 className="text-brand-400 hover:bg-brand-500/10"
               />
               <BubbleItem
                 icon={<Scissors size={14} />}
-                label="Shorten"
+                label="Rút gọn"
                 onClick={() => handleAiAction('shorten')}
                 className="text-amber-400 hover:bg-amber-500/10"
               />
               <BubbleItem
                 icon={<Type size={14} />}
-                label="Summarize"
+                label="Tóm tắt"
                 onClick={() => handleAiAction('summarize')}
                 className="text-emerald-400 hover:bg-emerald-500/10"
               />
@@ -228,24 +225,24 @@ export function RichTextEditor({
           style={{ top: `${slashMenu.top}px`, left: `${slashMenu.left}px` }}
         >
           <div className="px-4 py-3 text-[9px] font-black text-white/20 uppercase tracking-[0.3em] border-b border-white/5 mb-2">
-            AI_PROTOCOL_CMDS
+            LỆNH AI
           </div>
           <SlashMenuItem
             icon={<Sparkles size={14} className="text-brand-400" />}
-            title="Continue Writing"
-            desc="AI will complete the neural sequence"
+            title="Tiếp tục viết"
+            desc="AI sẽ hoàn thành đoạn văn"
             onClick={() => handleAiAction('improve')}
           />
           <SlashMenuItem
             icon={<Type size={14} className="text-emerald-400" />}
-            title="Extract Keywords"
-            desc="Isolate core intel points"
+            title="Trích xuất từ khóa"
+            desc="Lấy các ý chính"
             onClick={() => handleAiAction('summarize')}
           />
           <SlashMenuItem
             icon={<Scissors size={14} className="text-amber-400" />}
-            title="Protocol Condenser"
-            desc="Optimize data density"
+            title="Rút gọn nội dung"
+            desc="Tối ưu độ dài"
             onClick={() => handleAiAction('shorten')}
           />
         </div>
@@ -291,7 +288,7 @@ export function RichTextEditor({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-glow-emerald"></span>
             </div>
-            Neural_Bridge_Active
+            Kết nối AI đang hoạt động
           </div>
         </div>
       )}
@@ -301,33 +298,17 @@ export function RichTextEditor({
           {/* Notion-style Header */}
           <div className="relative group mb-20">
             {/* Cover Image */}
-            <div className="h-64 md:h-80 w-full rounded-[3rem] overflow-hidden relative border border-white/5 mb-[-5rem] shadow-glass group/cover">
-              <img
-                src={coverImage}
-                alt="Cover"
-                className="w-full h-full object-cover transition-transform duration-1000 group-hover/cover:scale-105 opacity-60"
-              />
+            <div className="h-64 md:h-80 w-full rounded-[3rem] overflow-hidden relative border border-white/5 mb-[-5rem] shadow-glass group/cover bg-gradient-to-br from-brand-500/20 via-slate-900/90 to-slate-950">
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
-              {editable && (
-                <button
-                  onClick={() =>
-                    setCoverImage(
-                      `https://images.unsplash.com/photo-${Math.floor(Math.random() * 10000)}?auto=format&fit=crop&q=80&w=2000`,
-                    )
-                  }
-                  className="absolute bottom-10 right-10 px-6 py-3 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white opacity-0 group-hover/cover:opacity-100 transition-all hover:bg-brand-500 hover:border-brand-500"
-                >
-                  Regenerate_Skin
-                </button>
-              )}
             </div>
 
             <div className="px-12 relative z-10 flex items-end gap-8">
               {/* Icon */}
               <div
                 onClick={() => {
-                  const icons = ['📑', '💾', '🛡️', '⚡', '📊', '🏛️', '🎯'];
-                  setIcon(icons[Math.floor(Math.random() * icons.length)] ?? '📑');
+                  const ICONS = ['📑', '💾', '🛡️', '⚡', '📊', '🏛️', '🎯'];
+                  const nextIcon = ICONS[(ICONS.indexOf(icon) + 1) % ICONS.length];
+                  setIcon(nextIcon);
                 }}
                 className="w-32 h-32 bg-slate-900 rounded-[2.5rem] shadow-glow-brand/5 flex items-center justify-center text-6xl border border-white/10 transform transition hover:scale-110 cursor-pointer active:scale-95 group/icon"
               >
@@ -337,7 +318,7 @@ export function RichTextEditor({
               <div className="mb-4">
                 <div className="flex items-center gap-2 text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
                   <Command size={12} />
-                  <span>Archive_Node</span>
+                  <span>Tài liệu</span>
                   <span>/</span>
                   <span className="text-brand-500/60 font-mono">ID_{docId?.substring(0, 8)}</span>
                 </div>

@@ -146,10 +146,10 @@ export function KnowledgeGraphView({
       {/* UI Overlay */}
       <div className="absolute top-10 left-10 z-20 space-y-2">
         <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">
-          Neural Knowledge Graph
+          Bản đồ kiến thức
         </h3>
         <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">
-          Project Semantic Map
+          Bản đồ dự án
         </p>
       </div>
 
@@ -226,9 +226,9 @@ export function KnowledgeGraphView({
 
       {/* Legend */}
       <div className="absolute bottom-10 left-10 z-20 flex gap-8">
-        <LegendItem icon={<Database size={12} />} label="Missions" color="text-indigo-400" />
-        <LegendItem icon={<FileText size={12} />} label="Intelligence" color="text-emerald-400" />
-        <LegendItem icon={<Users size={12} />} label="Operators" color="text-rose-400" />
+        <LegendItem icon={<Database size={12} />} label="Công việc" color="text-indigo-400" />
+        <LegendItem icon={<FileText size={12} />} label="Tri thức" color="text-emerald-400" />
+        <LegendItem icon={<Users size={12} />} label="Thành viên" color="text-rose-400" />
       </div>
     </div>
   );

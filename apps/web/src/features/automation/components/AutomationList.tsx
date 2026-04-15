@@ -26,7 +26,7 @@ export function AutomationList({ workspaceId, projectId }: AutomationListProps) 
       apiPut(`/automation/rules/${rule.id}`, { isActive: !rule.isActive }, { auth: true }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
-      toast.success('Protocol Status Synchronized');
+      toast.success('Đã cập nhật trạng thái');
     },
   });
 
@@ -34,7 +34,7 @@ export function AutomationList({ workspaceId, projectId }: AutomationListProps) 
     mutationFn: (id: string) => apiDelete(`/automation/rules/${id}`, { auth: true }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
-      toast.success('Sequence Purged');
+      toast.success('Đã xóa rule');
     },
   });
 
@@ -43,7 +43,7 @@ export function AutomationList({ workspaceId, projectId }: AutomationListProps) 
       <div className="p-20 flex flex-col items-center justify-center gap-4">
         <Activity className="h-8 w-8 text-brand-500/40 animate-pulse" />
         <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
-          Retrieving_Logic_Nodes...
+          Đang tải rule...
         </span>
       </div>
     );
@@ -54,7 +54,7 @@ export function AutomationList({ workspaceId, projectId }: AutomationListProps) 
         <div className="p-20 border-2 border-dashed border-white/5 rounded-[3rem] text-center bg-white/[0.01] group hover:border-brand-500/20 transition-all duration-700">
           <Sparkles className="mx-auto h-16 w-16 text-white/5 mb-6 group-hover:text-brand-500/20 group-hover:scale-110 transition-all" />
           <h3 className="text-xl font-black text-white uppercase tracking-tight">
-            Zero Automation Protocols
+            Không có automation nào
           </h3>
           <p className="text-[12px] text-white/20 mt-4 max-w-sm mx-auto font-medium leading-relaxed uppercase tracking-widest">
             Deploy AI Agents or synthesize manual rule-sets to optimize operational efficiency.
@@ -91,7 +91,7 @@ export function AutomationList({ workspaceId, projectId }: AutomationListProps) 
                 </div>
                 <div className="text-center space-y-1">
                   <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
-                    Trigger_Input
+                    Kích hoạt
                   </span>
                   <p className="text-[11px] font-black text-white uppercase tracking-wider">
                     {rule.trigger.type}
@@ -106,7 +106,7 @@ export function AutomationList({ workspaceId, projectId }: AutomationListProps) 
                   <div className="h-1 w-1 rounded-full bg-indigo-500 animate-pulse [animation-delay:0.2s]" />
                 </div>
                 <span className="text-[8px] font-black text-white uppercase tracking-[0.4em] font-mono">
-                  FLOW_BRIDGE_ACTIVE
+                  Luồng hoạt động
                 </span>
               </div>
 
@@ -119,7 +119,7 @@ export function AutomationList({ workspaceId, projectId }: AutomationListProps) 
                   </h4>
                 </div>
                 <p className="text-[12px] text-white/40 font-medium line-clamp-2 uppercase tracking-tight italic">
-                  {rule.description || 'System_Automated_Sequence_Active // Status_Stable'}
+                  {rule.description || 'Tự động hóa đang hoạt động'}
                 </p>
               </div>
 
@@ -136,7 +136,7 @@ export function AutomationList({ workspaceId, projectId }: AutomationListProps) 
                 </div>
                 <div className="text-center space-y-1">
                   <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
-                    Action_Payload
+                    Hành động
                   </span>
                   <p className="text-[11px] font-black text-white uppercase tracking-wider">
                     {actions[0]?.type || 'EXECUTE'}
@@ -161,7 +161,7 @@ export function AutomationList({ workspaceId, projectId }: AutomationListProps) 
                 <button
                   onClick={() => deleteMutation.mutate(rule.id)}
                   className="p-3 bg-white/5 text-white/20 hover:text-rose-500 border border-white/5 hover:border-rose-500/30 rounded-xl transition-all"
-                  title="Purge Protocol"
+                  title="Xóa rule"
                 >
                   <Trash size={16} />
                 </button>

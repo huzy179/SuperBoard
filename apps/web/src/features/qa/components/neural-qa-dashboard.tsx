@@ -81,15 +81,15 @@ export function NeuralQaDashboard() {
           </div>
           <div className="flex flex-col">
             <h1 className="text-4xl font-black text-white uppercase tracking-tighter italic">
-              Neural QA Center
+              Trung tâm QA
             </h1>
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
-                Autonomous Quality Engineering
+                Kiểm tra chất lượng tự động
               </span>
               <div className="h-1.5 w-1.5 bg-rose-500 rounded-full animate-ping" />
               <span className="text-[10px] font-bold text-rose-500/80 uppercase tracking-widest leading-none">
-                CORE_SENTRY_ACTIVE
+                HỆ THỐNG ĐANG HOẠT ĐỘNG
               </span>
             </div>
           </div>
@@ -98,7 +98,7 @@ export function NeuralQaDashboard() {
         <div className="flex items-center gap-4 px-6 py-4 rounded-3xl bg-white/5 border border-white/10 group">
           <Activity size={16} className="text-emerald-400 animate-pulse" />
           <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">
-            System Integrity: 98.4%
+            Tình trạng hệ thống: 98.4%
           </span>
         </div>
       </div>
@@ -108,10 +108,10 @@ export function NeuralQaDashboard() {
         <div className="space-y-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-[11px] font-black text-white/30 uppercase tracking-[0.3em]">
-              Live Incident Stream
+              Luồng sự cố trực tiếp
             </h3>
             <button className="text-[10px] font-bold text-rose-400 uppercase tracking-widest flex items-center gap-2 hover:text-rose-300 transition-colors">
-              Clear Buffer <Terminal size={12} />
+              Xóa bộ đệm <Terminal size={12} />
             </button>
           </div>
 
@@ -160,10 +160,10 @@ export function NeuralQaDashboard() {
                   </div>
                   <div>
                     <h3 className="text-xl font-black text-white uppercase italic tracking-tighter">
-                      AI Diagnosis
+                      Chẩn đoán AI
                     </h3>
                     <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-                      Neural Logic Scan
+                      Quét logic Neural
                     </p>
                   </div>
                 </div>
@@ -177,7 +177,7 @@ export function NeuralQaDashboard() {
                   ) : (
                     <Zap size={14} />
                   )}
-                  {isDiagnosing ? 'Scanning...' : 'Self-Heal'}
+                  {isDiagnosing ? 'Đang quét...' : 'Tự sửa'}
                 </button>
               </div>
 
@@ -197,7 +197,7 @@ export function NeuralQaDashboard() {
                   <div className="flex flex-col items-center justify-center h-40 gap-4">
                     <Code size={32} className="text-white/10" />
                     <span className="uppercase tracking-[0.3em] text-white/20">
-                      Awaiting Signal Acquisition...
+                      Chờ tín hiệu...
                     </span>
                   </div>
                 )}
@@ -208,7 +208,7 @@ export function NeuralQaDashboard() {
                   <div className="flex items-center gap-2 text-emerald-400 mb-2">
                     <CheckCircle2 size={14} />
                     <span className="text-[10px] font-black uppercase tracking-widest">
-                      Proposed Fix
+                      Đề xuất sửa lỗi
                     </span>
                   </div>
                   <p className="text-[10px] font-medium text-white/40 leading-relaxed italic">
@@ -222,7 +222,7 @@ export function NeuralQaDashboard() {
                     className="text-indigo-400 mb-2 group-hover:scale-110 transition-transform"
                   />
                   <span className="text-[10px] font-black text-white uppercase tracking-widest">
-                    Open in IDE
+                    Mở trong IDE
                   </span>
                 </div>
               </div>
@@ -231,7 +231,7 @@ export function NeuralQaDashboard() {
             <div className="h-full flex flex-col items-center justify-center opacity-20 filter grayscale">
               <ShieldAlert size={80} className="text-white/10 mb-6" />
               <span className="text-[11px] font-black text-white uppercase tracking-[0.5em]">
-                Command Idle
+                Chế độ chờ
               </span>
             </div>
           )}

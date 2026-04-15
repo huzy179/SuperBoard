@@ -94,9 +94,7 @@ export function AiPlannerModal({
               <h2 className="text-xl font-black text-white uppercase tracking-tight">
                 Strategic AI Planner
               </h2>
-              <p className="text-sm text-white/40">
-                Orchestrate mission goals into actionable task vectors
-              </p>
+              <p className="text-sm text-white/40">Tạo kế hoạch dự án với AI</p>
             </div>
           </div>
           <button
@@ -131,7 +129,7 @@ export function AiPlannerModal({
                   />
                   <div className="absolute bottom-4 right-4 flex items-center gap-2">
                     <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-                      Neural Mode Active
+                      Chế độ AI đang hoạt động
                     </span>
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   </div>
@@ -142,7 +140,7 @@ export function AiPlannerModal({
                   className="w-full bg-white text-slate-950 h-16 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
                 >
                   {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} />}
-                  <span>Begin Project Orchestration</span>
+                  <span>Tạo kế hoạch với AI</span>
                 </button>
               </div>
             </div>
@@ -151,7 +149,7 @@ export function AiPlannerModal({
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-1 block">
-                    Mission Strategy Generated
+                    Chiến lược đã được tạo
                   </span>
                   <h3 className="text-white font-bold text-xl">{goal}</h3>
                 </div>
@@ -159,7 +157,7 @@ export function AiPlannerModal({
                   onClick={() => setProposedPlan(null)}
                   className="text-xs font-bold text-white/30 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-2"
                 >
-                  <ArrowRight size={14} /> Redefine Goal
+                  <ArrowRight size={14} /> Định nghĩa lại mục tiêu
                 </button>
               </div>
 
@@ -228,14 +226,14 @@ export function AiPlannerModal({
             <div className="flex items-center gap-4">
               <div className="flex flex-col">
                 <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-                  Orchestrating
+                  Đang xử lý
                 </span>
                 <span className="text-white font-black">{selectedTasks.size} Tasks</span>
               </div>
               <div className="w-px h-8 bg-white/10" />
               <div className="flex flex-col">
                 <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-                  Total Weight
+                  Tổng độ phức tạp
                 </span>
                 <span className="text-white font-black">
                   {proposedPlan
@@ -250,7 +248,7 @@ export function AiPlannerModal({
                 onClick={onClose}
                 className="px-8 h-14 rounded-2xl text-[10px] font-black text-white/40 hover:text-white transition-all uppercase tracking-widest"
               >
-                Abort
+                Huỷ
               </button>
               <button
                 onClick={handleExecute}
@@ -258,7 +256,7 @@ export function AiPlannerModal({
                 className="px-8 h-14 rounded-2xl bg-indigo-500 text-white shadow-glow-brand font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50"
               >
                 {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Layers size={16} />}
-                <span>Execute Strategic Plan</span>
+                <span>Thực thi kế hoạch</span>
               </button>
             </div>
           </div>

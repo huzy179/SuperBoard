@@ -62,10 +62,10 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
           </div>
           <div className="space-y-1">
             <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
-              Strategic Symbiosis Console
+              Bảng điều khiển tích hợp
             </h2>
             <p className="text-sm font-bold text-white uppercase tracking-tight italic">
-              AI Workspace Proposals
+              Gợi ý workspace từ AI
             </p>
           </div>
         </div>
@@ -73,7 +73,7 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
         <div className="px-5 py-2.5 bg-white/5 border border-white/10 rounded-full flex items-center gap-2">
           <Activity size={14} className="text-brand-400" />
           <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">
-            {pendingCount} Proposals Pending
+            {pendingCount} chỉ đang chờ
           </span>
         </div>
       </div>
@@ -114,7 +114,7 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
                 <div className="flex items-center gap-6">
                   <div className="flex-1 p-5 bg-white/5 rounded-2xl border border-white/5 space-y-2">
                     <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">
-                      Source
+                      Nguồn
                     </span>
                     <p className="text-[11px] font-bold text-white truncate uppercase tracking-tight">
                       {proposal.metadata.sourceProjectName}
@@ -123,7 +123,7 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
                   <ArrowRight className="text-white/20" />
                   <div className="flex-1 p-5 bg-brand-500/5 rounded-2xl border border-brand-500/10 space-y-2">
                     <span className="text-[8px] font-black text-brand-400/40 uppercase tracking-widest">
-                      Target
+                      Đích
                     </span>
                     <p className="text-[11px] font-bold text-white truncate uppercase tracking-tight">
                       {proposal.metadata.targetProjectName}
@@ -133,7 +133,7 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
 
                 <div className="space-y-2">
                   <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
-                    Proposal Rationale
+                    Cơ sở đề xuất
                   </span>
                   <p className="text-sm font-bold text-white/60 italic leading-relaxed">
                     "{proposal.reason}"
@@ -152,13 +152,13 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
                       <div className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                     ) : (
                       <>
-                        <Fingerprint size={16} /> Apply Commander's Stamp
+                        <Fingerprint size={16} /> Áp dụng
                       </>
                     )}
                   </button>
                 ) : (
                   <div className="w-full py-5 text-center text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em]">
-                    Strategic Alignment Executed
+                    Đã áp dụng chiến lược
                   </div>
                 )}
               </div>
@@ -170,7 +170,7 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
           <div className="lg:col-span-2 py-40 flex flex-col items-center justify-center text-center space-y-4">
             <Box size={40} className="text-white/10" />
             <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-              Zero Strategic Proposals Active
+              Chưa có đề xuất nào
             </p>
           </div>
         )}

@@ -54,10 +54,10 @@ export function ExecutiveDirective({ workspaceId }: { workspaceId: string }) {
         </div>
         <div className="space-y-1">
           <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
-            Neural Executive
+            Chỉ thị AI
           </h2>
           <p className="text-sm font-bold text-white uppercase tracking-tight italic">
-            Global Directive Protocol
+            Giao thức chỉ thị toàn cục
           </p>
         </div>
       </div>
@@ -153,7 +153,7 @@ export function ExecutiveDirective({ workspaceId }: { workspaceId: string }) {
                 <div className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <Fingerprint size={18} /> Sign & Dispatch Directive
+                  <Fingerprint size={18} /> Ký & gửi chỉ thị
                 </>
               )}
             </button>
@@ -161,7 +161,7 @@ export function ExecutiveDirective({ workspaceId }: { workspaceId: string }) {
             <div className="flex items-center justify-center gap-3 py-6 text-emerald-400">
               <CheckCircle2 size={24} />
               <span className="text-[11px] font-black uppercase tracking-[0.4em]">
-                Directive Dispatched to Core OS
+                Chỉ thị đã được gửi
               </span>
             </div>
           )}

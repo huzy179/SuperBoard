@@ -49,7 +49,7 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
             disabled={isFetchingNextPage}
             className="px-6 py-2 rounded-full bg-white/[0.03] border border-white/10 text-[10px] font-black text-brand-400 uppercase tracking-widest hover:bg-white/[0.05] hover:text-white transition-all transition-colors"
           >
-            {isFetchingNextPage ? 'Retrieving Protocols...' : 'Fetch Previous Transmission'}
+            {isFetchingNextPage ? 'Đang tải...' : 'Tin nhắn cũ hơn'}
           </button>
         </div>
       )}
@@ -74,7 +74,7 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
                 {showHeader ? (
                   <div className="relative shrink-0">
                     <AssigneeAvatar
-                      name={message.author?.fullName || 'Operator'}
+                      name={message.author?.fullName || 'Thành viên'}
                       src={message.author?.avatarUrl}
                       size="md"
                     />
@@ -124,7 +124,7 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
                           size={10}
                           className="group-hover/reaction:scale-125 transition-transform"
                         />
-                        <span>OPERATOR_ACK</span>
+                        <span>Đã react</span>
                       </button>
                     </div>
 
@@ -136,13 +136,13 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
                         <button
                           onClick={() => onOpenThread?.(message)}
                           className="p-2.5 hover:bg-white/5 text-white/40 hover:text-brand-400 rounded-lg transition-all"
-                          title="Open Transmission Thread"
+                          title="Mở cuộc trò chuyện"
                         >
                           <Reply size={16} />
                         </button>
                         <button
                           className="p-2.5 hover:bg-white/5 text-white/40 hover:text-rose-400 rounded-lg transition-all"
-                          title="Signal Intensity"
+                          title="Cường độ tín hiệu"
                         >
                           <Zap size={16} />
                         </button>

@@ -154,10 +154,10 @@ export function TaskEditSlideOver({
     try {
       setShowAiMenu(false);
       const result = await decomposeMutation.mutateAsync(editingTask.id);
-      toast.info(`Neural Decomposition Complete: ${result.subtasks.length} sub-nodes suggested.`);
+      toast.info(`Đã phân tách: ${result.subtasks.length} công việc con được gợi ý.`);
       if (result.subtasks.length > 0 && result.subtasks[0]) setSubtaskTitle(result.subtasks[0]);
     } catch {
-      toast.error('Neural Decomposition Interrupted.');
+      toast.error('Phân tách thất bại.');
     }
   };
 
@@ -167,9 +167,9 @@ export function TaskEditSlideOver({
       const result = await refineMutation.mutateAsync(editingTask.id);
       setEditDescription(result.description);
       if (result.storyPoints) setEditStoryPoints(result.storyPoints.toString());
-      toast.success('Vector Refinement Successful.');
+      toast.success('Đã tối ưu nội dung.');
     } catch {
-      toast.error('Vector Refinement Failed.');
+      toast.error('Tối ưu thất bại.');
     }
   };
 
@@ -216,14 +216,14 @@ export function TaskEditSlideOver({
                     </div>
                   )}
                   <span className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-400">
-                    Mission Active
+                    Công việc đang mở
                   </span>
                 </div>
                 <h2
                   id="task-detail-title"
                   className="text-2xl font-black text-white tracking-tighter uppercase leading-none"
                 >
-                  Unit Specification
+                  Chi tiết công việc
                 </h2>
               </div>
             </div>
@@ -243,7 +243,7 @@ export function TaskEditSlideOver({
                     size={16}
                     className={isAiThinking ? 'animate-spin' : 'group-hover:animate-pulse'}
                   />
-                  <span>Intelligence Terminal</span>
+                  <span>Tùy chọn AI</span>
                   <ChevronDown
                     size={14}
                     className={`transition-transform duration-500 ${showAiMenu ? 'rotate-180' : ''}`}
@@ -254,7 +254,7 @@ export function TaskEditSlideOver({
                   <div className="absolute right-0 mt-4 w-72 bg-slate-900/95 border border-white/5 rounded-[2rem] shadow-glass backdrop-blur-3xl overflow-hidden py-3 z-50 animate-in fade-in zoom-in-95 duration-300">
                     <div className="px-5 py-2 mb-2">
                       <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">
-                        Protocol Selection
+                        Chọn chức năng
                       </span>
                     </div>
                     <button
@@ -266,10 +266,10 @@ export function TaskEditSlideOver({
                       </div>
                       <div className="flex-1 min-w-0">
                         <span className="text-xs font-black uppercase tracking-widest block">
-                          Neural Decompose
+                          Phân tách AI
                         </span>
                         <span className="text-[9px] text-white/20 font-medium uppercase tracking-tight truncate mt-0.5">
-                          Analyze & generate sub-nodes
+                          Phân tích &amp; tạo công việc con
                         </span>
                       </div>
                     </button>
@@ -282,10 +282,10 @@ export function TaskEditSlideOver({
                       </div>
                       <div className="flex-1 min-w-0">
                         <span className="text-xs font-black uppercase tracking-widest block">
-                          Refine Payload
+                          Tối ưu nội dung
                         </span>
                         <span className="text-[9px] text-white/20 font-medium uppercase tracking-tight truncate mt-0.5">
-                          Optimize description & sizing
+                          Tối ưu mô tả &amp; ước lượng
                         </span>
                       </div>
                     </button>
@@ -303,10 +303,10 @@ export function TaskEditSlideOver({
                       </div>
                       <div className="flex-1 min-w-0">
                         <span className="text-xs font-black uppercase tracking-widest block">
-                          Executive Brief
+                          Tóm tắt AI
                         </span>
                         <span className="text-[9px] text-white/20 font-medium uppercase tracking-tight truncate mt-0.5">
-                          Generate status intelligence
+                          Tạo tóm tắt tự động
                         </span>
                       </div>
                     </button>
@@ -330,7 +330,7 @@ export function TaskEditSlideOver({
             className="flex-1 overflow-y-auto elite-scrollbar custom-scrollbar"
           >
             <div className="px-10 py-12 space-y-16">
-              {/* Neural Health Forecast */}
+              {/* Dự đoán tiến độ */}
               {taskPrediction && (
                 <div
                   className={`relative group overflow-hidden rounded-[2.5rem] border p-8 shadow-glass animate-in slide-in-from-top-6 duration-700 ${
@@ -355,38 +355,37 @@ export function TaskEditSlideOver({
                           <h4
                             className={`text-[10px] font-black uppercase tracking-[0.4em] ${isAtRisk ? 'text-amber-500' : 'text-emerald-500'}`}
                           >
-                            Neural Health Forecast
+                            Dự đoán tiến độ
                           </h4>
                         </div>
                         <span className="text-[10px] font-black uppercase tracking-widest text-white/20">
-                          {Math.round(taskPrediction.confidence * 100)}% Confidence
+                          {Math.round(taskPrediction.confidence * 100)}% Độ tin cậy
                         </span>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                         <div className="space-y-1">
                           <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-                            Estimated Completion
+                            Dự kiến hoàn thành
                           </p>
                           <p className="text-xl font-black text-white uppercase tracking-tighter">
                             {formatDate(taskPrediction.estimatedCompletionDate)}
                           </p>
                           {isAtRisk && (
                             <p className="text-[10px] font-bold text-amber-500/60 uppercase tracking-tight italic">
-                              ⚠️ Projected to exceed due date (
-                              {formatDate(editingTask.dueDate || '')})
+                              ⚠️ Dự kiến trễ hạn ({formatDate(editingTask.dueDate || '')})
                             </p>
                           )}
                         </div>
                         <div className="space-y-1">
                           <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-                            Risk Assessment
+                            Đánh giá rủi ro
                           </p>
                           <div className="flex items-center gap-3">
                             <span
                               className={`text-xl font-black uppercase tracking-tighter ${isAtRisk ? 'text-amber-500' : 'text-emerald-400'}`}
                             >
-                              {isAtRisk ? 'High Delay Risk' : 'Healthy Vector'}
+                              {isAtRisk ? 'Nguy cơ trễ' : 'Đúng tiến độ'}
                             </span>
                           </div>
                         </div>
@@ -395,12 +394,10 @@ export function TaskEditSlideOver({
                       {isAtRisk && (
                         <div className="mt-4 pt-4 border-t border-white/5 space-y-3">
                           <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">
-                            AI Workload Redistribution Suggestion
+                            Gợi ý chuyển công việc
                           </p>
                           <div className="flex items-center gap-3">
-                            <span className="text-xs font-bold text-white/80">
-                              Redistribute to:
-                            </span>
+                            <span className="text-xs font-bold text-white/80">Chuyển cho:</span>
                             <div className="flex gap-2">
                               {/* Filter members with low current workload in a real impl */}
                               {members.slice(0, 2).map((m) => (
@@ -410,7 +407,7 @@ export function TaskEditSlideOver({
                                   onClick={() => setEditAssigneeId(m.id)}
                                   className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black text-white/40 uppercase hover:bg-brand-500 hover:text-white transition-all"
                                 >
-                                  {m.fullName.split(' ')[0]} (Low workload)
+                                  {m.fullName.split(' ')[0]} (ít việc)
                                 </button>
                               ))}
                             </div>
@@ -423,7 +420,17 @@ export function TaskEditSlideOver({
               )}
 
               {/* Proactive Intelligence Alerts */}
-              {intelligence?.duplicates && intelligence.duplicates.length > 0 && (
+              {intelligence === undefined ? (
+                <div className="animate-pulse rounded-[2.5rem] bg-white/[0.02] border border-white/5 p-8">
+                  <div className="flex items-start gap-6">
+                    <div className="w-14 h-14 rounded-2xl bg-white/[0.03]" />
+                    <div className="flex-1 space-y-3 pt-2">
+                      <div className="h-4 bg-white/[0.03] rounded-lg w-1/4" />
+                      <div className="h-4 bg-white/[0.03] rounded-lg w-3/4" />
+                    </div>
+                  </div>
+                </div>
+              ) : intelligence.duplicates && intelligence.duplicates.length > 0 ? (
                 <div className="relative group overflow-hidden rounded-[2.5rem] border border-amber-500/20 bg-amber-500/[0.02] p-8 shadow-glow-amber animate-in slide-in-from-top-6 duration-700">
                   <div className="flex items-start gap-6">
                     <div className="p-4 bg-amber-500/10 rounded-2xl text-amber-500 border border-amber-500/20 shadow-glow-amber">
@@ -432,13 +439,13 @@ export function TaskEditSlideOver({
                     <div className="space-y-3 flex-1">
                       <div className="flex items-center gap-3">
                         <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-500">
-                          Semantic Duplicate Warning
+                          Công việc trùng lặp
                         </h4>
                         <div className="h-px flex-1 bg-gradient-to-r from-amber-500/20 to-transparent" />
                       </div>
                       <p className="text-sm text-white/90 leading-relaxed font-bold italic tracking-tight">
-                        Detecting {intelligence.duplicates.length} potentially redundant units in
-                        current workspace.
+                        Detecting {intelligence.duplicates.length} công việc trùng lặp tiềm năng
+                        trong workspace.
                       </p>
                       <div className="flex flex-col gap-2 mt-4">
                         {intelligence.duplicates.map((dup) => (
@@ -455,7 +462,7 @@ export function TaskEditSlideOver({
                               {dup.title}
                             </span>
                             <span className="text-[10px] font-mono text-amber-500/50">
-                              {Math.round(dup.score * 100)}% MATCH
+                              {Math.round(dup.score * 100)}% trùng
                             </span>
                           </button>
                         ))}
@@ -463,10 +470,21 @@ export function TaskEditSlideOver({
                     </div>
                   </div>
                 </div>
-              )}
+              ) : null}
 
               {/* Neural Prediction Insights */}
-              {intelligence?.suggestions && (
+              {intelligence === undefined ? (
+                <div className="animate-pulse rounded-[2.5rem] bg-white/[0.02] border border-white/5 p-8">
+                  <div className="flex items-start gap-6">
+                    <div className="w-14 h-14 rounded-2xl bg-white/[0.03]" />
+                    <div className="flex-1 space-y-3 pt-2">
+                      <div className="h-4 bg-white/[0.03] rounded-lg w-1/3" />
+                      <div className="h-4 bg-white/[0.03] rounded-lg w-1/2" />
+                      <div className="h-4 bg-white/[0.03] rounded-lg w-2/3" />
+                    </div>
+                  </div>
+                </div>
+              ) : intelligence.suggestions ? (
                 <div className="relative group overflow-hidden rounded-[2.5rem] border border-cyan-500/20 bg-cyan-500/[0.02] p-8 shadow-glow-cyan animate-in slide-in-from-top-6 duration-700">
                   <div className="flex items-start gap-6">
                     <div className="p-4 bg-cyan-500/10 rounded-2xl text-cyan-400 border border-cyan-500/20 shadow-glow-cyan">
@@ -475,7 +493,7 @@ export function TaskEditSlideOver({
                     <div className="space-y-4 flex-1">
                       <div className="flex items-center gap-3">
                         <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400">
-                          Neural Triage Suggestions
+                          Gợi ý AI
                         </h4>
                         <div className="h-px flex-1 bg-gradient-to-r from-cyan-500/20 to-transparent" />
                       </div>
@@ -490,7 +508,7 @@ export function TaskEditSlideOver({
                               }
                               className="px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-black uppercase tracking-widest hover:bg-cyan-500 hover:text-white transition-all shadow-glow-cyan/10"
                             >
-                              Suggested Priority: {intelligence.suggestions.priority}
+                              Ưu tiên gợi ý: {intelligence.suggestions.priority}
                             </button>
                           )}
 
@@ -511,10 +529,10 @@ export function TaskEditSlideOver({
                     </div>
                   </div>
                 </div>
-              )}
+              ) : null}
 
               {/* Intelligent Analytical Briefing */}
-              {aiAnalysis && (
+              {aiAnalysis ? (
                 <div className="relative group overflow-hidden rounded-[2.5rem] border border-brand-500/20 bg-brand-500/[0.02] p-8 shadow-glow-brand animate-in slide-in-from-top-6 duration-700">
                   <div className="absolute top-6 right-6">
                     <button
@@ -531,7 +549,7 @@ export function TaskEditSlideOver({
                     <div className="space-y-3 flex-1">
                       <div className="flex items-center gap-3">
                         <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-400">
-                          Intelligent Briefing
+                          Tóm tắt AI
                         </h4>
                         <div className="h-px flex-1 bg-gradient-to-r from-brand-500/20 to-transparent" />
                       </div>
@@ -542,7 +560,18 @@ export function TaskEditSlideOver({
                   </div>
                   <div className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-transparent via-brand-500/30 to-transparent w-full" />
                 </div>
-              )}
+              ) : summarizeMutation.isPending ? (
+                <div className="animate-pulse rounded-[2.5rem] bg-white/[0.02] border border-white/5 p-8">
+                  <div className="flex items-start gap-6">
+                    <div className="w-14 h-14 rounded-2xl bg-white/[0.03]" />
+                    <div className="flex-1 space-y-3 pt-2">
+                      <div className="h-4 bg-white/[0.03] rounded-lg w-1/3" />
+                      <div className="h-4 bg-white/[0.03] rounded-lg w-2/3" />
+                      <div className="h-4 bg-white/[0.03] rounded-lg w-1/2" />
+                    </div>
+                  </div>
+                </div>
+              ) : null}
 
               <section className="space-y-16">
                 <TaskPropertiesForm
@@ -572,7 +601,7 @@ export function TaskEditSlideOver({
                   <div className="flex items-center gap-4 px-2">
                     <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white/5" />
                     <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
-                      Directives & Logic
+                      Chỉ dẫn & Logic
                     </label>
                     <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/5" />
                   </div>
@@ -582,7 +611,7 @@ export function TaskEditSlideOver({
                       onChange={(e) => setEditDescription(e.target.value)}
                       rows={8}
                       className="w-full rounded-[2.5rem] border border-white/5 bg-white/[0.01] px-8 py-8 text-sm font-bold text-white focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.02] transition-all placeholder:text-white/5 shadow-inner elite-scrollbar"
-                      placeholder="ESTABLISH_MISSION_PARAMETERS..."
+                      placeholder="Mô tả công việc..."
                     />
                     <div className="absolute bottom-8 right-8 flex items-center gap-2">
                       <span className="text-[9px] font-black text-white/5 uppercase tracking-[0.2em]">
@@ -619,7 +648,7 @@ export function TaskEditSlideOver({
               <div className="border-t border-white/5 pt-16">
                 <div className="flex items-center gap-4 px-2 mb-10">
                   <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
-                    Signal Logs
+                    Bình luận
                   </label>
                   <div className="h-px flex-1 bg-gradient-to-r from-white/5 to-transparent" />
                 </div>
@@ -635,14 +664,14 @@ export function TaskEditSlideOver({
                 <div className="flex items-center gap-3">
                   <History size={14} className="text-brand-500" />
                   <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">
-                    Established: {formatDate(editingTask.createdAt)}
+                    Tạo lúc: {formatDate(editingTask.createdAt)}
                   </span>
                 </div>
                 <div className="h-4 w-px bg-white/5" />
                 <div className="flex items-center gap-3">
                   <Zap size={14} className="text-cyan-500" />
                   <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">
-                    Last Synced: {formatDate(editingTask.updatedAt)}
+                    Cập nhật lúc: {formatDate(editingTask.updatedAt)}
                   </span>
                 </div>
               </div>
@@ -654,7 +683,7 @@ export function TaskEditSlideOver({
                   <div className="w-8 h-8 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0">
                     <Terminal size={14} />
                   </div>
-                  <span>PROTOCOL_SYNC_HEADER_ERROR: {taskUpdateError}</span>
+                  <span>Lỗi lưu: {taskUpdateError}</span>
                 </div>
               </div>
             )}
@@ -671,7 +700,7 @@ export function TaskEditSlideOver({
               >
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                 <span className="relative z-10 flex items-center gap-3">
-                  <Archive size={16} /> Restore Vector
+                  <Archive size={16} /> Khôi phục
                 </span>
               </button>
             ) : (
@@ -682,7 +711,7 @@ export function TaskEditSlideOver({
                 className="group px-8 py-4 bg-transparent border border-rose-500/20 text-rose-500/40 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all disabled:opacity-30 flex items-center gap-3"
               >
                 <Archive size={16} className="group-hover:animate-bounce" />
-                <span>Archive Manifest</span>
+                <span>Xóa công việc</span>
               </button>
             )}
 
@@ -692,7 +721,7 @@ export function TaskEditSlideOver({
                 onClick={onClose}
                 className="px-8 py-4 border border-white/5 text-white/20 font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl hover:bg-white/5 hover:text-white transition-all"
               >
-                Abort Protocol
+                Hủy bỏ
               </button>
               <button
                 type="submit"
@@ -707,7 +736,7 @@ export function TaskEditSlideOver({
                   ) : (
                     <ShieldCheck className="size-4" />
                   )}
-                  {isSaving ? 'Synchronizing...' : 'Commit Specification'}
+                  {isSaving ? 'Đang lưu...' : 'Lưu thay đổi'}
                 </span>
               </button>
             </div>

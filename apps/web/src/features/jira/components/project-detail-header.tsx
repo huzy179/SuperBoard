@@ -60,10 +60,10 @@ export function ProjectDetailHeader({
   const visibleMemberAvatars = project.members.slice(0, 5);
 
   const navItems = [
-    { id: 'board', label: 'Tactical Board', icon: <LayoutGrid size={14} />, mode: 'board' },
-    { id: 'list', label: 'Mission List', icon: <List size={14} />, mode: 'list' },
-    { id: 'calendar', label: 'Chronos', icon: <CalendarIcon size={14} />, mode: 'calendar' },
-    { id: 'insights', label: 'Strategic Insights', icon: <Sparkles size={14} />, mode: 'insights' },
+    { id: 'board', label: 'Bảng công việc', icon: <LayoutGrid size={14} />, mode: 'board' },
+    { id: 'list', label: 'Danh sách', icon: <List size={14} />, mode: 'list' },
+    { id: 'calendar', label: 'Lịch', icon: <CalendarIcon size={14} />, mode: 'calendar' },
+    { id: 'insights', label: 'Phân tích', icon: <Sparkles size={14} />, mode: 'insights' },
   ];
 
   return (
@@ -75,7 +75,7 @@ export function ProjectDetailHeader({
           className="flex items-center gap-3 text-[10px] uppercase font-black tracking-[0.4em] text-white/30"
         >
           <a href="/jira" className="transition-colors hover:text-brand-400">
-            Project Nodes
+            Dự án
           </a>
           <span className="text-white/10 opacity-50">/</span>
           <span className="text-white/20">{project.name}</span>
@@ -114,7 +114,7 @@ export function ProjectDetailHeader({
                 {projectKey && (
                   <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-xl border border-white/10 shadow-luxe transition-all hover:bg-white/10">
                     <span className="font-mono text-[10px] font-black uppercase tracking-widest text-brand-400">
-                      NODE_ID: {projectKey}
+                      {projectKey}
                     </span>
                   </div>
                 )}
@@ -122,7 +122,7 @@ export function ProjectDetailHeader({
                 <Link
                   href={`/jira/projects/${project.id}/settings/workflow`}
                   className="p-3 bg-white/5 rounded-[1.25rem] text-white/20 hover:text-brand-400 hover:bg-white/10 transition-all hover:rotate-180 border border-white/5"
-                  title="Neural Workflow Architect"
+                  title="Thiết kế quy trình"
                 >
                   <Settings2 size={18} />
                 </Link>
@@ -130,19 +130,18 @@ export function ProjectDetailHeader({
                 <div className="group/intel relative flex items-center gap-2 px-4 py-2 bg-brand-500/5 rounded-2xl border border-brand-500/20 text-brand-400 cursor-pointer hover:bg-brand-500/10 transition-all active:scale-95">
                   <Brain size={16} className="animate-pulse" />
                   <span className="text-[10px] font-black uppercase tracking-[0.2em]">
-                    Intelligence Pulse
+                    Tình trạng dự án
                   </span>
                   <div className="absolute top-12 left-0 w-64 p-4 bg-slate-900 border border-white/10 rounded-2xl shadow-glass opacity-0 group-hover/intel:opacity-100 translate-y-2 group-hover/intel:translate-y-0 transition-all pointer-events-none z-50">
                     <p className="text-[9px] font-bold text-white/50 leading-relaxed italic">
-                      Project health is tracking at optimal levels. Resource allocation efficiency:
-                      94%.
+                      Tình trạng dự án đang ở mức tối ưu. Hiệu quả phân bổ nguồn lực: 94%.
                     </p>
                   </div>
                 </div>
               </div>
 
               <p className="max-w-3xl text-sm font-medium leading-relaxed text-white/40 mb-2 italic">
-                "{project.description || 'Manifest objectives pending definition...'}"
+                "{project.description || 'Mô tả dự án...'}"
               </p>
             </div>
 
@@ -171,15 +170,15 @@ export function ProjectDetailHeader({
               <div className="flex items-center gap-8">
                 <div className="flex flex-col">
                   <div className="flex items-center gap-1.5 text-[9px] font-black text-white/20 uppercase tracking-widest leading-none mb-1.5">
-                    <History size={10} /> Sync Status
+                    <History size={10} /> Cập nhật gần nhất
                   </div>
                   <span className="text-[11px] font-black text-white uppercase tracking-wider">
-                    MODIFIED {formatDate(project.updatedAt)}
+                    Cập nhật {formatDate(project.updatedAt)}
                   </span>
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-1.5 text-[9px] font-black text-white/20 uppercase tracking-widest leading-none mb-1.5">
-                    <Activity size={10} /> Active Operatives
+                    <Activity size={10} /> Thành viên đang hoạt động
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-1.5 w-1.5">
@@ -187,7 +186,7 @@ export function ProjectDetailHeader({
                       <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
                     </span>
                     <span className="text-[11px] font-black text-emerald-400 uppercase tracking-wider">
-                      {viewerCount} Live Status
+                      {viewerCount} Đang theo dõi
                     </span>
                   </div>
                 </div>
@@ -204,7 +203,7 @@ export function ProjectDetailHeader({
               >
                 <div className="absolute inset-0 bg-brand-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                 <span className="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors">
-                  <Plus size={14} /> Initialize Mission
+                  <Plus size={14} /> Tạo công việc
                 </span>
               </button>
 
@@ -214,7 +213,7 @@ export function ProjectDetailHeader({
                 className="group relative flex items-center gap-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 px-6 py-3 text-[10px] font-black uppercase tracking-widest text-indigo-400 transition-all hover:bg-indigo-500 hover:text-white active:scale-95 shadow-glow-brand"
               >
                 <Sparkles size={14} className="animate-pulse" />
-                <span>Plan with AI</span>
+                <span>Lên kế hoạch với AI</span>
               </button>
 
               <button
@@ -222,7 +221,7 @@ export function ProjectDetailHeader({
                 className="flex items-center gap-2 rounded-xl bg-white/5 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-brand-500 hover:shadow-glow-brand"
               >
                 <Mic size={16} />
-                <span>Mission Briefing</span>
+                <span>Tóm tắt nhanh</span>
               </button>
 
               <div className="h-8 w-px bg-white/10" />
@@ -255,7 +254,7 @@ export function ProjectDetailHeader({
                   }`}
                 >
                   <BarChart3 size={14} />
-                  <span>Intelligence</span>
+                  <span>Báo cáo</span>
                 </Link>
               </div>
 
@@ -266,7 +265,7 @@ export function ProjectDetailHeader({
                   type="button"
                   onClick={onOpenAutomation}
                   className="p-3 rounded-full transition-all border bg-white/5 text-white/20 border-white/5 hover:text-white hover:bg-white/10"
-                  title="Automation Gateway"
+                  title="Tự động hóa"
                 >
                   <Zap size={16} />
                 </button>
@@ -275,7 +274,7 @@ export function ProjectDetailHeader({
                   type="button"
                   onClick={onOpenGraph}
                   className="p-3 rounded-full transition-all border bg-white/5 text-white/20 border-white/5 hover:text-brand-400 hover:bg-brand-500/10 hover:border-brand-500/20 shadow-glow-brand"
-                  title="Neural Knowledge Map"
+                  title="Bản đồ kiến thức"
                 >
                   <Activity size={16} />
                 </button>
@@ -288,16 +287,11 @@ export function ProjectDetailHeader({
                       ? 'bg-emerald-500/20 text-emerald-500 border-emerald-500/30'
                       : 'bg-white/5 text-white/20 border-white/5 hover:text-white hover:bg-white/10'
                   }`}
-                  title="Synchronize Neural Link"
+                  title="Sao chép liên kết"
                 >
                   <Share2 size={16} />
                 </button>
               </div>
-            </div>
-            <div className="mr-6">
-              <span className="text-[8px] font-black text-white/10 uppercase tracking-[0.5em]">
-                Command Protocol V4.2
-              </span>
             </div>
           </div>
         </div>

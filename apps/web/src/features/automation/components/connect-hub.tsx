@@ -4,12 +4,11 @@ import { useState, useEffect } from 'react';
 import {
   Share2,
   Plus,
-  Terminal,
   Trash2,
   ExternalLink,
-  Zap,
   Globe,
   MessageCircle,
+  Construction,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -79,16 +78,14 @@ export function ConnectHub({ workspaceId }: { workspaceId: string }) {
           </div>
           <div>
             <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter italic">
-              SuperBoard Connect
+              SuperBoard Kết nối
             </h2>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
-                Ecosystem Expansion Interface
+                Giao diện kết nối dịch vụ
               </span>
               <div className="h-1 w-1 bg-indigo-500 rounded-full animate-pulse" />
-              <span className="text-[9px] font-bold text-indigo-400/60 uppercase">
-                Node_Connected_Secure
-              </span>
+              <span className="text-[9px] font-bold text-indigo-400/60 uppercase">Đã kết nối</span>
             </div>
           </div>
         </div>
@@ -98,13 +95,13 @@ export function ConnectHub({ workspaceId }: { workspaceId: string }) {
             onClick={() => setActiveTab('connections')}
             className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'connections' ? 'bg-white/10 text-white border border-white/10' : 'text-white/40 hover:text-white'}`}
           >
-            Connections
+            Kết nối
           </button>
           <button
             onClick={() => setActiveTab('monitor')}
             className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'monitor' ? 'bg-white/10 text-white border border-white/10' : 'text-white/40 hover:text-white'}`}
           >
-            Neural Monitor
+            Giám sát
           </button>
         </div>
       </div>
@@ -118,10 +115,10 @@ export function ConnectHub({ workspaceId }: { workspaceId: string }) {
             </div>
             <div>
               <span className="text-sm font-black text-white uppercase tracking-tighter">
-                Register Node
+                Thêm kết nối
               </span>
               <p className="text-[10px] font-medium text-white/20 uppercase tracking-widest mt-1 leading-relaxed">
-                Connect a new service to the workspace ecosystem
+                Kết nối dịch vụ mới vào workspace
               </p>
             </div>
           </div>
@@ -159,7 +156,7 @@ export function ConnectHub({ workspaceId }: { workspaceId: string }) {
 
               <div className="flex items-center justify-between mt-4">
                 <button className="flex items-center gap-2 text-[10px] font-black text-white/40 uppercase tracking-widest hover:text-white transition-colors">
-                  Configure <ExternalLink size={12} />
+                  Cấu hình <ExternalLink size={12} />
                 </button>
                 <button
                   onClick={() => deleteIntegration(integration.id)}
@@ -172,89 +169,18 @@ export function ConnectHub({ workspaceId }: { workspaceId: string }) {
           ))}
         </div>
       ) : (
-        /* Neural Monitor */
-        <div className="flex-1 flex flex-col gap-8">
-          <div className="grid grid-cols-4 gap-6">
-            <div className="p-6 rounded-[2rem] bg-white/5 border border-white/5 flex flex-col gap-2">
-              <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
-                Global Throughput
-              </span>
-              <span className="text-2xl font-black text-white tabular-nums italic">420 pk/s</span>
-            </div>
-            <div className="p-6 rounded-[2rem] bg-white/5 border border-white/5 flex flex-col gap-2">
-              <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
-                Neural Latency
-              </span>
-              <span className="text-2xl font-black text-emerald-400 tabular-nums italic">14ms</span>
-            </div>
-            <div className="p-6 rounded-[2rem] bg-white/5 border border-white/5 flex flex-col gap-2">
-              <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
-                Signals Processed
-              </span>
-              <span className="text-2xl font-black text-white tabular-nums italic">1.2k</span>
-            </div>
-            <div className="p-6 rounded-[2rem] bg-indigo-500/10 border border-indigo-500/20 flex flex-col gap-2 shadow-glow-indigo">
-              <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest italic">
-                Simulation Mode
-              </span>
-              <span className="text-2xl font-black text-white tabular-nums italic uppercase">
-                Engaged
-              </span>
-            </div>
+        /* Neural Monitor / Giám sát — empty state */
+        <div className="flex-1 flex flex-col items-center justify-center gap-6 p-20">
+          <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/20">
+            <Construction size={40} />
           </div>
-
-          <div className="flex-1 rounded-[2.5rem] bg-black/60 border border-white/10 p-10 font-mono relative overflow-hidden flex flex-col">
-            <div className="absolute top-4 right-4 flex gap-2">
-              <div className="w-3 h-3 rounded-full bg-rose-500/20" />
-              <div className="w-3 h-3 rounded-full bg-amber-500/20" />
-              <div className="w-3 h-3 rounded-full bg-emerald-500/20" />
-            </div>
-
-            <div className="flex items-center gap-3 mb-8 text-white/20 border-b border-white/5 pb-6">
-              <Terminal size={18} />
-              <span className="text-[11px] font-bold uppercase tracking-widest">
-                SuperBoard Neural Terminal v1.0.4
-              </span>
-            </div>
-
-            <div className="flex-1 space-y-4 overflow-auto scrollbar-hide">
-              <div className="flex gap-4">
-                <span className="text-indigo-400/60 font-black">[14:32:11]</span>
-                <span className="text-white/40 italic">
-                  CORE_INIT: Connecting to Neural Agency...
-                </span>
-              </div>
-              <div className="flex gap-4">
-                <span className="text-emerald-400/60 font-black text-[9px] mt-1 italic uppercase tracking-tighter shadow-glow-emerald">
-                  Success
-                </span>
-                <span className="text-white/80">
-                  Signal handshake complete with provider: SLACK_NODE_01
-                </span>
-              </div>
-              <div className="flex gap-4">
-                <span className="text-indigo-400/60 font-black">[14:34:02]</span>
-                <span className="text-white/40 italic">
-                  INBOUND: GitHub webhook hit /hooks/github
-                </span>
-              </div>
-              <div className="flex gap-4 ml-6 border-l border-white/10 pl-6">
-                <Zap size={14} className="text-amber-400 mt-1" />
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-bold text-white/60 uppercase tracking-tighter italic">
-                    Interpreting Logic...
-                  </span>
-                  <p className="text-[11px] text-white/40 leading-relaxed italic">
-                    "AI Synthesis: commit 'feat: project-digital-twin' correlates to Mission Pulse.
-                    Increasing velocity index by 1.2%."
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-4 animate-pulse">
-                <div className="w-1.5 h-4 bg-indigo-500" />
-                <span className="text-white/20 italic">Awaiting tactical signals...</span>
-              </div>
-            </div>
+          <div className="text-center">
+            <h3 className="text-white font-black text-xl uppercase tracking-widest mb-2">
+              Tính năng đang phát triển
+            </h3>
+            <p className="text-white/30 text-sm font-medium">
+              Chức năng giám sát sẽ sớm được cập nhật
+            </p>
           </div>
         </div>
       )}

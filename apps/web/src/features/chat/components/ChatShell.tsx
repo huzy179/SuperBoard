@@ -4,7 +4,7 @@ import { MessageInput } from './MessageInput';
 import { ThreadPanel } from './ThreadPanel';
 import { ChannelSidebar } from './ChannelSidebar';
 import { chatSocket } from '@/lib/realtime/chat-socket';
-import { Hash, Lock, Users, Search, MoreVertical, Terminal } from 'lucide-react';
+import { Hash, Lock, Users, Search, MoreVertical } from 'lucide-react';
 import type { Channel, Message } from '@superboard/shared';
 
 interface ChatShellProps {
@@ -114,7 +114,7 @@ export function ChatShell({ channel }: ChatShellProps) {
                     <div className="h-1 w-1 rounded-full bg-brand-500 animate-bounce [animation-delay:0.4s]" />
                   </div>
                   <span className="text-[9px] font-black text-brand-400/60 uppercase tracking-widest italic">
-                    Neural pulse detected: Transmission incoming
+                    {channel.name} đang nhập...
                   </span>
                 </div>
               )}
@@ -123,18 +123,8 @@ export function ChatShell({ channel }: ChatShellProps) {
             <div className="px-8 pb-8 pt-2">
               <MessageInput channelId={channel.id} />
               <div className="mt-4 flex items-center justify-center gap-6 opacity-20 group">
-                <div className="flex items-center gap-2">
-                  <Terminal
-                    size={10}
-                    className="text-white group-hover:text-brand-400 transition-colors"
-                  />
-                  <span className="text-[9px] font-black text-white uppercase tracking-widest">
-                    End_to_End_Encryption_Active
-                  </span>
-                </div>
-                <div className="h-1 w-1 rounded-full bg-white/50" />
                 <span className="text-[9px] font-black text-white uppercase tracking-widest italic">
-                  Protocol_v4.2.0
+                  v4.2.0
                 </span>
               </div>
             </div>

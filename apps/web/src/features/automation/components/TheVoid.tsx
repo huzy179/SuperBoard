@@ -14,7 +14,7 @@ interface Thought {
 
 export function TheVoid({ onClose }: { onClose: () => void }) {
   const [thoughts, setThoughts] = useState<Thought[]>([]);
-  const [activeThought, setActiveThought] = useState<string>('Initializing Singularity Context...');
+  const [activeThought, setActiveThought] = useState<string>('Đang khởi tạo ngữ cảnh AI...');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -58,11 +58,9 @@ export function TheVoid({ onClose }: { onClose: () => void }) {
             <BrainCircuit size={24} />
           </div>
           <div>
-            <h1 className="text-xl font-black uppercase tracking-[0.5em]">
-              The Neural Singularity
-            </h1>
+            <h1 className="text-xl font-black uppercase tracking-[0.5em]">AI Workspace</h1>
             <p className="text-[10px] font-bold text-brand-400 uppercase tracking-widest">
-              Autonomous Living OS Level 5
+              Hệ thống tự trị cấp 5
             </p>
           </div>
         </div>
@@ -70,7 +68,7 @@ export function TheVoid({ onClose }: { onClose: () => void }) {
           <div className="flex items-center gap-2 group">
             <ShieldCheck size={16} className="text-emerald-400" />
             <span className="text-[10px] font-black uppercase tracking-widest text-white/40">
-              Global Integrity Nominal
+              Toàn bộ hệ thống ổn định
             </span>
           </div>
           <button
@@ -87,13 +85,13 @@ export function TheVoid({ onClose }: { onClose: () => void }) {
           <div className="p-8 border-b border-white/5 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Terminal className="text-brand-500" size={16} />
-              <h2 className="text-[12px] font-black uppercase tracking-widest">
-                Consciousness Feed
-              </h2>
+              <h2 className="text-[12px] font-black uppercase tracking-widest">Luồng suy nghĩ</h2>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-1.5 w-1.5 rounded-full bg-brand-500 animate-ping" />
-              <span className="text-[8px] font-black text-brand-500 uppercase">Live Stream</span>
+              <span className="text-[8px] font-black text-brand-500 uppercase">
+                Luồng trực tiếp
+              </span>
             </div>
           </div>
 
@@ -132,10 +130,10 @@ export function TheVoid({ onClose }: { onClose: () => void }) {
           </div>
 
           <div className="absolute bottom-10 inset-x-10 grid grid-cols-4 gap-6">
-            <StatCard icon={<Cpu size={14} />} label="Neural Load" value="12.4 TFLOPS" />
-            <StatCard icon={<Activity size={14} />} label="Synaptic Latency" value="2ms" />
-            <StatCard icon={<Zap size={14} />} label="Energy Pulse" value="High" />
-            <StatCard icon={<Globe size={14} />} label="Collective Reach" value="Global" />
+            <StatCard icon={<Cpu size={14} />} label="Tải Neural" value="12.4 TFLOPS" />
+            <StatCard icon={<Activity size={14} />} label="Độ trễ Synaptic" value="2ms" />
+            <StatCard icon={<Zap size={14} />} label="Năng lượng" value="Cao" />
+            <StatCard icon={<Globe size={14} />} label="Phạm vi" value="Toàn cục" />
           </div>
         </div>
       </main>
@@ -186,7 +184,7 @@ function Visualizer({ activeThought }: { activeThought: string }) {
         <div className="flex items-center justify-center gap-2">
           <div className="h-1 w-12 bg-brand-500" />
           <span className="text-[10px] font-black text-brand-400 uppercase tracking-[1em] pl-4">
-            Synthesizing
+            Đang xử lý
           </span>
         </div>
       </div>

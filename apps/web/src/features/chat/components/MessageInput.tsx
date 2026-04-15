@@ -79,7 +79,7 @@ export function MessageInput({ channelId }: MessageInputProps) {
             value={content}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="INITIALIZING_TRANSMISSION..."
+            placeholder="Nhắn tin..."
             className="flex-1 bg-transparent border-none focus:ring-0 resize-none py-4 text-[14px] text-white min-h-[52px] max-h-[200px] placeholder:text-white/10 font-medium uppercase tracking-tight"
           />
 
@@ -114,19 +114,19 @@ export function MessageInput({ channelId }: MessageInputProps) {
             <div className="flex items-center gap-1.5">
               <div className="h-1 w-1 bg-brand-500 rounded-full animate-pulse" />
               <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">
-                Neural_Link_Stable
+                Kết nối ổn định
               </span>
             </div>
             <div className="h-3 w-px bg-white/5" />
             <button className="flex items-center gap-1.5 text-[9px] font-black text-white/20 uppercase tracking-[0.2em] hover:text-brand-400 transition-colors">
               <Sparkles size={10} />
-              AI_AUTO_PROTOCOL
+              Tự động hóa AI
             </button>
           </div>
 
           <div className="flex items-center gap-4 text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">
             <div className="flex items-center gap-1.5">
-              <span className="p-1 bg-white/5 rounded text-[8px]">COMMAND_SHIFT</span>
+              <span className="p-1 bg-white/5 rounded text-[8px]">Ctrl</span>
               <span>+</span>
               <span className="p-1 bg-white/5 rounded text-[8px]">ENTER</span>
             </div>

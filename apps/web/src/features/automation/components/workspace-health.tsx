@@ -74,15 +74,15 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
           </div>
           <div>
             <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter">
-              Self-Organizing Heartbeat
+              Tự tổ chức theo dõi
             </h2>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
-                Autonomous Workspace Refactoring
+                Tự động cải thiện workspace
               </span>
               <div className="h-1 w-1 bg-emerald-500 rounded-full animate-ping" />
               <span className="text-[9px] font-bold text-emerald-500/60 uppercase">
-                System_Nominal_Heal_Ready
+                Hệ thống sẵn sàng
               </span>
             </div>
           </div>
@@ -94,7 +94,7 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
           className="px-8 py-4 rounded-2xl bg-indigo-600 text-white font-black text-[11px] uppercase tracking-[0.3em] flex items-center gap-3 hover:bg-indigo-500 transition-all shadow-glow-indigo disabled:opacity-50"
         >
           {isHealing ? <RefreshCw className="animate-spin" size={16} /> : <Zap size={16} />}
-          Trigger Heal Cycle
+          Chạy dọn dẹp
         </button>
       </div>
 
@@ -103,10 +103,10 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
         <div className="col-span-12 lg:col-span-7 space-y-8">
           <div className="flex items-center justify-between px-2">
             <h3 className="text-[11px] font-black text-white/30 uppercase tracking-[0.4em]">
-              Neural Suggestions
+              Gợi ý từ AI
             </h3>
             <span className="text-[10px] font-bold text-emerald-500 lowercase opacity-60 italic">
-              {redundancyActions.length} duplications detected
+              {redundancyActions.length} trùng lặp được phát hiện
             </span>
           </div>
 
@@ -126,7 +126,7 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
                       </div>
                       <div className="flex flex-col">
                         <span className="text-lg font-black text-white uppercase italic tracking-tighter">
-                          Merge Recommended
+                          Khuyến nghị gộp
                         </span>
                         <span className="text-[9px] font-black text-white/20 uppercase tracking-widest mt-1">
                           Ref: {action.targetId.slice(0, 8)}
@@ -144,10 +144,10 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
 
                   <div className="flex items-center gap-4 mt-2">
                     <button className="px-6 py-2.5 rounded-xl bg-indigo-600 text-[10px] font-black text-white uppercase tracking-widest hover:bg-indigo-500 transition-colors">
-                      Execute Merge
+                      Thực hiện gộp
                     </button>
                     <button className="px-6 py-2.5 rounded-xl bg-white/5 text-[10px] font-black text-white/40 uppercase tracking-widest hover:text-white transition-colors">
-                      Dismiss Signal
+                      Bỏ qua tín hiệu
                     </button>
                   </div>
                 </div>
@@ -156,7 +156,7 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
               <div className="p-20 flex flex-col items-center justify-center gap-6 rounded-[2.5rem] bg-white/[0.01] border border-white/5 border-dashed">
                 <ShieldCheck size={60} className="text-white/10" />
                 <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">
-                  No Redundancies Detected
+                  Không có trùng lặp
                 </span>
               </div>
             )}
@@ -166,7 +166,7 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
         {/* Right: Archival Log */}
         <div className="col-span-12 lg:col-span-5 flex flex-col gap-8">
           <h3 className="text-[11px] font-black text-white/30 uppercase tracking-[0.4em] px-2 truncate">
-            Archival Heartbeat
+            Nhịp dọn dẹp
           </h3>
 
           <div className="flex-1 rounded-[2.5rem] bg-black/60 border border-white/10 p-8 flex flex-col gap-6 overflow-hidden">
@@ -182,7 +182,7 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
                   <div className="flex-1 pt-1 space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-black text-white/80 uppercase tracking-widest">
-                        Self_Cleanup_Archived
+                        Tự động dọn dẹp
                       </span>
                       <span className="text-[9px] font-black text-white/20 italic tabular-nums">
                         {new Date(action.createdAt).toLocaleTimeString([], {
@@ -201,7 +201,7 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
                 <div className="flex flex-col items-center justify-center h-full gap-4 text-center opacity-20">
                   <Trash2 size={40} />
                   <span className="text-[10px] font-black uppercase tracking-[0.3em]">
-                    No Archival Events
+                    Không có sự kiện dọn dẹp
                   </span>
                 </div>
               )}
@@ -210,7 +210,7 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
             <div className="pt-6 border-t border-white/5 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-                  Health Operations
+                  Thao tác sức khỏe
                 </span>
                 <span className="text-[11px] font-black text-white/60 tabular-nums italic">
                   {actions.length} Total

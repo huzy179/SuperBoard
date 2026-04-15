@@ -12,6 +12,35 @@
   @apply bg-surface-card border border-surface-border shadow-luxe hover:shadow-2xl transition-all duration-500 rounded-card;
 }
 
+/* Dark glass utility classes — used for unified dark aesthetic across all components */
+.dark-glass-panel {
+  @apply bg-slate-950/80 backdrop-blur-3xl border border-white/5 shadow-glass rounded-[2rem];
+}
+
+.dark-glass-card {
+  @apply bg-white/[0.02] border border-white/5 shadow-glass rounded-2xl;
+}
+
+.dark-glass-input {
+  @apply bg-white/[0.03] border border-white/10 text-white placeholder:text-white/20 rounded-xl;
+}
+
+.dark-glass-badge {
+  @apply bg-white/[0.03] border border-white/5 text-white/60 rounded-lg text-[10px] font-black uppercase tracking-widest;
+}
+
+.dark-glass-chip {
+  @apply bg-slate-800 text-white/40 hover:bg-slate-700 hover:text-white rounded-lg px-2 py-1 text-[11px] font-medium transition-colors;
+}
+
+.dark-glass-chip-active {
+  @apply bg-brand-500/10 text-brand-400 border border-brand-500/30;
+}
+
+.dark-glass-skeleton {
+  @apply animate-pulse rounded-[2.5rem] bg-white/[0.02] border border-white/5;
+}
+
 .mesh-bg {
   background:
     radial-gradient(at 0% 0%, oklch(0.95 0.02 260) 0px, transparent 50%),

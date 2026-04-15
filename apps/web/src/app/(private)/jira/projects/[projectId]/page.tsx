@@ -488,6 +488,12 @@ export default function ProjectDetailPage() {
           onPrevMonth={prevMonth}
           onNextMonth={nextMonth}
           onOpenEdit={handleOpenEdit}
+          onDropTask={async (taskId, newDateKey) => {
+            await updateTaskMutation.mutateAsync({
+              id: taskId,
+              dueDate: new Date(newDateKey),
+            });
+          }}
           workflow={workflow}
         />
       )}

@@ -36,7 +36,7 @@ export function ThreadPanel({ parentMessage, onClose }: ThreadPanelProps) {
             <MessageCircle size={14} className="text-brand-400" />
           </div>
           <h2 className="text-[11px] font-black text-white uppercase tracking-[0.2em]">
-            Transmission Thread
+            Cuộc trò chuyện
           </h2>
         </div>
         <button
@@ -80,7 +80,7 @@ export function ThreadPanel({ parentMessage, onClose }: ThreadPanelProps) {
             <div className="flex items-center gap-2">
               <div className="h-1.5 w-1.5 rounded-full bg-brand-400 animate-ping" />
               <span className="text-[9px] font-black text-brand-400/60 uppercase tracking-[0.2em] leading-none">
-                {replies?.length || 0} RECOVERED_SIGNALS
+                {replies?.length || 0} tin nhắn
               </span>
             </div>
 
@@ -94,7 +94,7 @@ export function ThreadPanel({ parentMessage, onClose }: ThreadPanelProps) {
               ) : (
                 <Sparkles size={12} className="group-hover/summary:animate-pulse" />
               )}
-              <span>AI_SYNTHESIS</span>
+              <span>AI Tóm tắt</span>
             </button>
           </div>
 
@@ -105,7 +105,7 @@ export function ThreadPanel({ parentMessage, onClose }: ThreadPanelProps) {
               <div className="flex items-center gap-2 mb-3">
                 <ShieldCheck size={12} className="text-emerald-400" />
                 <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">
-                  Protocol Intelligence Summary
+                  Tóm tắt từ AI
                 </span>
               </div>
               <p className="text-[12px] text-emerald-100/70 leading-relaxed italic font-medium">
@@ -158,7 +158,7 @@ export function ThreadPanel({ parentMessage, onClose }: ThreadPanelProps) {
         <div className="flex items-center gap-3 text-white/10">
           <Zap size={10} />
           <span className="text-[9px] font-black uppercase tracking-[0.3em]">
-            Thread_Link_Secure
+            Liên kết cuộc trò chuyện
           </span>
         </div>
       </div>

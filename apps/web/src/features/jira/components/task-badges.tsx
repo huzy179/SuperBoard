@@ -78,7 +78,7 @@ export function LabelDots({ labels }: { labels: LabelDTO[] }) {
       {labels.map((label) => (
         <span
           key={label.id}
-          className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-600"
+          className="inline-flex items-center gap-1 rounded-full bg-white/[0.03] px-2 py-0.5 text-[10px] font-medium text-white/60 border border-white/5"
           title={label.name}
         >
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: label.color }} />

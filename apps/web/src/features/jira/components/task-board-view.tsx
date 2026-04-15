@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { toast } from 'sonner';
 import type { ProjectTaskItemDTO, WorkflowStatusTemplateDTO } from '@superboard/shared';
 import {
@@ -109,17 +109,20 @@ export function TaskBoardView({
     return null;
   }, [draggedTaskId, boardData]);
 
-  const getAllowedTargetStatuses = (fromStatus: string) => {
-    if (!workflow) return new Set<string>();
-    const allowed = new Set<string>();
-    workflow.transitions.forEach((t) => {
-      if (t.fromStatusId === fromStatus) {
-        const toStatus = workflow.statuses.find((s) => s.id === t.toStatusId);
-        if (toStatus) allowed.add(toStatus.key);
-      }
-    });
-    return allowed;
-  };
+  const getAllowedTargetStatuses = useCallback(
+    (fromStatus: string) => {
+      if (!workflow) return new Set<string>();
+      const allowed = new Set<string>();
+      workflow.transitions.forEach((t) => {
+        if (t.fromStatusId === fromStatus) {
+          const toStatus = workflow.statuses.find((s) => s.id === t.toStatusId);
+          if (toStatus) allowed.add(toStatus.key);
+        }
+      });
+      return allowed;
+    },
+    [workflow],
+  );
 
   const allowedStatuses = useMemo(() => {
     if (!draggedTask) return new Set<string>();
@@ -127,7 +130,7 @@ export function TaskBoardView({
     const currentStatus = workflow?.statuses.find((s) => s.key === draggedTask.status);
     if (!currentStatus) return new Set<string>();
     return getAllowedTargetStatuses(currentStatus.id);
-  }, [draggedTask, workflow]);
+  }, [draggedTask, workflow, getAllowedTargetStatuses]);
   return (
     <div className="flex gap-4 overflow-x-auto pb-3">
       {columns.map((column) => {
@@ -143,7 +146,7 @@ export function TaskBoardView({
         return (
           <div
             key={column.key}
-            className={`w-80 shrink-0 rounded-[2rem] border-t-8 bg-white/40 backdrop-blur-xl transition-all duration-500 flex flex-col max-h-full shadow-glass ${
+            className={`min-w-[20rem] shrink-0 rounded-[2rem] border-t-8 bg-white/40 backdrop-blur-xl transition-all duration-500 flex flex-col max-h-full shadow-glass ${
               COLUMN_BORDER[column.key] ?? 'border-t-slate-400'
             } ${
               isDragOver
@@ -284,7 +287,7 @@ export function TaskBoardView({
                     </p>
                     {/* Labels */}
                     {task.labels && task.labels.length > 0 ? (
-                      <div className="mt-1.5">
+                      <div className="mt-1.5 max-h-12 overflow-hidden">
                         <LabelDots labels={task.labels} />
                       </div>
                     ) : null}

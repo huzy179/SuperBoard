@@ -54,10 +54,10 @@ export function TestGeneratorModal({ onClose }: TestGeneratorModalProps) {
             </div>
             <div>
               <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter leading-none">
-                Autonomous Test Factory
+                Nhà máy test tự động
               </h2>
               <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
-                Synthetic Logic Simulation
+                Mô phỏng logic tổng hợp
               </span>
             </div>
           </div>
@@ -74,7 +74,7 @@ export function TestGeneratorModal({ onClose }: TestGeneratorModalProps) {
           <div className="w-1/3 bg-black/40 p-10 flex flex-col gap-6">
             <div className="space-y-4">
               <label className="text-[10px] font-black text-white/30 uppercase tracking-widest flex items-center gap-2">
-                <Command size={10} /> Mission Specification
+                <Command size={10} /> Yêu cầu test
               </label>
               <textarea
                 value={prompt}
@@ -90,7 +90,7 @@ export function TestGeneratorModal({ onClose }: TestGeneratorModalProps) {
               className="w-full py-5 rounded-3xl bg-indigo-600 text-white font-black text-[11px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-indigo-500 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-glow-indigo disabled:opacity-50 disabled:scale-100"
             >
               {isGenerating ? <RefreshCw className="animate-spin" size={16} /> : <Zap size={16} />}
-              {isGenerating ? 'Synthesizing...' : 'Generate Neural Spec'}
+              {isGenerating ? 'Đang xử lý...' : 'Tạo spec test'}
             </button>
 
             <div className="mt-auto p-6 rounded-3xl bg-amber-500/5 border border-amber-500/10">

@@ -31,7 +31,7 @@ export function NeuralWorkspaceDigest({ workspaceId }: NeuralWorkspaceDigestProp
       const data = await res.json();
       setDigest(data.data.digest);
     } catch {
-      toast.error('Không thể đồng bộ Intelligence');
+      toast.error('Không thể đồng bộ AI');
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -78,10 +78,10 @@ export function NeuralWorkspaceDigest({ workspaceId }: NeuralWorkspaceDigestProp
               </div>
               <div>
                 <h3 className="text-sm font-black text-white uppercase tracking-widest">
-                  Neural Digest
+                  Tóm tắt AI
                 </h3>
                 <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">
-                  Workspace Synthesis
+                  Tổng hợp workspace
                 </p>
               </div>
             </div>
@@ -90,7 +90,7 @@ export function NeuralWorkspaceDigest({ workspaceId }: NeuralWorkspaceDigestProp
               <div className="p-4 bg-white/5 rounded-2xl border border-white/5 transition-all hover:bg-white/10">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">
-                    Workspace Momentum
+                    Tiến độ workspace
                   </span>
                   <TrendingUp size={12} className="text-emerald-400" />
                 </div>
@@ -103,7 +103,7 @@ export function NeuralWorkspaceDigest({ workspaceId }: NeuralWorkspaceDigestProp
               <div className="p-4 bg-white/5 rounded-2xl border border-white/5 transition-all hover:bg-white/10">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[9px] font-black text-rose-400/40 uppercase tracking-[0.2em]">
-                    Cross-Node Risks
+                    Rủi ro đa dự án
                   </span>
                   <AlertTriangle size={12} className="text-rose-400" />
                 </div>
@@ -120,7 +120,7 @@ export function NeuralWorkspaceDigest({ workspaceId }: NeuralWorkspaceDigestProp
               className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-white/5 border border-white/5 text-[9px] font-black text-white/40 uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all active:scale-95"
             >
               <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
-              {isRefreshing ? 'Synchronizing Context...' : 'Sync Global Intelligence'}
+              {isRefreshing ? 'Đang đồng bộ...' : 'Đồng bộ AI'}
             </button>
           </div>
 
@@ -130,7 +130,7 @@ export function NeuralWorkspaceDigest({ workspaceId }: NeuralWorkspaceDigestProp
               <div className="flex items-center gap-3">
                 <div className="h-1 w-6 bg-brand-500 rounded-full" />
                 <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">
-                  AI Executive Briefing
+                  Báo cáo tổng hợp từ AI
                 </span>
               </div>
               <div className="flex items-center gap-2 text-[9px] font-black text-white/20 uppercase tracking-widest">
@@ -141,7 +141,7 @@ export function NeuralWorkspaceDigest({ workspaceId }: NeuralWorkspaceDigestProp
 
             <div className="prose prose-invert prose-sm max-w-none">
               <p className="text-lg leading-relaxed text-white/70 font-medium italic">
-                "{digest || 'Analyzing operational data across mission nodes...'}"
+                "{digest || 'Đang phân tích dữ liệu hoạt động...'}"
               </p>
             </div>
 
@@ -149,13 +149,13 @@ export function NeuralWorkspaceDigest({ workspaceId }: NeuralWorkspaceDigestProp
               <div className="flex items-center gap-2 px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full">
                 <Zap size={10} className="text-indigo-400" />
                 <span className="text-[8px] font-black text-indigo-300 uppercase tracking-[0.1em]">
-                  Multi-Project Sync Active
+                  Đồng bộ đa dự án đang hoạt động
                 </span>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                 <Activity size={10} className="text-emerald-400" />
                 <span className="text-[8px] font-black text-emerald-300 uppercase tracking-[0.1em]">
-                  Velocity Normalized
+                  Vận tốc đã được tối ưu
                 </span>
               </div>
             </div>

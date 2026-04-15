@@ -20,12 +20,12 @@ export function KnowledgeMap({ projectId, onClose, onSelectNode }: KnowledgeMapP
       const res = await fetch(`/api/v1/knowledge/diary/${projectId}`, { method: 'POST' });
       const body = await res.json();
       if (res.ok) {
-        toast.success('Successfully generated weekly Dev Diary');
+        toast.success('Đã tạo nhật ký tuần thành công');
       } else {
         throw new Error(body.message);
       }
     } catch (err: unknown) {
-      toast.error(`Generation failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error('Tạo thất bại: ' + (err instanceof Error ? err.message : 'Lỗi không xác định'));
     } finally {
       setIsGeneratingDiary(false);
     }
@@ -41,11 +41,11 @@ export function KnowledgeMap({ projectId, onClose, onSelectNode }: KnowledgeMapP
           </div>
           <div className="flex flex-col">
             <h2 className="text-3xl font-black text-white uppercase tracking-tighter italic">
-              Knowledge Architecture
+              Kiến trúc tri thức
             </h2>
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
-                Neural Semantic Web
+                Web ngữ nghĩa AI
               </span>
               <div className="h-1.5 w-1.5 bg-brand-500 rounded-full animate-ping" />
               <span className="text-[10px] font-bold text-brand-500/80 uppercase tracking-widest leading-none">
@@ -67,7 +67,7 @@ export function KnowledgeMap({ projectId, onClose, onSelectNode }: KnowledgeMapP
             ) : (
               <BookOpen size={14} className="group-hover:rotate-12 transition-transform" />
             )}
-            {isGeneratingDiary ? 'Synthesizing...' : 'Generate Dev Diary'}
+            {isGeneratingDiary ? 'Đang tạo...' : 'Tạo nhật ký dev'}
             <div className="absolute -top-1 -right-1">
               <Sparkles size={10} className="text-white animate-pulse" />
             </div>
@@ -93,7 +93,7 @@ export function KnowledgeMap({ projectId, onClose, onSelectNode }: KnowledgeMapP
           <div className="flex items-center gap-3">
             <Zap size={14} className="text-brand-400" />
             <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">
-              Neural Linkage Protocol
+              Giao thức liên kết
             </span>
           </div>
           <p className="text-[11px] font-medium text-white/30 leading-relaxed italic">

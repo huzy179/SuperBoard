@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import type { AuthUserDTO } from '@superboard/shared';
 import { clearAccessToken, getAccessToken } from '@/lib/auth-storage';
 import { getCurrentUser } from '@/lib/services/auth-service';
@@ -14,38 +14,34 @@ type UseAuthSessionResult = {
 
 export function useAuthSession(): UseAuthSessionResult {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<AuthUserDTO | null>(null);
+  const authToken = getAccessToken();
 
-  const status = loading ? 'loading' : user ? 'authenticated' : 'unauthenticated';
+  const {
+    data: user,
+    isLoading,
+    error: queryError,
+  } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: getCurrentUser,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    enabled: !!authToken,
+    retry: 1,
+  });
 
-  useEffect(() => {
-    const token = getAccessToken();
+  const error = queryError instanceof Error ? queryError.message : null;
 
-    if (!token) {
-      router.replace('/login');
-      return;
-    }
+  const status = isLoading ? 'loading' : user ? 'authenticated' : 'unauthenticated';
 
-    getCurrentUser()
-      .then((currentUser) => {
-        setUser(currentUser);
-      })
-      .catch((caughtError) => {
-        const message = caughtError instanceof Error ? caughtError.message : 'Unauthorized';
-        setError(message);
-        clearAccessToken();
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [router]);
+  if (!user && !isLoading && !error && authToken) {
+    clearAccessToken();
+    router.replace('/login');
+  }
 
   function logout() {
     clearAccessToken();
     router.push('/login');
   }
 
-  return { loading, status, error, user, logout };
+  return { loading: isLoading, status, error, user: user ?? null, logout };
 }

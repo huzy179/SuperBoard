@@ -39,7 +39,6 @@ export function TaskListView({
   onUpdateTaskStatus,
   isUpdatePending,
   isDragDropLocked,
-  statusSelectLockReason,
   workflow,
 }: TaskListViewProps) {
   const getStatusOptionsForTask = (currentStatus: string) => {
@@ -67,45 +66,46 @@ export function TaskListView({
       .map((s) => ({ key: s.key, label: s.name }));
   };
   return (
-    <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/50 backdrop-blur-md shadow-2xl animate-in fade-in zoom-in-95 duration-500">
-      <table className="min-w-full divide-y divide-slate-100 text-sm">
-        <thead className="bg-slate-50/80">
-          <tr>
-            <th className="px-6 py-4 text-left">
-              <input
-                type="checkbox"
-                checked={visibleTasks.length > 0 && selectedVisibleCount === visibleTasks.length}
-                onChange={toggleSelectAllVisible}
-                aria-label="Chọn tất cả task đang hiển thị"
-                className="h-4 w-4 rounded-md border-slate-300 text-brand-600 focus:ring-brand-500 shadow-sm cursor-pointer"
-              />
+    <div className="overflow-hidden rounded-[3rem] border border-white/5 bg-white/[0.01] backdrop-blur-[40px] shadow-luxe animate-in fade-in slide-in-from-bottom-8 duration-1000 relative group">
+      {/* Internal Rim Lighting */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+      <table className="min-w-full border-collapse text-sm tabular-nums relative z-10">
+        <thead>
+          <tr className="bg-white/[0.02] border-b border-white/5">
+            <th className="px-10 py-8 text-left w-20">
+              <div className="relative flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  checked={visibleTasks.length > 0 && selectedVisibleCount === visibleTasks.length}
+                  onChange={toggleSelectAllVisible}
+                  className="h-5 w-5 rounded-lg border-white/10 bg-white/5 text-brand-500 focus:ring-brand-500/50 shadow-inner cursor-pointer transition-all"
+                />
+              </div>
             </th>
-            <th className="px-6 py-4 text-left text-[10px] font-black tracking-widest text-slate-400 uppercase">
-              Công việc
+            <th className="px-8 py-8 text-left text-[11px] font-black tracking-[0.5em] text-white/20 uppercase italic">
+              OPERATIONAL_TASK
             </th>
-            <th className="px-6 py-4 text-left text-[10px] font-black tracking-widest text-slate-400 uppercase">
-              Trạng thái
+            <th className="px-8 py-8 text-left text-[11px] font-black tracking-[0.5em] text-white/20 uppercase italic">
+              FREQUENCY_HUB
             </th>
-            <th className="px-6 py-4 text-left text-[10px] font-black tracking-widest text-slate-400 uppercase">
-              Ưu tiên
+            <th className="px-8 py-8 text-left text-[11px] font-black tracking-[0.5em] text-white/20 uppercase italic">
+              PRIORITY_RANK
             </th>
-            <th className="px-6 py-4 text-left text-[10px] font-black tracking-widest text-slate-400 uppercase">
-              Người thực hiện
+            <th className="px-8 py-8 text-left text-[11px] font-black tracking-[0.5em] text-white/20 uppercase italic">
+              OPERATOR_ID
             </th>
-            <th className="px-6 py-4 text-left text-[10px] font-black tracking-widest text-slate-400 uppercase">
-              Cập nhật
+            <th className="px-10 py-8 text-left text-[11px] font-black tracking-[0.5em] text-white/20 uppercase italic">
+              SYSTEM_SYNC
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-50 bg-white/30">
+        <tbody className="divide-y divide-white/[0.03]">
           {visibleTasks.map((task) => {
             const isSelected = selectedTaskIds.has(task.id);
             return (
               <tr
                 key={task.id}
-                tabIndex={0}
-                role="button"
-                aria-label={task.title}
                 onClick={(e) => {
                   if (e.metaKey || e.ctrlKey || e.shiftKey) {
                     onSelectTask(task.id, e);
@@ -113,106 +113,112 @@ export function TaskListView({
                     onOpenEdit(task);
                   }
                 }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onOpenEdit(task);
-                  }
-                }}
-                className={`group cursor-pointer transition-all duration-300 hover:bg-white/80 ${
-                  isSelected ? 'bg-brand-50/50 shadow-[inset_0_0_20px_rgba(37,99,235,0.05)]' : ''
-                } ${task.deletedAt ? 'bg-slate-50/50 grayscale opacity-40' : ''}`}
+                className={`group cursor-pointer transition-all duration-500 hover:bg-white/[0.04] relative ${
+                  isSelected ? 'bg-brand-500/[0.03]' : ''
+                } ${task.deletedAt ? 'opacity-20 grayscale pointer-events-none' : ''}`}
               >
-                <td className="px-6 py-4" onClick={(event) => event.stopPropagation()}>
-                  <div
-                    className={`transition-opacity duration-200 ${isSelected ? 'opacity-100' : 'opacity-20 group-hover:opacity-100'}`}
-                  >
+                <td className="px-10 py-6" onClick={(event) => event.stopPropagation()}>
+                  <div className="relative flex items-center justify-center">
+                    {isSelected && (
+                      <motion.div
+                        layoutId={`selected-row-${task.id}`}
+                        className="absolute -left-10 w-1.5 h-12 bg-brand-500 shadow-glow-brand rounded-r-lg"
+                      />
+                    )}
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={(e) => onSelectTask(task.id, e)}
-                      aria-label={`Chọn task ${task.title}`}
-                      className="h-4 w-4 rounded-md border-slate-300 text-brand-600 focus:ring-brand-500 shadow-sm cursor-pointer"
+                      className={`h-5 w-5 rounded-lg border-white/10 bg-white/5 text-brand-500 transition-all ${isSelected ? 'opacity-100' : 'opacity-20 group-hover:opacity-100'}`}
                     />
                   </div>
                 </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm transition-transform group-hover:scale-110">
+                <td className="px-8 py-6">
+                  <div className="flex items-center gap-6">
+                    <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-white/5 shadow-inner transition-all duration-700 group-hover:scale-110 group-hover:shadow-glow-brand/10">
                       <TaskTypeIcon type={task.type ?? 'task'} />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-4">
                         <TaskIdBadge projectKey={projectKey} number={task.number} />
                         <p
-                          className={`font-bold transition-colors ${
-                            task.deletedAt
-                              ? 'text-slate-400 line-through'
-                              : 'text-slate-900 group-hover:text-brand-700'
+                          className={`text-sm font-black tracking-tight uppercase italic transition-colors duration-500 ${
+                            isSelected ? 'text-white' : 'text-white/70 group-hover:text-white'
                           }`}
                         >
                           {task.title}
                         </p>
                       </div>
-                      {task.labels && task.labels.length > 0 ? (
-                        <div className="mt-1.5 overflow-hidden">
+                      {task.labels && task.labels.length > 0 && (
+                        <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-700">
                           <LabelDots labels={task.labels} />
                         </div>
-                      ) : null}
+                      )}
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-8 py-6">
                   <div className="relative inline-block" onClick={(e) => e.stopPropagation()}>
                     <select
                       value={task.status}
                       disabled={isUpdatePending || isDragDropLocked}
-                      title={statusSelectLockReason}
                       onChange={(event) => {
                         onUpdateTaskStatus(
                           task.id,
                           event.target.value as unknown as ProjectTaskItemDTO['status'],
                         );
                       }}
-                      className="appearance-none rounded-xl border border-slate-200 bg-white pl-3 pr-8 py-2 text-[11px] font-black uppercase tracking-widest text-slate-700 focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all disabled:opacity-50 outline-none cursor-pointer shadow-sm"
+                      className="appearance-none rounded-2xl border border-white/5 bg-white/[0.02] pl-6 pr-12 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-white/40 focus:bg-white/[0.05] focus:text-white outline-none transition-all cursor-pointer shadow-inner italic"
                     >
                       {getStatusOptionsForTask(task.status).map((opt) => (
-                        <option key={opt.key} value={opt.key}>
-                          {opt.label}
+                        <option key={opt.key} value={opt.key} className="bg-slate-950 italic">
+                          {opt.label.toUpperCase()}
                         </option>
                       ))}
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
-                      <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
-                        <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                      </svg>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-white/10">
+                      <ChevronDown size={14} />
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-8 py-6">
                   <PriorityBadge priority={task.priority} />
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-8 py-6">
                   {task.assigneeName ? (
-                    <div className="flex items-center gap-2.5 group/assignee">
-                      <AssigneeAvatar name={task.assigneeName} color={task.assigneeAvatarColor} />
-                      <span className="text-xs font-bold text-slate-600 transition-colors group-hover/assignee:text-slate-900 truncate max-w-[120px]">
-                        {task.assigneeName}
-                      </span>
+                    <div className="flex items-center gap-5 group/assignee">
+                      <div className="ring-2 ring-white/5 rounded-full p-0.5 transition-all group-hover/assignee:ring-brand-500/30 shadow-luxe">
+                        <AssigneeAvatar
+                          name={task.assigneeName}
+                          color={task.assigneeAvatarColor}
+                          size={32}
+                        />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[11px] font-black text-white/60 uppercase tracking-tight italic group-hover/assignee:text-white transition-colors">
+                          {task.assigneeName}
+                        </span>
+                        <span className="text-[8px] font-bold text-white/10 uppercase tracking-widest">
+                          RANK_CERTIFIED
+                        </span>
+                      </div>
                     </div>
                   ) : (
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">
-                      Chưa gán
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-white/5 animate-ping" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/5 italic">
+                        VOID_OPERATOR
+                      </span>
+                    </div>
                   )}
                 </td>
-                <td className="px-6 py-4">
-                  <div className="flex flex-col">
-                    <span className="text-[11px] font-bold text-slate-600">
-                      {formatDate(task.updatedAt)}
+                <td className="px-10 py-6">
+                  <div className="flex flex-col gap-1 text-right">
+                    <span className="text-xs font-black text-white/40 uppercase font-mono tracking-tighter group-hover:text-brand-400 transition-colors italic">
+                      {formatDate(task.updatedAt).toUpperCase()}
                     </span>
-                    <span className="text-[9px] font-medium text-slate-400 uppercase tracking-tight">
-                      Last Activity
+                    <span className="text-[8px] font-bold text-white/5 uppercase tracking-[0.4em]">
+                      PULSE_LAST_SEEN
                     </span>
                   </div>
                 </td>

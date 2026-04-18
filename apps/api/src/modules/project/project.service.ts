@@ -983,90 +983,81 @@ export class ProjectService {
 
     logger.info(`[ProjectService] Dashboard stats cache MISS for workspace ${workspaceId}`);
 
-    const tasks = await this.prisma.task.findMany({
-      where: {
-        project: { workspaceId },
-      },
-      select: {
-        id: true,
-        title: true,
-        status: true,
-        priority: true,
-        type: true,
-        dueDate: true,
-        assigneeId: true,
-        assignee: { select: { fullName: true, avatarColor: true } },
-        projectId: true,
-      },
+    const [statusCounts, priorityCounts, typeCounts, assigneeCounts, projectCounts] =
+      await Promise.all([
+        this.prisma.task.groupBy({
+          by: ['status'],
+          where: { project: { workspaceId }, deletedAt: null },
+          _count: { id: true },
+        }),
+        this.prisma.task.groupBy({
+          by: ['priority'],
+          where: { project: { workspaceId }, deletedAt: null },
+          _count: { id: true },
+        }),
+        this.prisma.task.groupBy({
+          by: ['type'],
+          where: { project: { workspaceId }, deletedAt: null },
+          _count: { id: true },
+        }),
+        this.prisma.task.groupBy({
+          by: ['assigneeId'],
+          where: { project: { workspaceId }, deletedAt: null, assigneeId: { not: null } },
+          _count: { id: true },
+        }),
+        this.prisma.task.groupBy({
+          by: ['projectId', 'status'],
+          where: { project: { workspaceId }, deletedAt: null },
+          _count: { id: true },
+        }),
+      ]);
+
+    const tasksByStatus = statusCounts.map((s) => ({
+      status: s.status as DashboardStatsDTO['tasksByStatus'][number]['status'],
+      count: s._count.id,
+    }));
+
+    const tasksByPriority = priorityCounts.map((p) => ({
+      priority: p.priority as DashboardStatsDTO['tasksByPriority'][number]['priority'],
+      count: p._count.id,
+    }));
+
+    const tasksByType = typeCounts.map((t) => ({
+      type: (t.type ?? 'task') as DashboardStatsDTO['tasksByType'][number]['type'],
+      count: t._count.id,
+    }));
+
+    // Fetch assignee user info for assignee counts
+    const assigneeIds = assigneeCounts.map((a) => a.assigneeId);
+    const assigneeUsers = await this.prisma.user.findMany({
+      where: { id: { in: assigneeIds as string[] } },
+      select: { id: true, fullName: true, avatarColor: true },
+    });
+    const assigneeUserMap = new Map(assigneeUsers.map((u) => [u.id, u]));
+    const tasksByAssignee = assigneeCounts.map((a) => {
+      const user = assigneeUserMap.get(a.assigneeId as string);
+      return {
+        assigneeId: a.assigneeId as string,
+        assigneeName: user?.fullName ?? 'Unknown',
+        avatarColor: user?.avatarColor ?? null,
+        count: a._count.id,
+      };
     });
 
-    // Tasks by status
-    const statusMap = new Map<string, number>();
-    for (const t of tasks) {
-      statusMap.set(t.status, (statusMap.get(t.status) ?? 0) + 1);
-    }
-    const tasksByStatus = [...statusMap.entries()].map(([status, count]) => ({
-      status: status as DashboardStatsDTO['tasksByStatus'][number]['status'],
-      count,
-    }));
-
-    // Tasks by priority
-    const priorityMap = new Map<string, number>();
-    for (const t of tasks) {
-      priorityMap.set(t.priority, (priorityMap.get(t.priority) ?? 0) + 1);
-    }
-    const tasksByPriority = [...priorityMap.entries()].map(([priority, count]) => ({
-      priority: priority as DashboardStatsDTO['tasksByPriority'][number]['priority'],
-      count,
-    }));
-
-    // Tasks by type
-    const typeMap = new Map<string, number>();
-    for (const t of tasks) {
-      typeMap.set(t.type ?? 'task', (typeMap.get(t.type ?? 'task') ?? 0) + 1);
-    }
-    const tasksByType = [...typeMap.entries()].map(([type, count]) => ({
-      type: type as DashboardStatsDTO['tasksByType'][number]['type'],
-      count,
-    }));
-
-    // Tasks by assignee
-    const assigneeMap = new Map<string, { name: string; color: string | null; count: number }>();
-    for (const t of tasks) {
-      if (t.assigneeId && t.assignee) {
-        const existing = assigneeMap.get(t.assigneeId);
-        if (existing) {
-          existing.count++;
-        } else {
-          assigneeMap.set(t.assigneeId, {
-            name: t.assignee.fullName,
-            color: t.assignee.avatarColor ?? null,
-            count: 1,
-          });
-        }
-      }
-    }
-    const tasksByAssignee = [...assigneeMap.entries()].map(([assigneeId, v]) => ({
-      assigneeId,
-      assigneeName: v.name,
-      avatarColor: v.color,
-      count: v.count,
-    }));
-
-    // Tasks by project
+    // Fetch project info for project counts
     const projects = await this.prisma.project.findMany({
-      where: { workspaceId },
+      where: { id: { in: projectIds as string[] } },
       select: { id: true, name: true, key: true, color: true },
     });
-    const projectTaskMap = new Map<string, { total: number; done: number }>();
-    for (const t of tasks) {
-      const existing = projectTaskMap.get(t.projectId) ?? { total: 0, done: 0 };
-      existing.total++;
-      if (t.status === 'done') existing.done++;
-      projectTaskMap.set(t.projectId, existing);
+    const projectTotals = new Map<string, { total: number; done: number }>();
+    for (const pc of projectCounts) {
+      const existing = projectTotals.get(pc.projectId as string) ?? { total: 0, done: 0 };
+      existing.total += pc._count.id;
+      if (pc.status === 'done') existing.done += pc._count.id;
+      projectTotals.set(pc.projectId as string, existing);
     }
     const tasksByProject = projects.map((p) => {
-      const counts = projectTaskMap.get(p.id) ?? { total: 0, done: 0 };
+      const counts = projectTotals.get(p.id) ?? { total: 0, done: 0 };
       return {
         projectId: p.id,
         projectName: p.name,
@@ -1077,11 +1068,16 @@ export class ProjectService {
       };
     });
 
-    // Overdue tasks
+    // Overdue tasks — count only non-deleted, non-done/cancelled with past due date
     const now = new Date();
-    const overdueTasks = tasks.filter(
-      (t) => t.dueDate && t.dueDate < now && t.status !== 'done' && t.status !== 'cancelled',
-    ).length;
+    const overdueTaskCount = await this.prisma.task.count({
+      where: {
+        project: { workspaceId },
+        deletedAt: null,
+        dueDate: { lt: now },
+        status: { notIn: ['done', 'cancelled'] },
+      },
+    });
 
     // Recent activity
     const recentEvents = await this.prisma.taskEvent.findMany({
@@ -1112,7 +1108,7 @@ export class ProjectService {
       tasksByType,
       tasksByAssignee,
       tasksByProject,
-      overdueTasks,
+      overdueTasks: overdueTaskCount,
       recentActivity,
     };
 

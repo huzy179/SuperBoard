@@ -25,6 +25,8 @@ import {
   PanelLeft,
 } from 'lucide-react';
 
+import { motion, AnimatePresence } from 'framer-motion';
+
 type PrivateShellProps = {
   children: ReactNode;
   user: AuthUserDTO;
@@ -270,6 +272,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
             aria-label="Access Command Menu"
             aria-expanded={sidebarOpen}
             aria-controls="mobile-sidebar"
+            aria-haspopup="true"
           >
             <PanelLeft size={22} />
           </button>
@@ -290,8 +293,18 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
           {/* Internal Grain Texture */}
           <div className="absolute inset-0 bg-noise opacity-[0.02] pointer-events-none mix-blend-overlay" />
 
-          <div className="max-w-[1700px] mx-auto relative z-10 animate-in fade-in duration-1000">
-            {children}
+          <div className="max-w-[1700px] mx-auto relative z-10">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={pathname}
+                initial={{ opacity: 0, y: 10, filter: 'blur(8px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, y: -10, filter: 'blur(8px)' }}
+                transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </main>
       </div>

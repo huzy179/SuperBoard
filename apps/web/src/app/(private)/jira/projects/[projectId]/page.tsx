@@ -1,66 +1,76 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import type {
-  CreateTaskRequestDTO,
-  ProjectTaskItemDTO,
-  ProjectMemberDTO,
-} from '@superboard/shared';
-import { FullPageError, FullPageLoader } from '@/components/ui/page-states';
-import { QuickSearchDialog } from '@/features/jira/components/quick-search-dialog';
+import type { CreateTaskRequestDTO, ProjectMemberDTO } from '@superboard/shared';
+import { FullPageError } from '@/components/ui/page-states';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { ProjectSkeleton } from '@/features/jira/components/ProjectSkeleton';
 
 import { ProjectDetailHeader } from '@/features/jira/components/project-detail-header';
-import { TaskBoardView } from '@/features/jira/components/task-board-view';
-import { TaskListView } from '@/features/jira/components/task-list-view';
-import { TaskEditSlideOver } from '@/features/jira/components/task-edit-slide-over';
-import { TaskCalendarView } from '@/features/jira/components/task-calendar-view';
+import { ProjectViewManager } from '@/features/jira/components/ProjectViewManager';
+import { ProjectOverlayManager } from '@/features/jira/components/ProjectOverlayManager';
 import { TaskCreateForm } from '@/features/jira/components/task-create-form';
 import { TaskFilterBar } from '@/features/jira/components/task-filter-bar';
 import { TaskBulkActionBar } from '@/features/jira/components/task-bulk-action-bar';
-import { AutomationSlideOver } from '@/features/automation/components/automation-slide-over';
-import { KnowledgeMap } from '@/features/search/components/knowledge-map';
-import { ProjectCopilot } from '@/features/ai/components/project-copilot';
-import { ExecutiveBriefingCard } from '@/features/reports/components/executive-briefing-card';
 
+import {
+  ProjectDetailProvider,
+  useProjectDetailContext,
+} from '@/features/jira/context/ProjectDetailContext';
 import { useAuthSession } from '@/features/auth/hooks';
 import {
   useProjectDetail,
   useProjectCalendar,
   useProjectHeaderActions,
-  useBulkTaskOperation,
+  useTaskBulkActions,
+  useTaskDragDrop,
+  useTaskEditPanel,
+  useTaskSelection,
+  useProjectWorkflow,
+  usePredictiveHealth,
+} from '@/features/jira/hooks';
+import {
   useCreateTask,
   useUpdateTask,
   useUpdateTaskStatus,
   useArchiveTask,
   useRestoreTask,
-  useProjectUrlState,
-  useTaskSelection,
-  useTaskBulkActions,
-  useTaskEditPanel,
-  useTaskDragDrop,
-  useProjectWorkflow,
-  usePredictiveHealth,
-} from '@/features/jira/hooks';
+  useBulkTaskOperation,
+} from '@/features/jira/hooks/use-task-mutations';
+import { useProjectUrlState } from '@/features/jira/hooks/use-project-url-state';
 import { BOARD_COLUMNS, PRIORITY_OPTIONS, TASK_TYPE_OPTIONS } from '@/lib/constants/task';
-import {
-  filterAndSortProjectTasks,
-  toggleSetFilterValue,
-  type TaskSortBy,
-  type SortDirection,
-  buildBoardData,
-} from '@/lib/helpers/task-view';
-import type { ViewMode } from '@/stores/jira-project-ui-store';
+import { filterAndSortProjectTasks, buildBoardData } from '@/lib/helpers/task-view';
 
 export default function ProjectDetailPage() {
+  return (
+    <ProjectDetailProvider>
+      <ProjectDetailPageContent />
+    </ProjectDetailProvider>
+  );
+}
+
+function ProjectDetailPageContent() {
   const params = useParams<{ projectId: string }>();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const projectId = params.projectId;
 
-  const [showArchived, setShowArchived] = useState(false);
+  const {
+    showCreateTaskPanel,
+    setShowCreateTaskPanel,
+    taskStatus,
+    setShowQuickSearch,
+    filterQuery,
+    filterAssignee,
+    filterStatuses,
+    filterPriorities,
+    filterTypes,
+    sortBy,
+    sortDir,
+    showArchived,
+  } = useProjectDetailContext();
 
   const {
     data: project,
@@ -89,19 +99,6 @@ export default function ProjectDetailPage() {
   );
   const allowedTypes = useMemo(() => new Set(TASK_TYPE_OPTIONS.map((type) => type.key)), []);
 
-  // Filter & View states
-  const [viewMode, setViewMode] = useState<ViewMode>('board');
-  const [showCreateTaskPanel, setShowCreateTaskPanel] = useState(false);
-  const [filterQuery, setFilterQuery] = useState('');
-  const [filterAssignee, setFilterAssignee] = useState('');
-  const [filterStatuses, setFilterStatuses] = useState<Set<string>>(new Set());
-  const [filterPriorities, setFilterPriorities] = useState<Set<string>>(new Set());
-  const [filterTypes, setFilterTypes] = useState<Set<string>>(new Set());
-  const [sortBy, setSortBy] = useState<TaskSortBy>('');
-  const [sortDir, setSortDir] = useState<SortDirection>('asc');
-  const [showAutomationPanel, setShowAutomationPanel] = useState(false);
-  const [showKnowledgeMap, setShowKnowledgeMap] = useState(false);
-
   // Sync state with URL
   useProjectUrlState({
     projectId,
@@ -111,24 +108,6 @@ export default function ProjectDetailPage() {
     allowedStatuses,
     allowedPriorities,
     allowedTypes,
-    viewMode,
-    filterQuery,
-    filterAssignee,
-    filterStatuses,
-    filterPriorities,
-    filterTypes,
-    sortBy,
-    sortDir,
-    setViewMode,
-    setFilterQuery,
-    setFilterAssignee,
-    setFilterStatuses,
-    setFilterPriorities,
-    setFilterTypes,
-    setSortBy,
-    setSortDir,
-    showArchived,
-    setShowArchived,
   });
 
   const tasks = useMemo(() => project?.tasks ?? [], [project?.tasks]);
@@ -196,7 +175,6 @@ export default function ProjectDetailPage() {
     handleDeleteSubtask,
     editingParentTask,
     dialogRef,
-    handleDialogKeyDown,
     handleUpdateTask,
     handleDeleteTask,
     handleRestoreTask,
@@ -232,9 +210,6 @@ export default function ProjectDetailPage() {
     setTaskUpdateError,
   });
 
-  const [taskStatus, setTaskStatus] = useState<ProjectTaskItemDTO['status'] | undefined>();
-  const [showQuickSearch, setShowQuickSearch] = useState(false);
-
   const { viewerCount, isCopyLinkSuccess, onCopyFilterLink } = useProjectHeaderActions(projectId);
 
   const {
@@ -245,9 +220,6 @@ export default function ProjectDetailPage() {
     prevMonth,
     nextMonth,
   } = useProjectCalendar(tasks);
-
-  const handleOpenQuickSearch = useCallback(() => setShowQuickSearch(true), []);
-  const handleCloseQuickSearch = useCallback(() => setShowQuickSearch(false), []);
 
   const { data: workflow } = useProjectWorkflow(projectId);
   const { data: predictiveHealth } = usePredictiveHealth(projectId);
@@ -268,8 +240,8 @@ export default function ProjectDetailPage() {
   }, [workflow?.statuses]);
 
   useKeyboardShortcuts([
-    { key: 'k', metaKey: true, handler: handleOpenQuickSearch },
-    { key: '/', handler: handleOpenQuickSearch },
+    { key: 'k', metaKey: true, handler: () => setShowQuickSearch(true) },
+    { key: '/', handler: () => setShowQuickSearch(true) },
   ]);
 
   const boardDataStatuses = useMemo(() => dynamicColumns.map((col) => col.key), [dynamicColumns]);
@@ -301,28 +273,12 @@ export default function ProjectDetailPage() {
     isUpdatePending: updateTaskStatusMutation.isPending,
   });
 
-  const handleUpdateTaskStatusDirect = async (
-    taskId: string,
-    status: ProjectTaskItemDTO['status'],
-  ) => {
-    await updateTaskStatusMutation.mutateAsync({ taskId, status });
-  };
-
-  const handleToggleFilter = (key: 'status' | 'priority' | 'type', value: string) => {
-    const setters = {
-      status: { current: filterStatuses, setter: setFilterStatuses },
-      priority: { current: filterPriorities, setter: setFilterPriorities },
-      type: { current: filterTypes, setter: setFilterTypes },
-    };
-    const { current, setter } = setters[key];
-    setter(toggleSetFilterValue(new Set(current), value));
-  };
-
-  const currentViewLabel = useMemo(() => {
-    if (viewMode === 'list') return 'Danh sách';
-    if (viewMode === 'calendar') return 'Lịch';
-    return 'Board';
-  }, [viewMode]);
+  const handleUpdateTaskStatusDirect = useCallback(
+    async (taskId: string, status: string) => {
+      await updateTaskStatusMutation.mutateAsync({ taskId, status });
+    },
+    [updateTaskStatusMutation],
+  );
 
   const statusSelectLockReason = isDragDropLocked
     ? 'Đang chờ xác nhận xoá, tạm khoá chỉnh sửa'
@@ -330,7 +286,7 @@ export default function ProjectDetailPage() {
       ? 'Đang cập nhật trạng thái task'
       : undefined;
 
-  if (loading) return <FullPageLoader label="Đang tải..." />;
+  if (loading) return <ProjectSkeleton />;
   if (error || !project)
     return (
       <FullPageError
@@ -342,85 +298,53 @@ export default function ProjectDetailPage() {
     );
 
   return (
-    <section className="flex flex-col gap-6 p-6">
-      <ProjectDetailHeader
-        project={project!}
-        projectKey={projectKey}
-        currentViewLabel={currentViewLabel}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-        viewerCount={viewerCount}
-        setShowCreateTaskPanel={setShowCreateTaskPanel}
-        isCopyLinkSuccess={isCopyLinkSuccess}
-        onCopyFilterLink={onCopyFilterLink}
-        onOpenAutomation={() => setShowAutomationPanel(true)}
-        onOpenGraph={() => setShowKnowledgeMap(true)}
-      />
+    <section className="flex flex-col gap-6 p-6 min-h-screen relative overflow-hidden bg-slate-950">
+      {/* Neural Aura Backgrounds */}
+      <div className="absolute top-0 left-1/4 w-[800px] h-[800px] bg-brand-500/5 blur-[160px] rounded-full pointer-events-none -translate-y-1/2" />
+      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-indigo-500/5 blur-[140px] rounded-full pointer-events-none translate-y-1/2" />
 
-      <div className="flex flex-col gap-4">
-        <TaskFilterBar
-          members={members}
-          filterQuery={filterQuery}
-          onFilterQueryChange={setFilterQuery}
-          filterAssignee={filterAssignee}
-          onFilterAssigneeChange={setFilterAssignee}
-          filterStatuses={filterStatuses}
-          onToggleStatus={(val) => handleToggleFilter('status', val)}
-          filterPriorities={filterPriorities}
-          onTogglePriority={(val) => handleToggleFilter('priority', val)}
-          filterTypes={filterTypes}
-          onToggleType={(val) => handleToggleFilter('type', val)}
-          sortBy={sortBy}
-          onSortByChange={setSortBy}
-          sortDir={sortDir}
-          onToggleSortDir={() => setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
-          hasActiveFilters={
-            filterStatuses.size > 0 ||
-            filterPriorities.size > 0 ||
-            filterTypes.size > 0 ||
-            !!filterAssignee ||
-            !!filterQuery
-          }
-          onClearFilters={() => {
-            setFilterStatuses(new Set());
-            setFilterPriorities(new Set());
-            setFilterTypes(new Set());
-            setFilterAssignee('');
-            setFilterQuery('');
-            setShowArchived(false);
-          }}
-          showArchived={showArchived}
-          onToggleShowArchived={() => setShowArchived((prev) => !prev)}
-          workflow={workflow}
+      <div className="relative z-10 flex flex-col gap-8">
+        <ProjectDetailHeader
+          project={project!}
+          projectKey={projectKey}
+          viewerCount={viewerCount}
+          isCopyLinkSuccess={isCopyLinkSuccess}
+          onCopyFilterLink={onCopyFilterLink}
         />
 
-        <TaskBulkActionBar
-          members={members}
-          selectedCount={selectedTaskIds.size}
-          selectedVisibleCount={selectedVisibleCount}
-          totalVisibleCount={visibleTasks.length}
-          bulkStatus={bulkStatus}
-          onBulkStatusChange={setBulkStatus}
-          bulkPriority={bulkPriority}
-          onBulkPriorityChange={setBulkPriority}
-          bulkAssigneeId={bulkAssigneeId}
-          onBulkAssigneeIdChange={setBulkAssigneeId}
-          isStatusPending={bulkUpdatePending}
-          isPriorityPending={bulkPriorityPending}
-          isAssignPending={bulkAssignPending}
-          isDeletePending={bulkDeletePending}
-          onToggleSelectAllVisible={toggleSelectAllVisible}
-          onClearSelection={clearTaskSelection}
-          onApplyStatus={() => handleBulkUpdateStatus({ selectedTaskIds, clearTaskSelection })}
-          onApplyPriority={() => handleBulkUpdatePriority({ selectedTaskIds, clearTaskSelection })}
-          onApplyAssignee={() => handleBulkAssignAssignee({ selectedTaskIds, clearTaskSelection })}
-          onDeleteSelected={() => handleBulkDeleteTasks({ selectedTaskIds, clearTaskSelection })}
-          workflow={workflow}
-        />
-      </div>
+        <div className="flex flex-col gap-4">
+          <TaskFilterBar members={members} workflow={workflow} />
 
-      {showCreateTaskPanel ? (
-        <div className="rounded-xl border border-brand-100 bg-brand-50/30 p-4 shadow-sm animate-in fade-in slide-in-from-top-2">
+          <TaskBulkActionBar
+            members={members}
+            selectedCount={selectedTaskIds.size}
+            selectedVisibleCount={selectedVisibleCount}
+            totalVisibleCount={visibleTasks.length}
+            bulkStatus={bulkStatus}
+            onBulkStatusChange={setBulkStatus}
+            bulkPriority={bulkPriority}
+            onBulkPriorityChange={setBulkPriority}
+            bulkAssigneeId={bulkAssigneeId}
+            onBulkAssigneeIdChange={setBulkAssigneeId}
+            isStatusPending={bulkUpdatePending}
+            isPriorityPending={bulkPriorityPending}
+            isAssignPending={bulkAssignPending}
+            isDeletePending={bulkDeletePending}
+            onToggleSelectAllVisible={toggleSelectAllVisible}
+            onClearSelection={clearTaskSelection}
+            onApplyStatus={() => handleBulkUpdateStatus({ selectedTaskIds, clearTaskSelection })}
+            onApplyPriority={() =>
+              handleBulkUpdatePriority({ selectedTaskIds, clearTaskSelection })
+            }
+            onApplyAssignee={() =>
+              handleBulkAssignAssignee({ selectedTaskIds, clearTaskSelection })
+            }
+            onDeleteSelected={() => handleBulkDeleteTasks({ selectedTaskIds, clearTaskSelection })}
+            workflow={workflow}
+          />
+        </div>
+
+        {showCreateTaskPanel ? (
           <TaskCreateForm
             initialStatus={taskStatus}
             onSuccess={() => setShowCreateTaskPanel(false)}
@@ -432,55 +356,16 @@ export default function ProjectDetailPage() {
             }}
             workflow={workflow}
           />
-        </div>
-      ) : null}
+        ) : null}
 
-      {viewMode === 'board' ? (
-        <TaskBoardView
-          boardData={boardData}
+        <ProjectViewManager
+          projectId={projectId}
           projectKey={projectKey}
-          isDragDropLocked={isDragDropLocked}
-          dragOverColumn={dragOverColumn}
-          setDragOverColumn={setDragOverColumn}
-          onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-          onDropByPosition={handleDropByPosition}
-          onOpenEdit={handleOpenEdit}
-          selectedTaskIds={selectedTaskIds}
-          onSelectTask={handleSelectTask}
-          isUpdatePending={updateTaskStatusMutation.isPending}
-          updatingTaskId={updateTaskStatusMutation.variables?.taskId}
-          onAddTask={(status) => {
-            setTaskStatus(status);
-            setShowCreateTaskPanel(true);
-          }}
-          columns={dynamicColumns}
-          workflow={workflow}
-          draggedTaskId={draggedTaskId}
-          atRiskTaskIds={atRiskTaskIds}
-        />
-      ) : viewMode === 'list' ? (
-        <TaskListView
           visibleTasks={visibleTasks}
-          projectKey={projectKey}
-          selectedTaskIds={selectedTaskIds}
-          selectedVisibleCount={selectedVisibleCount}
-          onSelectTask={handleSelectTask}
-          toggleSelectAllVisible={toggleSelectAllVisible}
-          onOpenEdit={handleOpenEdit}
-          onUpdateTaskStatus={handleUpdateTaskStatusDirect}
-          isUpdatePending={updateTaskStatusMutation.isPending}
-          isDragDropLocked={isDragDropLocked}
-          statusSelectLockReason={statusSelectLockReason}
+          boardData={boardData}
+          dynamicColumns={dynamicColumns}
           workflow={workflow}
-        />
-      ) : viewMode === 'insights' ? (
-        <div className="animate-in fade-in zoom-in-95 duration-700">
-          <ExecutiveBriefingCard projectId={projectId} />
-        </div>
-      ) : (
-        <TaskCalendarView
+          atRiskTaskIds={atRiskTaskIds}
           calendarMonthLabel={calendarMonthLabel}
           calendarCells={calendarCells}
           dueTasksByDate={dueTasksByDate}
@@ -488,23 +373,41 @@ export default function ProjectDetailPage() {
           onPrevMonth={prevMonth}
           onNextMonth={nextMonth}
           onOpenEdit={handleOpenEdit}
-          onDropTask={async (taskId, newDateKey) => {
+          onUpdateTaskStatus={handleUpdateTaskStatusDirect}
+          onDropTask={async (taskId: string, newDateKey: string) => {
             await updateTaskMutation.mutateAsync({
-              id: taskId,
-              dueDate: new Date(newDateKey),
+              taskId: taskId,
+              data: { dueDate: new Date(newDateKey).toISOString() },
             });
           }}
-          workflow={workflow}
+          selectedTaskIds={selectedTaskIds}
+          selectedVisibleCount={selectedVisibleCount}
+          onSelectTask={handleSelectTask}
+          toggleSelectAllVisible={toggleSelectAllVisible}
+          isDragDropLocked={isDragDropLocked}
+          dragOverColumn={dragOverColumn}
+          setDragOverColumn={setDragOverColumn}
+          draggedTaskId={draggedTaskId}
+          handleDragStart={handleDragStart}
+          handleDragOver={handleDragOver}
+          handleDrop={handleDrop}
+          handleDropByPosition={handleDropByPosition}
+          isUpdatePending={updateTaskStatusMutation.isPending}
+          updatingTaskId={updateTaskStatusMutation.variables?.taskId}
+          statusSelectLockReason={statusSelectLockReason}
         />
-      )}
 
-      {editingTask ? (
-        <TaskEditSlideOver
-          editingTask={editingTask}
-          projectKey={projectKey}
+        <ProjectOverlayManager
           projectId={projectId}
-          currentUserId={currentUser?.id ?? ''}
+          project={project}
+          tasks={tasks}
           members={members}
+          currentUser={currentUser}
+          workflow={workflow}
+          predictiveHealth={predictiveHealth}
+          editingTask={editingTask}
+          onCloseEdit={handleCloseEdit}
+          onOpenEdit={handleOpenEdit}
           editTitle={editTitle}
           setEditTitle={setEditTitle}
           editDescription={editDescription}
@@ -530,62 +433,16 @@ export default function ProjectDetailPage() {
           handleToggleSubtaskDone={handleToggleSubtaskDone}
           handleDeleteSubtask={handleDeleteSubtask}
           editingParentTask={editingParentTask}
-          onClose={handleCloseEdit}
-          onSave={handleUpdateTask}
-          onDelete={handleDeleteTask}
-          onRestore={handleRestoreTask}
+          handleUpdateTask={handleUpdateTask}
+          handleDeleteTask={handleDeleteTask}
+          handleRestoreTask={handleRestoreTask}
           isSaving={updateTaskMutation.isPending}
           isDeleting={archiveTaskMutation.isPending}
           isRestoring={restoreTaskMutation.isPending}
           taskUpdateError={taskUpdateError}
-          handleOpenEdit={handleOpenEdit}
           dialogRef={dialogRef}
-          handleDialogKeyDown={handleDialogKeyDown}
-          workflow={workflow}
-          predictiveHealth={predictiveHealth}
-          workspaceId={project?.workspaceId ?? ''}
-          tasks={tasks}
         />
-      ) : null}
-
-      {showQuickSearch ? (
-        <QuickSearchDialog
-          tasks={tasks}
-          projectId={projectId}
-          onClose={handleCloseQuickSearch}
-          onSelectTask={(taskId) => {
-            setShowQuickSearch(false);
-            const task = tasks.find((t) => t.id === taskId);
-            if (task) handleOpenEdit(task);
-          }}
-        />
-      ) : null}
-
-      {showAutomationPanel && (
-        <AutomationSlideOver
-          workspaceId={project?.workspaceId ?? ''}
-          projectId={projectId}
-          onClose={() => setShowAutomationPanel(false)}
-        />
-      )}
-
-      {showKnowledgeMap && (
-        <KnowledgeMap
-          projectId={projectId}
-          onClose={() => setShowKnowledgeMap(false)}
-          onSelectNode={(nodeId, type) => {
-            if (type === 'task') {
-              const task = tasks.find((t) => t.id === nodeId);
-              if (task) {
-                setShowKnowledgeMap(false);
-                handleOpenEdit(task);
-              }
-            }
-          }}
-        />
-      )}
-
-      <ProjectCopilot projectId={projectId} />
+      </div>
     </section>
   );
 }

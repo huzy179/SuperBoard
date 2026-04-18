@@ -306,8 +306,9 @@ export function RichTextEditor({
               {/* Icon */}
               <div
                 onClick={() => {
-                  const ICONS = ['📑', '💾', '🛡️', '⚡', '📊', '🏛️', '🎯'];
-                  const nextIcon = ICONS[(ICONS.indexOf(icon) + 1) % ICONS.length];
+                  const ICONS = ['📑', '💾', '🛡️', '⚡', '📊', '🏛️', '🎯'] as const;
+                  const currentIcon = icon as (typeof ICONS)[number];
+                  const nextIcon = ICONS[(ICONS.indexOf(currentIcon) + 1) % ICONS.length]!;
                   setIcon(nextIcon);
                 }}
                 className="w-32 h-32 bg-slate-900 rounded-[2.5rem] shadow-glow-brand/5 flex items-center justify-center text-6xl border border-white/10 transform transition hover:scale-110 cursor-pointer active:scale-95 group/icon"

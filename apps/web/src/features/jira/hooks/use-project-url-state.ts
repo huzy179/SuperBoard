@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import type { ReadonlyURLSearchParams } from 'next/navigation';
 import { LAST_PROJECT_QUERY_KEY, LAST_PROJECT_VIEW_KEY } from '@/lib/constants/project';
-import type { SortDirection, TaskSortBy } from '@/lib/helpers/task-view';
 import type { ViewMode } from '@/stores/jira-project-ui-store';
+import { useProjectDetailContext } from '../context/ProjectDetailContext';
 
 type UrlStateOptions = {
   projectId: string;
@@ -12,24 +12,6 @@ type UrlStateOptions = {
   allowedStatuses: ReadonlySet<string>;
   allowedPriorities: ReadonlySet<string>;
   allowedTypes: ReadonlySet<string>;
-  viewMode: ViewMode;
-  filterQuery: string;
-  filterAssignee: string;
-  filterStatuses: Set<string>;
-  filterPriorities: Set<string>;
-  filterTypes: Set<string>;
-  sortBy: TaskSortBy;
-  sortDir: SortDirection;
-  setViewMode: (value: ViewMode) => void;
-  setFilterQuery: (value: string) => void;
-  setFilterAssignee: (value: string) => void;
-  setFilterStatuses: (value: Set<string>) => void;
-  setFilterPriorities: (value: Set<string>) => void;
-  setFilterTypes: (value: Set<string>) => void;
-  setSortBy: (value: TaskSortBy) => void;
-  setSortDir: (value: SortDirection) => void;
-  showArchived: boolean;
-  setShowArchived: (value: boolean) => void;
 };
 
 function parseCsvSet(value: string | null, allowed: ReadonlySet<string>): Set<string> {
@@ -97,6 +79,26 @@ function areSetsEqual(a: Set<string>, b: Set<string>): boolean {
 
 export function useProjectUrlState(options: UrlStateOptions) {
   const isApplyingUrlStateRef = useRef(false);
+  const {
+    viewMode,
+    setViewMode,
+    filterQuery,
+    setFilterQuery,
+    filterAssignee,
+    setFilterAssignee,
+    filterStatuses,
+    setFilterStatuses,
+    filterPriorities,
+    setFilterPriorities,
+    filterTypes,
+    setFilterTypes,
+    sortBy,
+    setSortBy,
+    sortDir,
+    setSortDir,
+    showArchived,
+    setShowArchived,
+  } = useProjectDetailContext();
 
   useEffect(() => {
     const nextViewMode = parseViewMode(options.searchParams.get('view'));
@@ -114,41 +116,41 @@ export function useProjectUrlState(options: UrlStateOptions) {
 
     let changed = false;
 
-    if (options.viewMode !== nextViewMode) {
+    if (viewMode !== nextViewMode) {
       changed = true;
-      options.setViewMode(nextViewMode);
+      setViewMode(nextViewMode);
     }
-    if (options.filterQuery !== nextQuery) {
+    if (filterQuery !== nextQuery) {
       changed = true;
-      options.setFilterQuery(nextQuery);
+      setFilterQuery(nextQuery);
     }
-    if (options.filterAssignee !== nextAssignee) {
+    if (filterAssignee !== nextAssignee) {
       changed = true;
-      options.setFilterAssignee(nextAssignee);
+      setFilterAssignee(nextAssignee);
     }
-    if (!areSetsEqual(options.filterStatuses, nextStatuses)) {
+    if (!areSetsEqual(filterStatuses, nextStatuses)) {
       changed = true;
-      options.setFilterStatuses(nextStatuses);
+      setFilterStatuses(nextStatuses);
     }
-    if (!areSetsEqual(options.filterPriorities, nextPriorities)) {
+    if (!areSetsEqual(filterPriorities, nextPriorities)) {
       changed = true;
-      options.setFilterPriorities(nextPriorities);
+      setFilterPriorities(nextPriorities);
     }
-    if (!areSetsEqual(options.filterTypes, nextTypes)) {
+    if (!areSetsEqual(filterTypes, nextTypes)) {
       changed = true;
-      options.setFilterTypes(nextTypes);
+      setFilterTypes(nextTypes);
     }
-    if (options.sortBy !== nextSortBy) {
+    if (sortBy !== nextSortBy) {
       changed = true;
-      options.setSortBy(nextSortBy);
+      setSortBy(nextSortBy);
     }
-    if (options.sortDir !== nextSortDir) {
+    if (sortDir !== nextSortDir) {
       changed = true;
-      options.setSortDir(nextSortDir);
+      setSortDir(nextSortDir);
     }
-    if (options.showArchived !== nextShowArchived) {
+    if (showArchived !== nextShowArchived) {
       changed = true;
-      options.setShowArchived(nextShowArchived);
+      setShowArchived(nextShowArchived);
     }
 
     if (changed) {
@@ -159,24 +161,24 @@ export function useProjectUrlState(options: UrlStateOptions) {
     options.allowedStatuses,
     options.allowedPriorities,
     options.allowedTypes,
-    options.viewMode,
-    options.filterQuery,
-    options.filterAssignee,
-    options.filterStatuses,
-    options.filterPriorities,
-    options.filterTypes,
-    options.sortBy,
-    options.sortDir,
-    options.setViewMode,
-    options.setFilterQuery,
-    options.setFilterAssignee,
-    options.setFilterStatuses,
-    options.setFilterPriorities,
-    options.setFilterTypes,
-    options.setSortBy,
-    options.setSortDir,
-    options.showArchived,
-    options.setShowArchived,
+    viewMode,
+    filterQuery,
+    filterAssignee,
+    filterStatuses,
+    filterPriorities,
+    filterTypes,
+    sortBy,
+    sortDir,
+    showArchived,
+    setViewMode,
+    setFilterQuery,
+    setFilterAssignee,
+    setFilterStatuses,
+    setFilterPriorities,
+    setFilterTypes,
+    setSortBy,
+    setSortDir,
+    setShowArchived,
   ]);
 
   useEffect(() => {
@@ -187,55 +189,55 @@ export function useProjectUrlState(options: UrlStateOptions) {
 
     const nextParams = new URLSearchParams(options.searchParams.toString());
 
-    if (options.viewMode === 'board') {
+    if (viewMode === 'board') {
       nextParams.delete('view');
     } else {
-      nextParams.set('view', options.viewMode);
+      nextParams.set('view', viewMode);
     }
 
-    const normalizedQuery = options.filterQuery.trim();
+    const normalizedQuery = filterQuery.trim();
     if (!normalizedQuery) {
       nextParams.delete('q');
     } else {
       nextParams.set('q', normalizedQuery);
     }
 
-    if (!options.filterAssignee) {
+    if (!filterAssignee) {
       nextParams.delete('assignee');
     } else {
-      nextParams.set('assignee', options.filterAssignee);
+      nextParams.set('assignee', filterAssignee);
     }
 
-    const statusesValue = serializeCsvSet(options.filterStatuses);
+    const statusesValue = serializeCsvSet(filterStatuses);
     if (!statusesValue) {
       nextParams.delete('statuses');
     } else {
       nextParams.set('statuses', statusesValue);
     }
 
-    const prioritiesValue = serializeCsvSet(options.filterPriorities);
+    const prioritiesValue = serializeCsvSet(filterPriorities);
     if (!prioritiesValue) {
       nextParams.delete('priorities');
     } else {
       nextParams.set('priorities', prioritiesValue);
     }
 
-    const typesValue = serializeCsvSet(options.filterTypes);
+    const typesValue = serializeCsvSet(filterTypes);
     if (!typesValue) {
       nextParams.delete('types');
     } else {
       nextParams.set('types', typesValue);
     }
 
-    if (!options.sortBy) {
+    if (!sortBy) {
       nextParams.delete('sortBy');
       nextParams.delete('sortDir');
     } else {
-      nextParams.set('sortBy', options.sortBy);
-      nextParams.set('sortDir', options.sortDir);
+      nextParams.set('sortBy', sortBy);
+      nextParams.set('sortDir', sortDir);
     }
 
-    if (!options.showArchived) {
+    if (!showArchived) {
       nextParams.delete('archived');
     } else {
       nextParams.set('archived', 'true');
@@ -248,15 +250,15 @@ export function useProjectUrlState(options: UrlStateOptions) {
       options.router.replace(nextUrl, { scroll: false });
     }
   }, [
-    options.viewMode,
-    options.filterQuery,
-    options.filterAssignee,
-    options.filterStatuses,
-    options.filterPriorities,
-    options.filterTypes,
-    options.sortBy,
-    options.sortDir,
-    options.showArchived,
+    viewMode,
+    filterQuery,
+    filterAssignee,
+    filterStatuses,
+    filterPriorities,
+    filterTypes,
+    sortBy,
+    sortDir,
+    showArchived,
     options.pathname,
     options.router,
     options.searchParams,
@@ -274,7 +276,7 @@ export function useProjectUrlState(options: UrlStateOptions) {
       const current = raw ? (JSON.parse(raw) as Record<string, ViewMode>) : {};
       const nextViews = {
         ...current,
-        [options.projectId]: options.viewMode,
+        [options.projectId]: viewMode,
       };
       window.localStorage.setItem(LAST_PROJECT_VIEW_KEY, JSON.stringify(nextViews));
 
@@ -288,5 +290,5 @@ export function useProjectUrlState(options: UrlStateOptions) {
     } catch {
       // ignore localStorage parse/write errors
     }
-  }, [options.projectId, options.viewMode, options.searchParams]);
+  }, [options.projectId, viewMode, options.searchParams]);
 }

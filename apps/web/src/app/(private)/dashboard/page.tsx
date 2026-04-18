@@ -5,7 +5,6 @@ import {
   Activity,
   AlertCircle,
   BrainCircuit,
-  Cpu,
   Folders,
   LayoutDashboard,
   RefreshCcw,
@@ -18,6 +17,10 @@ import { FullPageError } from '@/components/ui/page-states';
 import { useDashboardStats } from '@/features/dashboard/hooks';
 import { STATUS_LABELS } from '@/lib/constants/task';
 import type { DashboardStatsDTO } from '@superboard/shared';
+
+import { StatCard } from '@/features/dashboard/components/stat-card';
+import { DonutDistributionChart } from '@/features/dashboard/components/distribution-chart';
+import { DashboardSkeleton } from '@/features/dashboard/components/dashboard-skeleton';
 
 const CHART_COLOR_CLASSES = [
   'text-brand-500',
@@ -280,204 +283,6 @@ export default function DashboardPage() {
             return null;
           })}
       </div>
-    </div>
-  );
-}
-
-function DonutDistributionChart({
-  items,
-  total,
-  emptyMessage,
-}: {
-  items: Array<{ key: string; label: string; value: number; colorClass: string }>;
-  total: number;
-  emptyMessage: string;
-}) {
-  const radius = 38;
-  const circumference = 2 * Math.PI * radius;
-
-  if (items.length === 0 || total === 0) {
-    return (
-      <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-[2rem] opacity-20">
-        <Cpu size={32} className="mb-4" />
-        <p className="text-[10px] font-black uppercase tracking-[0.3em]">{emptyMessage}</p>
-      </div>
-    );
-  }
-
-  let currentOffset = 0;
-
-  return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 items-center">
-      <div className="relative flex justify-center">
-        <svg
-          viewBox="0 0 100 100"
-          className="h-48 w-48 -rotate-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.05)]"
-        >
-          <circle
-            cx="50"
-            cy="50"
-            r={radius}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="10"
-            className="text-white/[0.02]"
-          />
-          {items.map((item) => {
-            const segmentLength = (item.value / total) * circumference;
-            const dashOffset = -currentOffset;
-            currentOffset += segmentLength;
-
-            return (
-              <circle
-                key={item.key}
-                cx="50"
-                cy="50"
-                r={radius}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="10"
-                strokeLinecap="round"
-                strokeDasharray={`${segmentLength} ${circumference}`}
-                strokeDashoffset={dashOffset}
-                className={`${item.colorClass} transition-all duration-1000 ease-out`}
-                style={{
-                  filter: `drop-shadow(0 0 8px currentColor)`,
-                  strokeDashoffset: dashOffset,
-                }}
-              />
-            );
-          })}
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-4xl font-black text-white tracking-tighter leading-none">
-            {total}
-          </span>
-          <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] mt-2">
-            Active Nodes
-          </span>
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        {items.map((item) => {
-          const percent = Math.round((item.value / total) * 100);
-          return (
-            <div
-              key={item.key}
-              className="group/legend flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-white/10 transition-all"
-            >
-              <div className="flex items-center gap-4">
-                <div
-                  className={`h-2 w-2 rounded-full shadow-glow-current transition-transform group-hover/legend:scale-150 ${item.colorClass.replace('text-', 'bg-')}`}
-                />
-                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest group-hover/legend:text-white transition-colors">
-                  {item.label}
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="block text-sm font-black text-white tracking-tight">
-                  {item.value} Units
-                </span>
-                <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
-                  {percent}% Weight
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  icon,
-  color,
-  trend,
-  delay,
-}: {
-  label: string;
-  value: number;
-  icon: React.ReactNode;
-  color: 'brand' | 'emerald' | 'blue' | 'rose';
-  trend: string;
-  delay: number;
-}) {
-  const colorMap = {
-    brand: 'border-brand-500/20 text-brand-400 bg-brand-500/10 shadow-glow-brand/5',
-    emerald: 'border-emerald-500/20 text-emerald-400 bg-emerald-500/10 shadow-glow-emerald/5',
-    blue: 'border-blue-500/20 text-blue-400 bg-blue-500/10 shadow-glow-blue/5',
-    rose: 'border-rose-500/20 text-rose-400 bg-rose-500/10 shadow-glow-rose/5',
-  };
-
-  const glowMap = {
-    brand: 'bg-brand-500/5 shadow-glow-brand/20',
-    emerald: 'bg-emerald-500/5 shadow-glow-emerald/20',
-    blue: 'bg-blue-500/5 shadow-glow-blue/20',
-    rose: 'bg-rose-500/5 shadow-glow-rose/20',
-  };
-
-  return (
-    <div
-      className="group relative animate-in slide-in-from-bottom-8 duration-700"
-      style={{ animationDelay: `${delay * 100}ms`, animationFillMode: 'both' }}
-    >
-      <div
-        className={`absolute inset-x-8 -bottom-4 h-8 ${glowMap[color]} blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700`}
-      />
-      <div
-        className={`relative h-full rounded-[2.5rem] border border-white/5 bg-white/[0.01] p-8 backdrop-blur-3xl transition-all duration-500 hover:bg-white/[0.03] hover:-translate-y-2 hover:border-white/10 shadow-inner overflow-hidden`}
-      >
-        <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100" />
-        <div className="flex items-start justify-between relative z-10 mb-8">
-          <div
-            className={`p-4 rounded-2xl border ${colorMap[color]} transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6`}
-          >
-            {icon}
-          </div>
-          <div className="text-right">
-            <span className="block text-[8px] font-black uppercase tracking-[0.3em] text-white/20 mb-1">
-              Telemetry
-            </span>
-            <span
-              className={`text-[10px] font-black uppercase tracking-widest ${color === 'rose' ? 'text-rose-500 animate-pulse' : 'text-white/40'}`}
-            >
-              {trend}
-            </span>
-          </div>
-        </div>
-        <div className="relative z-10">
-          <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-2 pl-1">
-            {label}
-          </p>
-          <p className="text-5xl font-black text-white tracking-tighter tabular-nums leading-none">
-            {value}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DashboardSkeleton() {
-  return (
-    <div className="space-y-10 animate-pulse">
-      <div className="flex justify-between items-end">
-        <div className="space-y-4">
-          <div className="h-3 w-32 bg-white/5 rounded-full" />
-          <div className="h-12 w-96 bg-white/5 rounded-2xl" />
-        </div>
-        <div className="h-10 w-10 bg-white/5 rounded-2xl" />
-      </div>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-64 bg-white/5 border border-white/5 rounded-[2.5rem]" />
-        ))}
-      </div>
-      <div className="h-96 bg-white/5 border border-white/5 rounded-[2.5rem]" />
     </div>
   );
 }

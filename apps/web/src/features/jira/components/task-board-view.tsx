@@ -1,5 +1,6 @@
 import { useMemo, useCallback } from 'react';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { ProjectTaskItemDTO, WorkflowStatusTemplateDTO } from '@superboard/shared';
 import {
   TaskTypeIcon,
@@ -9,9 +10,9 @@ import {
   LabelDots,
   TaskIdBadge,
 } from '@/features/jira/components/task-badges';
-import { COLUMN_BORDER } from '@/lib/constants/task';
 import { formatDate } from '@/lib/format-date';
 import { isTaskOverdue } from '@/lib/helpers/task-view';
+import { QuantumCard } from '@/components/ui/quantum/QuantumCard';
 
 interface TaskBoardViewProps {
   boardData: Map<string, ProjectTaskItemDTO[]>;
@@ -41,6 +42,29 @@ interface TaskBoardViewProps {
   draggedTaskId: string | null;
   atRiskTaskIds?: Set<string>;
 }
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const columnVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.175, 0.885, 0.32, 1.275],
+    },
+  },
+};
+
 export function TaskBoardView({
   boardData,
   projectKey,
@@ -62,41 +86,71 @@ export function TaskBoardView({
   draggedTaskId,
   atRiskTaskIds,
 }: TaskBoardViewProps) {
-  const getCategoryColor = (category: string | undefined) => {
+  const getCategoryTheme = (category: string | undefined) => {
     switch (category) {
       case 'todo':
-        return 'bg-slate-100 text-slate-600 border-slate-200';
+        return {
+          label: 'STABLE_VOID',
+          color: 'text-slate-400',
+          bg: 'bg-slate-400/10',
+          border: 'border-slate-400/20',
+          glow: 'shadow-glow-slate/10',
+          indicator: '●',
+        };
       case 'in_progress':
-        return 'bg-blue-50 text-blue-700 border-blue-200';
+        return {
+          label: 'ACTIVE_PULSE',
+          color: 'text-brand-400',
+          bg: 'bg-brand-400/10',
+          border: 'border-brand-400/20',
+          glow: 'shadow-glow-brand/20',
+          indicator: '○',
+        };
       case 'in_review':
-        return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+        return {
+          label: 'RECON_ANALYSIS',
+          color: 'text-indigo-400',
+          bg: 'bg-indigo-400/10',
+          border: 'border-indigo-400/20',
+          glow: 'shadow-glow-indigo/10',
+          indicator: '◔',
+        };
       case 'done':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        return {
+          label: 'MISSION_COMPLETE',
+          color: 'text-emerald-400',
+          bg: 'bg-emerald-400/10',
+          border: 'border-emerald-400/20',
+          glow: 'shadow-glow-emerald/20',
+          indicator: '✔',
+        };
       case 'blocked':
-        return 'bg-rose-50 text-rose-700 border-rose-200';
+        return {
+          label: 'SYSTEM_STALL',
+          color: 'text-rose-400',
+          bg: 'bg-rose-400/10',
+          border: 'border-rose-400/20',
+          glow: 'shadow-glow-rose/10',
+          indicator: '✘',
+        };
       case 'cancelled':
-        return 'bg-slate-100 text-slate-500 border-slate-200';
+        return {
+          label: 'VOID_NULL',
+          color: 'text-white/20',
+          bg: 'bg-white/5',
+          border: 'border-white/10',
+          glow: 'none',
+          indicator: '◌',
+        };
       default:
-        return 'bg-slate-100 text-slate-600 border-slate-200';
-    }
-  };
-
-  const getCategoryIndicator = (category: string | undefined) => {
-    switch (category) {
-      case 'todo':
-        return '●';
-      case 'in_progress':
-        return '○';
-      case 'in_review':
-        return '◔';
-      case 'done':
-        return '✔';
-      case 'blocked':
-        return '✘';
-      case 'cancelled':
-        return '◌';
-      default:
-        return '●';
+        return {
+          label: 'UNKNOWN_SIGNAL',
+          color: 'text-slate-400',
+          bg: 'bg-slate-400/10',
+          border: 'border-slate-400/20',
+          glow: 'none',
+          indicator: '●',
+        };
     }
   };
 
@@ -126,13 +180,18 @@ export function TaskBoardView({
 
   const allowedStatuses = useMemo(() => {
     if (!draggedTask) return new Set<string>();
-    // Find the status ID of the current task
     const currentStatus = workflow?.statuses.find((s) => s.key === draggedTask.status);
     if (!currentStatus) return new Set<string>();
     return getAllowedTargetStatuses(currentStatus.id);
   }, [draggedTask, workflow, getAllowedTargetStatuses]);
+
   return (
-    <div className="flex gap-4 overflow-x-auto pb-3">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="flex gap-8 overflow-x-auto pb-12 pt-4 elite-scrollbar"
+    >
       {columns.map((column) => {
         const tasks = boardData.get(column.key) ?? [];
         const isDragOver = dragOverColumn === column.key;
@@ -140,22 +199,21 @@ export function TaskBoardView({
           !draggedTaskId || allowedStatuses.has(column.key) || draggedTask?.status === column.key;
         const isBlocked = draggedTaskId && !isAllowedTarget;
         const statusInfo = workflow?.statuses.find((s) => s.key === column.key);
-        const categoryStyles = getCategoryColor(statusInfo?.category);
-        const indicator = getCategoryIndicator(statusInfo?.category);
+        const theme = getCategoryTheme(statusInfo?.category);
 
         return (
-          <div
+          <motion.div
             key={column.key}
-            className={`min-w-[20rem] shrink-0 rounded-[2rem] border-t-8 bg-white/40 backdrop-blur-xl transition-all duration-500 flex flex-col max-h-full shadow-glass ${
-              COLUMN_BORDER[column.key] ?? 'border-t-slate-400'
-            } ${
+            layout
+            variants={columnVariants}
+            className={`min-w-[24rem] shrink-0 rounded-[3rem] border bg-white/[0.01] backdrop-blur-[40px] transition-all duration-700 flex flex-col max-h-[75vh] relative group/column ${
               isDragOver
                 ? isAllowedTarget
-                  ? 'border-emerald-500 bg-emerald-50/50 ring-8 ring-emerald-500/5 scale-[1.02] z-20 shadow-2xl'
-                  : 'border-rose-500 bg-rose-50/50 opacity-70 cursor-no-drop'
+                  ? 'border-brand-500 bg-brand-500/[0.03] shadow-glow-brand/10 scale-[1.02] z-20'
+                  : 'border-rose-500 bg-rose-500/10 opacity-70 cursor-no-drop'
                 : isBlocked
-                  ? 'opacity-40 grayscale-[0.5]'
-                  : 'border-white/50 border-b border-x'
+                  ? 'opacity-30 grayscale border-white/5'
+                  : 'border-white/5 shadow-luxe'
             }`}
             onDragOver={(e) => {
               onDragOver(e);
@@ -169,159 +227,203 @@ export function TaskBoardView({
                 onDrop(event, column.key);
               } else {
                 event.preventDefault();
-                toast.error('Giai đoạn này bị chặn bởi quy trình dự án');
+                toast.error('Mission trajectory blocked by protocol');
               }
             }}
           >
-            <div className="flex items-center justify-between border-b border-white/40 bg-white/20 px-4 py-3.5 backdrop-blur-sm rounded-t-[2rem]">
-              <div className="flex items-center gap-2">
-                <div
-                  className={`flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${categoryStyles}`}
+            {/* Atmospheric Background Glow */}
+            {isDragOver && isAllowedTarget && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="absolute inset-0 bg-brand-500/5 pointer-events-none rounded-[3rem] blur-3xl"
+              />
+            )}
+
+            {/* Column Header */}
+            <div className="flex items-center justify-between px-8 py-6 border-b border-white/5 relative z-10 bg-white/[0.02] rounded-t-[3rem]">
+              <div className="flex flex-col gap-1.5">
+                <span
+                  className={`text-[9px] font-black uppercase tracking-[0.4em] italic leading-none transition-colors duration-500 ${isDragOver ? 'text-brand-400' : 'text-white/20'}`}
                 >
-                  <span>{indicator}</span>
-                  <span>{column.label}</span>
+                  {theme.label}
+                </span>
+                <div className="flex items-center gap-3">
+                  <span className={`text-xs animate-pulse ${theme.color}`}>{theme.indicator}</span>
+                  <h3
+                    className={`text-base font-black uppercase tracking-tighter italic transition-colors duration-500 ${isDragOver ? 'text-white' : 'text-white/80'}`}
+                  >
+                    {column.label}
+                  </h3>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-900/5 px-1.5 text-[10px] font-black text-slate-500">
-                  {tasks.length}
+              <div className="flex items-center gap-4">
+                <div className="h-2 w-2 rounded-full bg-white/5" />
+                <span className="tabular-nums inline-flex h-8 min-w-10 items-center justify-center rounded-2xl bg-white/5 px-2.5 text-[10px] font-black font-mono text-white/40 border border-white/5 shadow-inner">
+                  {tasks.length.toString().padStart(2, '0')}
                 </span>
-                <button
-                  type="button"
-                  className="rounded px-1 text-xs leading-none text-slate-400 hover:bg-slate-200 hover:text-slate-600"
-                  aria-label={`Tùy chọn cột ${column.label}`}
-                >
-                  ...
-                </button>
               </div>
             </div>
-            <div className="space-y-2.5 p-2.5">
-              {tasks.length === 0 ? (
-                <p className="rounded-lg border border-dashed border-slate-200 px-3 py-5 text-center text-xs text-slate-500">
-                  Không có task
-                </p>
-              ) : (
-                tasks.map((task) => (
-                  <article
-                    key={task.id}
-                    tabIndex={0}
-                    role="button"
-                    aria-label={task.title}
-                    draggable={!isUpdatePending && !isDragDropLocked}
-                    onDragStart={(event) => onDragStart(event, task.id)}
-                    onDragOver={(event) => {
-                      onDragOver(event);
-                      event.stopPropagation();
-                    }}
-                    onDrop={(event) => onDropByPosition(event, column.key, task.id)}
-                    onClick={(e) => {
-                      if (e.metaKey || e.ctrlKey || e.shiftKey) {
-                        onSelectTask(task.id, e);
-                      } else {
-                        onOpenEdit(task);
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        onOpenEdit(task);
-                      }
-                    }}
-                    className={`group relative premium-card p-5 bg-white/80 backdrop-blur-sm transition-all duration-500 ${
-                      task.priority === 'urgent'
-                        ? 'border-l-red-500'
-                        : task.priority === 'high'
-                          ? 'border-l-orange-500'
-                          : task.priority === 'medium'
-                            ? 'border-l-blue-400'
-                            : 'border-l-slate-200'
-                    } ${
-                      isUpdatePending && updatingTaskId === task.id
-                        ? 'opacity-60 scale-95'
-                        : isDragDropLocked
-                          ? 'cursor-not-allowed opacity-80'
-                          : 'cursor-pointer hover:border-brand-500 hover:shadow-2xl hover:-translate-y-1.5 active:scale-[0.98]'
-                    } ${
-                      selectedTaskIds.has(task.id)
-                        ? 'border-brand-500 ring-8 ring-brand-500/5 shadow-2xl translate-y-[-4px] bg-brand-50/50'
-                        : 'border-white/50'
-                    } ${task.deletedAt ? 'bg-slate-50 opacity-60 grayscale' : ''}
-                  `}
+
+            {/* Task List Container */}
+            <div className="flex-1 overflow-y-auto space-y-5 p-6 min-h-[200px] elite-scrollbar relative z-10">
+              <AnimatePresence mode="popLayout">
+                {tasks.length === 0 ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex flex-col items-center justify-center py-24 rounded-[2.5rem] border-2 border-dashed border-white/5 bg-slate-950/20 group/empty"
                   >
-                    <div
-                      className={`absolute top-2 right-2 transition-opacity duration-200 ${selectedTaskIds.has(task.id) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedTaskIds.has(task.id)}
-                        onChange={(e) => onSelectTask(task.id, e)}
-                        onClick={(event) => event.stopPropagation()}
-                        aria-label={`Chọn task ${task.title}`}
-                        className="h-4 w-4 rounded-md border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer shadow-sm"
-                      />
+                    <div className="w-16 h-16 rounded-[1.5rem] bg-white/[0.02] border border-white/5 flex items-center justify-center mb-6 group-hover/empty:scale-110 group-hover/empty:rotate-12 transition-all duration-700">
+                      <span className="text-white/5 text-3xl font-black grayscale">∅</span>
                     </div>
-                    {atRiskTaskIds?.has(task.id) && (
-                      <div className="absolute top-2 left-2 flex items-center gap-1.5 px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded-md animate-pulse">
-                        <div className="h-1.5 w-1.5 rounded-full bg-amber-500 shadow-glow-amber scale-110" />
-                        <span className="text-[9px] font-black uppercase tracking-widest text-amber-600">
-                          At Risk
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between gap-1 mb-2">
-                      <div className="flex items-center gap-1.5">
-                        <TaskTypeIcon type={task.type ?? 'task'} />
-                        <TaskIdBadge projectKey={projectKey} number={task.number} />
-                      </div>
-                      {task.storyPoints ? <StoryPointsBadge points={task.storyPoints} /> : null}
-                    </div>
-                    {/* Title */}
-                    <p
-                      className={`text-[14px] font-bold leading-snug transition-colors ${
-                        task.deletedAt
-                          ? 'text-slate-400 line-through'
-                          : 'text-slate-900 group-hover:text-brand-700'
-                      }`}
-                    >
-                      {task.title}
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/10 italic">
+                      No Signal Packets
                     </p>
-                    {/* Labels */}
-                    {task.labels && task.labels.length > 0 ? (
-                      <div className="mt-1.5 max-h-12 overflow-hidden">
-                        <LabelDots labels={task.labels} />
-                      </div>
-                    ) : null}
-                    {/* Bottom: priority + due date + assignee */}
-                    <div className="mt-2 flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5">
-                        <PriorityBadge priority={task.priority} />
-                        {task.dueDate ? (
-                          <span
-                            className={`text-[11px] ${isTaskOverdue(task.dueDate) && task.status !== 'done' ? 'font-semibold text-red-600' : 'text-slate-500'}`}
-                          >
-                            {formatDate(task.dueDate)}
-                          </span>
-                        ) : null}
-                      </div>
-                      {task.assigneeName ? (
-                        <AssigneeAvatar name={task.assigneeName} color={task.assigneeAvatarColor} />
-                      ) : null}
-                    </div>
-                  </article>
-                ))
-              )}
+                  </motion.div>
+                ) : (
+                  tasks.map((task) => (
+                    <motion.div
+                      key={task.id}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ type: 'spring', damping: 25, stiffness: 120 }}
+                    >
+                      <QuantumCard
+                        hoverEffect={true}
+                        glowIntensity={isSelected ? 0.3 : 0.1}
+                        glowColor={
+                          task.priority === 'urgent'
+                            ? 'rose'
+                            : task.priority === 'high'
+                              ? 'brand'
+                              : 'none'
+                        }
+                        className={`${
+                          isUpdatePending && updatingTaskId === task.id
+                            ? 'opacity-60 grayscale scale-95'
+                            : isDragDropLocked
+                              ? 'cursor-not-allowed opacity-80'
+                              : 'cursor-grab active:cursor-grabbing'
+                        } ${
+                          selectedTaskIds.has(task.id)
+                            ? 'ring-2 ring-brand-500/40 bg-brand-500/5 shadow-glow-brand/10'
+                            : ''
+                        } ${task.deletedAt ? 'opacity-30 grayscale' : ''}`}
+                      >
+                        <article
+                          draggable={!isUpdatePending && !isDragDropLocked}
+                          onDragStart={(event) => onDragStart(event, task.id)}
+                          onDragOver={(event) => {
+                            onDragOver(event);
+                            event.stopPropagation();
+                          }}
+                          onDrop={(event) => onDropByPosition(event, column.key, task.id)}
+                          onClick={(e) => {
+                            if (e.metaKey || e.ctrlKey || e.shiftKey) {
+                              onSelectTask(task.id, e);
+                            } else {
+                              onOpenEdit(task);
+                            }
+                          }}
+                          className="p-6 space-y-5"
+                        >
+                          {/* Top Protocols */}
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/[0.03] border border-white/5 shadow-inner">
+                                <TaskTypeIcon type={task.type ?? 'task'} />
+                              </div>
+                              <TaskIdBadge projectKey={projectKey} number={task.number} />
+                            </div>
+                            {task.storyPoints ? (
+                              <StoryPointsBadge points={task.storyPoints} />
+                            ) : null}
+                          </div>
+
+                          {/* Mission Title */}
+                          <div className="space-y-2">
+                            {atRiskTaskIds?.has(task.id) && (
+                              <div className="flex items-center gap-2 mb-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shadow-glow-amber" />
+                                <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest italic">
+                                  MISSION_AT_RISK
+                                </span>
+                              </div>
+                            )}
+                            <h4
+                              className={`text-base font-black tracking-tighter leading-tight transition-colors italic uppercase ${
+                                task.deletedAt
+                                  ? 'text-white/10 line-through'
+                                  : 'text-white/90 group-hover:text-white'
+                              }`}
+                            >
+                              {task.title}
+                            </h4>
+                          </div>
+
+                          {/* Labels Track */}
+                          {task.labels && task.labels.length > 0 ? (
+                            <div className="pt-1">
+                              <LabelDots labels={task.labels} />
+                            </div>
+                          ) : null}
+
+                          {/* Tactical Metadata Footer */}
+                          <div className="flex items-center justify-between pt-5 border-t border-white/5">
+                            <div className="flex items-center gap-4">
+                              <PriorityBadge priority={task.priority} />
+                              {task.dueDate ? (
+                                <div className="flex items-center gap-2.5 px-3 py-1 bg-white/[0.02] rounded-lg border border-white/5">
+                                  <div
+                                    className={`h-1.5 w-1.5 rounded-full ${isTaskOverdue(task.dueDate) && task.status !== 'done' ? 'bg-rose-500 animate-pulse shadow-glow-rose' : 'bg-white/10'}`}
+                                  />
+                                  <span
+                                    className={`text-[9px] font-black tracking-widest uppercase italic ${isTaskOverdue(task.dueDate) && task.status !== 'done' ? 'text-rose-400' : 'text-white/20'}`}
+                                  >
+                                    {formatDate(task.dueDate).toUpperCase()}
+                                  </span>
+                                </div>
+                              ) : null}
+                            </div>
+                            {task.assigneeName ? (
+                              <div className="ring-4 ring-slate-950/80 rounded-full scale-110 shadow-luxe">
+                                <AssigneeAvatar
+                                  name={task.assigneeName}
+                                  color={task.assigneeAvatarColor}
+                                  size={28}
+                                />
+                              </div>
+                            ) : null}
+                          </div>
+                        </article>
+                      </QuantumCard>
+                    </motion.div>
+                  ))
+                )}
+              </AnimatePresence>
             </div>
-            {/* Quick add button */}
-            <button
-              type="button"
-              onClick={() => onAddTask(column.key)}
-              className="w-full border-t border-slate-200 px-3 py-2.5 text-left text-xs font-medium text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-            >
-              + Thêm task
-            </button>
-          </div>
+
+            {/* Signal Input Footer */}
+            <div className="px-6 pb-6 relative z-10">
+              <button
+                type="button"
+                onClick={() => onAddTask(column.key)}
+                className="group w-full flex items-center justify-center gap-4 rounded-2xl border border-dashed border-white/10 py-4 text-[10px] font-black uppercase tracking-[0.4em] text-white/10 transition-all hover:border-brand-500/40 hover:bg-brand-500/5 hover:text-brand-400 shadow-inner group/add"
+              >
+                <div className="w-5 h-5 flex items-center justify-center rounded-lg bg-white/5 border border-white/5 group-hover/add:bg-brand-500 group-hover/add:text-white transition-all">
+                  <span className="text-sm font-bold translate-y-[-1px] group-hover/add:rotate-90 transition-transform">
+                    +
+                  </span>
+                </div>
+                <span className="italic">INJECT_TASK_SIGNAL</span>
+              </button>
+            </div>
+          </motion.div>
         );
       })}
-    </div>
+    </motion.div>
   );
 }

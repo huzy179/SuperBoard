@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Check, Trash2, User, Flag, Loader2, SquareCheck, MousePointer2 } from 'lucide-react';
+import { X, Trash2, User, Flag, Loader2, SquareCheck, MousePointer2 } from 'lucide-react';
 import type { ProjectMemberDTO, ProjectTaskItemDTO, TaskPriorityDTO } from '@superboard/shared';
 import { BOARD_COLUMNS, PRIORITY_OPTIONS } from '@/lib/constants/task';
 
@@ -63,148 +63,242 @@ export function TaskBulkActionBar(props: TaskBulkActionBarProps) {
   if (selectedCount === 0) return null;
 
   return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[80] animate-in slide-in-from-bottom-8 fade-in duration-500">
-      <div className="glass-panel p-1 rounded-[2rem] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.18)]">
-        <div className="bg-slate-900 rounded-[1.8rem] flex items-center h-16 px-2 gap-4">
-          {/* Selected Info */}
-          <div className="flex items-center gap-3 pl-4 pr-6 border-r border-white/10 h-10">
-            <div className="w-6 h-6 bg-brand-600 rounded-lg flex items-center justify-center text-[10px] font-black text-white shadow-lg shadow-brand-600/30">
-              {selectedCount}
+    <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[200] w-full max-w-4xl px-6 pointer-events-none">
+      <div className="pointer-events-auto rounded-[3rem] border border-white/10 bg-slate-950/40 p-2 shadow-luxe backdrop-blur-[60px] animate-in slide-in-from-bottom-20 fade-in duration-1000 relative group overflow-hidden">
+        {/* Rim Light */}
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+        {/* Unified Bridge Container */}
+        <div className="bg-white/[0.01] rounded-[2.5rem] flex items-center h-20 px-4 gap-4 border border-white/5 relative z-10">
+          {/* Tactical Intel Section */}
+          <div className="flex items-center gap-6 pl-6 pr-8 border-r border-white/5 h-12">
+            <div className="relative">
+              <div className="absolute inset-0 bg-brand-500 blur-lg opacity-40 animate-pulse" />
+              <div className="relative w-10 h-10 bg-brand-500 rounded-2xl flex items-center justify-center text-xs font-black text-white shadow-glow-brand/20">
+                {selectedCount}
+              </div>
             </div>
-            <span className="text-[11px] font-black text-white/90 uppercase tracking-widest whitespace-nowrap">
-              Đã Chọn
-            </span>
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-black text-white uppercase tracking-[0.4em] block leading-none italic">
+                SYNCED_UNITS
+              </span>
+              <span className="text-[8px] font-bold text-white/10 uppercase tracking-[0.2em] block">
+                STABLE_NODE_LINK
+              </span>
+            </div>
             <button
               onClick={onClearSelection}
-              className="w-6 h-6 flex items-center justify-center text-white/30 hover:text-white transition-colors"
-              title="Hủy chọn"
+              className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white/5 text-white/20 hover:text-rose-400 hover:bg-rose-500/10 transition-all active:scale-95 group/clear"
+              title="Clear Selection"
             >
-              <X size={14} />
+              <X size={16} className="group-hover/clear:rotate-90 transition-transform" />
             </button>
           </div>
 
-          {/* Action Buttons Group */}
-          <div className="flex items-center gap-1">
-            {/* Status Action */}
+          {/* Action Hub */}
+          <div className="flex flex-1 items-center gap-3">
+            {/* Status Protocol */}
             <div className="relative">
               <button
                 onClick={() => setActiveMenu(activeMenu === 'status' ? null : 'status')}
-                className={`h-11 px-4 rounded-2xl flex items-center gap-2 transition-all group ${activeMenu === 'status' ? 'bg-white text-slate-900 shadow-xl' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
+                className={`h-12 px-6 rounded-[1.5rem] flex items-center gap-4 transition-all duration-500 border ${
+                  activeMenu === 'status'
+                    ? 'bg-white border-white text-slate-950 shadow-luxe scale-105'
+                    : 'bg-white/[0.02] border-white/5 text-white/40 hover:text-white hover:bg-white/5'
+                }`}
               >
-                <Loader2 size={16} className={isStatusPending ? 'animate-spin' : ''} />
-                <span className="text-[11px] font-black uppercase tracking-widest">Trạng thái</span>
+                <Loader2
+                  size={16}
+                  className={isStatusPending ? 'animate-spin text-brand-500' : ''}
+                />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] italic">
+                  STATE
+                </span>
               </button>
-              {activeMenu === 'status' && (
-                <div className="absolute bottom-full mb-4 left-0 glass-panel p-1 rounded-2xl w-56 shadow-2xl animate-in fade-in slide-in-from-bottom-2">
-                  <div className="bg-slate-800 rounded-xl overflow-hidden py-1">
-                    {(workflow?.statuses || BOARD_COLUMNS).map((s) => (
-                      <button
-                        key={s.key}
-                        onClick={() => {
-                          onBulkStatusChange(s.key);
-                          onApplyStatus();
-                          setActiveMenu(null);
-                        }}
-                        className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-xs font-bold transition-all ${bulkStatus === s.key ? 'text-brand-400 bg-brand-500/5' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}
-                      >
-                        <span>
-                          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                          {(s as any).label || (s as any).name}
-                        </span>
-                        {bulkStatus === s.key && <Check size={14} />}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
 
-            {/* Priority Action */}
-            <div className="relative">
-              <button
-                onClick={() => setActiveMenu(activeMenu === 'priority' ? null : 'priority')}
-                className={`h-11 px-4 rounded-2xl flex items-center gap-2 transition-all group ${activeMenu === 'priority' ? 'bg-white text-slate-900 shadow-xl' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
-              >
-                <Flag size={16} className={isPriorityPending ? 'animate-pulse' : ''} />
-                <span className="text-[11px] font-black uppercase tracking-widest">Ưu tiên</span>
-              </button>
-              {activeMenu === 'priority' && (
-                <div className="absolute bottom-full mb-4 left-0 glass-panel p-1 rounded-2xl w-48 shadow-2xl animate-in fade-in slide-in-from-bottom-2">
-                  <div className="bg-slate-800 rounded-xl overflow-hidden py-1">
-                    {PRIORITY_OPTIONS.map((p) => (
-                      <button
-                        key={p.key}
-                        onClick={() => {
-                          onBulkPriorityChange(p.key as TaskPriorityDTO);
-                          onApplyPriority();
-                          setActiveMenu(null);
-                        }}
-                        className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-xs font-bold transition-all ${bulkPriority === p.key ? 'text-brand-400 bg-brand-500/5' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}
-                      >
-                        <span>{p.label}</span>
-                        {bulkPriority === p.key && <Check size={14} />}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Assignee Action */}
-            <div className="relative">
-              <button
-                onClick={() => setActiveMenu(activeMenu === 'assignee' ? null : 'assignee')}
-                className={`h-11 px-4 rounded-2xl flex items-center gap-2 transition-all group ${activeMenu === 'assignee' ? 'bg-white text-slate-900 shadow-xl' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
-              >
-                <User size={16} className={isAssignPending ? 'animate-pulse' : ''} />
-                <span className="text-[11px] font-black uppercase tracking-widest">Gán việc</span>
-              </button>
-              {activeMenu === 'assignee' && (
-                <div className="absolute bottom-full mb-4 left-0 glass-panel p-1 rounded-2xl w-64 shadow-2xl animate-in fade-in slide-in-from-bottom-2">
-                  <div className="bg-slate-800 rounded-xl overflow-hidden py-1">
-                    <button
-                      onClick={() => {
-                        onBulkAssigneeIdChange('');
-                        onApplyAssignee();
-                        setActiveMenu(null);
-                      }}
-                      className="w-full px-4 py-2.5 text-left text-xs font-bold text-rose-400 hover:bg-rose-500/5 border-b border-white/5"
-                    >
-                      Bỏ gán tất cả
-                    </button>
-                    <div className="max-h-60 overflow-y-auto">
-                      {members.map((m) => (
+              <AnimatePresence>
+                {activeMenu === 'status' && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                    animate={{ opacity: 1, scale: 1, y: -12 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    className="absolute bottom-full left-0 mb-6 rounded-[2.5rem] border border-white/10 bg-slate-950/90 p-3 w-72 backdrop-blur-3xl shadow-luxe z-50 overflow-hidden"
+                  >
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/40 to-transparent" />
+                    <div className="space-y-1.5 p-1">
+                      {(workflow?.statuses || BOARD_COLUMNS).map((s) => (
                         <button
-                          key={m.id}
+                          key={s.key}
                           onClick={() => {
-                            onBulkAssigneeIdChange(m.id);
-                            onApplyAssignee();
+                            onBulkStatusChange(s.key);
+                            onApplyStatus();
                             setActiveMenu(null);
                           }}
-                          className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all ${bulkAssigneeId === m.id ? 'text-brand-400 bg-brand-500/5' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}
+                          className={`w-full flex items-center justify-between px-6 py-4 text-left rounded-2xl transition-all duration-300 group/item ${
+                            bulkStatus === s.key
+                              ? 'text-brand-400 bg-brand-500/10 border border-brand-500/10'
+                              : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'
+                          }`}
                         >
-                          <div className="w-6 h-6 rounded-lg bg-slate-700 font-bold flex items-center justify-center text-[10px]">
-                            {m.fullName.charAt(0)}
-                          </div>
-                          <span className="text-xs font-bold truncate">{m.fullName}</span>
-                          {bulkAssigneeId === m.id && <Check size={14} className="ml-auto" />}
+                          <span className="text-[11px] font-black uppercase tracking-widest italic group-hover/item:translate-x-1 transition-transform">
+                            {s.label || s.name}
+                          </span>
+                          {bulkStatus === s.key && (
+                            <div className="h-1.5 w-1.5 rounded-full bg-brand-400 shadow-glow-brand animate-pulse" />
+                          )}
                         </button>
                       ))}
                     </div>
-                  </div>
-                </div>
-              )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* More Actions (Date, Type, Select All) */}
-            <div className="relative ml-2 pl-2 border-l border-white/10 flex items-center gap-1">
+            {/* Priority Protocol */}
+            <div className="relative">
+              <button
+                onClick={() => setActiveMenu(activeMenu === 'priority' ? null : 'priority')}
+                className={`h-12 px-6 rounded-[1.5rem] flex items-center gap-4 transition-all duration-500 border ${
+                  activeMenu === 'priority'
+                    ? 'bg-white border-white text-slate-950 shadow-luxe scale-105'
+                    : 'bg-white/[0.02] border-white/5 text-white/40 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Flag
+                  size={16}
+                  className={isPriorityPending ? 'animate-pulse text-indigo-500' : ''}
+                />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] italic">
+                  RANK
+                </span>
+              </button>
+
+              <AnimatePresence>
+                {activeMenu === 'priority' && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                    animate={{ opacity: 1, scale: 1, y: -12 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    className="absolute bottom-full left-0 mb-6 rounded-[2.5rem] border border-white/10 bg-slate-950/90 p-3 w-64 backdrop-blur-3xl shadow-luxe z-50 overflow-hidden"
+                  >
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent" />
+                    <div className="space-y-1.5 p-1">
+                      {PRIORITY_OPTIONS.map((p) => (
+                        <button
+                          key={p.key}
+                          onClick={() => {
+                            onBulkPriorityChange(p.key as TaskPriorityDTO);
+                            onApplyPriority();
+                            setActiveMenu(null);
+                          }}
+                          className={`w-full flex items-center justify-between px-6 py-4 text-left rounded-2xl transition-all duration-300 group/item ${
+                            bulkPriority === p.key
+                              ? 'text-indigo-400 bg-indigo-500/10 border border-indigo-500/10'
+                              : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'
+                          }`}
+                        >
+                          <span className="text-[11px] font-black uppercase tracking-widest italic group-hover/item:translate-x-1 transition-transform">
+                            {p.label}
+                          </span>
+                          {bulkPriority === p.key && (
+                            <div className="h-1.5 w-1.5 rounded-full bg-indigo-400 shadow-glow-indigo animate-pulse" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Operator Protocol */}
+            <div className="relative">
+              <button
+                onClick={() => setActiveMenu(activeMenu === 'assignee' ? null : 'assignee')}
+                className={`h-12 px-6 rounded-[1.5rem] flex items-center gap-4 transition-all duration-500 border ${
+                  activeMenu === 'assignee'
+                    ? 'bg-white border-white text-slate-950 shadow-luxe scale-105'
+                    : 'bg-white/[0.02] border-white/5 text-white/40 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <User
+                  size={16}
+                  className={isAssignPending ? 'animate-pulse text-emerald-500' : ''}
+                />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] italic">
+                  OPERATOR
+                </span>
+              </button>
+
+              <AnimatePresence>
+                {activeMenu === 'assignee' && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                    animate={{ opacity: 1, scale: 1, y: -12 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    className="absolute bottom-full left-0 mb-6 rounded-[2.5rem] border border-white/10 bg-slate-950/90 p-3 w-80 backdrop-blur-3xl shadow-luxe z-50 overflow-hidden"
+                  >
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
+                    <div className="space-y-1.5 p-1">
+                      <button
+                        onClick={() => {
+                          onBulkAssigneeIdChange('');
+                          onApplyAssignee();
+                          setActiveMenu(null);
+                        }}
+                        className="w-full px-6 py-4 text-left text-[11px] font-black uppercase tracking-[0.2em] text-rose-400 bg-rose-500/5 hover:bg-rose-500/10 rounded-2xl transition-all mb-2 border border-rose-500/10 italic"
+                      >
+                        DE-SYNC ALL_UNITS
+                      </button>
+                      <div className="max-h-72 overflow-y-auto elite-scrollbar space-y-1.5">
+                        {members.map((m) => (
+                          <button
+                            key={m.id}
+                            onClick={() => {
+                              onBulkAssigneeIdChange(m.id);
+                              onApplyAssignee();
+                              setActiveMenu(null);
+                            }}
+                            className={`w-full flex items-center gap-5 px-6 py-4 text-left rounded-2xl transition-all duration-300 group/item ${
+                              bulkAssigneeId === m.id
+                                ? 'text-brand-400 bg-brand-500/10 border border-brand-500/10'
+                                : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'
+                            }`}
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-white/5 font-black flex items-center justify-center text-[10px] border border-white/5 shadow-inner">
+                              {m.fullName.charAt(0)}
+                            </div>
+                            <span className="text-[11px] font-black uppercase tracking-tight truncate flex-1 italic group-hover/item:translate-x-1 transition-transform">
+                              {m.fullName}
+                            </span>
+                            {bulkAssigneeId === m.id && (
+                              <div className="h-1.5 w-1.5 rounded-full bg-brand-400 shadow-glow-brand animate-pulse" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Tactical Override Group */}
+            <div className="h-10 w-px bg-white/5 mx-2" />
+            <div className="flex items-center gap-2">
               <button
                 onClick={onToggleSelectAllVisible}
-                className="h-11 w-11 rounded-2xl flex items-center justify-center text-white/40 hover:text-white hover:bg-white/5 transition-all"
-                title={selectedVisibleCount === totalVisibleCount ? 'Bỏ chọn hết' : 'Chọn hết'}
+                className={`h-12 w-12 rounded-[1.25rem] flex items-center justify-center border transition-all duration-500 active:scale-90 ${
+                  selectedVisibleCount === totalVisibleCount
+                    ? 'bg-brand-500 border-brand-500 text-white shadow-glow-brand/20'
+                    : 'bg-white/[0.02] border-white/5 text-white/20 hover:text-white/80 hover:bg-white/5'
+                }`}
+                title={
+                  selectedVisibleCount === totalVisibleCount ? 'Deselect All' : 'Select All Visible'
+                }
               >
                 {selectedVisibleCount === totalVisibleCount ? (
-                  <SquareCheck size={18} className="text-brand-500" />
+                  <SquareCheck size={18} />
                 ) : (
                   <MousePointer2 size={18} />
                 )}
@@ -213,11 +307,11 @@ export function TaskBulkActionBar(props: TaskBulkActionBarProps) {
               <button
                 onClick={onDeleteSelected}
                 disabled={isDeletePending}
-                className="h-11 w-11 rounded-2xl flex items-center justify-center text-rose-500/40 hover:text-rose-500 hover:bg-rose-500/5 transition-all disabled:opacity-30"
-                title="Xóa công việc"
+                className="h-12 w-12 rounded-[1.25rem] flex items-center justify-center text-rose-500/30 hover:text-white hover:bg-rose-500 border border-transparent hover:border-rose-500/20 transition-all disabled:opacity-30 active:scale-90 shadow-glow-rose/0 hover:shadow-glow-rose/20"
+                title="Purge Task"
               >
                 {isDeletePending ? (
-                  <Loader2 size={18} className="animate-spin" />
+                  <Loader2 size={18} className="animate-spin text-rose-500" />
                 ) : (
                   <Trash2 size={18} />
                 )}
@@ -225,13 +319,14 @@ export function TaskBulkActionBar(props: TaskBulkActionBarProps) {
             </div>
           </div>
 
-          {/* Close Action */}
-          <div className="pl-4 pr-2">
+          {/* Mission Conclusion */}
+          <div className="pl-6 pr-2">
             <button
               onClick={onClearSelection}
-              className="h-10 px-6 rounded-2xl bg-white/5 text-white/60 hover:text-white hover:bg-white/10 text-[10px] font-black uppercase tracking-widest transition-all"
+              className="group relative h-14 px-10 rounded-[1.5rem] bg-white border border-white text-slate-950 font-black text-xs uppercase tracking-[0.4em] hover:scale-105 active:scale-95 transition-all shadow-luxe overflow-hidden"
             >
-              Hoàn tất
+              <span className="relative z-10 italic">DONE</span>
+              <div className="absolute inset-0 bg-brand-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
           </div>
         </div>

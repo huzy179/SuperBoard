@@ -107,132 +107,154 @@ export function WorkflowEditor({
 
   if (isLoading) return <div className="p-8">Đang tải cấu hình quy trình...</div>;
 
-  const statuses = data?.statuses ?? [];
+  const statuses = data?.statuses || [];
 
   return (
-    <div className="flex flex-col gap-12 pb-32 animate-in fade-in duration-700">
-      <header className="flex items-center justify-between">
+    <div className="flex flex-col gap-16 pb-32 animate-in fade-in duration-1000">
+      <header className="flex items-center justify-between px-8">
         <div>
-          <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase mb-3">
+          <h1 className="text-6xl font-black text-white tracking-tighter uppercase mb-4">
             {title || 'Workflow Core'}
           </h1>
-          <div className="flex items-center gap-3">
-            <span className="h-2 w-2 rounded-full bg-brand-500 shadow-[0_0_10px_rgba(99,102,241,1)]" />
-            <p className="text-sm font-bold text-slate-500 uppercase tracking-[0.2em]">
+          <div className="flex items-center gap-4">
+            <div className="h-2 w-2 rounded-full bg-brand-500 shadow-glow-brand animate-pulse" />
+            <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">
               {description || 'Neural configuration for project logic pathways.'}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-4">{extraActions}</div>
+        <div className="flex items-center gap-6">{extraActions}</div>
       </header>
 
       {/* STATUSES SECTION */}
-      <section className="relative group overflow-hidden rounded-[3rem] border border-white/20 bg-white/40 shadow-glass backdrop-blur-3xl transition-all">
+      <section className="relative group overflow-hidden rounded-[3.5rem] border border-white/5 bg-white/[0.01] shadow-luxe backdrop-blur-3xl transition-all">
         {/* Rim Light */}
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-        <div className="px-10 py-6 border-b border-white/20 bg-white/40 flex justify-between items-center">
-          <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-brand-500" />
+        <div className="px-12 py-8 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
+          <h2 className="text-[11px] font-black text-white/40 uppercase tracking-[0.4em] flex items-center gap-3">
+            <div className="h-1.5 w-1.5 rounded-full bg-brand-500 shadow-glow-brand" />
             Logic States Configuration
           </h2>
-          <span className="text-[10px] font-black text-brand-600 bg-brand-50 border border-brand-100 px-3 py-1 rounded-full uppercase tracking-widest">
-            {statuses.length} active nodes
+          <span className="text-[10px] font-black text-brand-400 bg-brand-500/5 border border-brand-500/20 px-6 py-2 rounded-full uppercase tracking-widest shadow-glow-brand/5">
+            {statuses.length} ACTIVE_NODES_DETACHED
           </span>
         </div>
-        <div className="p-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="p-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {statuses.map((status) => (
               <div
                 key={status.id}
-                className="group/item relative flex flex-col gap-4 p-6 rounded-[2rem] border border-white bg-white/50 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                className={`group/item relative flex flex-col gap-6 p-8 rounded-[2.5rem] border transition-all duration-500 shadow-inner ${
+                  status.category === 'done'
+                    ? 'border-emerald-500/10 bg-emerald-500/[0.01] hover:bg-emerald-500/[0.03] hover:border-emerald-500/30'
+                    : status.category === 'todo'
+                      ? 'border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/20'
+                      : 'border-brand-500/10 bg-brand-500/[0.01] hover:bg-brand-500/[0.03] hover:border-brand-500/30'
+                }`}
               >
                 <div className="flex items-center justify-between">
                   <div
-                    className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
+                    className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border ${
                       status.category === 'done'
-                        ? 'bg-emerald-100 text-emerald-700'
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-glow-emerald/5'
                         : status.category === 'todo'
-                          ? 'bg-slate-100 text-slate-600'
-                          : 'bg-brand-100 text-brand-700'
+                          ? 'bg-white/5 text-white/40 border-white/10'
+                          : 'bg-brand-500/10 text-brand-400 border-brand-500/20 shadow-glow-brand/5'
                     }`}
                   >
                     {status.category}
                   </div>
                   {!status.isSystem && (
-                    <div className="flex gap-1.5 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                    <div className="flex gap-2 opacity-0 group-hover/item:opacity-100 transition-all translate-y-1 group-hover:translate-y-0">
                       <button
                         onClick={() => {
                           setEditingStatusId(status.id);
                           setEditName(status.name);
                         }}
-                        className="p-2 hover:bg-white rounded-xl text-slate-400 hover:text-brand-600 transition-colors"
+                        className="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl text-white/40 hover:text-brand-400 transition-all border border-transparent hover:border-white/10"
                       >
-                        ✏️
+                        <Settings2 size={16} />
                       </button>
                       <button
                         onClick={() => onDeleteStatus(status.id)}
-                        className="p-2 hover:bg-white rounded-xl text-slate-400 hover:text-rose-600 transition-colors"
+                        className="w-9 h-9 flex items-center justify-center bg-rose-500/5 hover:bg-rose-500/10 rounded-xl text-rose-500/40 hover:text-rose-400 transition-all border border-transparent hover:border-rose-500/10"
                       >
-                        🗑️
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   )}
                 </div>
 
-                <div className="flex-1">
+                <div className="flex-1 space-y-2">
                   {editingStatusId === status.id ? (
-                    <div className="flex gap-2">
+                    <div className="relative group/edit">
                       <input
                         autoFocus
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSaveStatusName(status.id)}
-                        className="w-full px-3 py-2 bg-white border border-brand-300 rounded-xl text-sm font-black shadow-inner"
+                        className="w-full px-6 py-4 bg-slate-950/80 border border-brand-500/30 rounded-2xl text-base font-black text-white shadow-luxe outline-none focus:border-brand-500 transition-all uppercase"
                       />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[8px] font-black text-brand-500/50 uppercase tracking-widest">
+                        COMMIT_READY
+                      </span>
                     </div>
                   ) : (
-                    <h4 className="text-xl font-black text-slate-900 tracking-tight">
+                    <h4 className="text-2xl font-black text-white tracking-tighter uppercase leading-none italic group-hover/item:text-brand-400 transition-colors">
                       {status.name}
                     </h4>
                   )}
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                    Node: {status.key}
+                  <p className="text-[10px] font-black text-white/10 uppercase tracking-widest transition-colors group-hover/item:text-white/20">
+                    ID: {status.key}
                   </p>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-12 pt-10 border-t border-black/5">
-            <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-6 px-2">
-              Initialize New Node
+          <div className="mt-20 pt-16 border-t border-white/5 relative">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-950 px-8 py-2 border border-white/5 rounded-full text-[9px] font-black text-white/10 uppercase tracking-[0.3em]">
+              Neural Growth Sector
+            </div>
+
+            <h3 className="text-[11px] font-black text-white/20 uppercase tracking-[0.4em] mb-10 px-4 text-center">
+              Initialize New Logic Node
             </h3>
-            <div className="flex flex-wrap gap-4">
-              <input
-                type="text"
-                placeholder="Status Name (e.g. Quality Assurance)"
-                value={newStatusName}
-                onChange={(e) => setNewStatusName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddStatus()}
-                className="flex-1 min-w-[300px] px-8 py-5 bg-white/60 border border-white/40 rounded-3xl focus:bg-white focus:border-brand-500/50 outline-none transition-all font-bold text-lg text-slate-800 shadow-inner"
-              />
-              <select
-                value={newStatusCategory}
-                onChange={(e) => setNewStatusCategory(e.target.value as WorkflowStatusCategory)}
-                className="px-8 py-5 rounded-3xl border border-white/40 bg-white/60 focus:bg-white focus:border-brand-500/50 outline-none transition-all font-black uppercase text-xs tracking-widest shadow-inner appearance-none pr-12"
-              >
-                <option value="todo">Chưa thực hiện</option>
-                <option value="in_progress">Đang thực hiện</option>
-                <option value="in_review">Đang review</option>
-                <option value="done">Hoàn thành</option>
-                <option value="blocked">Bị chặn</option>
-              </select>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 px-4">
+              <div className="md:col-span-2 relative group-within/input">
+                <input
+                  type="text"
+                  placeholder="NODE_DESIGNATION (E.G. QUALITY_ASSURANCE)"
+                  value={newStatusName}
+                  onChange={(e) => setNewStatusName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddStatus()}
+                  className="w-full px-10 py-6 bg-white/[0.01] border border-white/5 rounded-[2rem] focus:bg-white/[0.02] focus:border-brand-500/40 outline-none transition-all font-black text-xl text-white shadow-inner uppercase placeholder:text-white/5"
+                />
+              </div>
+              <div className="relative">
+                <select
+                  value={newStatusCategory}
+                  onChange={(e) => setNewStatusCategory(e.target.value as WorkflowStatusCategory)}
+                  className="w-full appearance-none px-10 py-6 rounded-[2rem] border border-white/5 bg-white/[0.01] focus:bg-white/[0.02] focus:border-brand-500/40 outline-none transition-all font-black uppercase text-xs tracking-[0.2em] text-white/60 shadow-inner"
+                >
+                  <option value="todo">Chưa thực hiện</option>
+                  <option value="in_progress">Đang thực hiện</option>
+                  <option value="in_review">Đang review</option>
+                  <option value="done">Hoàn thành</option>
+                  <option value="blocked">Bị chặn</option>
+                </select>
+                <ChevronDown
+                  className="absolute right-6 top-1/2 -translate-y-1/2 text-white/10 pointer-events-none"
+                  size={16}
+                />
+              </div>
               <button
                 onClick={handleAddStatus}
                 disabled={isPending || !newStatusName.trim()}
-                className="px-10 py-5 bg-slate-900 hover:bg-brand-600 disabled:bg-slate-300 text-white font-black rounded-3xl shadow-2xl transition-all active:scale-95 uppercase text-[10px] tracking-widest"
+                className="relative overflow-hidden px-10 py-6 bg-brand-500 hover:scale-105 disabled:bg-white/5 disabled:scale-100 text-white font-black rounded-[2rem] shadow-glow-brand/20 transition-all active:scale-95 uppercase text-[11px] tracking-[0.3em] group/btn"
               >
+                <div className="absolute inset-x-0 top-0 h-px bg-white/40" />
                 {isPending ? 'Propagating...' : 'Register Node'}
               </button>
             </div>
@@ -241,39 +263,50 @@ export function WorkflowEditor({
       </section>
 
       {/* TRANSITION MATRIX SECTION */}
-      <section className="relative overflow-hidden rounded-[3rem] border border-white/20 bg-white/40 shadow-glass backdrop-blur-3xl">
-        <div className="px-10 py-8 border-b border-white/20 bg-white/40 flex justify-between items-center">
-          <div>
-            <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+      <section className="relative overflow-hidden rounded-[3.5rem] border border-white/5 bg-white/[0.01] shadow-luxe backdrop-blur-3xl transition-all">
+        <div className="px-12 py-10 border-b border-white/5 bg-white/[0.02] flex justify-between items-center relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-emerald-500/[0.01] pointer-events-none" />
+          <div className="relative z-10">
+            <h2 className="text-[11px] font-black text-white/40 uppercase tracking-[0.4em] flex items-center gap-3">
+              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-glow-emerald animate-pulse" />
               Transition Logic Matrix
             </h2>
-            <p className="text-[10px] font-bold text-slate-500 mt-1 uppercase tracking-widest">
-              Define valid state migration pathways
+            <p className="text-[9px] font-black text-white/10 mt-2 uppercase tracking-[0.3em]">
+              Mapping neural migration pathways
             </p>
           </div>
           {isMatrixDirty && (
             <button
               onClick={handleSaveTransitions}
               disabled={isPending}
-              className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black rounded-2xl shadow-xl transition-all active:scale-95 uppercase tracking-widest"
+              className="relative overflow-hidden px-12 py-4 bg-emerald-500 hover:scale-105 text-white text-[10px] font-black rounded-2xl shadow-glow-emerald/20 transition-all active:scale-95 uppercase tracking-[0.3em]"
             >
+              <div className="absolute inset-x-0 top-0 h-px bg-white/40" />
               {isPending ? 'Syncing...' : 'Commit Matrix'}
             </button>
           )}
         </div>
-        <div className="p-10 overflow-x-auto">
-          <table className="w-full border-separate border-spacing-2">
+        <div className="p-12 overflow-x-auto elite-scrollbar">
+          <table className="w-full border-separate border-spacing-4">
             <thead>
               <tr>
-                <th className="p-4 border-b border-black/5">
-                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 block text-left">
-                    Source \ Target
-                  </span>
+                <th className="p-6 border-b border-white/5">
+                  <div className="flex flex-col items-start gap-1">
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/10">
+                      ORIGIN
+                    </span>
+                    <span className="text-white/40 px-3 py-1 bg-white/5 rounded-lg">↘</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/10 ml-8 text-right">
+                      TARGET
+                    </span>
+                  </div>
                 </th>
                 {statuses.map((s) => (
-                  <th key={s.id} className="p-4 border-b border-black/5">
-                    <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
+                  <th
+                    key={s.id}
+                    className="p-6 border-b border-white/5 group/th transition-all hover:bg-white/[0.02] rounded-3xl"
+                  >
+                    <span className="text-xs font-black text-white/40 group-hover/th:text-white uppercase tracking-widest transition-colors block">
                       {s.name}
                     </span>
                   </th>
@@ -283,8 +316,8 @@ export function WorkflowEditor({
             <tbody>
               {statuses.map((from) => (
                 <tr key={from.id}>
-                  <td className="p-4 border-r border-black/5 bg-white/10 rounded-2xl">
-                    <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
+                  <td className="p-6 border-r border-white/5 bg-white/[0.02] rounded-[1.5rem] shadow-inner">
+                    <span className="text-xs font-black text-white/60 uppercase tracking-widest">
                       {from.name}
                     </span>
                   </td>
@@ -293,25 +326,33 @@ export function WorkflowEditor({
                     const isSelf = from.id === to.id;
 
                     return (
-                      <td key={to.id} className="p-2">
+                      <td key={to.id} className="p-3">
                         {isSelf ? (
-                          <div className="h-3 w-3 bg-slate-200 rounded-full mx-auto opacity-20" />
+                          <div className="h-10 w-full bg-white/[0.02] rounded-2xl flex items-center justify-center opacity-10">
+                            <span className="text-[8px] font-black">X</span>
+                          </div>
                         ) : (
                           <button
                             onClick={() => toggleTransition(from.id, to.id)}
-                            className={`group relative h-10 w-full rounded-2xl flex items-center justify-center transition-all duration-300 border ${
+                            className={`group h-12 w-full rounded-2xl flex items-center justify-center transition-all duration-500 border shadow-inner ${
                               isAllowed
-                                ? 'bg-slate-900 border-slate-900 text-emerald-400 shadow-xl scale-[1.05] z-10'
-                                : 'bg-white/40 border-white text-slate-300 hover:border-brand-300'
+                                ? 'bg-white/10 border-white/20 text-emerald-400 shadow-glow-emerald/10 scale-105 z-10'
+                                : 'bg-white/[0.01] border-white/5 text-white/5 hover:border-brand-500/30'
                             }`}
                           >
                             <div
-                              className={`h-2 w-2 rounded-full transition-all duration-300 ${
+                              className={`h-2.5 w-2.5 rounded-full transition-all duration-500 ${
                                 isAllowed
-                                  ? 'bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]'
-                                  : 'bg-slate-200 group-hover:bg-brand-400'
+                                  ? 'bg-emerald-500 shadow-glow-emerald'
+                                  : 'bg-white/5 group-hover:bg-brand-500/50'
                               }`}
                             />
+                            {isAllowed && (
+                              <motion.div
+                                layoutId={`trans-${from.id}-${to.id}`}
+                                className="absolute inset-0 border-2 border-emerald-500/40 rounded-2xl animate-pulse pointer-events-none"
+                              />
+                            )}
                           </button>
                         )}
                       </td>
@@ -322,17 +363,23 @@ export function WorkflowEditor({
             </tbody>
           </table>
 
-          <div className="mt-10 flex items-center gap-8 px-6 py-4 bg-white/40 rounded-3xl border border-white/60">
-            <div className="flex items-center gap-3">
-              <div className="h-3 w-3 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-              <span className="text-[9px] font-black text-slate-900 uppercase tracking-[0.2em]">
+          <div className="mt-16 flex items-center gap-12 px-10 py-6 bg-white/[0.01] rounded-[2.5rem] border border-white/5 shadow-inner">
+            <div className="flex items-center gap-4">
+              <div className="h-4 w-4 rounded-full bg-emerald-500 shadow-glow-emerald" />
+              <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">
                 Authorized Pathway
               </span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="h-3 w-3 rounded-full bg-slate-200" />
-              <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+            <div className="flex items-center gap-4">
+              <div className="h-4 w-4 rounded-full bg-white/5 border border-white/10" />
+              <span className="text-[10px] font-black text-white/10 uppercase tracking-[0.3em]">
                 Restricted Pathway
+              </span>
+            </div>
+            <div className="ml-auto flex items-center gap-3">
+              <Cpu size={14} className="text-white/10" />
+              <span className="text-[9px] font-black text-white/5 uppercase tracking-[0.5em]">
+                LOGIC_LAYER_4_ACTIVE
               </span>
             </div>
           </div>

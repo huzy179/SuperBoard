@@ -88,77 +88,81 @@ export function MissionCommandBriefing({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] bg-[#020617]/95 backdrop-blur-2xl flex items-center justify-center p-6"
+        className="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-[40px] flex items-center justify-center p-8 overflow-hidden"
       >
+        {/* Background Atmosphere */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-[1200px] max-h-[800px] rounded-full bg-brand-500/5 blur-[120px] pointer-events-none" />
+
         <button
           onClick={onClose}
-          className="absolute top-10 right-10 p-4 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-all z-20 group"
+          className="absolute top-12 right-12 p-5 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-all z-20 group active:scale-95"
         >
-          <X size={24} className="text-white/40 group-hover:text-white" />
+          <X size={28} className="text-white/20 group-hover:text-white" />
         </button>
 
-        <div className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
+        <div className="max-w-[1400px] w-full grid grid-cols-1 lg:grid-cols-4 gap-16 items-start relative z-10">
           {/* Left: Intelligence Slants */}
-          <div className="hidden lg:flex flex-col gap-6">
+          <div className="hidden lg:flex flex-col gap-8">
+            <div className="mb-4">
+              <h4 className="text-[10px] font-black uppercase tracking-[0.5em] text-white/20 mb-2">
+                INTELLIGENCE_QUOTIENT
+              </h4>
+              <div className="h-0.5 w-12 bg-brand-500 shadow-glow-brand" />
+            </div>
+
             <SlantCard
-              icon={<Cpu size={16} />}
-              label="Neural Status"
-              value="Optimal"
-              sub="Cognitive Atlas Synchronized"
+              icon={<Cpu size={18} />}
+              label="Neural Topology"
+              value="STABLE_OS"
+              sub="Cognitive Atlas Synced"
             />
             <SlantCard
-              icon={<ShieldAlert size={16} />}
+              icon={<ShieldAlert size={18} />}
               label="Divergence"
               value={data?.metrics.collisions || 0}
-              sub="Active Collisions"
+              sub="Active Logic Collisions"
               urgent={data?.metrics.collisions ? data.metrics.collisions > 0 : false}
             />
             <SlantCard
-              icon={<TrendingUp size={16} />}
-              label="Mission Velocity"
+              icon={<TrendingUp size={18} />}
+              label="Strategic Velocity"
               value={data?.metrics.velocity || 0}
-              sub="Strategic Units / Pulse"
+              sub="Units / Pulse Cycle"
             />
 
             {forecast && (
               <motion.div
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="p-6 bg-brand-500/5 border border-brand-500/20 rounded-[2.5rem] space-y-6"
+                className="p-8 bg-white/[0.01] border border-white/5 rounded-[3rem] space-y-8 shadow-inner backdrop-blur-3xl relative group overflow-hidden"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Eye size={14} className="text-brand-400" />
-                    <span className="text-[10px] font-black text-white uppercase tracking-widest">
-                      The Oracle
+                <div className="absolute inset-0 bg-brand-500/[0.01] opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                <div className="flex items-center justify-between relative z-10">
+                  <div className="flex items-center gap-3">
+                    <Eye size={16} className="text-brand-400" />
+                    <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">
+                      THE_ORACLE
                     </span>
                   </div>
                   <button
                     onClick={() => setShowSandbox(!showSandbox)}
-                    className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest transition-all ${showSandbox ? 'bg-brand-500 text-white' : 'bg-white/5 text-white/40 hover:bg-white/10'}`}
+                    className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${showSandbox ? 'bg-brand-500 text-white shadow-glow-brand' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10'}`}
                   >
-                    Simulate Scenario
+                    Simulate
                   </button>
-                  <div className="flex items-center gap-1.5">
-                    <div
-                      className={`h-1.5 w-1.5 rounded-full ${forecast.trajectory === 'POSITIVE' ? 'bg-emerald-500 shadow-glow-emerald' : 'bg-red-500 shadow-glow-red'}`}
-                    />
-                    <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">
-                      {forecast.trajectory} Trajectory
-                    </span>
-                  </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-4 relative z-10">
                   <div className="flex items-center justify-between">
-                    <span className="text-[9px] font-bold text-white/20 uppercase tracking-widest">
-                      Confidence
+                    <span className="text-[9px] font-black text-white/10 uppercase tracking-[0.2em]">
+                      Confidence Vector
                     </span>
-                    <span className="text-[10px] font-black text-brand-400">
+                    <span className="text-[11px] font-black text-brand-400 shadow-glow-brand/20">
                       {((simulatedForecast?.confidence || forecast.confidence) * 100).toFixed(0)}%
                     </span>
                   </div>
-                  <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-1.5 w-full bg-slate-950 rounded-full overflow-hidden shadow-inner">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{
@@ -169,23 +173,24 @@ export function MissionCommandBriefing({
                   </div>
                 </div>
 
-                <p className="text-[11px] font-bold text-white uppercase tracking-tight italic leading-relaxed opacity-60">
+                <p className="text-xs font-bold text-white uppercase tracking-tight italic leading-relaxed text-white/60 relative z-10 bg-slate-950/50 p-4 rounded-2xl border border-white/5">
                   "{simulatedForecast?.prediction || forecast.prediction}"
                 </p>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">
-                      Est. Days
+                <div className="grid grid-cols-2 gap-6 relative z-10">
+                  <div className="space-y-1.5">
+                    <span className="text-[9px] font-black text-white/10 uppercase tracking-widest">
+                      EST_WINDOW
                     </span>
-                    <div className="flex items-center gap-2">
-                      <p className="text-lg font-black text-white">
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-2xl font-black text-white italic">
                         {simulatedForecast?.metrics.completionDays ||
                           forecast.metrics.completionDays}
                       </p>
+                      <span className="text-[10px] font-black text-white/20">DAYS</span>
                       {simulatedForecast && (
                         <span
-                          className={`text-[10px] font-black ${simulatedForecast.metrics.completionDays < forecast.metrics.completionDays ? 'text-emerald-400' : 'text-red-400'}`}
+                          className={`text-[11px] font-black ml-auto ${simulatedForecast.metrics.completionDays < forecast.metrics.completionDays ? 'text-emerald-400' : 'text-red-400'}`}
                         >
                           {simulatedForecast.metrics.completionDays <
                           forecast.metrics.completionDays
@@ -195,12 +200,12 @@ export function MissionCommandBriefing({
                       )}
                     </div>
                   </div>
-                  <div className="space-y-1">
-                    <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">
-                      Drift Index
+                  <div className="space-y-1.5">
+                    <span className="text-[9px] font-black text-white/10 uppercase tracking-widest">
+                      DRIFT_IDX
                     </span>
                     <p
-                      className={`text-lg font-black ${forecast.metrics.driftIndex > 0.5 ? 'text-red-400' : 'text-emerald-400'}`}
+                      className={`text-2xl font-black ${forecast.metrics.driftIndex > 0.5 ? 'text-red-400 shadow-glow-red/20' : 'text-emerald-400 shadow-glow-emerald/20'}`}
                     >
                       {forecast.metrics.driftIndex.toFixed(2)}
                     </p>
@@ -211,80 +216,112 @@ export function MissionCommandBriefing({
           </div>
 
           {/* Center: Command Feed */}
-          <div className="lg:col-span-2 space-y-12">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-brand-500/10 rounded-lg">
-                  <Terminal className="h-4 w-4 text-brand-500" />
+          <div className="lg:col-span-3 space-y-16">
+            <div className="flex items-end justify-between px-4">
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-brand-500/10 rounded-xl border border-brand-500/20">
+                    <Terminal className="h-5 w-5 text-brand-500 animate-pulse" />
+                  </div>
+                  <span className="text-[11px] font-black text-white/20 uppercase tracking-[0.6em] animate-pulse">
+                    Command Nexus Active
+                  </span>
                 </div>
-                <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">
-                  Command Nexus Active
+                <h2 className="text-5xl md:text-7xl font-black text-white uppercase tracking-tighter leading-none italic">
+                  {data?.missionName || 'MISSION'}{' '}
+                  <span className="text-white/10 not-italic">
+                    {showExecutive ? 'DIRECTIVE' : 'BRIEFING'}
+                  </span>
+                </h2>
+              </div>
+
+              <div className="flex flex-col items-end gap-2 mb-2">
+                <div className="h-1 w-32 bg-white/5 rounded-full overflow-hidden">
+                  <motion.div
+                    animate={{ x: [-128, 128] }}
+                    transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
+                    className="h-full w-24 bg-brand-500/40 blur-sm"
+                  />
+                </div>
+                <span className="text-[8px] font-black text-white/10 uppercase tracking-[0.3em]">
+                  SECURE_VOID_TRANSFER
                 </span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none">
-                {data?.missionName || 'Mission'}{' '}
-                <span className="text-white/20 italic">
-                  {showExecutive ? 'Directive' : 'Briefing'}
-                </span>
-              </h2>
             </div>
 
-            <div className="flex items-center gap-4 border-b border-white/5 pb-2">
+            <div className="flex items-center gap-2 bg-white/[0.01] border border-white/5 p-2 rounded-2xl w-fit ml-4">
               <button
                 onClick={() => setShowExecutive(false)}
-                className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg transition-all ${!showExecutive ? 'bg-brand-500 text-white' : 'text-white/40 hover:text-white/60'}`}
+                className={`text-[10px] font-black uppercase tracking-[0.2em] px-8 py-3 rounded-xl transition-all ${!showExecutive ? 'bg-white text-slate-950 shadow-luxe' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
               >
-                Mission Sitrep
+                MISSION_SITREP
               </button>
               <button
                 onClick={() => setShowExecutive(true)}
-                className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg transition-all ${showExecutive ? 'bg-brand-500 text-white' : 'text-white/40 hover:text-white/60'}`}
+                className={`text-[10px] font-black uppercase tracking-[0.2em] px-8 py-3 rounded-xl transition-all ${showExecutive ? 'bg-brand-500 text-white shadow-glow-brand' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
               >
-                Executive Directive
+                EXECUTIVE_DIRECTIVE
               </button>
             </div>
 
             {showExecutive ? (
               <ExecutiveDirective workspaceId="default-workspace" />
             ) : (
-              <div className="relative min-h-[300px] p-8 rounded-[3rem] border border-brand-500/20 bg-brand-500/[0.02] shadow-glow-brand/5 overflow-hidden">
-                <div className="relative z-10 space-y-8">
-                  <div className="flex items-center gap-4">
-                    <div className="h-2 w-2 rounded-full bg-brand-500 animate-pulse shadow-glow-brand" />
-                    <span className="text-[10px] font-black text-brand-400 uppercase tracking-widest">
-                      Sitrep Synthesis
-                    </span>
+              <div className="relative min-h-[450px] p-12 rounded-[4rem] border border-white/5 bg-white/[0.01] shadow-inner backdrop-blur-3xl overflow-hidden group">
+                {/* Visual accents */}
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-500/40 to-transparent opacity-50" />
+
+                <div className="relative z-10 space-y-12">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="h-2 w-2 rounded-full bg-brand-500 animate-pulse shadow-glow-brand" />
+                      <span className="text-[11px] font-black text-brand-400 uppercase tracking-[0.4em]">
+                        Intelligence Synthesis
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Zap size={14} className="text-white/10" />
+                      <span className="text-[9px] font-black text-white/5 uppercase tracking-widest">
+                        B-RATING: 0.94
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="space-y-6">
-                    <p className="text-xl md:text-2xl font-bold text-white uppercase tracking-tight leading-relaxed italic border-l-4 border-brand-500 pl-8">
+                  <div className="space-y-10">
+                    <p className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight leading-relaxed italic border-l-8 border-brand-500 pl-12 transition-all">
                       {displayText}
                       {isTyping && (
-                        <span className="inline-block w-2 h-6 bg-brand-500 animate-pulse ml-2" />
+                        <span className="inline-block w-3 h-8 bg-brand-500 animate-pulse ml-4 shadow-glow-brand" />
                       )}
                     </p>
 
                     {!isTyping && data && (
                       <motion.div
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center gap-6 pt-10"
+                        className="flex items-center gap-10 pt-16"
                       >
-                        <button className="px-8 py-4 bg-brand-500 rounded-2xl text-[10px] font-black text-white uppercase tracking-widest shadow-glow-brand hover:scale-105 transition-all">
+                        <button className="relative px-12 py-5 bg-white text-slate-950 rounded-[1.5rem] text-[11px] font-black uppercase tracking-[0.4em] shadow-luxe hover:scale-105 active:scale-95 transition-all group/exec">
+                          <div className="absolute inset-x-0 top-0 h-px bg-slate-950/20" />
                           Execute Directives
                         </button>
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2">
                             {[...Array(5)].map((_, i) => (
                               <div
                                 key={i}
-                                className={`h-4 w-1 rounded-full ${i < data.latestIntensity * 5 ? 'bg-brand-500' : 'bg-white/10'}`}
+                                className={`h-6 w-1.5 rounded-full transition-all duration-500 shadow-glow-brand/10 ${i < data.latestIntensity * 5 ? 'bg-brand-500' : 'bg-white/5'}`}
                               />
                             ))}
                           </div>
-                          <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                            Pulse Intensity
-                          </span>
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] font-black text-white uppercase tracking-widest block">
+                              Pulse Intensity
+                            </span>
+                            <span className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em]">
+                              S_LVL: 09
+                            </span>
+                          </div>
                         </div>
                       </motion.div>
                     )}
@@ -293,21 +330,21 @@ export function MissionCommandBriefing({
               </div>
             )}
 
-            <div className="flex items-center justify-between py-6 px-4 bg-white/5 border border-white/10 rounded-3xl">
-              <div className="flex items-center gap-4">
-                <div className="h-10 w-10 bg-brand-500/20 rounded-full flex items-center justify-center border border-brand-500/30">
-                  <Zap className="h-5 w-5 text-brand-500 fill-brand-500" />
+            <div className="flex items-center justify-between py-8 px-10 bg-white/[0.01] border border-white/5 rounded-[2.5rem] shadow-inner ml-4 mr-4 group hover:bg-white/[0.02] transition-all">
+              <div className="flex items-center gap-6">
+                <div className="h-12 w-12 bg-brand-500/10 rounded-2xl flex items-center justify-center border border-brand-500/30 group-hover:border-brand-500 transition-all">
+                  <Zap className="h-6 w-6 text-brand-500 fill-brand-500/20" />
                 </div>
-                <div className="space-y-0.5">
-                  <p className="text-[10px] font-black text-white uppercase tracking-widest">
-                    System Voice
+                <div className="space-y-1">
+                  <p className="text-[11px] font-black text-white uppercase tracking-[0.3em]">
+                    Neural Voice Core
                   </p>
-                  <p className="text-[9px] font-bold text-white/40 uppercase tracking-[0.2em]">
-                    Neural Synthesis Layer 4
+                  <p className="text-[9px] font-bold text-white/20 uppercase tracking-[0.4em]">
+                    SYNTHESIS_LAYER_4 // ACTIVE_OS
                   </p>
                 </div>
               </div>
-              <Activity className="h-4 w-4 text-brand-500/40" />
+              <Activity className="h-5 w-5 text-brand-500/20 group-hover:text-brand-500/40 transition-all" />
             </div>
           </div>
         </div>
@@ -319,7 +356,7 @@ export function MissionCommandBriefing({
             initial={{ opacity: 0, x: 100 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 100 }}
-            className="fixed inset-y-0 right-0 w-[400px] z-[120]"
+            className="fixed inset-y-0 right-0 w-[450px] z-[120] shadow-luxe"
           >
             <StrategicSandbox
               projectId={projectId}

@@ -6,7 +6,7 @@ import { ArrowLeft, Sparkles, Plus } from 'lucide-react';
 import { AutomationList } from '@/features/automation/components/AutomationList';
 import { CreateRuleModal } from '@/features/automation/components/CreateRuleModal';
 import { AIAutomationDialog } from '@/features/automation/components/AIAutomationDialog';
-import { useProjectDetail } from '@/features/jira/hooks';
+import { useProjectDetail } from '@/features/board/hooks';
 import { FullPageLoader } from '@/components/ui/page-states';
 
 export default function AutomationPage() {

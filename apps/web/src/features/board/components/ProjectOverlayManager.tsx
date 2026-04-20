@@ -13,7 +13,7 @@ import type {
   ProjectItemDTO,
   TaskTypeDTO,
 } from '@superboard/shared';
-import type { PredictiveHealthResponse } from '@/features/jira/hooks/use-predictive-health';
+import type { PredictiveHealthResponse } from '@/features/board/hooks/use-predictive-health';
 import type { TaskPriority } from '@/lib/constants/task';
 
 interface ProjectOverlayManagerProps {

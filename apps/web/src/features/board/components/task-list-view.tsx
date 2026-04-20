@@ -7,7 +7,7 @@ import {
   AssigneeAvatar,
   LabelDots,
   TaskIdBadge,
-} from '@/features/jira/components/task-badges';
+} from '@/features/board/components/task-badges';
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { formatDate } from '@/lib/format-date';

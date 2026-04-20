@@ -4,7 +4,7 @@ import {
   useProjectContextMemory,
   useProjectCrudForm,
   useProjectFavorites,
-} from '@/features/jira/hooks/project-core';
+} from '@/features/board/hooks/project-core';
 import {
   filterProjectsByQuery,
   sortProjectsWithFavorites,

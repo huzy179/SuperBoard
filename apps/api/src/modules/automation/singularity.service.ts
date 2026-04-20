@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { DiagnosisService } from '../knowledge/diagnosis.service';
-import { ChronologyService } from '../project/chronology.service';
+import { ChronologyService } from '../analytics/chronology.service';
 import { NotificationService } from '../notification/notification.service';
 import { SymbiosisService } from './symbiosis.service';
 import { AiService } from '../ai/ai.service';

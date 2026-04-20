@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
 import { logger } from '../../common/logger';
-import { ProjectGateway } from './project.gateway';
+import { ProjectGateway } from '../project/project.gateway';
 
 @Injectable()
 export class WorkflowAutomationService {

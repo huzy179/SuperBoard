@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
-import { ReportService } from '../project/report.service';
+import { ReportService } from '../analytics/report.service';
 
 @Injectable()
 export class TalentService {

@@ -5,7 +5,7 @@ import {
   updateProject,
   archiveProject,
   restoreProject,
-} from '@/features/jira/api/project-service';
+} from '@/features/board/api/project-service';
 import { publishProjectsListUpdated } from '@/lib/realtime/project-sync';
 
 export function useCreateProject() {

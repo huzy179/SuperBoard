@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { ReportService } from '../project/report.service';
+import { ReportService } from '../analytics/report.service';
 import { DocService } from '../doc/doc.service';
 import { AiService } from '../ai/ai.service';
 import { format, startOfWeek } from 'date-fns';

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ProjectItemDTO } from '@superboard/shared';
-import { getProjects } from '@/features/jira/api/project-service';
+import { getProjects } from '@/features/board/api/project-service';
 import { subscribeProjectsListUpdated } from '@/lib/realtime/project-sync';
 
 export function useProjects() {

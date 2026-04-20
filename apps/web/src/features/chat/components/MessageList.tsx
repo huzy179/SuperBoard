@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { useMessages } from '../hooks/use-chat';
-import { AssigneeAvatar } from '@/features/jira/components/task-badges';
+import { AssigneeAvatar } from '@/features/board/components/task-badges';
 import {
   Loader2,
   Reply,

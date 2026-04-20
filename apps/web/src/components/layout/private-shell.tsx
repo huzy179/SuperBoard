@@ -9,7 +9,7 @@ import { AppBrand } from './app-brand';
 import { NotificationBell } from '@/components/notifications/notification-bell';
 import { CommandPalette } from '@/components/search/CommandPalette';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
-import { AssigneeAvatar } from '@/features/jira/components/task-badges';
+import { AssigneeAvatar } from '@/features/board/components/task-badges';
 import { WorkspaceSwitcher } from '@/features/workspace/components/WorkspaceSwitcher';
 import { SingularityPulse } from './SingularityPulse';
 import {

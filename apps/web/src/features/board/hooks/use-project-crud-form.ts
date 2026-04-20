@@ -5,7 +5,7 @@ import {
   useCreateProject,
   useArchiveProject,
   useUpdateProject,
-} from '@/features/jira/hooks/project-mutation-core';
+} from '@/features/board/hooks/project-mutation-core';
 
 export function useProjectCrudForm() {
   const createProjectMutation = useCreateProject();

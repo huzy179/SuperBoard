@@ -8,7 +8,7 @@ import {
   useCreateComment,
   useUpdateComment,
   useDeleteComment,
-} from '@/features/jira/hooks';
+} from '@/features/board/hooks';
 import { formatRelativeTime } from '@/lib/format-date';
 import { subscribeTaskPresence } from '@/lib/realtime/project-socket';
 import {

@@ -9,7 +9,7 @@ import {
   AssigneeAvatar,
   LabelDots,
   TaskIdBadge,
-} from '@/features/jira/components/task-badges';
+} from '@/features/board/components/task-badges';
 import { formatDate } from '@/lib/format-date';
 import { isTaskOverdue } from '@/lib/helpers/task-view';
 import { QuantumCard } from '@/components/ui/quantum/QuantumCard';

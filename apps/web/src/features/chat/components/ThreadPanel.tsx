@@ -5,7 +5,7 @@ import { X, Sparkles, Loader2, MessageCircle, Zap, ShieldCheck } from 'lucide-re
 import { useThreadMessages, useSummarizeThread } from '../hooks/use-chat';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { AssigneeAvatar } from '@/features/jira/components/task-badges';
+import { AssigneeAvatar } from '@/features/board/components/task-badges';
 import type { Message } from '@superboard/shared';
 
 interface ThreadPanelProps {

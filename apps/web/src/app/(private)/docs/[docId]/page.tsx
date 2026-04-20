@@ -6,7 +6,7 @@ import { useAuthSession } from '@/features/auth/hooks/use-auth-session';
 import { RichTextEditor } from '@/features/docs/components/RichTextEditor';
 import { DocTOC } from '@/features/docs/components/DocTOC';
 import { DocVersionSidebar } from '@/features/docs/components/DocVersionSidebar';
-import { AssigneeAvatar } from '@/features/jira/components/task-badges';
+import { AssigneeAvatar } from '@/features/board/components/task-badges';
 import { useState } from 'react';
 import {
   Settings,

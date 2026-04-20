@@ -19,7 +19,7 @@ import {
   updateProjectTask,
   updateProjectTaskStatus,
   getTaskIntelligence,
-} from '@/features/jira/api/task-service';
+} from '@/features/board/api/task-service';
 import { publishProjectDetailUpdated } from '@/lib/realtime/project-sync';
 
 export function useSummarizeTask() {

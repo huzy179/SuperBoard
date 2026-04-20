@@ -16,8 +16,8 @@ import {
   useDeleteWorkspaceStatus,
   useUpdateWorkspaceTransitions,
   useSyncWorkspaceWorkflow,
-} from '@/features/jira/hooks/use-workflow';
-import { WorkflowEditor } from '@/features/jira/components/WorkflowEditor';
+} from '@/features/board/hooks/use-workflow';
+import { WorkflowEditor } from '@/features/board/components/WorkflowEditor';
 import { WorkspaceCreateModal } from '@/features/workspace/components/WorkspaceCreateModal';
 import { AvatarUpload } from '@/components/user/AvatarUpload';
 import { WorkspaceMemberSettings } from '@/features/workspace/components/WorkspaceMemberSettings';

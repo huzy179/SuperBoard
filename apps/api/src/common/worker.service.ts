@@ -2,7 +2,7 @@ import { Injectable, OnModuleDestroy, OnModuleInit, Inject, forwardRef } from '@
 import { ConfigService } from '@nestjs/config';
 import { Worker, Job } from 'bullmq';
 import { PrismaService } from '../prisma/prisma.service';
-import { ReportService } from '../modules/project/report.service';
+import { ReportService } from '../modules/analytics/report.service';
 import { NeuralAgentService } from '../modules/automation/neural-agent.service';
 
 @Injectable()

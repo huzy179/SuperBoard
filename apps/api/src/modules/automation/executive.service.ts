@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { SymbiosisService } from './symbiosis.service';
-import { ForecastService } from '../project/forecast.service';
+import { ForecastService } from '../analytics/forecast.service';
 import { AiService } from '../ai/ai.service';
 
 interface DirectiveMetadata {

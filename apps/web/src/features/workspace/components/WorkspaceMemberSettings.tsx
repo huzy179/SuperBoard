@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Search, Filter, UserPlus, Trash2, ShieldAlert, Clock, Mail } from 'lucide-react';
-import { AssigneeAvatar } from '@/features/jira/components/task-badges';
+import { AssigneeAvatar } from '@/features/board/components/task-badges';
 import {
   useWorkspaceMembers,
   useUpdateMemberRole,

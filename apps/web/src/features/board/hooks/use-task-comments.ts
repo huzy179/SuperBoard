@@ -8,7 +8,7 @@ import {
   getTaskComments,
   updateTaskComment,
 } from '@/lib/services/comment-service';
-import { getTaskHistory } from '@/features/jira/api/task-service';
+import { getTaskHistory } from '@/features/board/api/task-service';
 import {
   publishTaskCommentsUpdated,
   subscribeTaskCommentsUpdated,

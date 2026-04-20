@@ -9,9 +9,9 @@ import {
   useUpdateProjectStatus,
   useDeleteProjectStatus,
   useUpdateProjectTransitions,
-} from '@/features/jira/hooks';
-import { useProjectDetail } from '@/features/jira/hooks';
-import { WorkflowEditor } from '@/features/jira/components/WorkflowEditor';
+} from '@/features/board/hooks';
+import { useProjectDetail } from '@/features/board/hooks';
+import { WorkflowEditor } from '@/features/board/components/WorkflowEditor';
 
 export default function WorkflowSettingsPage() {
   const params = useParams<{ projectId: string }>();

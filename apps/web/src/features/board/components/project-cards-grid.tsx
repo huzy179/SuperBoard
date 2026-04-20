@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import type { ProjectItemDTO } from '@superboard/shared';
-import { ProjectCard } from '@/features/jira/components/project-card';
+import { ProjectCard } from '@/features/board/components/project-card';
 import { Plus } from 'lucide-react';
 
 type ProjectCardsGridProps = {

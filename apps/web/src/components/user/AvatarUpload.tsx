@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import { useUploadAvatar, useUpdateProfile } from '@/features/user/hooks/user-profile';
 import { AuthUserDTO } from '@superboard/shared';
-import { AssigneeAvatar } from '@/features/jira/components/task-badges';
+import { AssigneeAvatar } from '@/features/board/components/task-badges';
 
 interface AvatarUploadProps {
   user: AuthUserDTO;

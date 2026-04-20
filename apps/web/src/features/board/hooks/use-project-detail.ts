@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ProjectDetailDTO } from '@superboard/shared';
-import { getProjectDetail } from '@/features/jira/api/project-service';
+import { getProjectDetail } from '@/features/board/api/project-service';
 import { subscribeProjectDetailUpdated } from '@/lib/realtime/project-sync';
 import {
   subscribeProjectSocketUpdated,

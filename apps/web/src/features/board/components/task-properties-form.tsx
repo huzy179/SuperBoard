@@ -3,7 +3,7 @@
 import { Dispatch, SetStateAction, useMemo } from 'react';
 import { Activity, Flag, Calendar, User, Orbit, Target, ShieldCheck, Cpu } from 'lucide-react';
 import type { ProjectTaskItemDTO, ProjectMemberDTO, TaskTypeDTO } from '@superboard/shared';
-import { LabelDots } from '@/features/jira/components/task-badges';
+import { LabelDots } from '@/features/board/components/task-badges';
 import {
   PRIORITY_OPTIONS,
   TASK_TYPE_OPTIONS,

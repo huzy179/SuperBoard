@@ -22,20 +22,20 @@ import type {
   TaskTypeDTO,
   WorkflowStatusTemplateDTO,
 } from '@superboard/shared';
-import type { PredictiveHealthResponse } from '@/features/jira/hooks/use-predictive-health';
-import { TaskTypeIcon } from '@/features/jira/components/task-badges';
-import { TaskCommentSection } from '@/features/jira/components/task-comment-section';
+import type { PredictiveHealthResponse } from '@/features/board/hooks/use-predictive-health';
+import { TaskTypeIcon } from '@/features/board/components/task-badges';
+import { TaskCommentSection } from '@/features/board/components/task-comment-section';
 import { formatDate } from '@/lib/format-date';
 import { type TaskPriority } from '@/lib/constants/task';
-import { TaskSubtaskManager } from '@/features/jira/components/task-subtask-manager';
-import { TaskPropertiesForm } from '@/features/jira/components/task-properties-form';
-import { TaskAttachmentManager } from '@/features/jira/components/task-attachment-manager';
+import { TaskSubtaskManager } from '@/features/board/components/task-subtask-manager';
+import { TaskPropertiesForm } from '@/features/board/components/task-properties-form';
+import { TaskAttachmentManager } from '@/features/board/components/task-attachment-manager';
 import {
   useSummarizeTask,
   useAiDecompose,
   useAiRefine,
   useTaskIntelligence,
-} from '@/features/jira/hooks/use-task-mutations';
+} from '@/features/board/hooks/use-task-mutations';
 import { useRelatedDocs } from '@/features/search/hooks/use-related-docs';
 import { toast } from 'sonner';
 import Link from 'next/link';

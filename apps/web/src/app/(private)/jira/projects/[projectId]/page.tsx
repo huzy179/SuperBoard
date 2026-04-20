@@ -5,20 +5,20 @@ import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigat
 import type { CreateTaskRequestDTO, ProjectMemberDTO } from '@superboard/shared';
 import { FullPageError } from '@/components/ui/page-states';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
-import { ProjectSkeleton } from '@/features/jira/components/ProjectSkeleton';
+import { ProjectSkeleton } from '@/features/board/components/ProjectSkeleton';
 
-import { ProjectDetailHeader } from '@/features/jira/components/project-detail-header';
-import { ProjectViewManager } from '@/features/jira/components/ProjectViewManager';
-import { ProjectOverlayManager } from '@/features/jira/components/ProjectOverlayManager';
-import { TaskCreateForm } from '@/features/jira/components/task-create-form';
-import { TaskFilterBar } from '@/features/jira/components/task-filter-bar';
-import { TaskBulkActionBar } from '@/features/jira/components/task-bulk-action-bar';
-import { MissionArchitectTerminal } from '@/features/jira/components/MissionArchitectTerminal';
+import { ProjectDetailHeader } from '@/features/board/components/project-detail-header';
+import { ProjectViewManager } from '@/features/board/components/ProjectViewManager';
+import { ProjectOverlayManager } from '@/features/board/components/ProjectOverlayManager';
+import { TaskCreateForm } from '@/features/board/components/task-create-form';
+import { TaskFilterBar } from '@/features/board/components/task-filter-bar';
+import { TaskBulkActionBar } from '@/features/board/components/task-bulk-action-bar';
+import { MissionArchitectTerminal } from '@/features/board/components/MissionArchitectTerminal';
 
 import {
   ProjectDetailProvider,
   useProjectDetailContext,
-} from '@/features/jira/context/ProjectDetailContext';
+} from '@/features/board/context/ProjectDetailContext';
 import { useAuthSession } from '@/features/auth/hooks';
 import {
   useProjectDetail,
@@ -30,7 +30,7 @@ import {
   useTaskSelection,
   useProjectWorkflow,
   usePredictiveHealth,
-} from '@/features/jira/hooks';
+} from '@/features/board/hooks';
 import {
   useCreateTask,
   useUpdateTask,
@@ -38,8 +38,8 @@ import {
   useArchiveTask,
   useRestoreTask,
   useBulkTaskOperation,
-} from '@/features/jira/hooks/use-task-mutations';
-import { useProjectUrlState } from '@/features/jira/hooks/use-project-url-state';
+} from '@/features/board/hooks/use-task-mutations';
+import { useProjectUrlState } from '@/features/board/hooks/use-project-url-state';
 import { BOARD_COLUMNS, PRIORITY_OPTIONS, TASK_TYPE_OPTIONS } from '@/lib/constants/task';
 import { filterAndSortProjectTasks, buildBoardData } from '@/lib/helpers/task-view';
 

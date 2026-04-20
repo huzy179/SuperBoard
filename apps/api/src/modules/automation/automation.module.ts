@@ -15,7 +15,7 @@ import { SymbiosisService } from './symbiosis.service';
 import { ExecutiveService } from './executive.service';
 import { ProjectModule } from '../project/project.module';
 import { DiagnosisService } from '../knowledge/diagnosis.service';
-import { ChronologyService } from '../project/chronology.service';
+import { ChronologyService } from '../analytics/chronology.service';
 import { DocService } from '../doc/doc.service';
 
 @Module({

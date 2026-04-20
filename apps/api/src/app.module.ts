@@ -28,6 +28,7 @@ import { ChatModule } from './modules/chat/chat.module';
 import { DocModule } from './modules/doc/doc.module';
 import { AutomationModule } from './modules/automation/automation.module';
 import { KnowledgeModule } from './modules/knowledge/knowledge.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 @Module({
@@ -57,6 +58,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     DocModule,
     AutomationModule,
     KnowledgeModule,
+    AnalyticsModule,
   ],
   controllers: [HealthController],
   providers: [

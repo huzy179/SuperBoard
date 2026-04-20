@@ -4,7 +4,7 @@ import { TaskService } from '../task/task.service';
 import { DocService } from '../doc/doc.service';
 import { ChatService } from '../chat/chat.service';
 import { ProjectService } from '../project/project.service';
-import { ReportService } from '../project/report.service';
+import { ReportService } from '../analytics/report.service';
 import { apiSuccess } from '../../common/api-response';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { requireWorkspace } from '../../common/helpers';

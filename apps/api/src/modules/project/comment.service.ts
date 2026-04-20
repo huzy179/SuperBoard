@@ -12,7 +12,7 @@ import { NotificationService } from '../notification/notification.service';
 import type { CommentItemDTO } from '@superboard/shared';
 import { ProjectGateway } from './project.gateway';
 import { MentionService } from './mention.service';
-import { WorkflowAutomationService } from './workflow-automation.service';
+import { WorkflowAutomationService } from '../analytics/workflow-automation.service';
 
 @Injectable()
 export class CommentService {

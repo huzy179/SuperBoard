@@ -1,0 +1,7 @@
+[
+  {
+    "instruction": "Tóm tắt nội dung công việc sau đây một cách súc tích và nêu bật các hành động chính.",
+    "input": "Xây dựng hệ thống đăng nhập",
+    "output": "Hệ thống đăng nhập bằng email."
+  }
+]

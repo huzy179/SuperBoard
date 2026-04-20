@@ -49,6 +49,8 @@ import { SimulationService } from './simulation.service';
 import { ProjectGateway } from './project.gateway';
 import { CommentService } from './comment.service';
 
+import { BriefingService } from './briefing.service';
+
 @Controller('v1/projects')
 export class ProjectController {
   constructor(
@@ -59,6 +61,7 @@ export class ProjectController {
     private simulationService: SimulationService,
     private projectGateway: ProjectGateway,
     private commentService: CommentService,
+    private briefingService: BriefingService,
   ) {}
 
   @Post(':projectId/simulate')
@@ -290,6 +293,56 @@ export class ProjectController {
     });
 
     return apiSuccess(task);
+  }
+
+  @Post(':projectId/tasks/batch')
+  async bulkCreateTasks(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+    @Body() body: { tasks: { title: string; description?: string }[] },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<any> {
+    const workspaceId = requireWorkspace(user);
+
+    if (!body.tasks || !Array.isArray(body.tasks) || body.tasks.length === 0) {
+      throw new BadRequestException('Tasks array is required and cannot be empty');
+    }
+
+    const tasks = await this.projectService.bulkCreateTasksForProject({
+      projectId,
+      workspaceId,
+      actorId: user.id,
+      tasks: body.tasks,
+    });
+
+    this.projectGateway.emitProjectUpdated(projectId);
+
+    return apiSuccess(tasks);
+  }
+
+  @Post(':projectId/statuses/sync')
+  async syncStatuses(
+    @CurrentUser() user: AuthUserDTO,
+    @Param('projectId') projectId: string,
+    @Body() body: { statuses: { name: string; category: string }[] },
+  ) {
+    requireWorkspace(user);
+    await this.projectService.syncProjectStatusesWithAiSuggestions(projectId, body.statuses);
+    this.projectGateway.emitProjectUpdated(projectId);
+    return apiSuccess({ success: true });
+  }
+
+  @Post(':projectId/generate-briefing')
+  async generateBriefing(
+    @Param('projectId') projectId: string,
+    @Body() body: { goal: string; tasks: unknown[] },
+  ) {
+    const result = await this.briefingService.generateMissionBriefing(
+      projectId,
+      body.goal,
+      body.tasks,
+    );
+    return apiSuccess(result);
   }
 
   @Patch(':projectId/tasks/:taskId/status')

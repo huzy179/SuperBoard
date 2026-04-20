@@ -126,4 +126,25 @@ export class AiController {
 
     return apiSuccess({ response });
   }
+
+  @Post('orchestrate')
+  async orchestrateGoal(
+    @CurrentUser() user: AuthUserDTO,
+    @Body() body: { goal: string; context?: string },
+  ) {
+    const result = await this.aiService.orchestrateGoal(body.goal, body.context || '');
+    return apiSuccess({ result });
+  }
+
+  @Post('architect')
+  async architect(@Body() body: { goal: string; imageBase64?: string }) {
+    const result = await this.aiService.architectProject(body.goal);
+    return apiSuccess(result);
+  }
+
+  @Post('dataset/export')
+  async exportDataset(@Body() body: { format: string; limit?: number }) {
+    const result = await this.aiService.generateTrainingDataset(body.format, body.limit ?? 1000);
+    return apiSuccess(result);
+  }
 }

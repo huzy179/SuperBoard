@@ -8,6 +8,8 @@ import {
   LabelDots,
   TaskIdBadge,
 } from '@/features/jira/components/task-badges';
+import { motion } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
 import { formatDate } from '@/lib/format-date';
 
 interface TaskListViewProps {
@@ -191,7 +193,7 @@ export function TaskListView({
                         <AssigneeAvatar
                           name={task.assigneeName}
                           color={task.assigneeAvatarColor}
-                          size={32}
+                          size="lg"
                         />
                       </div>
                       <div className="flex flex-col">

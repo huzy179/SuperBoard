@@ -1,11 +1,11 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
-import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { logger } from '../logger';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  intercept(context: ExecutionContext, next: CallHandler): any {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
 
@@ -13,7 +13,8 @@ export class LoggingInterceptor implements NestInterceptor {
     const userId = request.user?.id;
     const start = Date.now();
 
-    return next.handle().pipe(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (next.handle() as any).pipe(
       tap({
         next: () => {
           const durationMs = Date.now() - start;

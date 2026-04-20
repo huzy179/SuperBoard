@@ -3,7 +3,7 @@
 import { TaskBoardView } from './task-board-view';
 import { TaskListView } from './task-list-view';
 import { TaskCalendarView } from './task-calendar-view';
-import { ExecutiveBriefingCard } from '@/features/reports/components/executive-briefing-card';
+import { NeuralBriefing } from '@/features/dashboard/components/NeuralBriefing';
 import type { ProjectTaskItemDTO } from '@superboard/shared';
 import { useProjectDetailContext } from '../context/ProjectDetailContext';
 
@@ -26,7 +26,7 @@ interface ProjectViewManagerProps {
 
   // Handlers
   onOpenEdit: (task: ProjectTaskItemDTO) => void;
-  onAddTask: (status?: string) => void;
+  onAddTask?: (status?: string) => void;
   onUpdateTaskStatus: (taskId: string, status: string) => void;
   onDropTask: (taskId: string, newDate: string) => Promise<void>;
 
@@ -65,6 +65,7 @@ export function ProjectViewManager({
   onPrevMonth,
   onNextMonth,
   onOpenEdit,
+  onAddTask,
   onUpdateTaskStatus,
   onDropTask,
   selectedTaskIds,
@@ -86,8 +87,12 @@ export function ProjectViewManager({
   const { viewMode, setTaskStatus, setShowCreateTaskPanel } = useProjectDetailContext();
 
   const handleAddTask = (status?: string) => {
-    setTaskStatus(status);
-    setShowCreateTaskPanel(true);
+    if (onAddTask) {
+      onAddTask(status);
+    } else {
+      setTaskStatus(status);
+      setShowCreateTaskPanel(true);
+    }
   };
   if (viewMode === 'board') {
     return (
@@ -137,7 +142,7 @@ export function ProjectViewManager({
   if (viewMode === 'insights') {
     return (
       <div className="animate-in fade-in zoom-in-95 duration-700">
-        <ExecutiveBriefingCard projectId={projectId} />
+        <NeuralBriefing projectId={projectId} />
       </div>
     );
   }

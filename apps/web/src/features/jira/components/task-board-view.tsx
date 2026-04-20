@@ -60,7 +60,7 @@ const columnVariants = {
     y: 0,
     transition: {
       duration: 0.6,
-      ease: [0.175, 0.885, 0.32, 1.275],
+      ease: [0.175, 0.885, 0.32, 1.275] as any, // eslint-disable-line @typescript-eslint/no-explicit-any
     },
   },
 };
@@ -293,7 +293,6 @@ export function TaskBoardView({
                     >
                       <QuantumCard
                         hoverEffect={true}
-                        glowIntensity={isSelected ? 0.3 : 0.1}
                         glowColor={
                           task.priority === 'urgent'
                             ? 'rose'
@@ -393,7 +392,7 @@ export function TaskBoardView({
                                 <AssigneeAvatar
                                   name={task.assigneeName}
                                   color={task.assigneeAvatarColor}
-                                  size={28}
+                                  size="md"
                                 />
                               </div>
                             ) : null}

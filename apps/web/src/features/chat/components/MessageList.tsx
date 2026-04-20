@@ -1,12 +1,23 @@
-'use client';
-
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { useMessages } from '../hooks/use-chat';
 import { AssigneeAvatar } from '@/features/jira/components/task-badges';
-import { Loader2, Reply, Heart, Zap, MoreHorizontal } from 'lucide-react';
+import {
+  Loader2,
+  Reply,
+  Zap,
+  MoreHorizontal,
+  ExternalLink,
+  Box,
+  FileText,
+  CheckSquare,
+} from 'lucide-react';
 import type { Message } from '@superboard/shared';
+import { motion } from 'framer-motion';
+import { MessageToTaskDialog } from './MessageToTaskDialog';
+import { EmojiReactionPicker } from './EmojiReactionPicker';
+import { Smile } from 'lucide-react';
 
 interface MessageListProps {
   channelId: string;
@@ -16,6 +27,16 @@ interface MessageListProps {
 export function MessageList({ channelId, onOpenThread }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [taskConversionMessage, setTaskConversionMessage] = useState<Message | null>(null);
+  const [reactionMenuMessageId, setReactionMenuMessageId] = useState<string | null>(null);
+  const [reactions, setReactions] = useState<Record<string, string[]>>({});
+
+  const handleAddReaction = (messageId: string, emoji: string) => {
+    setReactions((prev) => ({
+      ...prev,
+      [messageId]: [...(prev[messageId] || []), emoji],
+    }));
+  };
 
   const { messages, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useMessages(channelId);
@@ -109,23 +130,38 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
                           : 'bg-white/[0.03] border-white/5 text-white/80 group-hover/bubble:bg-white/[0.05] group-hover/bubble:border-white/10'
                       }`}
                     >
-                      {message.content}
+                      <div className="flex-1">
+                        {message.content}
+                        <NeuralLinkPreview content={message.content} />
+                      </div>
 
                       {/* Physical noise texture proxy */}
                       <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 rounded-2xl" />
                     </div>
 
                     {/* Reaction System */}
-                    <div
-                      className={`flex flex-wrap gap-1.5 mt-2 px-1 ${isMe ? 'justify-end' : ''}`}
-                    >
-                      <button className="flex items-center gap-1.5 px-3 py-1 bg-slate-950 border border-white/5 rounded-full text-[10px] font-black text-white/40 hover:text-brand-400 hover:border-brand-500/30 transition-all group/reaction">
-                        <Heart
-                          size={10}
-                          className="group-hover/reaction:scale-125 transition-transform"
-                        />
-                        <span>Đã react</span>
-                      </button>
+                    <div className={`flex flex-wrap gap-2 mt-3 px-1 ${isMe ? 'justify-end' : ''}`}>
+                      {reactions[message.id]?.map((emoji, i) => (
+                        <motion.button
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          key={i}
+                          className="flex items-center gap-2 px-2.5 py-1 bg-brand-500/10 border border-brand-500/20 rounded-full text-xs shadow-glow-brand/5"
+                        >
+                          {emoji}
+                        </motion.button>
+                      ))}
+
+                      {!reactions[message.id]?.length && (
+                        <button className="group/pip relative flex items-center gap-2 px-3 py-1.5 bg-brand-500/5 border border-brand-500/10 rounded-full">
+                          <div className="relative flex h-2 w-2">
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500/40"></span>
+                          </div>
+                          <span className="text-[9px] font-black text-white/10 uppercase tracking-widest">
+                            Awaiting Intel
+                          </span>
+                        </button>
+                      )}
                     </div>
 
                     {/* Floating Controls */}
@@ -141,11 +177,26 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
                           <Reply size={16} />
                         </button>
                         <button
-                          className="p-2.5 hover:bg-white/5 text-white/40 hover:text-rose-400 rounded-lg transition-all"
-                          title="Cường độ tín hiệu"
+                          onClick={() => setTaskConversionMessage(message)}
+                          className="p-2.5 hover:bg-white/5 text-white/40 hover:text-emerald-400 rounded-lg transition-all"
+                          title="Chuyển thành Jira Task"
                         >
-                          <Zap size={16} />
+                          <CheckSquare size={16} />
                         </button>
+                        <div className="relative">
+                          <button
+                            onClick={() => setReactionMenuMessageId(message.id)}
+                            className="p-2.5 hover:bg-white/5 text-white/40 hover:text-brand-400 rounded-lg transition-all"
+                            title="Thêm phản hồi"
+                          >
+                            <Smile size={16} />
+                          </button>
+                          <EmojiReactionPicker
+                            isOpen={reactionMenuMessageId === message.id}
+                            onClose={() => setReactionMenuMessageId(null)}
+                            onSelect={(emoji) => handleAddReaction(message.id, emoji)}
+                          />
+                        </div>
                         <div className="w-px h-4 bg-white/5 mx-1" />
                         <button className="p-2.5 hover:bg-white/5 text-white/40 hover:text-white rounded-lg transition-all">
                           <MoreHorizontal size={16} />
@@ -159,6 +210,68 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
           })}
         </div>
       </div>
+
+      {taskConversionMessage && (
+        <MessageToTaskDialog
+          message={taskConversionMessage}
+          isOpen={!!taskConversionMessage}
+          onClose={() => setTaskConversionMessage(null)}
+        />
+      )}
     </div>
+  );
+}
+
+function NeuralLinkPreview({ content }: { content: string }) {
+  const isJiraMatch = content.match(/\/jira\/projects\/([^\s/]+)/);
+  const isDocMatch = content.match(/\/docs\/([^\s/]+)/);
+
+  if (!isJiraMatch && !isDocMatch) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mt-4 p-4 bg-black/40 border border-white/5 rounded-2xl group/preview hover:border-brand-500/30 transition-all cursor-pointer relative overflow-hidden"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 via-transparent to-transparent opacity-0 group-hover/preview:opacity-100 transition-opacity" />
+
+      <div className="flex items-center justify-between mb-3 relative z-10">
+        <div className="flex items-center gap-2">
+          {isJiraMatch ? (
+            <Box size={14} className="text-brand-400" />
+          ) : (
+            <FileText size={14} className="text-emerald-400" />
+          )}
+          <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">
+            {isJiraMatch ? 'Cross-Entity Node' : 'Encrypted Archive'}
+          </span>
+        </div>
+        <ExternalLink
+          size={12}
+          className="text-white/20 group-hover/preview:text-brand-400 transition-colors"
+        />
+      </div>
+
+      <div className="relative z-10">
+        <h4 className="text-xs font-black text-white uppercase tracking-wider mb-1">
+          {isJiraMatch ? 'Project Sector Delta' : 'Operating Protocol v1.4'}
+        </h4>
+        <p className="text-[10px] text-white/40 line-clamp-1 font-medium">
+          {isJiraMatch
+            ? 'Viewing active simulation in sector JIRA-402'
+            : 'Accessing collaborative intelligence node...'}
+        </p>
+      </div>
+
+      <div className="mt-4 flex items-center gap-3 relative z-10">
+        <div className="h-6 w-6 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
+          <div className="h-1.5 w-1.5 rounded-full bg-brand-400 animate-pulse" />
+        </div>
+        <span className="text-[8px] font-black text-brand-400 uppercase tracking-widest">
+          Active Link Established
+        </span>
+      </div>
+    </motion.div>
   );
 }

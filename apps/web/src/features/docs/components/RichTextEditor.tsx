@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useEditor, EditorContent, type JSONContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Collaboration from '@tiptap/extension-collaboration';
@@ -8,18 +10,25 @@ import { HocuspocusProvider } from '@hocuspocus/provider';
 import * as Y from 'yjs';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import {
+  Code,
+  Bold,
+  Italic,
+  Activity,
   Sparkles,
   Type,
   Scissors,
-  Bold,
-  Italic,
   List as ListIcon,
-  Code,
   Command,
-  Activity,
+  FileBox,
+  Search,
+  Box,
 } from 'lucide-react';
 import { processText } from '../api/doc-service';
+import { DocPropertyBar } from './DocPropertyBar';
+import { TaskNodeEmbed } from './TaskNodeEmbed';
+import { JiraTask } from '../extensions/jira-task';
 import { toast } from 'sonner';
+import { useSearch } from '@/features/search/hooks/use-search';
 
 interface RichTextEditorProps {
   docId?: string;
@@ -46,7 +55,14 @@ export function RichTextEditor({
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0, show: false });
   const [isAiProcessing, setIsAiProcessing] = useState(false);
   const [icon, setIcon] = useState('📑');
-  const [slashMenu, setSlashMenu] = useState({ show: false, top: 0, left: 0 });
+  const [slashMenu, setSlashMenu] = useState<{
+    show: boolean;
+    top: number;
+    left: number;
+    mode: 'default' | 'task_search';
+  }>({ show: false, top: 0, left: 0, mode: 'default' });
+  const [taskQuery, setTaskQuery] = useState('');
+  const { data: searchResults, isLoading: isSearching } = useSearch(taskQuery);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const ydoc = useMemo(() => new Y.Doc(), []);
@@ -90,11 +106,23 @@ export function RichTextEditor({
       editor.chain().focus().insertContentAt({ from, to }, result).run();
       toast.success('Đã xử lý xong');
     } catch {
-      toast.error('Lỗi xử lý');
+      // Error handled by hook
     } finally {
       setIsAiProcessing(false);
       setMenuPos((prev) => ({ ...prev, show: false }));
     }
+  };
+
+  const handleTemplateInject = (type: 'briefing' | 'rfc') => {
+    if (!editor) return;
+    const items =
+      type === 'briefing'
+        ? '<h1>MISSION BRIEFING</h1><p>Operation status: Active</p><ul><li>Target Objectives</li><li>Tactical Constraints</li></ul>'
+        : '<h1>STRATEGIC RFC</h1><p>Proposed by: Analysis Node</p><blockquote>Core Hypothesis</blockquote>';
+
+    editor.chain().focus().insertContent(items).run();
+    setSlashMenu((prev) => ({ ...prev, show: false }));
+    toast.success(`Đã tiêm mẫu ${type.toUpperCase()}`);
   };
 
   useEffect(() => {
@@ -134,10 +162,9 @@ export function RichTextEditor({
             name: user?.fullName || 'Người dùng',
             color: user?.avatarColor || '#6366f1',
           },
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ] as any[],
+        }),
+        JiraTask,
+      ],
       content: provider ? null : content,
       editable: editable,
       onUpdate: ({ editor }) => {
@@ -148,15 +175,25 @@ export function RichTextEditor({
         if (isSlash) {
           const { view } = editor;
           const coords = view.coordsAtPos(selection.from);
-          setSlashMenu({ show: true, top: coords.top + window.scrollY + 20, left: coords.left });
+          setSlashMenu({
+            show: true,
+            top: coords.top + window.scrollY + 20,
+            left: coords.left,
+            mode: 'default',
+          });
+        } else if (!slashMenu.show) {
+          // Do nothing if not already showing
         } else {
-          setSlashMenu((prev) => ({ ...prev, show: false }));
+          // Close if not slash and not in search mode
+          if (slashMenu.mode === 'default') {
+            setSlashMenu((prev) => ({ ...prev, show: false }));
+          }
         }
       },
       editorProps: {
         attributes: {
           class:
-            'prose prose-invert max-w-none focus:outline-none min-h-[500px] prose-slate prose-headings:text-white prose-p:text-white/60 prose-strong:text-white prose-code:text-brand-400 prose-pre:bg-black/40 prose-pre:border prose-pre:border-white/5',
+            'prose prose-invert max-w-none focus:outline-none min-h-[500px] prose-slate prose-headings:text-white prose-p:text-white/70 prose-strong:text-brand-400 prose-code:text-emerald-400 prose-pre:bg-black/40 prose-pre:border prose-pre:border-white/5 prose-headings:uppercase prose-headings:tracking-widest prose-headings:italic',
         },
       },
     },
@@ -245,6 +282,210 @@ export function RichTextEditor({
             desc="Tối ưu độ dài"
             onClick={() => handleAiAction('shorten')}
           />
+          <div className="px-4 py-3 text-[9px] font-black text-white/20 uppercase tracking-[0.3em] border-t border-white/5 my-2">
+            ĐỊNH DẠNG CƠ BẢN
+          </div>
+          <SlashMenuItem
+            icon={<Type size={14} className="text-white" />}
+            title="Tiêu đề 1"
+            desc="Tiêu đề chính cỡ lớn"
+            onClick={() => {
+              editor
+                .chain()
+                .focus()
+                .deleteRange({
+                  from: editor.state.selection.from - 1,
+                  to: editor.state.selection.from,
+                })
+                .toggleHeading({ level: 1 })
+                .run();
+              setSlashMenu((prev) => ({ ...prev, show: false }));
+            }}
+          />
+          <SlashMenuItem
+            icon={<Type size={12} className="text-white/80" />}
+            title="Tiêu đề 2"
+            desc="Tiêu đề phụ cỡ vừa"
+            onClick={() => {
+              editor
+                .chain()
+                .focus()
+                .deleteRange({
+                  from: editor.state.selection.from - 1,
+                  to: editor.state.selection.from,
+                })
+                .toggleHeading({ level: 2 })
+                .run();
+              setSlashMenu((prev) => ({ ...prev, show: false }));
+            }}
+          />
+          <SlashMenuItem
+            icon={<ListIcon size={14} className="text-white/60" />}
+            title="Danh sách dấu chấm"
+            desc="Tạo danh sách liệt kê"
+            onClick={() => {
+              editor
+                .chain()
+                .focus()
+                .deleteRange({
+                  from: editor.state.selection.from - 1,
+                  to: editor.state.selection.from,
+                })
+                .toggleBulletList()
+                .run();
+              setSlashMenu((prev) => ({ ...prev, show: false }));
+            }}
+          />
+          <SlashMenuItem
+            icon={<Code size={14} className="text-emerald-400" />}
+            title="Khối mã (Code)"
+            desc="Viết code có highlight"
+            onClick={() => {
+              editor
+                .chain()
+                .focus()
+                .deleteRange({
+                  from: editor.state.selection.from - 1,
+                  to: editor.state.selection.from,
+                })
+                .toggleCodeBlock()
+                .run();
+              setSlashMenu((prev) => ({ ...prev, show: false }));
+            }}
+          />
+          <div className="px-4 py-3 text-[9px] font-black text-white/20 uppercase tracking-[0.3em] border-t border-white/5 my-2">
+            MẪU TÀI LIỆU
+          </div>
+          <SlashMenuItem
+            icon={<FileBox size={14} className="text-brand-400" />}
+            title="Mission Briefing"
+            desc="Mẫu báo cáo nhiệm vụ"
+            onClick={() => {
+              editor
+                .chain()
+                .focus()
+                .deleteRange({
+                  from: editor.state.selection.from - 1,
+                  to: editor.state.selection.from,
+                })
+                .run();
+              handleTemplateInject('briefing');
+            }}
+          />
+          <SlashMenuItem
+            icon={<Activity size={14} className="text-emerald-400" />}
+            title="Strategic RFC"
+            desc="Mẫu đề xuất kỹ thuật"
+            onClick={() => {
+              editor
+                .chain()
+                .focus()
+                .deleteRange({
+                  from: editor.state.selection.from - 1,
+                  to: editor.state.selection.from,
+                })
+                .run();
+              handleTemplateInject('rfc');
+            }}
+          />
+
+          <div className="px-4 py-3 text-[9px] font-black text-white/20 uppercase tracking-[0.3em] border-t border-white/5 my-2">
+            CROSS-PLATFORM
+          </div>
+          <SlashMenuItem
+            icon={<Box size={14} className="text-brand-400" />}
+            title="Jira Task"
+            desc="Nhúng công việc từ Jira"
+            onClick={() => {
+              setSlashMenu((prev) => ({ ...prev, mode: 'task_search' }));
+            }}
+          />
+        </div>
+      )}
+
+      {/* Task Search Mode */}
+      {slashMenu.show && slashMenu.mode === 'task_search' && (
+        <div
+          className="fixed z-50 w-80 bg-slate-950/95 border border-white/10 rounded-[2.5rem] shadow-2xl p-4 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-3xl overflow-hidden"
+          style={{ top: `${slashMenu.top}px`, left: `${slashMenu.left}px` }}
+        >
+          <div className="flex items-center gap-3 mb-4 px-2">
+            <Search size={16} className="text-brand-400" />
+            <input
+              autoFocus
+              value={taskQuery}
+              onChange={(e) => setTaskQuery(e.target.value)}
+              placeholder="Search Jira Tasks..."
+              className="bg-transparent border-none outline-none text-sm text-white placeholder:text-white/10 w-full"
+            />
+          </div>
+
+          <div className="max-h-64 overflow-y-auto elite-scrollbar space-y-1">
+            {isSearching && (
+              <div className="py-8 text-center">
+                <Activity size={20} className="animate-spin text-brand-500 mx-auto mb-2" />
+                <span className="text-[9px] font-black text-brand-400 uppercase tracking-widest">
+                  Searching...
+                </span>
+              </div>
+            )}
+
+            {searchResults?.tasks?.map((task) => (
+              <button
+                key={task.id}
+                onClick={async () => {
+                  const e: any = editor;
+                  e.chain()
+                    .focus()
+                    .deleteRange({
+                      from: editor.state.selection.from - 1,
+                      to: editor.state.selection.from,
+                    })
+                    .setJiraTask({
+                      taskId: `${task.projectName?.substring(0, 3).toUpperCase()}-${task.number}`,
+                      title: task.title,
+                      status: task.status,
+                      assignee: task.assigneeName || 'Unassigned',
+                    })
+                    .run();
+                  setSlashMenu((prev) => ({ ...prev, show: false, mode: 'default' }));
+                  setTaskQuery('');
+                }}
+                className="w-full p-4 hover:bg-white/[0.03] rounded-2xl transition-all text-left border border-transparent hover:border-white/5 group"
+              >
+                <div className="text-[11px] font-black text-white uppercase tracking-tight truncate group-hover:text-brand-400">
+                  {task.title}
+                </div>
+                <div className="flex items-center gap-3 mt-1">
+                  <span className="text-[10px] text-white/20 uppercase font-mono">
+                    {task.projectName?.substring(0, 3)}-{task.number}
+                  </span>
+                  <div className="h-1 w-1 rounded-full bg-white/5" />
+                  <span className="text-[9px] text-white/10 uppercase tracking-widest italic">
+                    {task.status}
+                  </span>
+                </div>
+              </button>
+            ))}
+
+            {!isSearching && (!searchResults?.tasks || searchResults.tasks.length === 0) && (
+              <div className="py-8 text-center text-[10px] text-white/10 uppercase tracking-widest italic">
+                No tactical matches
+              </div>
+            )}
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between px-2">
+            <button
+              onClick={() => setSlashMenu((prev) => ({ ...prev, mode: 'default' }))}
+              className="text-[9px] font-black text-white/20 uppercase tracking-widest hover:text-white transition-colors"
+            >
+              Back
+            </button>
+            <span className="text-[9px] font-black text-brand-500/40 uppercase tracking-[0.2em]">
+              Neural Sync Active
+            </span>
+          </div>
         </div>
       )}
 
@@ -328,7 +569,29 @@ export function RichTextEditor({
           </div>
 
           <div className="px-12">
-            <EditorContent editor={editor} />
+            <DocPropertyBar
+              classification="TOP_SECRET"
+              status="DRAFT"
+              ownerName={user?.fullName || 'Protocol Agent'}
+            />
+            <EditorContent editor={editor} className="relative group/editor" />
+
+            {/* Entity Embed Demo */}
+            <div className="mt-20">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+                <span className="text-[10px] font-black text-white/10 uppercase tracking-[0.5em]">
+                  Cross-Platform Asset Embed
+                </span>
+                <div className="h-px flex-1 bg-gradient-to-l from-transparent via-white/5 to-transparent" />
+              </div>
+              <TaskNodeEmbed
+                taskId="JIRA-402"
+                title="Finalize Neural Singularity UI/UX Purge"
+                status="In Development"
+                assignee="Protocol Agent"
+              />
+            </div>
           </div>
         </div>
       </div>

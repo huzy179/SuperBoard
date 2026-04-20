@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import type { ProjectDetailDTO } from '@superboard/shared';
 import { formatDate } from '@/lib/format-date';
@@ -48,6 +49,7 @@ export function ProjectDetailHeader({
   const {
     viewMode,
     setViewMode,
+    showCreateTaskPanel,
     setShowCreateTaskPanel,
     setShowAutomationPanel,
     setShowKnowledgeMap,
@@ -222,7 +224,7 @@ export function ProjectDetailHeader({
 
               <button
                 type="button"
-                onClick={() => setShowCreateTaskPanel((value) => !value)}
+                onClick={() => setShowCreateTaskPanel(!showCreateTaskPanel)}
                 className="group relative flex items-center gap-3 rounded-[1.5rem] bg-white px-10 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-slate-950 transition-all hover:scale-105 active:scale-95 shadow-luxe overflow-hidden"
               >
                 <div className="absolute inset-0 bg-brand-500 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />

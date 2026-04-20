@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Settings2, Trash2, ChevronDown, Cpu } from 'lucide-react';
 import type { WorkflowStatusCategory } from '@superboard/shared';
 
 interface WorkflowData {

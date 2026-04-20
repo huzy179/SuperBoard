@@ -8,6 +8,37 @@ service AIService {
   rpc ProcessText (ProcessTextRequest) returns (TextResponse);
   rpc SummarizeChat (SummarizeChatRequest) returns (TextResponse);
   rpc GenerateAutomationRule (GenerateRuleRequest) returns (TextResponse);
+  rpc LogSignal (SignalRequest) returns (SignalResponse);
+  rpc ArchitectProject (ArchitectRequest) returns (ArchitectResponse);
+  rpc GenerateTrainingDataset (DatasetRequest) returns (DatasetResponse);
+}
+
+message DatasetRequest {
+  string format = 1; // "llama3", "alpaca"
+  int32 limit = 2;
+}
+
+message DatasetResponse {
+  string dataset_jsonl = 1;
+}
+
+message ArchitectRequest {
+  string goal = 1;
+  string image_base64 = 2; // Optional multimodal seed
+}
+
+message ArchitectResponse {
+  string project_json = 1;
+}
+
+message SignalRequest {
+  string intent = 1;
+  string payload_json = 2;
+  string context_json = 3;
+}
+
+message SignalResponse {
+  bool success = 1;
 }
 
 message GenerateRuleRequest {

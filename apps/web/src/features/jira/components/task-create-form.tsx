@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Mic, MicOff } from 'lucide-react';
+import { Mic, MicOff, Cpu, Zap, Activity, ShieldAlert } from 'lucide-react';
 import type {
   ProjectMemberDTO,
   ProjectTaskItemDTO,

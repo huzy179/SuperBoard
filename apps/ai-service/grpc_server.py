@@ -3,6 +3,8 @@ from concurrent import futures
 import ai_service_pb2
 import ai_service_pb2_grpc
 from services.gemini_service import gemini_service
+import json
+from services.training_hub import training_hub
 
 class AIServiceServicer(ai_service_pb2_grpc.AIServiceServicer):
     def SummarizeTask(self, request, context):
@@ -31,6 +33,27 @@ class AIServiceServicer(ai_service_pb2_grpc.AIServiceServicer):
         print(f"Generating automation rule for prompt: {request.prompt[:30]}...")
         result = gemini_service.generate_automation_rule(request.prompt)
         return ai_service_pb2.TextResponse(result=result)
+
+    def LogSignal(self, request, context):
+        print(f"Logging signal: {request.intent}")
+        try:
+            payload = json.loads(request.payload_json)
+            context_data = json.loads(request.context_json)
+            success = gemini_service.log_signal(request.intent, payload, context_data)
+            return ai_service_pb2.SignalResponse(success=success)
+        except Exception as e:
+            print(f"Signal logging failed: {str(e)}")
+            return ai_service_pb2.SignalResponse(success=False)
+
+    def ArchitectProject(self, request, context):
+        print(f"Architecting project for goal: {request.goal[:30]}...")
+        project_data = gemini_service.architect_project(request.goal)
+        return ai_service_pb2.ArchitectResponse(project_json=json.dumps(project_data, ensure_ascii=False))
+
+    def GenerateTrainingDataset(self, request, context):
+        print(f"Generating training dataset in format: {request.format}")
+        dataset_json = training_hub.generate_llama3_dataset(request.limit)
+        return ai_service_pb2.DatasetResponse(dataset_jsonl=dataset_json)
 
 def start_grpc_server() -> None:
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))

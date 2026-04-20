@@ -45,4 +45,19 @@ export class SearchController {
     const result = await this.searchService.generateNeuralAnswer(workspaceId, q || '');
     return apiSuccess(result);
   }
+
+  @Get('related-docs')
+  async getRelatedDocs(
+    @Request() req: { user: { defaultWorkspaceId: string } },
+    @Query('taskNumber') taskNumber: string,
+    @Query('taskTitle') taskTitle: string,
+  ) {
+    const workspaceId = req.user.defaultWorkspaceId;
+    const docs = await this.searchService.findRelatedDocsForTask(
+      workspaceId,
+      parseInt(taskNumber, 10),
+      taskTitle,
+    );
+    return apiSuccess(docs);
+  }
 }

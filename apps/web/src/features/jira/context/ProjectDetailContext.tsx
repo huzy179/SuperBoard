@@ -8,6 +8,7 @@ import type { ProjectTaskItemDTO } from '@superboard/shared';
 
 interface ProjectDetailContextType {
   // View Modes
+  projectId: string;
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
 
@@ -52,7 +53,13 @@ interface ProjectDetailContextType {
 
 const ProjectDetailContext = createContext<ProjectDetailContextType | undefined>(undefined);
 
-export function ProjectDetailProvider({ children }: { children: React.ReactNode }) {
+export function ProjectDetailProvider({
+  children,
+  projectId,
+}: {
+  children: React.ReactNode;
+  projectId: string;
+}) {
   const [viewMode, setViewMode] = useState<ViewMode>('board');
   const [showCreateTaskPanel, setShowCreateTaskPanel] = useState(false);
   const [taskStatus, setTaskStatus] = useState<ProjectTaskItemDTO['status'] | undefined>();
@@ -94,6 +101,7 @@ export function ProjectDetailProvider({ children }: { children: React.ReactNode 
 
   const value = useMemo(
     () => ({
+      projectId,
       viewMode,
       setViewMode,
       showCreateTaskPanel,
@@ -126,6 +134,7 @@ export function ProjectDetailProvider({ children }: { children: React.ReactNode 
       toggleFilter,
     }),
     [
+      projectId,
       viewMode,
       showCreateTaskPanel,
       taskStatus,

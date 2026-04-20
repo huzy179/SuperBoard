@@ -27,6 +27,16 @@ interface AIService {
   }): Observable<{ labels: string[] }>;
   SuggestPriority(data: { title: string; description: string }): Observable<{ priority: string }>;
   ProcessText(data: { text: string; mode: string }): Observable<{ result: string }>;
+  LogSignal(data: {
+    intent: string;
+    payload_json: string;
+    context_json: string;
+  }): Observable<{ success: boolean }>;
+  ArchitectProject(data: { goal: string }): Observable<{ project_json: string }>;
+  GenerateTrainingDataset(data: {
+    format: string;
+    limit: number;
+  }): Observable<{ dataset_json: string }>;
 }
 
 @Injectable()
@@ -328,5 +338,47 @@ export class AiService implements OnModuleInit {
 
   async getWorkspaceDigest(workspaceId: string): Promise<string> {
     return this.processText(`Workspace: ${workspaceId}`, 'executive_daily_briefing');
+  }
+
+  async generateTrainingDataset(format: string, limit: number): Promise<unknown[]> {
+    try {
+      const result = await firstValueFrom(
+        this.aiServiceClient.GenerateTrainingDataset({ format, limit }),
+      );
+      return JSON.parse(result.dataset_json) as unknown[];
+    } catch (error) {
+      this.logger.error('Dataset generation failed', error);
+      return [];
+    }
+  }
+
+  async logSignal(
+    intent: string,
+    payload: unknown,
+    context: Record<string, unknown> = {},
+  ): Promise<boolean> {
+    try {
+      const result = await firstValueFrom(
+        this.aiServiceClient.LogSignal({
+          intent,
+          payload_json: JSON.stringify(payload),
+          context_json: JSON.stringify(context),
+        }),
+      );
+      return result.success;
+    } catch (error) {
+      this.logger.warn(`Signal logging failed for ${intent}`, error);
+      return false;
+    }
+  }
+
+  async architectProject(goal: string): Promise<Record<string, unknown>> {
+    try {
+      const result = await firstValueFrom(this.aiServiceClient.ArchitectProject({ goal }));
+      return JSON.parse(result.project_json) as Record<string, unknown>;
+    } catch (error) {
+      this.logger.error('AI Architect failed', error);
+      throw error;
+    }
   }
 }

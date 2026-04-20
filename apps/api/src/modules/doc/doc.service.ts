@@ -30,6 +30,19 @@ export class DocService {
     // Trigger embedding sync in background
     void this.syncDocEmbedding(doc.id, doc.title, doc.content);
 
+    // Emit Neural Signal for telemetry
+    void this.aiService.logSignal(
+      'DOC_CREATED',
+      {
+        docId: doc.id,
+        title: doc.title,
+        authorId,
+      },
+      {
+        workspaceId,
+      },
+    );
+
     return doc;
   }
 
@@ -100,6 +113,18 @@ export class DocService {
     if (data.title !== undefined || data.content !== undefined) {
       void this.syncDocEmbedding(doc.id, doc.title, doc.content);
     }
+
+    // Emit Neural Signal for telemetry
+    void this.aiService.logSignal(
+      'DOC_UPDATED',
+      {
+        docId: doc.id,
+        title: doc.title,
+      },
+      {
+        workspaceId: doc.workspaceId,
+      },
+    );
 
     return doc;
   }

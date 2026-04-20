@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { ReadonlyURLSearchParams } from 'next/navigation';
 import { LAST_PROJECT_QUERY_KEY, LAST_PROJECT_VIEW_KEY } from '@/lib/constants/project';
 import type { ViewMode } from '@/stores/jira-project-ui-store';
+import type { TaskSortBy, SortDirection } from '@/lib/helpers/task-view';
 import { useProjectDetailContext } from '../context/ProjectDetailContext';
 
 type UrlStateOptions = {

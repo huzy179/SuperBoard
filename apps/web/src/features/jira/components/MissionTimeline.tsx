@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { History, ChevronRight, ChevronLeft, Layers } from 'lucide-react';
+import { History, ChevronRight, ChevronLeft, Layers, Brain } from 'lucide-react';
 
 interface TimelinePulse {
   id: string;

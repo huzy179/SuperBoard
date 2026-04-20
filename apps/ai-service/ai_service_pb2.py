@@ -24,21 +24,43 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10\x61i_service.proto\x12\x02\x61i\"4\n\x10SummarizeRequest\x12\x0f\n\x07task_id\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"$\n\x11SummarizeResponse\x12\x0f\n\x07summary\x18\x01 \x01(\t\" \n\x10\x45mbeddingRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\"&\n\x11\x45mbeddingResponse\x12\x11\n\tembedding\x18\x01 \x03(\x02\x32\x86\x01\n\tAIService\x12<\n\rSummarizeTask\x12\x14.ai.SummarizeRequest\x1a\x15.ai.SummarizeResponse\x12;\n\x0cGetEmbedding\x12\x14.ai.EmbeddingRequest\x1a\x15.ai.EmbeddingResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10\x61i_service.proto\x12\x02\x61i\"/\n\x0e\x44\x61tasetRequest\x12\x0e\n\x06\x66ormat\x18\x01 \x01(\t\x12\r\n\x05limit\x18\x02 \x01(\x05\"(\n\x0f\x44\x61tasetResponse\x12\x15\n\rdataset_jsonl\x18\x01 \x01(\t\"6\n\x10\x41rchitectRequest\x12\x0c\n\x04goal\x18\x01 \x01(\t\x12\x14\n\x0cimage_base64\x18\x02 \x01(\t\")\n\x11\x41rchitectResponse\x12\x14\n\x0cproject_json\x18\x01 \x01(\t\"K\n\rSignalRequest\x12\x0e\n\x06intent\x18\x01 \x01(\t\x12\x14\n\x0cpayload_json\x18\x02 \x01(\t\x12\x14\n\x0c\x63ontext_json\x18\x03 \x01(\t\"!\n\x0eSignalResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"%\n\x13GenerateRuleRequest\x12\x0e\n\x06prompt\x18\x01 \x01(\t\"B\n\x0bMessageData\x12\x0e\n\x06\x61uthor\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\x12\x12\n\ncreated_at\x18\x03 \x01(\t\"9\n\x14SummarizeChatRequest\x12!\n\x08messages\x18\x01 \x03(\x0b\x32\x0f.ai.MessageData\"0\n\x12ProcessTextRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x0c\n\x04mode\x18\x02 \x01(\t\"\x1e\n\x0cTextResponse\x12\x0e\n\x06result\x18\x01 \x01(\t\"4\n\x10SummarizeRequest\x12\x0f\n\x07task_id\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"$\n\x11SummarizeResponse\x12\x0f\n\x07summary\x18\x01 \x01(\t\" \n\x10\x45mbeddingRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\"&\n\x11\x45mbeddingResponse\x12\x11\n\tembedding\x18\x01 \x03(\x02\x32\xfa\x03\n\tAIService\x12<\n\rSummarizeTask\x12\x14.ai.SummarizeRequest\x1a\x15.ai.SummarizeResponse\x12;\n\x0cGetEmbedding\x12\x14.ai.EmbeddingRequest\x1a\x15.ai.EmbeddingResponse\x12\x37\n\x0bProcessText\x12\x16.ai.ProcessTextRequest\x1a\x10.ai.TextResponse\x12;\n\rSummarizeChat\x12\x18.ai.SummarizeChatRequest\x1a\x10.ai.TextResponse\x12\x43\n\x16GenerateAutomationRule\x12\x17.ai.GenerateRuleRequest\x1a\x10.ai.TextResponse\x12\x32\n\tLogSignal\x12\x11.ai.SignalRequest\x1a\x12.ai.SignalResponse\x12?\n\x10\x41rchitectProject\x12\x14.ai.ArchitectRequest\x1a\x15.ai.ArchitectResponse\x12\x42\n\x17GenerateTrainingDataset\x12\x12.ai.DatasetRequest\x1a\x13.ai.DatasetResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'ai_service_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_SUMMARIZEREQUEST']._serialized_start=24
-  _globals['_SUMMARIZEREQUEST']._serialized_end=76
-  _globals['_SUMMARIZERESPONSE']._serialized_start=78
-  _globals['_SUMMARIZERESPONSE']._serialized_end=114
-  _globals['_EMBEDDINGREQUEST']._serialized_start=116
-  _globals['_EMBEDDINGREQUEST']._serialized_end=148
-  _globals['_EMBEDDINGRESPONSE']._serialized_start=150
-  _globals['_EMBEDDINGRESPONSE']._serialized_end=188
-  _globals['_AISERVICE']._serialized_start=191
-  _globals['_AISERVICE']._serialized_end=325
+  _globals['_DATASETREQUEST']._serialized_start=24
+  _globals['_DATASETREQUEST']._serialized_end=71
+  _globals['_DATASETRESPONSE']._serialized_start=73
+  _globals['_DATASETRESPONSE']._serialized_end=113
+  _globals['_ARCHITECTREQUEST']._serialized_start=115
+  _globals['_ARCHITECTREQUEST']._serialized_end=169
+  _globals['_ARCHITECTRESPONSE']._serialized_start=171
+  _globals['_ARCHITECTRESPONSE']._serialized_end=212
+  _globals['_SIGNALREQUEST']._serialized_start=214
+  _globals['_SIGNALREQUEST']._serialized_end=289
+  _globals['_SIGNALRESPONSE']._serialized_start=291
+  _globals['_SIGNALRESPONSE']._serialized_end=324
+  _globals['_GENERATERULEREQUEST']._serialized_start=326
+  _globals['_GENERATERULEREQUEST']._serialized_end=363
+  _globals['_MESSAGEDATA']._serialized_start=365
+  _globals['_MESSAGEDATA']._serialized_end=431
+  _globals['_SUMMARIZECHATREQUEST']._serialized_start=433
+  _globals['_SUMMARIZECHATREQUEST']._serialized_end=490
+  _globals['_PROCESSTEXTREQUEST']._serialized_start=492
+  _globals['_PROCESSTEXTREQUEST']._serialized_end=540
+  _globals['_TEXTRESPONSE']._serialized_start=542
+  _globals['_TEXTRESPONSE']._serialized_end=572
+  _globals['_SUMMARIZEREQUEST']._serialized_start=574
+  _globals['_SUMMARIZEREQUEST']._serialized_end=626
+  _globals['_SUMMARIZERESPONSE']._serialized_start=628
+  _globals['_SUMMARIZERESPONSE']._serialized_end=664
+  _globals['_EMBEDDINGREQUEST']._serialized_start=666
+  _globals['_EMBEDDINGREQUEST']._serialized_end=698
+  _globals['_EMBEDDINGRESPONSE']._serialized_start=700
+  _globals['_EMBEDDINGRESPONSE']._serialized_end=738
+  _globals['_AISERVICE']._serialized_start=741
+  _globals['_AISERVICE']._serialized_end=1247
 # @@protoc_insertion_point(module_scope)

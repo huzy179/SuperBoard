@@ -675,4 +675,30 @@ export class SearchService {
       }))
       .filter((r) => r.id !== entityId);
   }
+
+  async findRelatedDocsForTask(workspaceId: string, taskNumber: number, taskTitle: string) {
+    // 1. Semantic search for task title
+    const semanticDocs = await this.searchDocsHybrid(workspaceId, taskTitle);
+
+    // 2. Traditional search for task number (e.g. "402")
+    const traditionalDocs = await this.prisma.doc.findMany({
+      where: {
+        workspaceId,
+        OR: [
+          { title: { contains: String(taskNumber), mode: 'insensitive' } },
+          // We can't easily search JSON content in traditional Prisma search for taskId
+          // but we can trust the hybrid search for mentions
+        ],
+      },
+      select: this.docSelect,
+      take: 5,
+    });
+
+    // 3. Merge and Deduplicate
+    const docMap = new Map<string, DocItemDTO>();
+    semanticDocs.forEach((d) => docMap.set(d.id, d));
+    traditionalDocs.map((d) => this.toDocDTO(d)).forEach((d) => docMap.set(d.id, d));
+
+    return Array.from(docMap.values()).slice(0, 5);
+  }
 }

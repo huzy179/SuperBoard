@@ -13,6 +13,7 @@ import { ProjectOverlayManager } from '@/features/jira/components/ProjectOverlay
 import { TaskCreateForm } from '@/features/jira/components/task-create-form';
 import { TaskFilterBar } from '@/features/jira/components/task-filter-bar';
 import { TaskBulkActionBar } from '@/features/jira/components/task-bulk-action-bar';
+import { MissionArchitectTerminal } from '@/features/jira/components/MissionArchitectTerminal';
 
 import {
   ProjectDetailProvider,
@@ -43,8 +44,11 @@ import { BOARD_COLUMNS, PRIORITY_OPTIONS, TASK_TYPE_OPTIONS } from '@/lib/consta
 import { filterAndSortProjectTasks, buildBoardData } from '@/lib/helpers/task-view';
 
 export default function ProjectDetailPage() {
+  const params = useParams<{ projectId: string }>();
+  const projectId = params.projectId;
+
   return (
-    <ProjectDetailProvider>
+    <ProjectDetailProvider projectId={projectId}>
       <ProjectDetailPageContent />
     </ProjectDetailProvider>
   );
@@ -178,6 +182,7 @@ function ProjectDetailPageContent() {
     handleUpdateTask,
     handleDeleteTask,
     handleRestoreTask,
+    handleDialogKeyDown,
   } = useTaskEditPanel({
     projectId,
     projectTasks: tasks,
@@ -304,13 +309,16 @@ function ProjectDetailPageContent() {
       <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-indigo-500/5 blur-[140px] rounded-full pointer-events-none translate-y-1/2" />
 
       <div className="relative z-10 flex flex-col gap-8">
-        <ProjectDetailHeader
-          project={project!}
-          projectKey={projectKey}
-          viewerCount={viewerCount}
-          isCopyLinkSuccess={isCopyLinkSuccess}
-          onCopyFilterLink={onCopyFilterLink}
-        />
+        <div className="flex items-center justify-between gap-4">
+          <ProjectDetailHeader
+            project={project!}
+            projectKey={projectKey}
+            viewerCount={viewerCount}
+            isCopyLinkSuccess={isCopyLinkSuccess}
+            onCopyFilterLink={onCopyFilterLink}
+          />
+          <MissionArchitectTerminal />
+        </div>
 
         <div className="flex flex-col gap-4">
           <TaskFilterBar members={members} workflow={workflow} />
@@ -441,6 +449,7 @@ function ProjectDetailPageContent() {
           isRestoring={restoreTaskMutation.isPending}
           taskUpdateError={taskUpdateError}
           dialogRef={dialogRef}
+          handleDialogKeyDown={handleDialogKeyDown}
         />
       </div>
     </section>

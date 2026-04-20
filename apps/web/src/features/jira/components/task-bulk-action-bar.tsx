@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trash2, User, Flag, Loader2, SquareCheck, MousePointer2 } from 'lucide-react';
 import type { ProjectMemberDTO, ProjectTaskItemDTO, TaskPriorityDTO } from '@superboard/shared';
 import { BOARD_COLUMNS, PRIORITY_OPTIONS } from '@/lib/constants/task';
@@ -126,28 +127,30 @@ export function TaskBulkActionBar(props: TaskBulkActionBarProps) {
                   >
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/40 to-transparent" />
                     <div className="space-y-1.5 p-1">
-                      {(workflow?.statuses || BOARD_COLUMNS).map((s) => (
-                        <button
-                          key={s.key}
-                          onClick={() => {
-                            onBulkStatusChange(s.key);
-                            onApplyStatus();
-                            setActiveMenu(null);
-                          }}
-                          className={`w-full flex items-center justify-between px-6 py-4 text-left rounded-2xl transition-all duration-300 group/item ${
-                            bulkStatus === s.key
-                              ? 'text-brand-400 bg-brand-500/10 border border-brand-500/10'
-                              : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'
-                          }`}
-                        >
-                          <span className="text-[11px] font-black uppercase tracking-widest italic group-hover/item:translate-x-1 transition-transform">
-                            {s.label || s.name}
-                          </span>
-                          {bulkStatus === s.key && (
-                            <div className="h-1.5 w-1.5 rounded-full bg-brand-400 shadow-glow-brand animate-pulse" />
-                          )}
-                        </button>
-                      ))}
+                      {(workflow?.statuses || BOARD_COLUMNS).map(
+                        (
+                          sw: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+                        ) => (
+                          <button
+                            key={sw.key}
+                            onClick={() => {
+                              onBulkStatusChange(sw.key as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+                              onApplyStatus();
+                              setActiveMenu(null);
+                            }}
+                            className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-[10px] font-black uppercase tracking-widest transition-all ${
+                              bulkStatus === sw.key
+                                ? 'text-brand-400 bg-brand-500/10 border border-brand-500/10'
+                                : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'
+                            }`}
+                          >
+                            <span className="truncate">{sw.label || sw.name}</span>
+                            {bulkStatus === sw.key && (
+                              <div className="h-1 w-1 rounded-full bg-brand-500 shadow-glow-brand" />
+                            )}
+                          </button>
+                        ),
+                      )}
                     </div>
                   </motion.div>
                 )}

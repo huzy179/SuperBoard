@@ -3,8 +3,10 @@ import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
 import { ThreadPanel } from './ThreadPanel';
 import { ChannelSidebar } from './ChannelSidebar';
+import { DirectTransmissionHub } from './DirectTransmissionHub';
 import { chatSocket } from '@/lib/realtime/chat-socket';
-import { Hash, Lock, Users, Search, MoreVertical } from 'lucide-react';
+import { Hash, Lock, Users, Search, MoreVertical, Phone } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
 import type { Channel, Message } from '@superboard/shared';
 
 interface ChatShellProps {
@@ -14,6 +16,7 @@ interface ChatShellProps {
 export function ChatShell({ channel }: ChatShellProps) {
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [activeThread, setActiveThread] = useState<Message | null>(null);
+  const [showTransmission, setShowTransmission] = useState(false);
 
   useEffect(() => {
     const unsubscribe = chatSocket.onTyping((data) => {
@@ -83,6 +86,13 @@ export function ChatShell({ channel }: ChatShellProps) {
             <div className="h-4 w-px bg-white/5" />
 
             <div className="flex items-center gap-4 text-white/40">
+              <button
+                onClick={() => setShowTransmission(true)}
+                className="p-2 hover:text-emerald-400 transition-all group relative"
+              >
+                <Phone size={18} />
+                <div className="absolute inset-0 bg-emerald-400/10 rounded-lg scale-0 group-hover:scale-100 transition-transform" />
+              </button>
               <button className="p-2 hover:text-white transition-all group relative">
                 <Search size={18} />
                 <div className="absolute inset-0 bg-brand-500/10 rounded-lg scale-0 group-hover:scale-100 transition-transform" />
@@ -137,6 +147,15 @@ export function ChatShell({ channel }: ChatShellProps) {
             </div>
           )}
         </div>
+
+        <AnimatePresence>
+          {showTransmission && (
+            <DirectTransmissionHub
+              channelName={channel.name}
+              onClose={() => setShowTransmission(false)}
+            />
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );

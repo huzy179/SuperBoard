@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { AiService } from '../ai/ai.service';
 import { SendMessageDto, UpdateMessageDto, AddReactionDto } from './dto/chat.dto';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ChatService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private aiService: AiService,
+  ) {}
 
   async getChannels(workspaceId: string, userId: string) {
     return this.prisma.channel.findMany({
@@ -92,7 +96,7 @@ export class ChatService {
   }
 
   async createMessage(channelId: string, userId: string, dto: SendMessageDto) {
-    return this.prisma.message.create({
+    const message = await this.prisma.message.create({
       data: {
         content: dto.content,
         channelId,
@@ -109,6 +113,46 @@ export class ChatService {
         },
       },
     });
+
+    // Emit Neural Signal for telemetry
+    void this.aiService.logSignal(
+      'CHAT_MESSAGE_SENT',
+      {
+        messageId: message.id,
+        channelId: message.channelId,
+        content: message.content,
+        authorId: message.authorId,
+      },
+      {
+        channelId: message.channelId,
+      },
+    );
+
+    // Proactive Intelligence: Detect Strategic Intent
+    this.detectAndPropose(channelId, message.content);
+
+    return message;
+  }
+
+  private async detectAndPropose(channelId: string, content: string) {
+    const triggerKeywords = ['architect', 'tổng hợp', 'kế hoạch', 'project', 'dự án', 'mission'];
+    const hasTrigger = triggerKeywords.some((kw) => content.toLowerCase().includes(kw));
+
+    if (hasTrigger) {
+      // Run a lightweight intent check via AI
+      const intentResult = await this.aiService.processText(content, 'intent_detection');
+      if (intentResult.includes('ACTION_PROPOSAL_REQUIRED')) {
+        // Suggest running the Mission Architect
+        await this.prisma.message.create({
+          data: {
+            content: `[NEURAL PROPOSAL] Tôi nhận thấy bạn đang thảo luận về một mục tiêu chiến lược. Bạn có muốn tôi sử dụng "Mission Architect" để bóc tách kế hoạch này không?`,
+            channelId,
+            authorId: 'ai-system-agent', // Dedicated system ID
+          },
+        });
+        // We'd also emit this via Gateway in a real scenario, or just rely on the next pull/socket event
+      }
+    }
   }
 
   async updateMessage(messageId: string, userId: string, dto: UpdateMessageDto) {

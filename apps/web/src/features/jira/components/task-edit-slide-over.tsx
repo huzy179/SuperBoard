@@ -13,6 +13,8 @@ import {
   Terminal,
   Cpu,
   Zap,
+  FileText,
+  ExternalLink,
 } from 'lucide-react';
 import type {
   ProjectTaskItemDTO,
@@ -34,7 +36,9 @@ import {
   useAiRefine,
   useTaskIntelligence,
 } from '@/features/jira/hooks/use-task-mutations';
+import { useRelatedDocs } from '@/features/search/hooks/use-related-docs';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 interface TaskEditSlideOverProps {
   editingTask: ProjectTaskItemDTO;
@@ -146,6 +150,10 @@ export function TaskEditSlideOver({
   const decomposeMutation = useAiDecompose();
   const refineMutation = useAiRefine();
   const { data: intelligence } = useTaskIntelligence(editingTask?.id);
+  const { data: relatedDocs } = useRelatedDocs(
+    editingTask?.number ?? undefined,
+    editingTask?.title,
+  );
 
   const taskPrediction = predictiveHealth?.predictions.find((p) => p.taskId === editingTask?.id);
   const isAtRisk = taskPrediction?.isAtRisk;
@@ -635,6 +643,47 @@ export function TaskEditSlideOver({
                     attachments={editingTask.attachments || []}
                   />
                 </div>
+
+                {/* Related Documentation Section */}
+                {relatedDocs && relatedDocs.length > 0 && (
+                  <div className="space-y-10 group/know">
+                    <div className="flex items-center gap-6 px-4">
+                      <div className="h-px w-12 bg-emerald-500/20" />
+                      <label className="text-[10px] font-black text-emerald-400/60 uppercase tracking-[0.5em]">
+                        Related Knowledge Context
+                      </label>
+                      <div className="h-px flex-1 bg-gradient-to-r from-emerald-500/20 to-transparent" />
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4">
+                      {relatedDocs.map((doc) => (
+                        <Link
+                          key={doc.id}
+                          href={`/docs/${doc.id}`}
+                          className="flex items-center justify-between p-6 bg-emerald-500/[0.02] border border-emerald-500/10 rounded-[2rem] hover:bg-emerald-500/10 hover:border-emerald-500/30 transition-all group/doc"
+                        >
+                          <div className="flex items-center gap-5">
+                            <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-400 group-hover/doc:scale-110 transition-transform">
+                              <FileText size={20} />
+                            </div>
+                            <div>
+                              <h5 className="text-sm font-black text-white uppercase tracking-tight group-hover/doc:text-emerald-400 transition-colors">
+                                {doc.title}
+                              </h5>
+                              <p className="text-[9px] text-white/20 uppercase tracking-[0.2em] mt-1">
+                                Updated {formatDate(doc.updatedAt)}
+                              </p>
+                            </div>
+                          </div>
+                          <ExternalLink
+                            size={16}
+                            className="text-white/10 group-hover/doc:text-emerald-400 transition-colors"
+                          />
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </section>
 
               <div className="border-t border-white/5 pt-20 bg-white/[0.01] -mx-10 px-10 rounded-t-[3rem]">
@@ -758,10 +807,12 @@ export function TaskEditSlideOver({
   );
 }
 
-function ShieldCheck({ className }: { className?: string }) {
+function ShieldCheck({ className, size = 16 }: { className?: string; size?: number }) {
   return (
     <svg
       className={className}
+      width={size}
+      height={size}
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"

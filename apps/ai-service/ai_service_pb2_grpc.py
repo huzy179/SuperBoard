@@ -44,6 +44,36 @@ class AIServiceStub(object):
                 request_serializer=ai__service__pb2.EmbeddingRequest.SerializeToString,
                 response_deserializer=ai__service__pb2.EmbeddingResponse.FromString,
                 _registered_method=True)
+        self.ProcessText = channel.unary_unary(
+                '/ai.AIService/ProcessText',
+                request_serializer=ai__service__pb2.ProcessTextRequest.SerializeToString,
+                response_deserializer=ai__service__pb2.TextResponse.FromString,
+                _registered_method=True)
+        self.SummarizeChat = channel.unary_unary(
+                '/ai.AIService/SummarizeChat',
+                request_serializer=ai__service__pb2.SummarizeChatRequest.SerializeToString,
+                response_deserializer=ai__service__pb2.TextResponse.FromString,
+                _registered_method=True)
+        self.GenerateAutomationRule = channel.unary_unary(
+                '/ai.AIService/GenerateAutomationRule',
+                request_serializer=ai__service__pb2.GenerateRuleRequest.SerializeToString,
+                response_deserializer=ai__service__pb2.TextResponse.FromString,
+                _registered_method=True)
+        self.LogSignal = channel.unary_unary(
+                '/ai.AIService/LogSignal',
+                request_serializer=ai__service__pb2.SignalRequest.SerializeToString,
+                response_deserializer=ai__service__pb2.SignalResponse.FromString,
+                _registered_method=True)
+        self.ArchitectProject = channel.unary_unary(
+                '/ai.AIService/ArchitectProject',
+                request_serializer=ai__service__pb2.ArchitectRequest.SerializeToString,
+                response_deserializer=ai__service__pb2.ArchitectResponse.FromString,
+                _registered_method=True)
+        self.GenerateTrainingDataset = channel.unary_unary(
+                '/ai.AIService/GenerateTrainingDataset',
+                request_serializer=ai__service__pb2.DatasetRequest.SerializeToString,
+                response_deserializer=ai__service__pb2.DatasetResponse.FromString,
+                _registered_method=True)
 
 
 class AIServiceServicer(object):
@@ -61,6 +91,42 @@ class AIServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ProcessText(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SummarizeChat(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GenerateAutomationRule(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def LogSignal(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ArchitectProject(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GenerateTrainingDataset(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_AIServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -73,6 +139,36 @@ def add_AIServiceServicer_to_server(servicer, server):
                     servicer.GetEmbedding,
                     request_deserializer=ai__service__pb2.EmbeddingRequest.FromString,
                     response_serializer=ai__service__pb2.EmbeddingResponse.SerializeToString,
+            ),
+            'ProcessText': grpc.unary_unary_rpc_method_handler(
+                    servicer.ProcessText,
+                    request_deserializer=ai__service__pb2.ProcessTextRequest.FromString,
+                    response_serializer=ai__service__pb2.TextResponse.SerializeToString,
+            ),
+            'SummarizeChat': grpc.unary_unary_rpc_method_handler(
+                    servicer.SummarizeChat,
+                    request_deserializer=ai__service__pb2.SummarizeChatRequest.FromString,
+                    response_serializer=ai__service__pb2.TextResponse.SerializeToString,
+            ),
+            'GenerateAutomationRule': grpc.unary_unary_rpc_method_handler(
+                    servicer.GenerateAutomationRule,
+                    request_deserializer=ai__service__pb2.GenerateRuleRequest.FromString,
+                    response_serializer=ai__service__pb2.TextResponse.SerializeToString,
+            ),
+            'LogSignal': grpc.unary_unary_rpc_method_handler(
+                    servicer.LogSignal,
+                    request_deserializer=ai__service__pb2.SignalRequest.FromString,
+                    response_serializer=ai__service__pb2.SignalResponse.SerializeToString,
+            ),
+            'ArchitectProject': grpc.unary_unary_rpc_method_handler(
+                    servicer.ArchitectProject,
+                    request_deserializer=ai__service__pb2.ArchitectRequest.FromString,
+                    response_serializer=ai__service__pb2.ArchitectResponse.SerializeToString,
+            ),
+            'GenerateTrainingDataset': grpc.unary_unary_rpc_method_handler(
+                    servicer.GenerateTrainingDataset,
+                    request_deserializer=ai__service__pb2.DatasetRequest.FromString,
+                    response_serializer=ai__service__pb2.DatasetResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -129,6 +225,168 @@ class AIService(object):
             '/ai.AIService/GetEmbedding',
             ai__service__pb2.EmbeddingRequest.SerializeToString,
             ai__service__pb2.EmbeddingResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ProcessText(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/ai.AIService/ProcessText',
+            ai__service__pb2.ProcessTextRequest.SerializeToString,
+            ai__service__pb2.TextResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SummarizeChat(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/ai.AIService/SummarizeChat',
+            ai__service__pb2.SummarizeChatRequest.SerializeToString,
+            ai__service__pb2.TextResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GenerateAutomationRule(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/ai.AIService/GenerateAutomationRule',
+            ai__service__pb2.GenerateRuleRequest.SerializeToString,
+            ai__service__pb2.TextResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def LogSignal(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/ai.AIService/LogSignal',
+            ai__service__pb2.SignalRequest.SerializeToString,
+            ai__service__pb2.SignalResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ArchitectProject(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/ai.AIService/ArchitectProject',
+            ai__service__pb2.ArchitectRequest.SerializeToString,
+            ai__service__pb2.ArchitectResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GenerateTrainingDataset(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/ai.AIService/GenerateTrainingDataset',
+            ai__service__pb2.DatasetRequest.SerializeToString,
+            ai__service__pb2.DatasetResponse.FromString,
             options,
             channel_credentials,
             insecure,

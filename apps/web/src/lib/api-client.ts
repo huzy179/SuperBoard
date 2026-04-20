@@ -97,7 +97,7 @@ export async function apiRequest<TData>(
           id: 'rate-limit-toast', // Prevent multiple identical toasts
         });
       } catch {
-        // sonner not available or failed to load
+        // ignore
       }
     }
 

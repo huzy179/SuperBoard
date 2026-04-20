@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+'use client';
+
 import { BOARD_COLUMNS, PRIORITY_OPTIONS, TASK_TYPE_OPTIONS } from '@/lib/constants/task';
 import type { TaskSortBy } from '@/lib/helpers/task-view';
 import { useProjectDetailContext } from '../context/ProjectDetailContext';
 import { ProjectMemberDTO, WorkflowStatusTemplateDTO } from '@superboard/shared';
+import { Sparkles, ChevronRight } from 'lucide-react';
 
 type TaskFilterBarProps = {
   members: ProjectMemberDTO[];
@@ -82,9 +86,9 @@ export function TaskFilterBar({ members, workflow }: TaskFilterBarProps) {
             STATUS
           </span>
           <div className="flex items-center gap-2">
-            {(workflow?.statuses || BOARD_COLUMNS).map((s) => {
-              const key = 'key' in s ? s.key : s.key;
-              const label = 'name' in s ? s.name : s.label;
+            {(workflow?.statuses || BOARD_COLUMNS).map((s: any) => {
+              const key = s.key;
+              const label = s.name || s.label;
               const isActive = filterStatuses.has(key);
               return (
                 <button

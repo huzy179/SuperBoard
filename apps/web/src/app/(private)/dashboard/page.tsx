@@ -42,22 +42,76 @@ const EMPTY_DASHBOARD_STATS: DashboardStatsDTO = {
   recentActivity: [],
 };
 
+type DashboardModuleId = 'STATS' | 'MATRIX' | 'EFFICIENCY' | 'SIGNALS' | 'VECTORS';
+
 interface DashboardModule {
-  id: string;
+  id: DashboardModuleId;
   order: number;
   focus: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+}
+
+const VALID_DASHBOARD_MODULE_IDS: DashboardModuleId[] = [
+  'STATS',
+  'MATRIX',
+  'EFFICIENCY',
+  'SIGNALS',
+  'VECTORS',
+];
+
+const DEFAULT_DASHBOARD_LAYOUT: DashboardModule[] = [
+  { id: 'STATS', order: 0, focus: false },
+  { id: 'MATRIX', order: 1, focus: false },
+  { id: 'EFFICIENCY', order: 2, focus: false },
+  { id: 'SIGNALS', order: 3, focus: false },
+  { id: 'VECTORS', order: 4, focus: false },
+];
+
+function isDashboardModuleId(value: unknown): value is DashboardModuleId {
+  return (
+    typeof value === 'string' && VALID_DASHBOARD_MODULE_IDS.includes(value as DashboardModuleId)
+  );
+}
+
+function parseAdaptiveLayout(payload: unknown): DashboardModule[] {
+  if (!Array.isArray(payload)) {
+    throw new TypeError('adaptiveLayout.data must be an array');
+  }
+
+  return payload.map((item, index) => {
+    if (!item || typeof item !== 'object') {
+      throw new TypeError(`adaptiveLayout.data[${index}] must be an object`);
+    }
+
+    const candidate = item as { id?: unknown; order?: unknown; focus?: unknown };
+
+    if (!isDashboardModuleId(candidate.id)) {
+      throw new TypeError(`adaptiveLayout.data[${index}].id has unknown type`);
+    }
+
+    if (typeof candidate.order !== 'number') {
+      throw new TypeError(`adaptiveLayout.data[${index}].order must be a number`);
+    }
+
+    if (typeof candidate.focus !== 'boolean') {
+      throw new TypeError(`adaptiveLayout.data[${index}].focus must be a boolean`);
+    }
+
+    return {
+      id: candidate.id,
+      order: candidate.order,
+      focus: candidate.focus,
+    };
+  });
 }
 
 export default function DashboardPage() {
   const { data: stats, isLoading, isError, error } = useDashboardStats();
-  const [adaptiveLayout, setAdaptiveLayout] = useState<DashboardModule[]>([]);
+  const [adaptiveLayout, setAdaptiveLayout] = useState<DashboardModule[]>(DEFAULT_DASHBOARD_LAYOUT);
 
   useEffect(() => {
     fetch('/api/v1/executive/adaptive-layout')
       .then((res) => res.json())
-      .then((body) => setAdaptiveLayout(body.data))
+      .then((body) => setAdaptiveLayout(parseAdaptiveLayout(body?.data)))
       .catch(() => {});
   }, []);
 
@@ -82,9 +136,9 @@ export default function DashboardPage() {
   if (isError || !stats) {
     return (
       <FullPageError
-        title="DASHBOARD_SYSCALL_FAILED"
-        message={error?.message ?? 'KERNEL_PANIC: UNEXPECTED_DASHBOARD_STATE'}
-        actionLabel="RETRY_SYSCALL"
+        title="Không thể tải dữ liệu tổng quan"
+        message={error?.message ?? 'Đã xảy ra lỗi khi tải dashboard'}
+        actionLabel="Thử lại"
         onAction={() => window.location.reload()}
       />
     );
@@ -132,42 +186,42 @@ export default function DashboardPage() {
 
       {/* Liquid Operational Matrix */}
       <div className="flex flex-col gap-10">
-        {adaptiveLayout
+        {[...adaptiveLayout]
           .sort((a, b) => a.order - b.order)
           .map((module) => {
             if (module.id === 'STATS')
               return (
                 <div key="STATS" className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                   <StatCard
-                    label="Total Protocols"
+                    label="Tổng công việc"
                     value={totalTasks}
                     icon={<Folders className="h-5 w-5" />}
                     color="brand"
-                    trend={`${completionRatio}% Done`}
+                    trend={`${completionRatio}% hoàn thành`}
                     delay={0}
                   />
                   <StatCard
-                    label="Synchronized"
+                    label="Đã hoàn thành"
                     value={doneTasks}
                     icon={<ShieldCheck className="h-5 w-5" />}
                     color="emerald"
-                    trend="Success State"
+                    trend="Tiến độ tốt"
                     delay={1}
                   />
                   <StatCard
-                    label="Active Processing"
+                    label="Đang thực hiện"
                     value={inProgressTasks}
                     icon={<Zap className="h-5 w-5" />}
                     color="blue"
-                    trend="Live Ops"
+                    trend="Đang xử lý"
                     delay={2}
                   />
                   <StatCard
-                    label="Stalled Units"
+                    label="Quá hạn"
                     value={safeStats.overdueTasks}
                     icon={<AlertCircle className="h-5 w-5" />}
                     color="rose"
-                    trend={`${overdueRatio}% Critical`}
+                    trend={`${overdueRatio}% cần chú ý`}
                     delay={3}
                   />
                 </div>

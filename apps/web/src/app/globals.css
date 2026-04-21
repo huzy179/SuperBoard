@@ -1,7 +1,185 @@
+@import "tailwindcss";
+@import "./theme.css";
+
 :root {
-  color-scheme: light;
+  color-scheme: dark;
   --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --ease-in-out-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* ============================================================
+   SHARED FORM PRIMITIVES
+   Dùng chung ở tất cả form components để đảm bảo UI nhất quán.
+   ============================================================ */
+
+/* Label chuẩn */
+.form-label {
+  @apply flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/40 mb-2;
+}
+
+/* Input / Select / Textarea chuẩn — dark glass */
+.form-input {
+  @apply w-full rounded-2xl border border-white/8 bg-white/[0.03] px-5 py-3.5
+         text-sm font-medium text-white placeholder:text-white/20
+         focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.05]
+         transition-all shadow-inner;
+}
+
+.form-input-lg {
+  @apply w-full rounded-2xl border border-white/8 bg-white/[0.03] px-6 py-4
+         text-base font-medium text-white placeholder:text-white/20
+         focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.05]
+         transition-all shadow-inner;
+}
+
+/* Select — cần appearance-none vì mỗi browser render khác nhau */
+.form-select {
+  @apply w-full rounded-2xl border border-white/8 bg-white/[0.03] px-5 py-3.5
+         text-sm font-medium text-white placeholder:text-white/20
+         focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.05]
+         transition-all shadow-inner appearance-none cursor-pointer;
+}
+
+/* Textarea */
+.form-textarea {
+  @apply w-full rounded-2xl border border-white/8 bg-white/[0.03] px-5 py-3.5
+         text-sm font-medium text-white placeholder:text-white/20
+         focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.05]
+         transition-all shadow-inner resize-none leading-relaxed;
+}
+
+/* Error message chuẩn */
+.form-error {
+  @apply flex items-center gap-3 rounded-2xl bg-rose-500/8 border border-rose-500/20
+         px-5 py-3.5 text-[11px] font-bold text-rose-400;
+}
+
+/* ============================================================
+   MODAL PRIMITIVES
+   Overlay và panel dùng chung cho tất cả dialog/modal.
+   ============================================================ */
+
+.modal-overlay {
+  @apply fixed inset-0 z-50 flex items-center justify-center
+         bg-slate-950/70 backdrop-blur-md
+         animate-fade-in;
+}
+
+.modal-panel {
+  @apply relative w-full rounded-[2rem] border border-white/8
+         bg-slate-900/95 backdrop-blur-3xl shadow-[0_32px_80px_-12px_rgba(0,0,0,0.8)]
+         animate-zoom-in overflow-hidden;
+}
+
+.modal-header {
+  @apply flex items-center justify-between px-8 py-6 border-b border-white/5;
+}
+
+.modal-title {
+  @apply text-lg font-black text-white tracking-tight;
+}
+
+.modal-subtitle {
+  @apply text-xs text-white/30 font-medium mt-0.5;
+}
+
+.modal-close-btn {
+  @apply w-10 h-10 flex items-center justify-center rounded-2xl
+         text-white/20 hover:text-white hover:bg-white/[0.06]
+         transition-all active:scale-90;
+}
+
+.modal-body {
+  @apply p-8;
+}
+
+.modal-footer {
+  @apply flex items-center gap-3 pt-6 border-t border-white/5 mt-6;
+}
+
+/* ============================================================
+   BUTTON PRIMITIVES
+   Ba loại button chính: primary, secondary, danger.
+   ============================================================ */
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 font-black text-[11px]
+         uppercase tracking-[0.15em] transition-all duration-300
+         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
+         rounded-2xl px-6 py-3.5;
+}
+
+.btn-sm {
+  @apply inline-flex items-center justify-center gap-2 font-black text-[10px]
+         uppercase tracking-[0.15em] transition-all duration-300
+         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
+         rounded-2xl px-4 py-2.5;
+}
+
+.btn-lg {
+  @apply inline-flex items-center justify-center gap-2 font-black text-xs
+         uppercase tracking-[0.15em] transition-all duration-300
+         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
+         rounded-2xl px-8 py-4;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 font-black text-[11px]
+         uppercase tracking-[0.15em] transition-all duration-300
+         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
+         rounded-2xl px-6 py-3.5
+         bg-brand-500 text-slate-950 hover:bg-brand-400
+         shadow-[0_4px_24px_-4px_oklch(0.68_0.13_160/0.4)];
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 font-black text-[11px]
+         uppercase tracking-[0.15em] transition-all duration-300
+         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
+         rounded-2xl px-6 py-3.5
+         bg-white/[0.04] text-white/50 border border-white/8
+         hover:bg-white/[0.08] hover:text-white hover:border-white/20;
+}
+
+.btn-danger {
+  @apply inline-flex items-center justify-center gap-2 font-black text-[11px]
+         uppercase tracking-[0.15em] transition-all duration-300
+         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
+         rounded-2xl px-6 py-3.5
+         bg-transparent text-rose-400/60 border border-rose-500/20
+         hover:bg-rose-500 hover:text-white hover:border-rose-500;
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 font-black text-[11px]
+         uppercase tracking-[0.15em] transition-all duration-300
+         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
+         rounded-2xl px-6 py-3.5
+         bg-transparent text-white/30
+         hover:bg-white/[0.04] hover:text-white;
+}
+
+/* Loading spinner dùng trong btn */
+.btn-spinner {
+  @apply animate-spin size-4;
+}
+
+/* ============================================================
+   SECTION DIVIDER dùng trong form panels
+   ============================================================ */
+.form-section-divider {
+  @apply flex items-center gap-4 my-8;
+}
+
+.form-section-divider::before,
+.form-section-divider::after {
+  content: '';
+  @apply flex-1 h-px bg-white/5;
+}
+
+.form-section-label {
+  @apply text-[9px] font-black text-white/20 uppercase tracking-[0.5em] whitespace-nowrap;
 }
 
 .glass-panel {

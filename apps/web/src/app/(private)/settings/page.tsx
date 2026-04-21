@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { FullPageError, FullPageLoader } from '@/components/ui/page-states';
 import { useAuthSession } from '@/features/auth/hooks';
 import { useUpdateProfile } from '@/features/user/hooks/user-profile';
@@ -16,8 +16,8 @@ import {
   useDeleteWorkspaceStatus,
   useUpdateWorkspaceTransitions,
   useSyncWorkspaceWorkflow,
-} from '@/features/board/hooks/use-workflow';
-import { WorkflowEditor } from '@/features/board/components/WorkflowEditor';
+} from '@/features/workflow/hooks/use-workflow';
+import { WorkflowEditor } from '@/features/workflow/components/WorkflowEditor';
 import { WorkspaceCreateModal } from '@/features/workspace/components/WorkspaceCreateModal';
 import { AvatarUpload } from '@/components/user/AvatarUpload';
 import { WorkspaceMemberSettings } from '@/features/workspace/components/WorkspaceMemberSettings';
@@ -35,6 +35,43 @@ import {
   Zap,
   Target,
 } from 'lucide-react';
+import type {
+  NotificationPreferenceDTO,
+  UpdateNotificationPreferenceRequestDTO,
+} from '@superboard/shared';
+
+const NOTIFICATION_TOGGLE_ITEMS: Array<{
+  id: keyof Pick<
+    UpdateNotificationPreferenceRequestDTO,
+    'taskAssignedEmail' | 'workspaceInviteEmail'
+  >;
+  label: string;
+  desc: string;
+  icon: ReactNode;
+}> = [
+  {
+    id: 'taskAssignedEmail',
+    label: 'Thông báo công việc mới',
+    desc: 'Nhận email khi bạn được giao một công việc mới.',
+    icon: <Target size={18} />,
+  },
+  {
+    id: 'workspaceInviteEmail',
+    label: 'Thông báo mời vào workspace',
+    desc: 'Nhận email khi có lời mời tham gia workspace.',
+    icon: <Mail size={18} />,
+  },
+];
+
+function isNotificationToggleEnabled(
+  preferences: NotificationPreferenceDTO | undefined,
+  key: keyof Pick<
+    UpdateNotificationPreferenceRequestDTO,
+    'taskAssignedEmail' | 'workspaceInviteEmail'
+  >,
+): boolean {
+  return preferences?.[key] ?? false;
+}
 
 export default function SettingsPage() {
   const { user } = useAuthSession();
@@ -67,14 +104,14 @@ export default function SettingsPage() {
   const [profileName, setProfileName] = useState(user?.fullName || '');
 
   if (isLoading || isWorkspaceLoading || (activeTab === 'workflows' && isWorkflowLoading))
-    return <FullPageLoader label="Establishing Secure Connection..." />;
+    return <FullPageLoader label="Đang kết nối dữ liệu..." />;
 
   if (isError) {
     return (
       <FullPageError
-        title="Access Protocol Failed"
-        message={error?.message ?? 'Unknown system error encountered'}
-        actionLabel="Re-Authenticate"
+        title="Không thể truy cập cài đặt"
+        message={error?.message ?? 'Đã xảy ra lỗi hệ thống'}
+        actionLabel="Thử lại"
         onAction={() => window.location.reload()}
       />
     );
@@ -90,11 +127,11 @@ export default function SettingsPage() {
           <div className="flex items-center gap-3">
             <ShieldCheck size={16} className="text-brand-400" />
             <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">
-              Core Interface
+              Thiết lập hệ thống
             </span>
           </div>
           <h1 className="text-4xl font-black text-white uppercase tracking-tighter leading-none">
-            Control Center
+            Cài đặt
           </h1>
         </div>
 
@@ -106,7 +143,7 @@ export default function SettingsPage() {
           <div className="p-1 bg-white/5 rounded-lg group-hover:bg-brand-500 group-hover:text-slate-950 transition-colors">
             <Plus size={14} />
           </div>
-          Initialize Workspace
+          Tạo workspace
         </button>
       </div>
 
@@ -114,11 +151,11 @@ export default function SettingsPage() {
         <div className="absolute inset-x-0 bottom-0 h-px bg-white/5" />
         <nav className="flex space-x-12 relative z-10">
           {[
-            { id: 'profile', label: 'Operator Identity', icon: <User size={14} /> },
-            { id: 'workspace', label: 'Nodes & Ops', icon: <Users size={14} /> },
-            { id: 'notifications', label: 'Signal Config', icon: <Bell size={14} /> },
+            { id: 'profile', label: 'Hồ sơ cá nhân', icon: <User size={14} /> },
+            { id: 'workspace', label: 'Thành viên workspace', icon: <Users size={14} /> },
+            { id: 'notifications', label: 'Thông báo', icon: <Bell size={14} /> },
             ...(canChangeRoles
-              ? [{ id: 'workflows', label: 'Neural Protocols', icon: <Workflow size={14} /> }]
+              ? [{ id: 'workflows', label: 'Quy trình công việc', icon: <Workflow size={14} /> }]
               : []),
           ].map((tab) => (
             <button
@@ -156,7 +193,7 @@ export default function SettingsPage() {
                     <Target size={20} />
                   </div>
                   <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-                    Operator Identity
+                    Hồ sơ cá nhân
                   </h2>
                 </div>
 
@@ -171,7 +208,7 @@ export default function SettingsPage() {
                 >
                   <div className="space-y-3">
                     <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 pl-4">
-                      DESIGNATION
+                      Họ và tên
                     </label>
                     <input
                       type="text"
@@ -184,7 +221,7 @@ export default function SettingsPage() {
 
                   <div className="space-y-3">
                     <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 pl-4">
-                      ENCRYPTED EMAIL
+                      Email
                     </label>
                     <div className="relative">
                       <input
@@ -213,7 +250,7 @@ export default function SettingsPage() {
                         ) : (
                           <Check size={16} />
                         )}
-                        {updateProfile.isPending ? 'SYNCING...' : 'UPDATE IDENTITY'}
+                        {updateProfile.isPending ? 'Đang lưu...' : 'Lưu thông tin'}
                       </span>
                     </button>
                   </div>
@@ -243,10 +280,10 @@ export default function SettingsPage() {
                     </div>
                     <div>
                       <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-                        Signal Config
+                        Cài đặt thông báo
                       </h2>
                       <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mt-1">
-                        Configure telemetry relay protocols.
+                        Chọn loại sự kiện bạn muốn nhận qua email.
                       </p>
                     </div>
                   </div>
@@ -267,36 +304,21 @@ export default function SettingsPage() {
 
                 <div className="space-y-4 pt-10 border-t border-white/5">
                   <label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/10 pl-4">
-                    TRIGGER EVENTS
+                    Loại sự kiện
                   </label>
                   <div className="grid gap-4">
-                    {[
-                      {
-                        id: 'taskAssignedEmail',
-                        label: 'Vector Authorization',
-                        desc: 'You are designated as the primary operator for a new mission vector.',
-                        icon: <Target size={18} />,
-                      },
-                      {
-                        id: 'workspaceInviteEmail',
-                        label: 'Namespace Invitation',
-                        desc: 'Receive access requests to establish connection with external node clusters.',
-                        icon: <Mail size={18} />,
-                      },
-                    ].map((item) => (
+                    {NOTIFICATION_TOGGLE_ITEMS.map((item) => (
                       <div
                         key={item.id}
                         onClick={() => {
                           if (preferences?.emailEnabled) {
                             updatePrefs.mutate({
-                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                              [item.id]: !(preferences as any)?.[item.id],
+                              [item.id]: !isNotificationToggleEnabled(preferences, item.id),
                             });
                           }
                         }}
                         className={`flex items-center justify-between p-6 rounded-[2rem] border transition-all cursor-pointer group ${
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          (preferences as any)?.[item.id]
+                          isNotificationToggleEnabled(preferences, item.id)
                             ? 'bg-white/[0.04] border-white/10'
                             : 'bg-transparent border-white/5 opacity-40 grayscale'
                         }`}
@@ -323,14 +345,12 @@ export default function SettingsPage() {
                         </div>
                         <div
                           className={`h-5 w-5 rounded-lg border-2 transition-all flex items-center justify-center ${
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            (preferences as any)?.[item.id]
+                            isNotificationToggleEnabled(preferences, item.id)
                               ? 'border-brand-500 bg-brand-500 text-slate-950'
                               : 'border-white/10'
                           }`}
                         >
-                          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                          {(preferences as any)?.[item.id] && <Check size={14} />}
+                          {isNotificationToggleEnabled(preferences, item.id) && <Check size={14} />}
                         </div>
                       </div>
                     ))}
@@ -345,17 +365,16 @@ export default function SettingsPage() {
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <section className="relative rounded-[3rem] border border-white/5 bg-slate-900/40 shadow-glass backdrop-blur-3xl overflow-hidden group">
               <WorkflowEditor
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                data={workflow as any}
+                {...(workflow ? { data: workflow } : {})}
                 isLoading={isWorkflowLoading}
-                title="Universal Protocol Manifest"
-                description="Establish default status vectors and transition logic for all workspace mission blocks."
+                title="Quy trình mặc định của workspace"
+                description="Thiết lập trạng thái và luồng chuyển trạng thái cho tất cả dự án trong workspace."
                 onAddStatus={(data) => createWorkspaceStatus.mutateAsync(data)}
                 onUpdateStatus={(statusId, data) =>
                   updateWorkspaceStatus.mutateAsync({ statusId, data })
                 }
                 onDeleteStatus={async (statusId) => {
-                  if (confirm('De-authorize mission status status?')) {
+                  if (confirm('Bạn có chắc muốn xóa trạng thái này?')) {
                     await deleteWorkspaceStatus.mutateAsync({ statusId });
                   }
                 }}
@@ -372,13 +391,13 @@ export default function SettingsPage() {
                 extraActions={
                   <button
                     onClick={() =>
-                      confirm('TRANSMIT GLOBAL PROTOCOL OVERWRITE TO ALL NODES?') &&
+                      confirm('Áp dụng quy trình này cho toàn bộ dự án trong workspace?') &&
                       syncWorkflow.mutate()
                     }
                     disabled={syncWorkflow.isPending}
                     className="px-8 py-3 bg-white/[0.03] border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-brand-500 hover:text-slate-950 hover:border-brand-500 transition-all shadow-luxe"
                   >
-                    {syncWorkflow.isPending ? 'TRANSMITTING...' : 'Propagate to System'}
+                    {syncWorkflow.isPending ? 'Đang đồng bộ...' : 'Đồng bộ cho toàn workspace'}
                   </button>
                 }
               />

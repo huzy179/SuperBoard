@@ -11,7 +11,7 @@ import {
   useUpdateProjectTransitions,
 } from '@/features/board/hooks';
 import { useProjectDetail } from '@/features/board/hooks';
-import { WorkflowEditor } from '@/features/board/components/WorkflowEditor';
+import { WorkflowEditor } from '@/features/workflow/components/WorkflowEditor';
 
 export default function WorkflowSettingsPage() {
   const params = useParams<{ projectId: string }>();

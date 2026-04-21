@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
 import { logger } from '../../common/logger';
-import { ProjectGateway } from '../project/project.gateway';
+import { ProjectEventsGateway } from '../project-events/project-events.gateway';
 
 @Injectable()
 export class WorkflowAutomationService {
   constructor(
     private prisma: PrismaService,
     private aiService: AiService,
-    private projectGateway: ProjectGateway,
+    private projectGateway: ProjectEventsGateway,
   ) {}
 
   async processCommentIntent(input: {

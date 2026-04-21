@@ -5,6 +5,7 @@ import { AiModule } from '../ai/ai.module';
 import { KnowledgeModule } from '../knowledge/knowledge.module';
 import { ProjectModule } from '../project/project.module';
 import { WorkflowModule } from '../workflow/workflow.module';
+import { ProjectEventsModule } from '../project-events/project-events.module';
 
 import { ReportController } from './report.controller';
 import { ExecutiveController } from './executive.controller';
@@ -25,6 +26,7 @@ import { BriefingService } from './briefing.service';
     KnowledgeModule,
     ProjectModule,
     WorkflowModule,
+    ProjectEventsModule,
   ],
   controllers: [ReportController, ExecutiveController],
   providers: [

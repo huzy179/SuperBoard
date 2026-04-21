@@ -1,8 +1,8 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useProjectReport } from '@/features/board/hooks/use-report';
-import { reportService } from '@/features/board/api/report-service';
+import { useProjectReport } from '@/features/reports/hooks/use-report';
+import { reportService } from '@/features/reports/api/report-service';
 import {
   DownloadIcon,
   BarChart3Icon,

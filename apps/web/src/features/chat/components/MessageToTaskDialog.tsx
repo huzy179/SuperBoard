@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Box, X, CheckSquare, Loader2, Target, Type, AlignLeft } from 'lucide-react';
-import { getProjects } from '@/features/board/api/project-service';
+import { getProjects } from '@/features/project/api/project-service';
 import { apiPost } from '@/lib/api-client';
 import { toast } from 'sonner';
 import type { Message, ProjectItemDTO } from '@superboard/shared';

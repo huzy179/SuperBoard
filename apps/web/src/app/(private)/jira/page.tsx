@@ -1,9 +1,9 @@
 'use client';
 
 import { SectionError, SectionSkeleton } from '@/components/ui/page-states';
-import { ProjectCardsGrid } from '@/features/board/components/project-cards-grid';
-import { ProjectForm } from '@/features/board/components/project-form';
-import { useJiraProjectsPage } from '@/features/board/hooks';
+import { ProjectCardsGrid } from '@/features/project/components/project-cards-grid';
+import { ProjectForm } from '@/features/project/components/project-form';
+import { useJiraProjectsPage } from '@/features/project/hooks';
 import { useAuthSession } from '@/features/auth/hooks/use-auth-session';
 import { NeuralWorkspaceDigest } from '@/features/ai/components/neural-workspace-digest';
 import { Search, Star, SortAsc, Zap, Plus, LayoutGrid, History, Activity } from 'lucide-react';

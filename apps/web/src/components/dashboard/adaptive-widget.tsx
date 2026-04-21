@@ -32,7 +32,7 @@ export function AdaptiveWidget({ order, focus, children, className }: AdaptiveWi
           <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 blur opacity-40 rounded-[2.5rem] animate-pulse pointer-events-none" />
           <div className="absolute top-4 right-8 flex items-center gap-2">
             <span className="text-[8px] font-black text-indigo-400 uppercase tracking-[0.3em]">
-              AI_FOCUS_ACTIVE
+              AI đang ưu tiên
             </span>
             <div className="h-1 w-1 bg-indigo-500 rounded-full animate-ping" />
           </div>

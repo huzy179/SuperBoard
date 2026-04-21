@@ -42,14 +42,16 @@ import { apiSuccess } from '../../common/api-response';
 import { requireWorkspace, findOrThrow, parseBooleanQuery } from '../../common/helpers';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { ProjectService } from './project.service';
-import { ProjectGateway } from './project.gateway';
-import { CommentService } from './comment.service';
+import { TaskService } from '../task/task.service';
+import { ProjectEventsGateway } from '../project-events/project-events.gateway';
+import { CommentService } from '../task/comment.service';
 
 @Controller('v1/projects')
 export class ProjectController {
   constructor(
     private projectService: ProjectService,
-    private projectGateway: ProjectGateway,
+    private taskService: TaskService,
+    private projectGateway: ProjectEventsGateway,
     private commentService: CommentService,
   ) {}
 
@@ -193,7 +195,7 @@ export class ProjectController {
     if (!title) throw new BadRequestException('Task title is required');
 
     const dueDate = this.parseOptionalDate(body.dueDate);
-    const task = await this.projectService.createTaskForProject({
+    const task = await this.taskService.createTaskForProject({
       projectId,
       workspaceId,
       actorId: user.id,
@@ -230,7 +232,7 @@ export class ProjectController {
     if (!body.tasks || !Array.isArray(body.tasks) || body.tasks.length === 0) {
       throw new BadRequestException('Tasks array is required and cannot be empty');
     }
-    const tasks = await this.projectService.bulkCreateTasksForProject({
+    const tasks = await this.taskService.bulkCreateTasksForProject({
       projectId,
       workspaceId,
       actorId: user.id,
@@ -250,7 +252,7 @@ export class ProjectController {
     const workspaceId = requireWorkspace(user);
     if (!body.status) throw new BadRequestException('Task status is required');
 
-    const task = await this.projectService.updateTaskStatusForProject({
+    const task = await this.taskService.updateTaskStatusForProject({
       projectId,
       taskId,
       workspaceId,
@@ -276,7 +278,7 @@ export class ProjectController {
     if (taskIds.length === 0) throw new BadRequestException('Task ids are required');
 
     const hasDueDate = Object.prototype.hasOwnProperty.call(body, 'dueDate');
-    const result = await this.projectService.bulkOperateTasksForProject({
+    const result = await this.taskService.bulkOperateTasksForProject({
       projectId,
       workspaceId,
       actorId: user.id,
@@ -306,7 +308,7 @@ export class ProjectController {
       throw new BadRequestException('Task title is required');
 
     const hasParentTaskId = Object.prototype.hasOwnProperty.call(body, 'parentTaskId');
-    const task = await this.projectService.updateTaskForProject({
+    const task = await this.taskService.updateTaskForProject({
       projectId,
       taskId,
       workspaceId,
@@ -340,7 +342,7 @@ export class ProjectController {
     @Param('taskId') taskId: string,
   ): Promise<DeleteTaskResponseDTO> {
     const workspaceId = requireWorkspace(user);
-    await this.projectService.deleteTaskForProject({
+    await this.taskService.deleteTaskForProject({
       projectId,
       taskId,
       workspaceId,
@@ -357,7 +359,7 @@ export class ProjectController {
     @Param('taskId') taskId: string,
   ): Promise<TaskHistoryResponseDTO> {
     const workspaceId = requireWorkspace(user);
-    const history = await this.projectService.getTaskHistoryForProject({
+    const history = await this.taskService.getTaskHistoryForProject({
       projectId,
       taskId,
       workspaceId,

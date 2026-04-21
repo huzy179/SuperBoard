@@ -5,7 +5,7 @@
 
 services:
   postgres:
-    image: pgvector/pgvector:16-pg16
+    image: pgvector/pgvector:pg16
     container_name: superboard-postgres
     ports:
       - '5433:5432'

@@ -5,7 +5,7 @@
 services:
   # ===== Core Services =====
   postgres:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     container_name: superboard-postgres
     ports:
       - '5433:5432'

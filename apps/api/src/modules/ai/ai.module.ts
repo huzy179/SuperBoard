@@ -10,7 +10,7 @@ import { ProjectModule } from '../project/project.module';
 
 @Module({
   imports: [
-    TaskModule,
+    forwardRef(() => TaskModule),
     DocModule,
     ChatModule,
     forwardRef(() => ProjectModule),

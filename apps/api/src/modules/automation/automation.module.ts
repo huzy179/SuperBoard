@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AutomationService } from './automation.service';
 import { AutomationController } from './automation.controller';
 import { AgentController } from './agent.controller';
@@ -19,7 +19,12 @@ import { ChronologyService } from '../analytics/chronology.service';
 import { DocService } from '../doc/doc.service';
 
 @Module({
-  imports: [NotificationModule, AiModule, TalentModule, ProjectModule],
+  imports: [
+    NotificationModule,
+    forwardRef(() => AiModule),
+    TalentModule,
+    forwardRef(() => ProjectModule),
+  ],
   controllers: [AutomationController, AgentController, ConnectController, ConsciousnessController],
   providers: [
     AutomationService,

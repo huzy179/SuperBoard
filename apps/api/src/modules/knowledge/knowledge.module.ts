@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { KnowledgeController } from './knowledge.controller';
 import { QaController } from './qa.controller';
 import { GraphService } from './graph.service';
@@ -10,7 +10,7 @@ import { DocModule } from '../doc/doc.module';
 import { AiModule } from '../ai/ai.module';
 
 @Module({
-  imports: [SearchModule, ProjectModule, DocModule, AiModule],
+  imports: [SearchModule, forwardRef(() => ProjectModule), DocModule, forwardRef(() => AiModule)],
   controllers: [KnowledgeController, QaController],
   providers: [GraphService, DiaryService, DiagnosisService],
   exports: [GraphService, DiaryService, DiagnosisService],

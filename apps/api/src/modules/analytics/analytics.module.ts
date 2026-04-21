@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import { NotificationModule } from '../notification/notification.module';
 import { AiModule } from '../ai/ai.module';
@@ -22,9 +22,9 @@ import { BriefingService } from './briefing.service';
   imports: [
     AuthModule,
     NotificationModule,
-    AiModule,
-    KnowledgeModule,
-    ProjectModule,
+    forwardRef(() => AiModule),
+    forwardRef(() => KnowledgeModule),
+    forwardRef(() => ProjectModule),
     WorkflowModule,
     ProjectEventsModule,
   ],

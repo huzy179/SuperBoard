@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import { NotificationModule } from '../notification/notification.module';
 import { ProjectService } from './project.service';
@@ -17,11 +17,11 @@ import { TaskModule } from '../task/task.module';
     AuthModule,
     NotificationModule,
     WorkflowModule,
-    AiModule,
-    AutomationModule,
+    forwardRef(() => AiModule),
+    forwardRef(() => AutomationModule),
     DocModule,
-    AnalyticsModule,
-    TaskModule,
+    forwardRef(() => AnalyticsModule),
+    forwardRef(() => TaskModule),
     ProjectEventsModule,
   ],
   controllers: [ProjectController],

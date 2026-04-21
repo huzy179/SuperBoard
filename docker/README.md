@@ -1,94 +1,62 @@
-# Docker Configuration
+# SuperBoard Docker Infrastructure
 
-This folder contains all Docker-related configurations for the SuperBoard project.
+Cấu trúc hạ tầng Docker chuyên nghiệp cho SuperBoard Monorepo.
 
-## Files
+## 📂 Thư mục Layout
 
-- **Dockerfile.api** - NestJS API service (Node.js)
-- **Dockerfile.web** - Next.js web application (Node.js)
-- **Dockerfile.ai** - Python AI service with gRPC
-- **docker-compose.yml** - Docker Compose orchestration file
-- **.dockerignore** - Files to exclude from Docker builds
-
-## Services
-
-### Infrastructure Services
-
-- **postgres** - PostgreSQL database (port 5433)
-- PostgreSQL dùng 2 database logical:
-  - `superboard` cho app data
-  - `keycloak` cho auth data
-- **redis** - Redis cache (port 6379)
-- **elasticsearch** - Elasticsearch search engine (port 9200)
-- **minio** - S3-compatible object storage (port 9000, 9001)
-- **keycloak** - Authentication service (port 8080)
-- **mailhog** - Email testing service (port 1025, 8025)
-
-### Application Services
-
-- **api** - NestJS REST API (port 3000)
-- **web** - Next.js web application (port 3001)
-- **ai-service** - Python AI service with gRPC (port 50051)
-
-## Usage
-
-### Start all services
-
-```bash
-docker-compose -f docker/docker-compose.yml up -d
+```text
+docker/
+├── compose/                # Docker Compose files (Orchestration)
+│   ├── docker-compose.yml        # Hạ tầng tối thiểu (Postgres, Redis, Collab)
+│   ├── docker-compose.full.yml   # Toàn bộ hệ thống (Keycloak, AI, ELK, etc.)
+│   └── docker-compose.monitoring.yml # Giám sát (Prometheus, Grafana)
+├── config/                 # Service-specific configurations
+│   ├── postgres/           # Scripts khởi tạo DB
+│   ├── prometheus/         # Cấu hình quét metric
+│   └── grafana/            # Provisioning dashboards & datasources
+└── README.md               # Tài liệu hướng dẫn
 ```
 
-### Stop all services
+## 🚀 Hướng dẫn sử dụng nhanh
+
+Lưu ý: Mọi lệnh nên được chạy từ **thư mục gốc (root)** của dự án.
+
+### 1. Chạy hệ thống tối thiểu (Cho dev core)
 
 ```bash
-docker-compose -f docker/docker-compose.yml down
+docker compose -f docker/compose/docker-compose.yml up -d
 ```
 
-### Rebuild services
+### 2. Chạy toàn bộ hệ sinh thái (Kèm AI & Infra)
 
 ```bash
-docker-compose -f docker/docker-compose.yml build
+docker compose -f docker/compose/docker-compose.full.yml up -d
 ```
 
-### View logs
+### 3. Chạy hệ thống giám sát (Monitoring)
 
 ```bash
-docker-compose -f docker/docker-compose.yml logs -f
+docker compose -f docker/compose/docker-compose.monitoring.yml up -d
 ```
 
-### View specific service logs
+## 📊 Monitoring Stack
 
-```bash
-docker-compose -f docker/docker-compose.yml logs -f api
-```
+Chúng tôi sử dụng bộ đôi Prometheus & Grafana để giám sát sức khỏe hệ thống:
 
-## Environment Variables
+- **Prometheus**: Thu thập metric từ API và AI-service.
+- **Grafana**: Hiển thị biểu đồ trực quan (Truy cập tại http://localhost:3001, pass: `admin`).
+- **Datasource**: Đã được cấu hình tự động (Provisioned) kết nối tới Prometheus.
 
-Update environment variables in `docker-compose.yml` or create a `.env` file:
+## 🛠 Cấu trúc Dockerfile
 
-```bash
-DATABASE_URL=postgresql://dev:devpassword@postgres:5432/superboard
-KEYCLOAK_DB_URL=postgresql://dev:devpassword@postgres:5432/keycloak
-REDIS_URL=redis://redis:6379
-ELASTICSEARCH_URL=http://elasticsearch:9200
-KEYCLOAK_URL=http://keycloak:8080
-NEXT_PUBLIC_API_URL=http://api:3000
-```
+Các Dockerfile được đặt trực tiếp trong thư mục của ứng dụng để đảm bảo tính đóng gói:
 
-## Network
+- `apps/api/Dockerfile`
+- `apps/web/Dockerfile`
+- `apps/ai-service/Dockerfile`
+- `apps/collab-service/Dockerfile`
 
-All services are connected to the `superboard` bridge network for inter-service communication.
+## ⚠️ Lưu ý quan trọng
 
-## Volumes
-
-- **postgres_data** - PostgreSQL database persistence
-- **minio_data** - MinIO data storage
-- **elasticsearch_data** - Elasticsearch indices storage
-
-## Health Checks
-
-All services include health checks. View service health:
-
-```bash
-docker-compose -f docker/docker-compose.yml ps
-```
+- **Build Context**: Luôn là thư mục gốc của dự án để đảm bảo `npm` có thể truy cập `packages/` và `package-lock.json`.
+- **.dockerignore**: Đã được đưa ra thư mục gốc để tối ưu hóa tốc độ build và loại bỏ `node_modules` thừa.

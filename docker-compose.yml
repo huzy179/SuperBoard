@@ -1,9 +1,13 @@
-# SuperBoard — Full infrastructure (includes unused/optional services)
-# Only run this if you need: Keycloak, Elasticsearch, MinIO, MailHog, AI service
-# Jira MVP only needs: postgres, redis (use docker-compose.yml instead)
+# SuperBoard — Unified Docker Infrastructure
+#
+# Usage:
+#   - Core Dev: docker compose up -d
+#   - Full Infra: docker compose --profile full up -d
+#   - Monitoring: docker compose --profile monitoring up -d
+#   - Everything: docker compose --profile full --profile monitoring up -d
 
 services:
-  # ===== Core Services =====
+  # ===== Core Database Services =====
   postgres:
     image: pgvector/pgvector:pg16
     container_name: superboard-postgres
@@ -15,7 +19,7 @@ services:
       POSTGRES_PASSWORD: devpassword
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./postgres/init-keycloak-db.sql:/docker-entrypoint-initdb.d/01-init-keycloak-db.sql:ro
+      - ./docker/config/postgres/init-keycloak-db.sql:/docker-entrypoint-initdb.d/01-init-keycloak-db.sql:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U dev -d superboard']
       interval: 5s
@@ -37,109 +41,11 @@ services:
     networks:
       - superboard
 
-  # ===== Optional: Unused in Jira MVP =====
-  minio:
-    image: minio/minio
-    container_name: superboard-minio
-    ports:
-      - '9000:9000'
-      - '9001:9001'
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    command: server /data --console-address ":9001"
-    volumes:
-      - minio_data:/data
-    healthcheck:
-      test: ['CMD-SHELL', 'curl -fsS http://localhost:9000/minio/health/live || exit 1']
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    networks:
-      - superboard
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3
-    container_name: superboard-elasticsearch
-    ports:
-      - '9200:9200'
-    environment:
-      discovery.type: single-node
-      xpack.security.enabled: 'false'
-      ES_JAVA_OPTS: -Xms512m -Xmx512m
-    volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
-    healthcheck:
-      test: ['CMD-SHELL', 'curl -fsS http://localhost:9200/_cluster/health || exit 1']
-      interval: 10s
-      timeout: 5s
-      retries: 15
-    networks:
-      - superboard
-
-  keycloak:
-    image: quay.io/keycloak/keycloak:24.0
-    container_name: superboard-keycloak
-    ports:
-      - '8080:8080'
-    environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
-      KC_DB_USERNAME: dev
-      KC_DB_PASSWORD: devpassword
-      KC_HEALTH_ENABLED: 'true'
-    command: start-dev
-    depends_on:
-      postgres:
-        condition: service_healthy
-    healthcheck:
-      test: ['CMD-SHELL', "bash -c '</dev/tcp/127.0.0.1/8080'"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
-    networks:
-      - superboard
-
-  mailhog:
-    image: mailhog/mailhog
-    container_name: superboard-mailhog
-    ports:
-      - '1025:1025'
-      - '8025:8025'
-    healthcheck:
-      test: ['CMD-SHELL', 'wget --spider -q http://localhost:8025 || exit 1']
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    networks:
-      - superboard
-
-  # ===== Optional: AI Service (unused in Jira MVP) =====
-  ai-service:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.ai
-    container_name: superboard-ai-service
-    ports:
-      - '50051:50051'
-    depends_on:
-      redis:
-        condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-    environment:
-      REDIS_URL: redis://redis:6379
-      ELASTICSEARCH_URL: http://elasticsearch:9200
-    networks:
-      - superboard
-
-  # ===== Application Services =====
+  # ===== Application Services (Default) =====
   api:
     build:
-      context: ..
-      dockerfile: docker/Dockerfile.api
+      context: .
+      dockerfile: apps/api/Dockerfile
     container_name: superboard-api
     ports:
       - '4000:4000'
@@ -156,8 +62,8 @@ services:
 
   web:
     build:
-      context: ..
-      dockerfile: docker/Dockerfile.web
+      context: .
+      dockerfile: apps/web/Dockerfile
     container_name: superboard-web
     ports:
       - '3000:3000'
@@ -168,10 +74,132 @@ services:
     networks:
       - superboard
 
+  collab-service:
+    build:
+      context: .
+      dockerfile: apps/collab-service/Dockerfile
+    container_name: superboard-collab
+    ports:
+      - '1234:1234'
+    environment:
+      - DATABASE_URL=postgresql://dev:devpassword@postgres:5432/superboard?schema=public
+      - JWT_SECRET=superboard-secure-secret-2024
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - superboard
+
+  # ===== Full Stack Services (Profile: full) =====
+  minio:
+    profiles: [full]
+    image: minio/minio
+    container_name: superboard-minio
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - superboard
+
+  elasticsearch:
+    profiles: [full]
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3
+    container_name: superboard-elasticsearch
+    ports:
+      - '9200:9200'
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: 'false'
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - superboard
+
+  keycloak:
+    profiles: [full]
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: superboard-keycloak
+    ports:
+      - '8080:8080'
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: dev
+      KC_DB_PASSWORD: devpassword
+    command: start-dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - superboard
+
+  mailhog:
+    profiles: [full]
+    image: mailhog/mailhog
+    container_name: superboard-mailhog
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+    networks:
+      - superboard
+
+  ai-service:
+    profiles: [full]
+    build:
+      context: .
+      dockerfile: apps/ai-service/Dockerfile
+    container_name: superboard-ai-service
+    ports:
+      - '50051:50051'
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      REDIS_URL: redis://redis:6379
+    networks:
+      - superboard
+
+  # ===== Monitoring Stack (Profile: monitoring) =====
+  prometheus:
+    profiles: [monitoring]
+    image: prom/prometheus:latest
+    container_name: superboard-prometheus
+    volumes:
+      - ./docker/config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - '9090:9090'
+    networks:
+      - superboard
+
+  grafana:
+    profiles: [monitoring]
+    image: grafana/grafana-oss:latest
+    container_name: superboard-grafana
+    ports:
+      - '3001:3000'
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/config/grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - superboard
+
 volumes:
   postgres_data:
   minio_data:
   elasticsearch_data:
+  grafana_data:
 
 networks:
   superboard:

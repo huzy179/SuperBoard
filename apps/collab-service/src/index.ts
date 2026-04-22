@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({});
 
 const server = Server.configure({
   port: 1234,

@@ -47,6 +47,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
+    "@prisma/client": "^7.5.0",
     "@typescript-eslint/eslint-plugin": "^8.57.0",
     "@typescript-eslint/parser": "^8.57.0",
     "chalk": "^4.1.2",
@@ -56,6 +57,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
     "prettier": "^3.5.3",
+    "prisma": "^7.5.0",
     "turbo": "^2.4.4",
     "typescript": "^5.8.2"
   },
@@ -68,6 +70,8 @@
     "node": ">=20.11.0"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "pg": "^8.20.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   }

@@ -14,7 +14,7 @@ WORKDIR /app
 # First install dependencies
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/package-lock.json ./package-lock.json
-RUN npm ci
+RUN npm install
 
 # Build the project
 COPY --from=builder /app/out/full/ .
@@ -36,11 +36,14 @@ USER nextjs
 
 WORKDIR /app
 
+# Copy root configurations
+COPY --from=installer /app/package.json ./package.json
+COPY --from=installer /app/package-lock.json ./package-lock.json
+
 # Copy built application and dependencies
-COPY --from=installer /app/node_modules ./node_modules
-COPY --from=installer /app/apps/web/package.json ./apps/web/package.json
-COPY --from=installer /app/apps/web/.next ./apps/web/.next
-COPY --from=installer /app/apps/web/public ./apps/web/public
+COPY --from=installer --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=installer --chown=nextjs:nodejs /app/apps/web ./apps/web
+COPY --from=installer --chown=nextjs:nodejs /app/packages ./packages
 
 ENV NODE_ENV=production
 ENV PORT=3000

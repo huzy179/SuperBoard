@@ -57,6 +57,8 @@ services:
     environment:
       DATABASE_URL: postgresql://dev:devpassword@postgres:5432/superboard
       REDIS_URL: redis://redis:6379
+      PRISMA_CLIENT_ENGINE_TYPE: binary
+      PRISMA_CLI_QUERY_ENGINE_TYPE: binary
     networks:
       - superboard
 
@@ -84,6 +86,8 @@ services:
     environment:
       - DATABASE_URL=postgresql://dev:devpassword@postgres:5432/superboard?schema=public
       - JWT_SECRET=superboard-secure-secret-2024
+      - PRISMA_CLIENT_ENGINE_TYPE=binary
+      - PRISMA_CLI_QUERY_ENGINE_TYPE=binary
     depends_on:
       postgres:
         condition: service_healthy

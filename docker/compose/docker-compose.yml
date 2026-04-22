@@ -19,7 +19,7 @@ services:
       POSTGRES_PASSWORD: devpassword
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./docker/config/postgres/init-keycloak-db.sql:/docker-entrypoint-initdb.d/01-init-keycloak-db.sql:ro
+      - ../config/postgres/init-keycloak-db.sql:/docker-entrypoint-initdb.d/01-init-keycloak-db.sql:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U dev -d superboard']
       interval: 5s
@@ -44,7 +44,7 @@ services:
   # ===== Application Services (Default) =====
   api:
     build:
-      context: .
+      context: ../..
       dockerfile: apps/api/Dockerfile
     container_name: superboard-api
     ports:
@@ -62,7 +62,7 @@ services:
 
   web:
     build:
-      context: .
+      context: ../..
       dockerfile: apps/web/Dockerfile
     container_name: superboard-web
     ports:
@@ -76,7 +76,7 @@ services:
 
   collab-service:
     build:
-      context: .
+      context: ../..
       dockerfile: apps/collab-service/Dockerfile
     container_name: superboard-collab
     ports:
@@ -155,7 +155,7 @@ services:
   ai-service:
     profiles: [full]
     build:
-      context: .
+      context: ../..
       dockerfile: apps/ai-service/Dockerfile
     container_name: superboard-ai-service
     ports:
@@ -174,7 +174,7 @@ services:
     image: prom/prometheus:latest
     container_name: superboard-prometheus
     volumes:
-      - ./docker/config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - '9090:9090'
     networks:
@@ -191,7 +191,7 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./docker/config/grafana/provisioning:/etc/grafana/provisioning
+      - ../config/grafana/provisioning:/etc/grafana/provisioning
     networks:
       - superboard
 

@@ -20,6 +20,6 @@ EXPOSE 50051
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import grpc; grpc.aio.secure_channel('localhost:50051', grpc.aio.ssl_channel_credentials())" || exit 1
+    CMD python -c "import grpc; grpc.insecure_channel('localhost:50051')" || exit 1
 
 CMD ["python", "grpc_server.py"]

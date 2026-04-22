@@ -1,51 +1,50 @@
-# Next.js Web Application
+# Optimized Next.js Web Dockerfile using Turbo Prune
 FROM node:20-alpine AS builder
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+RUN npm install -g turbo
+COPY . .
+RUN turbo prune @superboard/web @superboard/shared @superboard/ui @superboard/config-ts --docker
+
+# Add lockfile and package.json's of isolated subworkspace
+FROM node:20-slim AS installer
+RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+
+# First install dependencies
+COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/package-lock.json ./package-lock.json
+RUN npm ci
+
+# Build the project
+COPY --from=builder /app/out/full/ .
+COPY --from=builder /app/turbo.json ./turbo.json
+
+# Build with environment variables
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build --workspace=@superboard/web
+
+FROM node:20-slim AS runner
+WORKDIR /app
+
+RUN groupadd --system --gid 1001 nodejs
+RUN useradd --system --uid 1001 nextjs
+USER nextjs
 
 WORKDIR /app
 
-# Install system dependencies for native modules
-RUN apk add --no-cache libc6-compat python3 make g++
-
-# Copy package files
-COPY package.json package-lock.json ./
-COPY apps/ apps/
-COPY packages/ packages/
-
-# Install dependencies
-RUN npm ci --network-timeout=100000
-
-# Copy source code
-COPY apps/web apps/web
-COPY apps/web/.env.example apps/web/.env.production
-
-# Build the application
-WORKDIR /app/apps/web
-RUN npm run build
-
-# Production stage
-FROM node:20-alpine
-
-WORKDIR /app
-
-# Copy package files
-COPY package.json package-lock.json ./
-COPY apps/ apps/
-COPY packages/ packages/
-
-# Install production dependencies only
-RUN npm ci --omit=dev --legacy-peer-deps --ignore-scripts --network-timeout=100000
-
-# Copy built application
-COPY --from=builder /app/apps/web/.next apps/web/.next
-COPY --from=builder /app/apps/web/public apps/web/public
-COPY apps/web/package.json apps/web/
-COPY apps/web/.env.example apps/web/.env.production
-
-WORKDIR /app/apps/web
+# Copy built application and dependencies
+COPY --from=installer /app/node_modules ./node_modules
+COPY --from=installer /app/apps/web/package.json ./apps/web/package.json
+COPY --from=installer /app/apps/web/.next ./apps/web/.next
+COPY --from=installer /app/apps/web/public ./apps/web/public
 
 ENV NODE_ENV=production
 ENV PORT=3000
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["npm", "start", "--workspace=@superboard/web"]

@@ -30,10 +30,10 @@ dev-infra-down: ## Stop all Docker services
 	npm run dev:infra:down
 
 monitoring-up: ## Start Promenade + Grafana
-	docker compose -f docker/docker-compose.monitoring.yml up -d
+	docker compose -f docker/compose/docker-compose.yml --profile monitoring up -d
 
 monitoring-down: ## Stop Promenade + Grafana
-	docker compose -f docker/docker-compose.monitoring.yml down
+	docker compose -f docker/compose/docker-compose.yml --profile monitoring down
 
 # ─── Database ──────────────────────────────────────────────
 

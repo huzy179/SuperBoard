@@ -4,11 +4,15 @@ import { randomBytes, scryptSync } from 'node:crypto';
 import { config as dotenv } from 'dotenv';
 import { PrismaPg } from '@prisma/adapter-pg';
 import {
+  ChannelType,
+  IntegrationProvider,
   PrismaClient,
+  TaskEventType,
+  TaskLinkType,
   TaskPriority,
   TaskType,
   WorkflowStatusCategory,
-  TaskEventType,
+  WorkspaceInvitationStatus,
   WorkspaceMemberRole,
   WorkspacePlan,
 } from '@prisma/client';
@@ -33,13 +37,17 @@ function hashPassword(rawPassword: string): string {
   return `${salt}:${hash}`;
 }
 
-// --- Data definitions ---
+const WORKSPACE = {
+  slug: 'techviet',
+  name: 'TechViet Solutions',
+  plan: WorkspacePlan.pro,
+};
 
-const WORKFLOW_STATUSES = [
+const WORKSPACE_STATUSES = [
   { key: 'todo', name: 'Cần làm', category: WorkflowStatusCategory.todo, position: 1 },
   {
     key: 'in_progress',
-    name: 'Đang làm',
+    name: 'Đang thực hiện',
     category: WorkflowStatusCategory.in_progress,
     position: 2,
   },
@@ -49,9 +57,19 @@ const WORKFLOW_STATUSES = [
     category: WorkflowStatusCategory.in_review,
     position: 3,
   },
-  { key: 'done', name: 'Hoàn thành', category: WorkflowStatusCategory.done, position: 4 },
-  { key: 'cancelled', name: 'Đã huỷ', category: WorkflowStatusCategory.blocked, position: 5 },
-];
+  { key: 'blocked', name: 'Bị chặn', category: WorkflowStatusCategory.blocked, position: 4 },
+  { key: 'done', name: 'Hoàn thành', category: WorkflowStatusCategory.done, position: 5 },
+] as const;
+
+const WORKSPACE_TRANSITIONS = [
+  ['todo', 'in_progress'],
+  ['in_progress', 'in_review'],
+  ['in_progress', 'blocked'],
+  ['blocked', 'in_progress'],
+  ['in_review', 'done'],
+  ['in_review', 'in_progress'],
+  ['todo', 'done'],
+] as const;
 
 const USER_SPECS = [
   {
@@ -98,13 +116,11 @@ const USER_SPECS = [
   },
 ] as const;
 
-// PLACEHOLDER_PROJECTS
-
 const PROJECT_SPECS = [
   {
     id: 'seed-project-ecom',
     name: 'Nền tảng Thương mại Điện tử',
-    description: 'Xây dựng hệ thống mua sắm trực tuyến B2C với tích hợp thanh toán VNPay và Momo',
+    description: 'Omnichannel commerce: web, mobile và social storefront.',
     color: '#2563eb',
     icon: '🛒',
     key: 'ECOM',
@@ -112,8 +128,7 @@ const PROJECT_SPECS = [
   {
     id: 'seed-project-banking',
     name: 'Ứng dụng Mobile Banking',
-    description:
-      'Phát triển app ngân hàng di động cho iOS và Android với tính năng chuyển khoản, nạp tiền',
+    description: 'Ứng dụng ngân hàng số tập trung vào giao dịch real-time và bảo mật.',
     color: '#059669',
     icon: '🏦',
     key: 'BANK',
@@ -121,7 +136,7 @@ const PROJECT_SPECS = [
   {
     id: 'seed-project-hr',
     name: 'Cổng thông tin Nhân sự',
-    description: 'Hệ thống quản lý nhân viên, chấm công, tính lương và đánh giá hiệu suất nội bộ',
+    description: 'Quản trị vòng đời nhân sự từ onboarding tới payroll.',
     color: '#7c3aed',
     icon: '👥',
     key: 'HR',
@@ -129,583 +144,356 @@ const PROJECT_SPECS = [
   {
     id: 'seed-project-infra',
     name: 'Hạ tầng & DevOps',
-    description:
-      'Thiết lập CI/CD pipeline, Kubernetes cluster và monitoring stack cho toàn bộ hệ thống',
+    description: 'Platform engineering: CI/CD, observability, reliability.',
     color: '#dc2626',
     icon: '⚙️',
     key: 'INFRA',
   },
-];
+] as const;
 
-// User index: 0=Tuấn, 1=Lan, 2=Đức, 3=Anh, 4=Bảo, 5=Mai
-type TaskSpec = {
+type TaskSeed = {
   id: string;
+  projectId: string;
+  number: number;
   title: string;
   description: string;
-  status: string;
-  priority: TaskPriority;
   type: TaskType;
-  number: number;
-  storyPoints?: number;
-  assigneeIdx: number | null;
+  priority: TaskPriority;
+  status: string;
+  storyPoints: number;
+  assigneeEmail: string | null;
   dueDate: string | null;
   position: string;
+  parentTaskId?: string;
 };
 
-// PLACEHOLDER_TASKS
+const TASKS: TaskSeed[] = [
+  {
+    id: 'seed-task-ecom-1',
+    projectId: 'seed-project-ecom',
+    number: 1,
+    title: 'Thiết kế schema sản phẩm và tồn kho',
+    description: 'Bao gồm biến thể, kho theo vùng và lịch sử giá.',
+    type: TaskType.story,
+    priority: TaskPriority.high,
+    status: 'done',
+    storyPoints: 8,
+    assigneeEmail: 'le.van.duc@techviet.local',
+    dueDate: '2026-03-02',
+    position: '1000',
+  },
+  {
+    id: 'seed-task-ecom-2',
+    projectId: 'seed-project-ecom',
+    number: 2,
+    title: 'Triển khai checkout flow với VNPay + MoMo',
+    description: 'Xử lý callback, idempotency key và retry payment.',
+    type: TaskType.epic,
+    priority: TaskPriority.urgent,
+    status: 'in_progress',
+    storyPoints: 13,
+    assigneeEmail: 'pham.ngoc.anh@techviet.local',
+    dueDate: '2026-04-28',
+    position: '2000',
+  },
+  {
+    id: 'seed-task-ecom-3',
+    projectId: 'seed-project-ecom',
+    number: 3,
+    title: 'Subtask: OTP xác nhận thanh toán',
+    description: 'Bổ sung lớp xác thực rủi ro cao cho giao dịch > 5 triệu.',
+    type: TaskType.task,
+    priority: TaskPriority.medium,
+    status: 'in_review',
+    storyPoints: 5,
+    assigneeEmail: 'tran.thi.lan@techviet.local',
+    dueDate: '2026-04-20',
+    position: '2100',
+    parentTaskId: 'seed-task-ecom-2',
+  },
+  {
+    id: 'seed-task-bank-1',
+    projectId: 'seed-project-banking',
+    number: 1,
+    title: 'Thiết kế bounded context cho account/transaction',
+    description: 'Tách service theo domain và chuẩn hóa event contract.',
+    type: TaskType.epic,
+    priority: TaskPriority.urgent,
+    status: 'done',
+    storyPoints: 13,
+    assigneeEmail: 'nguyen.minh.tuan@techviet.local',
+    dueDate: '2026-02-10',
+    position: '1000',
+  },
+  {
+    id: 'seed-task-bank-2',
+    projectId: 'seed-project-banking',
+    number: 2,
+    title: 'Triển khai anti-fraud rule engine',
+    description: 'Rule velocity, device fingerprint, geo anomalies.',
+    type: TaskType.story,
+    priority: TaskPriority.high,
+    status: 'in_progress',
+    storyPoints: 8,
+    assigneeEmail: 'hoang.quoc.bao@techviet.local',
+    dueDate: '2026-05-01',
+    position: '2000',
+  },
+  {
+    id: 'seed-task-bank-3',
+    projectId: 'seed-project-banking',
+    number: 3,
+    title: 'Viết test bảo mật cho OTP endpoint',
+    description: 'Bao phủ rate limit, brute force và replay attack.',
+    type: TaskType.bug,
+    priority: TaskPriority.high,
+    status: 'todo',
+    storyPoints: 5,
+    assigneeEmail: 'vo.thi.mai@techviet.local',
+    dueDate: '2026-05-06',
+    position: '3000',
+  },
+  {
+    id: 'seed-task-hr-1',
+    projectId: 'seed-project-hr',
+    number: 1,
+    title: 'Thiết kế chính sách chấm công đa ca',
+    description: 'Bao gồm ca đêm, split shift và quy tắc tăng ca.',
+    type: TaskType.story,
+    priority: TaskPriority.high,
+    status: 'in_progress',
+    storyPoints: 8,
+    assigneeEmail: 'hoang.quoc.bao@techviet.local',
+    dueDate: '2026-04-30',
+    position: '1000',
+  },
+  {
+    id: 'seed-task-hr-2',
+    projectId: 'seed-project-hr',
+    number: 2,
+    title: 'Xây dựng module duyệt nghỉ phép',
+    description: '2 bước duyệt: quản lý trực tiếp và HRBP.',
+    type: TaskType.task,
+    priority: TaskPriority.medium,
+    status: 'todo',
+    storyPoints: 5,
+    assigneeEmail: 'pham.ngoc.anh@techviet.local',
+    dueDate: '2026-05-08',
+    position: '2000',
+  },
+  {
+    id: 'seed-task-infra-1',
+    projectId: 'seed-project-infra',
+    number: 1,
+    title: 'Xây dựng golden path CI/CD cho monorepo',
+    description: 'Build matrix cho api/web/service với quality gates.',
+    type: TaskType.story,
+    priority: TaskPriority.high,
+    status: 'done',
+    storyPoints: 8,
+    assigneeEmail: 'nguyen.minh.tuan@techviet.local',
+    dueDate: '2026-03-15',
+    position: '1000',
+  },
+  {
+    id: 'seed-task-infra-2',
+    projectId: 'seed-project-infra',
+    number: 2,
+    title: 'Thiết lập SLO và alert latency p95',
+    description: 'Định nghĩa SLI/SLO cho API critical path và paging policy.',
+    type: TaskType.task,
+    priority: TaskPriority.high,
+    status: 'in_review',
+    storyPoints: 5,
+    assigneeEmail: 'hoang.quoc.bao@techviet.local',
+    dueDate: '2026-04-29',
+    position: '2000',
+  },
+  {
+    id: 'seed-task-infra-3',
+    projectId: 'seed-project-infra',
+    number: 3,
+    title: 'Fix memory leak ở worker xử lý queue',
+    description: 'Phân tích heap snapshot, giảm object retention.',
+    type: TaskType.bug,
+    priority: TaskPriority.urgent,
+    status: 'blocked',
+    storyPoints: 8,
+    assigneeEmail: 'le.van.duc@techviet.local',
+    dueDate: '2026-04-26',
+    position: '3000',
+  },
+];
 
-const TASKS_BY_PROJECT: Record<string, TaskSpec[]> = {
-  'seed-project-ecom': [
-    {
-      id: 'seed-task-ecom-1',
-      title: 'Thiết kế database schema cho sản phẩm và danh mục',
-      description:
-        'Bao gồm bảng products, categories, product_variants, product_images. Hỗ trợ multi-tenant.',
-      status: 'done',
-      priority: TaskPriority.high,
-      type: TaskType.task,
-      number: 1,
-      storyPoints: 5,
-      assigneeIdx: 2,
-      dueDate: '2026-02-15',
-      position: '1000',
-    },
-    {
-      id: 'seed-task-ecom-2',
-      title: 'Xây dựng API quản lý sản phẩm (CRUD)',
-      description:
-        'REST API cho tạo, sửa, xoá, lấy danh sách sản phẩm. Hỗ trợ pagination, filter theo category.',
-      status: 'done',
-      priority: TaskPriority.high,
-      type: TaskType.story,
-      number: 2,
-      storyPoints: 8,
-      assigneeIdx: 2,
-      dueDate: '2026-02-28',
-      position: '2000',
-    },
-    {
-      id: 'seed-task-ecom-3',
-      title: 'Tích hợp cổng thanh toán VNPay',
-      description:
-        'Implement VNPay sandbox, xử lý callback IPN, verify checksum. Hỗ trợ QR code và thẻ nội địa.',
-      status: 'in_progress',
-      priority: TaskPriority.urgent,
-      type: TaskType.story,
-      number: 3,
-      storyPoints: 13,
-      assigneeIdx: 3,
-      dueDate: '2026-03-25',
-      position: '3000',
-    },
-    {
-      id: 'seed-task-ecom-4',
-      title: 'Thiết kế UI trang danh sách sản phẩm',
-      description:
-        'Responsive grid layout, filter sidebar, sort options. Theo design system đã thống nhất.',
-      status: 'in_progress',
-      priority: TaskPriority.medium,
-      type: TaskType.task,
-      number: 4,
-      storyPoints: 5,
-      assigneeIdx: 5,
-      dueDate: '2026-03-28',
-      position: '4000',
-    },
-    {
-      id: 'seed-task-ecom-5',
-      title: 'Implement giỏ hàng và checkout flow',
-      description:
-        'Cart persistence (localStorage + API sync), address form, shipping method selection, order summary.',
-      status: 'in_review',
-      priority: TaskPriority.high,
-      type: TaskType.epic,
-      number: 5,
-      storyPoints: 13,
-      assigneeIdx: 2,
-      dueDate: '2026-03-22',
-      position: '5000',
-    },
-    {
-      id: 'seed-task-ecom-6',
-      title: 'Viết unit test cho order service',
-      description:
-        'Coverage tối thiểu 80% cho OrderService. Mock payment gateway, test edge cases (hết hàng, timeout).',
-      status: 'todo',
-      priority: TaskPriority.medium,
-      type: TaskType.task,
-      number: 6,
-      storyPoints: 3,
-      assigneeIdx: 4,
-      dueDate: '2026-04-05',
-      position: '6000',
-    },
-    {
-      id: 'seed-task-ecom-7',
-      title: 'Tối ưu query tìm kiếm sản phẩm với Elasticsearch',
-      description:
-        'Index products vào ES, implement full-text search với Vietnamese analyzer, autocomplete suggestions.',
-      status: 'todo',
-      priority: TaskPriority.low,
-      type: TaskType.story,
-      number: 7,
-      storyPoints: 8,
-      assigneeIdx: null,
-      dueDate: '2026-04-20',
-      position: '7000',
-    },
-  ],
-  'seed-project-banking': [
-    {
-      id: 'seed-task-bank-1',
-      title: 'Thiết kế kiến trúc microservices cho core banking',
-      description:
-        'Tách thành account-service, transaction-service, notification-service. Dùng event-driven architecture.',
-      status: 'done',
-      priority: TaskPriority.urgent,
-      type: TaskType.epic,
-      number: 1,
-      storyPoints: 13,
-      assigneeIdx: 0,
-      dueDate: '2026-01-31',
-      position: '1000',
-    },
-    {
-      id: 'seed-task-bank-2',
-      title: 'Implement xác thực 2 lớp (OTP SMS)',
-      description:
-        'Tích hợp Twilio/SpeedSMS cho OTP. Rate limiting 5 lần/phút. OTP expire sau 5 phút.',
-      status: 'done',
-      priority: TaskPriority.urgent,
-      type: TaskType.story,
-      number: 2,
-      storyPoints: 8,
-      assigneeIdx: 3,
-      dueDate: '2026-02-20',
-      position: '2000',
-    },
-    {
-      id: 'seed-task-bank-3',
-      title: 'Xây dựng màn hình chuyển khoản nội bộ',
-      description:
-        'Form nhập số tài khoản, số tiền, nội dung. Xác nhận bằng OTP. Hiển thị biên lai sau khi thành công.',
-      status: 'in_progress',
-      priority: TaskPriority.high,
-      type: TaskType.story,
-      number: 3,
-      storyPoints: 8,
-      assigneeIdx: 5,
-      dueDate: '2026-03-20',
-      position: '3000',
-    },
-    {
-      id: 'seed-task-bank-4',
-      title: 'Tích hợp API Napas cho chuyển khoản liên ngân hàng',
-      description:
-        'Kết nối Napas gateway, xử lý reconciliation, retry mechanism cho failed transactions.',
-      status: 'in_progress',
-      priority: TaskPriority.urgent,
-      type: TaskType.story,
-      number: 4,
-      storyPoints: 13,
-      assigneeIdx: 2,
-      dueDate: '2026-03-18',
-      position: '4000',
-    },
-    {
-      id: 'seed-task-bank-5',
-      title: 'Kiểm thử bảo mật (penetration testing)',
-      description:
-        'OWASP Top 10 checklist, SQL injection, XSS, CSRF testing. Dùng Burp Suite và OWASP ZAP.',
-      status: 'in_review',
-      priority: TaskPriority.urgent,
-      type: TaskType.task,
-      number: 5,
-      storyPoints: 5,
-      assigneeIdx: 4,
-      dueDate: '2026-03-21',
-      position: '5000',
-    },
-    {
-      id: 'seed-task-bank-6',
-      title: 'Thiết kế màn hình lịch sử giao dịch',
-      description: 'Danh sách giao dịch với filter theo ngày, loại, trạng thái. Export PDF/Excel.',
-      status: 'todo',
-      priority: TaskPriority.medium,
-      type: TaskType.task,
-      number: 6,
-      storyPoints: 5,
-      assigneeIdx: 5,
-      dueDate: '2026-04-10',
-      position: '6000',
-    },
-    {
-      id: 'seed-task-bank-7',
-      title: 'Viết tài liệu API cho mobile team',
-      description: 'Swagger/OpenAPI spec cho tất cả endpoints. Bao gồm examples và error codes.',
-      status: 'todo',
-      priority: TaskPriority.low,
-      type: TaskType.task,
-      number: 7,
-      storyPoints: 3,
-      assigneeIdx: null,
-      dueDate: '2026-04-15',
-      position: '7000',
-    },
-  ],
-  // PLACEHOLDER_MORE_TASKS
-  'seed-project-hr': [
-    {
-      id: 'seed-task-hr-1',
-      title: 'Phân tích yêu cầu và lập tài liệu đặc tả',
-      description:
-        'Thu thập requirements từ phòng HR, viết SRS document. Bao gồm use case diagrams.',
-      status: 'done',
-      priority: TaskPriority.high,
-      type: TaskType.task,
-      number: 1,
-      storyPoints: 5,
-      assigneeIdx: 1,
-      dueDate: '2026-02-10',
-      position: '1000',
-    },
-    {
-      id: 'seed-task-hr-2',
-      title: 'Thiết kế ERD cho module nhân viên',
-      description:
-        'Bảng employees, departments, positions, contracts. Quan hệ manager-subordinate.',
-      status: 'done',
-      priority: TaskPriority.medium,
-      type: TaskType.task,
-      number: 2,
-      storyPoints: 3,
-      assigneeIdx: 2,
-      dueDate: '2026-02-25',
-      position: '2000',
-    },
-    {
-      id: 'seed-task-hr-3',
-      title: 'Xây dựng module chấm công theo ca',
-      description:
-        'Hỗ trợ ca sáng/chiều/đêm, OT calculation, nghỉ phép tích hợp. API check-in/check-out.',
-      status: 'in_progress',
-      priority: TaskPriority.high,
-      type: TaskType.story,
-      number: 3,
-      storyPoints: 13,
-      assigneeIdx: 4,
-      dueDate: '2026-03-30',
-      position: '3000',
-    },
-    {
-      id: 'seed-task-hr-4',
-      title: 'Implement tính năng xin nghỉ phép online',
-      description:
-        'Form xin phép, approval workflow (manager → HR), tính số ngày phép còn lại tự động.',
-      status: 'in_progress',
-      priority: TaskPriority.medium,
-      type: TaskType.story,
-      number: 4,
-      storyPoints: 8,
-      assigneeIdx: 3,
-      dueDate: '2026-04-05',
-      position: '4000',
-    },
-    {
-      id: 'seed-task-hr-5',
-      title: 'Tích hợp LDAP/Active Directory cho SSO',
-      description: 'Đồng bộ user từ AD, auto-provision accounts, group mapping sang roles.',
-      status: 'todo',
-      priority: TaskPriority.high,
-      type: TaskType.story,
-      number: 5,
-      storyPoints: 8,
-      assigneeIdx: null,
-      dueDate: '2026-04-15',
-      position: '5000',
-    },
-    {
-      id: 'seed-task-hr-6',
-      title: 'Xây dựng báo cáo lương tháng dạng PDF',
-      description:
-        'Template payslip PDF, tính gross/net, BHXH/BHYT/TNCN. Gửi email tự động cuối tháng.',
-      status: 'todo',
-      priority: TaskPriority.medium,
-      type: TaskType.task,
-      number: 6,
-      storyPoints: 5,
-      assigneeIdx: null,
-      dueDate: '2026-04-25',
-      position: '6000',
-    },
-    {
-      id: 'seed-task-hr-7',
-      title: 'Viết test E2E cho luồng onboarding nhân viên mới',
-      description:
-        'Playwright tests cho flow: tạo nhân viên → gán phòng ban → cấp tài khoản → gửi welcome email.',
-      status: 'todo',
-      priority: TaskPriority.low,
-      type: TaskType.task,
-      number: 7,
-      storyPoints: 3,
-      assigneeIdx: null,
-      dueDate: '2026-05-01',
-      position: '7000',
-    },
-  ],
-  'seed-project-infra': [
-    {
-      id: 'seed-task-infra-1',
-      title: 'Thiết lập Kubernetes cluster trên GKE',
-      description:
-        '3 node pools (system, app, worker), autoscaling 2-10 nodes, private cluster với Cloud NAT.',
-      status: 'done',
-      priority: TaskPriority.urgent,
-      type: TaskType.epic,
-      number: 1,
-      storyPoints: 13,
-      assigneeIdx: 0,
-      dueDate: '2026-02-05',
-      position: '1000',
-    },
-    {
-      id: 'seed-task-infra-2',
-      title: 'Cấu hình CI/CD pipeline với GitHub Actions',
-      description:
-        'Build → test → lint → Docker build → push to GCR → deploy to GKE. Separate staging/production.',
-      status: 'done',
-      priority: TaskPriority.high,
-      type: TaskType.story,
-      number: 2,
-      storyPoints: 8,
-      assigneeIdx: 4,
-      dueDate: '2026-02-18',
-      position: '2000',
-    },
-    {
-      id: 'seed-task-infra-3',
-      title: 'Triển khai Prometheus + Grafana monitoring',
-      description:
-        'Prometheus scrape metrics, Grafana dashboards cho API latency, error rate, resource usage.',
-      status: 'in_progress',
-      priority: TaskPriority.high,
-      type: TaskType.story,
-      number: 3,
-      storyPoints: 8,
-      assigneeIdx: 4,
-      dueDate: '2026-03-25',
-      position: '3000',
-    },
-    {
-      id: 'seed-task-infra-4',
-      title: 'Cấu hình Nginx Ingress và SSL certificates',
-      description:
-        "Cert-manager với Let's Encrypt, wildcard cert cho *.techviet.dev, rate limiting rules.",
-      status: 'done',
-      priority: TaskPriority.medium,
-      type: TaskType.task,
-      number: 4,
-      storyPoints: 3,
-      assigneeIdx: 0,
-      dueDate: '2026-03-01',
-      position: '4000',
-    },
-    {
-      id: 'seed-task-infra-5',
-      title: 'Thiết lập log aggregation với ELK Stack',
-      description:
-        'Filebeat → Logstash → Elasticsearch → Kibana. Structured JSON logging, retention 30 ngày.',
-      status: 'in_progress',
-      priority: TaskPriority.medium,
-      type: TaskType.story,
-      number: 5,
-      storyPoints: 8,
-      assigneeIdx: 2,
-      dueDate: '2026-04-01',
-      position: '5000',
-    },
-    {
-      id: 'seed-task-infra-6',
-      title: 'Viết runbook cho incident response',
-      description:
-        'Quy trình xử lý sự cố: escalation matrix, communication template, post-mortem checklist.',
-      status: 'todo',
-      priority: TaskPriority.low,
-      type: TaskType.task,
-      number: 6,
-      storyPoints: 2,
-      assigneeIdx: null,
-      dueDate: '2026-04-20',
-      position: '6000',
-    },
-    {
-      id: 'seed-task-infra-7',
-      title: 'Tối ưu Docker image size cho production',
-      description:
-        'Multi-stage builds, Alpine base, .dockerignore cleanup. Target: giảm từ 1.2GB xuống < 300MB.',
-      status: 'todo',
-      priority: TaskPriority.medium,
-      type: TaskType.bug,
-      number: 7,
-      storyPoints: 5,
-      assigneeIdx: null,
-      dueDate: '2026-04-10',
-      position: '7000',
-    },
-    {
-      id: 'seed-task-infra-8',
-      title: 'Cấu hình auto-scaling policy cho các service',
-      description:
-        'HPA dựa trên CPU/memory, custom metrics (request rate). Min 2 replicas cho production.',
-      status: 'in_review',
-      priority: TaskPriority.high,
-      type: TaskType.task,
-      number: 8,
-      storyPoints: 5,
-      assigneeIdx: 0,
-      dueDate: '2026-03-22',
-      position: '8000',
-    },
-  ],
-};
+const LABELS = [
+  { id: 'seed-label-backend', name: 'Backend', color: '#2563eb' },
+  { id: 'seed-label-frontend', name: 'Frontend', color: '#db2777' },
+  { id: 'seed-label-security', name: 'Bảo mật', color: '#dc2626' },
+  { id: 'seed-label-devops', name: 'DevOps', color: '#d97706' },
+  { id: 'seed-label-qa', name: 'Kiểm thử', color: '#059669' },
+  { id: 'seed-label-product', name: 'Sản phẩm', color: '#7c3aed' },
+] as const;
 
-// PLACEHOLDER_COMMENTS
+const TASK_LABELS = [
+  ['seed-task-ecom-2', 'seed-label-backend'],
+  ['seed-task-ecom-2', 'seed-label-product'],
+  ['seed-task-ecom-3', 'seed-label-security'],
+  ['seed-task-bank-2', 'seed-label-security'],
+  ['seed-task-bank-3', 'seed-label-qa'],
+  ['seed-task-hr-2', 'seed-label-product'],
+  ['seed-task-infra-1', 'seed-label-devops'],
+  ['seed-task-infra-2', 'seed-label-devops'],
+  ['seed-task-infra-3', 'seed-label-backend'],
+] as const;
 
-type CommentSpec = { id: string; taskId: string; authorIdx: number; content: string };
-
-const COMMENTS: CommentSpec[] = [
+const COMMENTS = [
   {
     id: 'seed-cmt-1',
-    taskId: 'seed-task-ecom-3',
-    authorIdx: 3,
-    content:
-      'Đã liên hệ với team VNPay, họ cần thêm 2 ngày để cấp sandbox credentials. Tạm thời dùng mock data để unblock frontend.',
+    taskId: 'seed-task-ecom-2',
+    authorEmail: 'pham.ngoc.anh@techviet.local',
+    content: 'Đã xong happy path checkout, còn xử lý timeout ở callback.',
   },
   {
     id: 'seed-cmt-2',
-    taskId: 'seed-task-ecom-3',
-    authorIdx: 2,
-    content:
-      'Lưu ý: VNPay yêu cầu IP whitelist cho production. Cần nhờ anh Bảo mở port trên firewall trước khi go-live.',
+    taskId: 'seed-task-bank-2',
+    authorEmail: 'hoang.quoc.bao@techviet.local',
+    content: 'Rule velocity theo device hoạt động ổn, cần tune false positive thêm.',
   },
   {
     id: 'seed-cmt-3',
-    taskId: 'seed-task-bank-4',
-    authorIdx: 2,
-    content:
-      'Napas API docs khá cũ, một số endpoint đã deprecated. Đang chờ confirm từ phía họ về version mới nhất.',
-  },
-  {
-    id: 'seed-cmt-4',
-    taskId: 'seed-task-bank-4',
-    authorIdx: 0,
-    content:
-      'Anh đã escalate lên account manager của Napas rồi. Họ hứa sẽ có response trong 24h. Cứ proceed với v2 API trước.',
-  },
-  {
-    id: 'seed-cmt-5',
-    taskId: 'seed-task-bank-5',
-    authorIdx: 4,
-    content:
-      'Found 2 medium-severity issues: missing rate limiting on OTP endpoint and JWT secret rotation not implemented. Đang fix.',
-  },
-  {
-    id: 'seed-cmt-6',
-    taskId: 'seed-task-bank-5',
-    authorIdx: 1,
-    content:
-      'Cần fix xong trước ngày 21/3 để kịp demo cho ban lãnh đạo. Priority cao nhất tuần này.',
-  },
-  {
-    id: 'seed-cmt-7',
-    taskId: 'seed-task-ecom-5',
-    authorIdx: 2,
-    content:
-      'Checkout flow đã xong phần happy path. Đang handle edge cases: hết hàng khi đang checkout, payment timeout.',
-  },
-  {
-    id: 'seed-cmt-8',
-    taskId: 'seed-task-hr-3',
-    authorIdx: 4,
-    content:
-      'Cần clarify với HR: ca đêm (22h-6h) tính OT như thế nào? Hiện tại logic đang tính sai cho ca split qua ngày.',
-  },
-  {
-    id: 'seed-cmt-9',
-    taskId: 'seed-task-hr-3',
-    authorIdx: 1,
-    content:
-      'Đã confirm với chị Hương bên HR: ca đêm tính 150% lương cơ bản, không phân biệt ngày thường hay cuối tuần.',
-  },
-  {
-    id: 'seed-cmt-10',
     taskId: 'seed-task-infra-3',
-    authorIdx: 4,
-    content:
-      'Dashboard Grafana đã setup xong cho API latency và error rate. Đang thêm alerts cho disk usage > 80%.',
+    authorEmail: 'le.van.duc@techviet.local',
+    content: 'Leak xảy ra khi worker nhận batch > 100 events. Đang bóc tách root cause.',
   },
-  {
-    id: 'seed-cmt-11',
-    taskId: 'seed-task-infra-1',
-    authorIdx: 0,
-    content:
-      'Cluster đã stable sau 2 tuần. Node pool đang chạy n2-standard-4, cost khoảng $800/tháng. Cần review lại sizing sau khi có traffic thực.',
-  },
-  {
-    id: 'seed-cmt-12',
-    taskId: 'seed-task-ecom-6',
-    authorIdx: 3,
-    content:
-      'Suggest dùng jest-mock-extended cho việc mock Prisma client. Sẽ clean hơn nhiều so với manual mocking.',
-  },
-];
+] as const;
 
-const LABEL_SPECS = [
-  { id: 'seed-label-bug', name: 'Bug', color: '#dc2626' },
-  { id: 'seed-label-feature', name: 'Tính năng', color: '#2563eb' },
-  { id: 'seed-label-improvement', name: 'Cải tiến', color: '#7c3aed' },
-  { id: 'seed-label-docs', name: 'Tài liệu', color: '#6b7280' },
-  { id: 'seed-label-perf', name: 'Hiệu năng', color: '#d97706' },
-  { id: 'seed-label-security', name: 'Bảo mật', color: '#dc2626' },
-  { id: 'seed-label-uiux', name: 'UI/UX', color: '#db2777' },
-  { id: 'seed-label-testing', name: 'Kiểm thử', color: '#059669' },
-];
+const availableTables = new Set<string>();
 
-const TASK_LABEL_SPECS: Array<{ taskId: string; labelId: string }> = [
-  { taskId: 'seed-task-ecom-1', labelId: 'seed-label-feature' },
-  { taskId: 'seed-task-ecom-3', labelId: 'seed-label-feature' },
-  { taskId: 'seed-task-ecom-4', labelId: 'seed-label-uiux' },
-  { taskId: 'seed-task-ecom-5', labelId: 'seed-label-feature' },
-  { taskId: 'seed-task-ecom-6', labelId: 'seed-label-testing' },
-  { taskId: 'seed-task-ecom-7', labelId: 'seed-label-perf' },
-  { taskId: 'seed-task-bank-2', labelId: 'seed-label-security' },
-  { taskId: 'seed-task-bank-4', labelId: 'seed-label-feature' },
-  { taskId: 'seed-task-bank-5', labelId: 'seed-label-security' },
-  { taskId: 'seed-task-bank-5', labelId: 'seed-label-testing' },
-  { taskId: 'seed-task-bank-7', labelId: 'seed-label-docs' },
-  { taskId: 'seed-task-hr-1', labelId: 'seed-label-docs' },
-  { taskId: 'seed-task-hr-3', labelId: 'seed-label-feature' },
-  { taskId: 'seed-task-hr-7', labelId: 'seed-label-testing' },
-  { taskId: 'seed-task-infra-3', labelId: 'seed-label-improvement' },
-  { taskId: 'seed-task-infra-7', labelId: 'seed-label-perf' },
-  { taskId: 'seed-task-infra-8', labelId: 'seed-label-improvement' },
-];
+async function refreshAvailableTables() {
+  const rows = await prisma.$queryRaw<Array<{ table_name: string }>>`
+    SELECT table_name
+    FROM information_schema.tables
+    WHERE table_schema = 'public'
+  `;
 
-// PLACEHOLDER_MAIN
+  availableTables.clear();
+  for (const row of rows) {
+    availableTables.add(row.table_name);
+    availableTables.add(row.table_name.toLowerCase());
+  }
+}
+
+function hasTable(tableName: string): boolean {
+  return availableTables.has(tableName) || availableTables.has(tableName.toLowerCase());
+}
+
+async function cleanupSeedData() {
+  if (hasTable('TaskLabel')) {
+    await prisma.taskLabel.deleteMany({ where: { taskId: { startsWith: 'seed-task-' } } });
+  }
+  if (hasTable('TaskLink')) {
+    await prisma.taskLink.deleteMany({
+      where: {
+        OR: [
+          { sourceTaskId: { startsWith: 'seed-task-' } },
+          { targetTaskId: { startsWith: 'seed-task-' } },
+        ],
+      },
+    });
+  }
+  if (hasTable('TaskDocLink')) {
+    await prisma.taskDocLink.deleteMany({
+      where: {
+        OR: [{ taskId: { startsWith: 'seed-task-' } }, { docId: { startsWith: 'seed-doc-' } }],
+      },
+    });
+  }
+  if (hasTable('DocVersion')) {
+    await prisma.docVersion.deleteMany({ where: { docId: { startsWith: 'seed-doc-' } } });
+  }
+  if (hasTable('Comment')) {
+    await prisma.comment.deleteMany({ where: { id: { startsWith: 'seed-cmt-' } } });
+  }
+  if (hasTable('TaskEvent')) {
+    await prisma.taskEvent.deleteMany({ where: { id: { startsWith: 'seed-evt-' } } });
+  }
+  if (hasTable('MessageReaction')) {
+    await prisma.messageReaction.deleteMany({ where: { messageId: { startsWith: 'seed-msg-' } } });
+  }
+  if (hasTable('Message')) {
+    await prisma.message.deleteMany({ where: { id: { startsWith: 'seed-msg-' } } });
+  }
+  if (hasTable('ChannelMember')) {
+    await prisma.channelMember.deleteMany({ where: { channelId: { startsWith: 'seed-chan-' } } });
+  }
+  if (hasTable('Notification')) {
+    await prisma.notification.deleteMany({ where: { id: { startsWith: 'seed-noti-' } } });
+  }
+  if (hasTable('WorkspaceInvitation')) {
+    await prisma.workspaceInvitation.deleteMany({ where: { id: { startsWith: 'seed-invite-' } } });
+  }
+  if (hasTable('AuditLog')) {
+    await prisma.auditLog.deleteMany({ where: { id: { startsWith: 'seed-audit-' } } });
+  }
+  if (hasTable('WorkflowRule')) {
+    await prisma.workflowRule.deleteMany({ where: { id: { startsWith: 'seed-rule-' } } });
+  }
+  if (hasTable('AgentAction')) {
+    await prisma.agentAction.deleteMany({ where: { id: { startsWith: 'seed-agent-' } } });
+  }
+  if (hasTable('SignalLog')) {
+    await prisma.signalLog.deleteMany({ where: { id: { startsWith: 'seed-signal-' } } });
+  }
+  if (hasTable('ExternalIntegration')) {
+    await prisma.externalIntegration.deleteMany({ where: { id: { startsWith: 'seed-int-' } } });
+  }
+  if (hasTable('Doc')) {
+    await prisma.doc.deleteMany({ where: { id: { startsWith: 'seed-doc-' } } });
+  }
+  if (hasTable('Channel')) {
+    await prisma.channel.deleteMany({ where: { id: { startsWith: 'seed-chan-' } } });
+  }
+  if (hasTable('Task')) {
+    await prisma.task.deleteMany({ where: { id: { startsWith: 'seed-task-' } } });
+  }
+  if (hasTable('ProjectWorkflowTransition')) {
+    await prisma.projectWorkflowTransition.deleteMany({
+      where: { id: { startsWith: 'seed-pwt-' } },
+    });
+  }
+  if (hasTable('ProjectWorkflowStatus')) {
+    await prisma.projectWorkflowStatus.deleteMany({ where: { id: { startsWith: 'seed-pws-' } } });
+  }
+  if (hasTable('Project')) {
+    await prisma.project.deleteMany({ where: { id: { startsWith: 'seed-project-' } } });
+  }
+  if (hasTable('Label')) {
+    await prisma.label.deleteMany({ where: { id: { startsWith: 'seed-label-' } } });
+  }
+  if (hasTable('WorkspaceWorkflowTransition')) {
+    await prisma.workspaceWorkflowTransition.deleteMany({
+      where: { id: { startsWith: 'seed-wwt-' } },
+    });
+  }
+  if (hasTable('WorkspaceWorkflowStatus')) {
+    await prisma.workspaceWorkflowStatus.deleteMany({ where: { id: { startsWith: 'seed-wws-' } } });
+  }
+}
 
 async function main() {
   console.log('🌱 Seeding database...');
   const defaultPassword = 'Passw0rd!';
 
-  // 1. Workspace
+  await refreshAvailableTables();
+  await cleanupSeedData();
+
   const workspace = await prisma.workspace.upsert({
-    where: { slug: 'techviet' },
-    update: { name: 'TechViet Solutions', plan: WorkspacePlan.free },
-    create: { name: 'TechViet Solutions', slug: 'techviet', plan: WorkspacePlan.free },
+    where: { slug: WORKSPACE.slug },
+    update: { name: WORKSPACE.name, plan: WORKSPACE.plan },
+    create: { slug: WORKSPACE.slug, name: WORKSPACE.name, plan: WORKSPACE.plan },
   });
   console.log(`  ✓ Workspace: ${workspace.name}`);
 
-  // 2. Permissions
   const permissionKeys = [
     'workspace.read',
     'workspace.manage',
@@ -715,7 +503,12 @@ async function main() {
     'task.write',
     'task.comment',
     'task.assign',
+    'docs.read',
+    'docs.write',
+    'channel.read',
+    'channel.write',
   ];
+
   for (const key of permissionKeys) {
     await prisma.permission.upsert({
       where: { key },
@@ -723,9 +516,7 @@ async function main() {
       create: { key, description: `Permission: ${key}` },
     });
   }
-  console.log(`  ✓ Permissions: ${permissionKeys.length}`);
 
-  // 3. Roles
   const roleSpecs = [
     { key: 'workspace-owner', name: 'Workspace Owner', perms: permissionKeys },
     {
@@ -743,35 +534,38 @@ async function main() {
         'task.read',
         'task.write',
         'task.comment',
+        'docs.read',
+        'docs.write',
+        'channel.read',
+        'channel.write',
       ],
     },
     {
       key: 'workspace-viewer',
       name: 'Workspace Viewer',
-      perms: ['workspace.read', 'project.read', 'task.read'],
+      perms: ['workspace.read', 'project.read', 'task.read', 'docs.read', 'channel.read'],
     },
-  ];
-  for (const spec of roleSpecs) {
+  ] as const;
+
+  for (const roleSpec of roleSpecs) {
     const role = await prisma.role.upsert({
-      where: { key: spec.key },
-      update: { name: spec.name },
-      create: { key: spec.key, name: spec.name, isSystem: true },
+      where: { key: roleSpec.key },
+      update: { name: roleSpec.name },
+      create: { key: roleSpec.key, name: roleSpec.name, isSystem: true },
     });
-    for (const permKey of spec.perms) {
-      const perm = await prisma.permission.findUniqueOrThrow({ where: { key: permKey } });
+
+    for (const permKey of roleSpec.perms) {
+      const permission = await prisma.permission.findUniqueOrThrow({ where: { key: permKey } });
       await prisma.rolePermission.upsert({
-        where: { roleId_permissionId: { roleId: role.id, permissionId: perm.id } },
+        where: { roleId_permissionId: { roleId: role.id, permissionId: permission.id } },
         update: {},
-        create: { roleId: role.id, permissionId: perm.id },
+        create: { roleId: role.id, permissionId: permission.id },
       });
     }
   }
-  console.log(`  ✓ Roles: ${roleSpecs.length}`);
+  console.log(`  ✓ Permission/Role: ${permissionKeys.length}/${roleSpecs.length}`);
 
-  // PLACEHOLDER_USERS
-
-  // 4. Users
-  const users: Array<{ id: string; fullName: string }> = [];
+  const usersByEmail = new Map<string, { id: string; fullName: string }>();
   for (const spec of USER_SPECS) {
     const user = await prisma.user.upsert({
       where: { email: spec.email },
@@ -791,7 +585,7 @@ async function main() {
         defaultWorkspaceId: workspace.id,
       },
     });
-    users.push({ id: user.id, fullName: user.fullName });
+    usersByEmail.set(spec.email, { id: user.id, fullName: user.fullName });
 
     await prisma.workspaceMember.upsert({
       where: { workspaceId_userId: { workspaceId: workspace.id, userId: user.id } },
@@ -807,10 +601,75 @@ async function main() {
       update: {},
       create: { userId: user.id, roleId: role.id, workspaceId: workspace.id },
     });
-  }
-  console.log(`  ✓ Users: ${users.map((u) => u.fullName).join(', ')}`);
 
-  // 5. Projects + Workflow Statuses + Tasks
+    await prisma.notificationPreference.upsert({
+      where: { userId: user.id },
+      update: {
+        emailEnabled: true,
+        inAppEnabled: true,
+        taskAssignedEmail: true,
+        workspaceInviteEmail: true,
+        commentMentionEmail: true,
+        commentMentionInApp: true,
+      },
+      create: {
+        userId: user.id,
+        emailEnabled: true,
+        inAppEnabled: true,
+        taskAssignedEmail: true,
+        workspaceInviteEmail: true,
+        commentMentionEmail: true,
+        commentMentionInApp: true,
+      },
+    });
+  }
+  console.log(`  ✓ Users: ${usersByEmail.size}`);
+
+  const hasWorkspaceWorkflow =
+    hasTable('WorkspaceWorkflowStatus') && hasTable('WorkspaceWorkflowTransition');
+  if (hasWorkspaceWorkflow) {
+    const workspaceStatusIds = new Map<string, string>();
+    for (const status of WORKSPACE_STATUSES) {
+      const wsStatus = await prisma.workspaceWorkflowStatus.upsert({
+        where: { workspaceId_key: { workspaceId: workspace.id, key: status.key } },
+        update: { name: status.name, category: status.category, position: status.position },
+        create: {
+          id: `seed-wws-${status.key}`,
+          workspaceId: workspace.id,
+          key: status.key,
+          name: status.name,
+          category: status.category,
+          position: status.position,
+        },
+      });
+      workspaceStatusIds.set(status.key, wsStatus.id);
+    }
+
+    for (const [fromKey, toKey] of WORKSPACE_TRANSITIONS) {
+      await prisma.workspaceWorkflowTransition.create({
+        data: {
+          id: `seed-wwt-${fromKey}-${toKey}`,
+          workspaceId: workspace.id,
+          fromStatusId: workspaceStatusIds.get(fromKey)!,
+          toStatusId: workspaceStatusIds.get(toKey)!,
+        },
+      });
+    }
+    console.log(`  ✓ Workspace workflow: ${WORKSPACE_STATUSES.length} statuses`);
+  } else {
+    console.log('  - Skip workspace workflow seed (table not found)');
+  }
+
+  if (hasTable('Label')) {
+    for (const label of LABELS) {
+      await prisma.label.upsert({
+        where: { id: label.id },
+        update: { name: label.name, color: label.color },
+        create: { id: label.id, name: label.name, color: label.color, workspaceId: workspace.id },
+      });
+    }
+  }
+
   for (const spec of PROJECT_SPECS) {
     const project = await prisma.project.upsert({
       where: { id: spec.id },
@@ -823,111 +682,541 @@ async function main() {
       },
       create: {
         id: spec.id,
+        workspaceId: workspace.id,
         name: spec.name,
         description: spec.description,
         color: spec.color,
         icon: spec.icon,
         key: spec.key,
-        workspaceId: workspace.id,
       },
     });
-    console.log(`  ✓ Project: ${project.name}`);
 
-    // Seed workflow statuses for this project
-    for (const ws of WORKFLOW_STATUSES) {
-      await prisma.projectWorkflowStatus.upsert({
-        where: { projectId_key: { projectId: project.id, key: ws.key } },
-        update: { name: ws.name, category: ws.category, position: ws.position },
-        create: {
-          projectId: project.id,
-          key: ws.key,
-          name: ws.name,
-          category: ws.category,
-          position: ws.position,
-        },
-      });
+    if (hasTable('ProjectWorkflowStatus')) {
+      const statusMap = new Map<string, string>();
+      for (const status of WORKSPACE_STATUSES) {
+        const projectStatus = await prisma.projectWorkflowStatus.upsert({
+          where: { projectId_key: { projectId: project.id, key: status.key } },
+          update: { name: status.name, category: status.category, position: status.position },
+          create: {
+            id: `seed-pws-${project.id}-${status.key}`,
+            projectId: project.id,
+            key: status.key,
+            name: status.name,
+            category: status.category,
+            position: status.position,
+          },
+        });
+        statusMap.set(status.key, projectStatus.id);
+      }
+
+      if (hasTable('ProjectWorkflowTransition')) {
+        for (const [fromKey, toKey] of WORKSPACE_TRANSITIONS) {
+          await prisma.projectWorkflowTransition.create({
+            data: {
+              id: `seed-pwt-${project.id}-${fromKey}-${toKey}`,
+              projectId: project.id,
+              fromStatusId: statusMap.get(fromKey)!,
+              toStatusId: statusMap.get(toKey)!,
+            },
+          });
+        }
+      }
     }
+  }
+  console.log(`  ✓ Projects: ${PROJECT_SPECS.length}`);
 
-    // Seed tasks
-    const tasks = TASKS_BY_PROJECT[spec.id] ?? [];
-    for (const t of tasks) {
-      const assigneeId = t.assigneeIdx !== null ? (users[t.assigneeIdx]?.id ?? null) : null;
-      const task = await prisma.task.upsert({
-        where: { id: t.id },
-        update: {
-          title: t.title,
-          description: t.description,
-          status: t.status,
-          priority: t.priority,
-          type: t.type,
-          number: t.number,
-          storyPoints: t.storyPoints ?? null,
-          position: t.position,
-          assigneeId,
-          dueDate: t.dueDate ? new Date(t.dueDate) : null,
-        },
-        create: {
-          id: t.id,
-          title: t.title,
-          description: t.description,
-          status: t.status,
-          priority: t.priority,
-          type: t.type,
-          number: t.number,
-          storyPoints: t.storyPoints ?? null,
-          position: t.position,
-          assigneeId,
-          dueDate: t.dueDate ? new Date(t.dueDate) : null,
-          projectId: project.id,
-        },
-      });
+  for (const task of TASKS) {
+    const assignee = task.assigneeEmail ? usersByEmail.get(task.assigneeEmail) : undefined;
+    await prisma.task.upsert({
+      where: { id: task.id },
+      update: {
+        title: task.title,
+        description: task.description,
+        type: task.type,
+        priority: task.priority,
+        status: task.status,
+        storyPoints: task.storyPoints,
+        number: task.number,
+        position: task.position,
+        assigneeId: assignee?.id ?? null,
+        dueDate: task.dueDate ? new Date(task.dueDate) : null,
+        parentTaskId: task.parentTaskId ?? null,
+      },
+      create: {
+        id: task.id,
+        projectId: task.projectId,
+        title: task.title,
+        description: task.description,
+        type: task.type,
+        priority: task.priority,
+        status: task.status,
+        storyPoints: task.storyPoints,
+        number: task.number,
+        position: task.position,
+        assigneeId: assignee?.id,
+        dueDate: task.dueDate ? new Date(task.dueDate) : null,
+        parentTaskId: task.parentTaskId,
+      },
+    });
+
+    if (hasTable('TaskEvent')) {
+      const owner = usersByEmail.get('nguyen.minh.tuan@techviet.local');
       await prisma.taskEvent.upsert({
-        where: { id: `seed-event-created-${task.id}` },
+        where: { id: `seed-evt-created-${task.id}` },
         update: {},
         create: {
-          id: `seed-event-created-${task.id}`,
+          id: `seed-evt-created-${task.id}`,
           taskId: task.id,
-          actorId: users[0]!.id,
+          actorId: owner?.id,
           type: TaskEventType.created,
-          payload: { title: t.title },
+          payload: { seeded: true },
+        },
+      });
+
+      if (task.status !== 'todo') {
+        await prisma.taskEvent.upsert({
+          where: { id: `seed-evt-status-${task.id}` },
+          update: {},
+          create: {
+            id: `seed-evt-status-${task.id}`,
+            taskId: task.id,
+            actorId: assignee?.id,
+            type: TaskEventType.status_changed,
+            payload: { from: 'todo', to: task.status },
+          },
+        });
+      }
+    }
+  }
+
+  if (hasTable('TaskLabel')) {
+    for (const [taskId, labelId] of TASK_LABELS) {
+      await prisma.taskLabel.create({ data: { taskId, labelId } });
+    }
+  }
+
+  if (hasTable('TaskLink')) {
+    await prisma.taskLink.createMany({
+      data: [
+        {
+          sourceTaskId: 'seed-task-infra-1',
+          targetTaskId: 'seed-task-bank-2',
+          type: TaskLinkType.blocks,
+        },
+        {
+          sourceTaskId: 'seed-task-ecom-2',
+          targetTaskId: 'seed-task-ecom-3',
+          type: TaskLinkType.relates_to,
+        },
+        {
+          sourceTaskId: 'seed-task-bank-3',
+          targetTaskId: 'seed-task-ecom-3',
+          type: TaskLinkType.relates_to,
+        },
+      ],
+    });
+  }
+  console.log(`  ✓ Tasks: ${TASKS.length}`);
+
+  if (hasTable('Comment')) {
+    for (const comment of COMMENTS) {
+      const author = usersByEmail.get(comment.authorEmail);
+      await prisma.comment.upsert({
+        where: { id: comment.id },
+        update: { content: comment.content, taskId: comment.taskId, authorId: author?.id },
+        create: {
+          id: comment.id,
+          taskId: comment.taskId,
+          authorId: author!.id,
+          content: comment.content,
         },
       });
     }
-    console.log(`    ✓ Tasks: ${tasks.length}`);
   }
 
-  // 6. Comments
-  for (const c of COMMENTS) {
-    const authorId = users[c.authorIdx]?.id;
-    if (!authorId) continue;
-    await prisma.comment.upsert({
-      where: { id: c.id },
-      update: { content: c.content, taskId: c.taskId },
-      create: { id: c.id, taskId: c.taskId, authorId, content: c.content },
+  const channels = [
+    {
+      id: 'seed-chan-general',
+      name: 'general',
+      description: 'Thông báo chung cho toàn bộ workspace',
+      type: ChannelType.public,
+    },
+    {
+      id: 'seed-chan-backend',
+      name: 'backend-core',
+      description: 'Kênh thảo luận API và kiến trúc hệ thống',
+      type: ChannelType.public,
+    },
+    {
+      id: 'seed-chan-incident',
+      name: 'incident-war-room',
+      description: 'Kênh xử lý sự cố P1/P2',
+      type: ChannelType.private,
+    },
+  ] as const;
+
+  if (hasTable('Channel')) {
+    for (const channel of channels) {
+      await prisma.channel.upsert({
+        where: { id: channel.id },
+        update: { name: channel.name, description: channel.description, type: channel.type },
+        create: {
+          id: channel.id,
+          workspaceId: workspace.id,
+          name: channel.name,
+          description: channel.description,
+          type: channel.type,
+        },
+      });
+    }
+  }
+
+  if (hasTable('ChannelMember')) {
+    for (const [email, user] of usersByEmail) {
+      await prisma.channelMember.upsert({
+        where: { channelId_userId: { channelId: 'seed-chan-general', userId: user.id } },
+        update: {},
+        create: { channelId: 'seed-chan-general', userId: user.id },
+      });
+
+      if (email !== 'vo.thi.mai@techviet.local') {
+        await prisma.channelMember.upsert({
+          where: { channelId_userId: { channelId: 'seed-chan-backend', userId: user.id } },
+          update: {},
+          create: { channelId: 'seed-chan-backend', userId: user.id },
+        });
+      }
+    }
+  }
+
+  const tuan = usersByEmail.get('nguyen.minh.tuan@techviet.local')!;
+  const duc = usersByEmail.get('le.van.duc@techviet.local')!;
+  const bao = usersByEmail.get('hoang.quoc.bao@techviet.local')!;
+
+  if (hasTable('Message')) {
+    await prisma.message.upsert({
+      where: { id: 'seed-msg-1' },
+      update: { content: 'Tuần này ưu tiên ổn định checkout và anti-fraud trước demo.' },
+      create: {
+        id: 'seed-msg-1',
+        channelId: 'seed-chan-general',
+        authorId: tuan.id,
+        content: 'Tuần này ưu tiên ổn định checkout và anti-fraud trước demo.',
+      },
+    });
+
+    await prisma.message.upsert({
+      where: { id: 'seed-msg-2' },
+      update: { content: 'Infra cần khóa SLO trước thứ 2 để đồng bộ alert policy.' },
+      create: {
+        id: 'seed-msg-2',
+        channelId: 'seed-chan-backend',
+        authorId: bao.id,
+        content: 'Infra cần khóa SLO trước thứ 2 để đồng bộ alert policy.',
+      },
+    });
+
+    await prisma.message.upsert({
+      where: { id: 'seed-msg-3' },
+      update: { content: 'Đã rõ, em cập nhật thêm runbook rollback trong hôm nay.' },
+      create: {
+        id: 'seed-msg-3',
+        channelId: 'seed-chan-backend',
+        authorId: duc.id,
+        parentId: 'seed-msg-2',
+        content: 'Đã rõ, em cập nhật thêm runbook rollback trong hôm nay.',
+      },
     });
   }
-  console.log(`  ✓ Comments: ${COMMENTS.length}`);
 
-  // 7. Labels
-  for (const label of LABEL_SPECS) {
-    await prisma.label.upsert({
-      where: { id: label.id },
-      update: { name: label.name, color: label.color },
-      create: { id: label.id, name: label.name, color: label.color, workspaceId: workspace.id },
+  if (hasTable('MessageReaction')) {
+    await prisma.messageReaction.createMany({
+      data: [
+        { messageId: 'seed-msg-1', userId: bao.id, emoji: '🔥' },
+        { messageId: 'seed-msg-2', userId: tuan.id, emoji: '✅' },
+        { messageId: 'seed-msg-3', userId: bao.id, emoji: '👍' },
+      ],
     });
   }
-  console.log(`  ✓ Labels: ${LABEL_SPECS.length}`);
 
-  // 8. Task-Label assignments
-  for (const tl of TASK_LABEL_SPECS) {
-    await prisma.taskLabel.upsert({
-      where: { taskId_labelId: { taskId: tl.taskId, labelId: tl.labelId } },
-      update: {},
-      create: { taskId: tl.taskId, labelId: tl.labelId },
+  if (hasTable('Doc')) {
+    await prisma.doc.upsert({
+      where: { id: 'seed-doc-architecture' },
+      update: {
+        title: 'Kiến trúc checkout resilient',
+        projectId: 'seed-project-ecom',
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                { type: 'text', text: 'Thiết kế retry + idempotency cho callback payment.' },
+              ],
+            },
+          ],
+        },
+      },
+      create: {
+        id: 'seed-doc-architecture',
+        workspaceId: workspace.id,
+        title: 'Kiến trúc checkout resilient',
+        projectId: 'seed-project-ecom',
+        createdById: tuan.id,
+        lastEditedBy: duc.id,
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                { type: 'text', text: 'Thiết kế retry + idempotency cho callback payment.' },
+              ],
+            },
+          ],
+        },
+      },
+    });
+
+    await prisma.doc.upsert({
+      where: { id: 'seed-doc-slo' },
+      update: { title: 'SLO handbook', projectId: 'seed-project-infra' },
+      create: {
+        id: 'seed-doc-slo',
+        workspaceId: workspace.id,
+        title: 'SLO handbook',
+        projectId: 'seed-project-infra',
+        createdById: bao.id,
+        lastEditedBy: bao.id,
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', text: 'Mục tiêu availability: 99.9% cho API thanh toán.' }],
+            },
+          ],
+        },
+      },
     });
   }
-  console.log(`  ✓ Task labels: ${TASK_LABEL_SPECS.length}`);
 
+  if (hasTable('DocVersion')) {
+    await prisma.docVersion.createMany({
+      data: [
+        {
+          id: 'seed-docv-1',
+          docId: 'seed-doc-architecture',
+          content: { version: 1, note: 'Khởi tạo outline checkout architecture' },
+        },
+        {
+          id: 'seed-docv-2',
+          docId: 'seed-doc-slo',
+          content: { version: 1, note: 'Khởi tạo SLO baseline' },
+        },
+      ],
+    });
+  }
+
+  if (hasTable('TaskDocLink')) {
+    await prisma.taskDocLink.createMany({
+      data: [
+        {
+          taskId: 'seed-task-ecom-2',
+          docId: 'seed-doc-architecture',
+          type: 'manual',
+          strength: 0.95,
+        },
+        { taskId: 'seed-task-infra-2', docId: 'seed-doc-slo', type: 'manual', strength: 0.9 },
+      ],
+    });
+  }
+
+  if (hasTable('WorkflowRule')) {
+    await prisma.workflowRule.createMany({
+      data: [
+        {
+          id: 'seed-rule-1',
+          workspaceId: workspace.id,
+          projectId: 'seed-project-ecom',
+          name: 'Auto gán reviewer khi vào in_review',
+          description: 'Task vào in_review sẽ tự gán reviewer mặc định.',
+          isActive: true,
+          trigger: { when: 'task.status_changed', to: 'in_review' },
+          actions: { assignReviewer: 'tran.thi.lan@techviet.local' },
+        },
+        {
+          id: 'seed-rule-2',
+          workspaceId: workspace.id,
+          projectId: null,
+          name: 'Cảnh báo task urgent bị blocked',
+          description: 'Gửi cảnh báo vào incident-war-room khi task urgent bị blocked.',
+          isActive: true,
+          trigger: { when: 'task.status_changed', to: 'blocked', priority: 'urgent' },
+          actions: { postChannel: 'incident-war-room' },
+        },
+      ],
+    });
+  }
+
+  if (hasTable('AgentAction')) {
+    await prisma.agentAction.createMany({
+      data: [
+        {
+          id: 'seed-agent-1',
+          workspaceId: workspace.id,
+          projectId: 'seed-project-ecom',
+          agentName: 'PlannerAI',
+          actionType: 'task_breakdown',
+          targetId: 'seed-task-ecom-2',
+          reason: 'Tự động chia nhỏ epic checkout theo payment providers.',
+          metadata: { chunks: 4 },
+        },
+        {
+          id: 'seed-agent-2',
+          workspaceId: workspace.id,
+          projectId: 'seed-project-infra',
+          agentName: 'SREAgent',
+          actionType: 'incident_hint',
+          targetId: 'seed-task-infra-3',
+          reason: 'Phát hiện pattern memory leak theo throughput.',
+          metadata: { confidence: 0.82 },
+        },
+      ],
+    });
+  }
+
+  if (hasTable('ExternalIntegration')) {
+    await prisma.externalIntegration.createMany({
+      data: [
+        {
+          id: 'seed-int-slack',
+          workspaceId: workspace.id,
+          projectId: 'seed-project-infra',
+          name: 'Slack Alerts',
+          provider: IntegrationProvider.SLACK,
+          type: 'webhook_out',
+          config: { channel: '#alerts', url: 'https://hooks.slack.test/seed' },
+          status: 'active',
+        },
+        {
+          id: 'seed-int-github',
+          workspaceId: workspace.id,
+          projectId: 'seed-project-ecom',
+          name: 'GitHub PR Webhook',
+          provider: IntegrationProvider.GITHUB,
+          type: 'webhook_in',
+          config: { secret: 'seed-secret', repo: 'techviet/ecom' },
+          status: 'active',
+        },
+      ],
+    });
+  }
+
+  if (hasTable('SignalLog') && hasTable('ExternalIntegration')) {
+    await prisma.signalLog.createMany({
+      data: [
+        {
+          id: 'seed-signal-1',
+          workspaceId: workspace.id,
+          projectId: 'seed-project-infra',
+          integrationId: 'seed-int-slack',
+          provider: IntegrationProvider.SLACK,
+          payload: { text: 'p95 latency vượt ngưỡng 900ms trong 10 phút' },
+          interpretation: 'Tín hiệu cảnh báo SLO degradation cần điều tra ngay.',
+        },
+        {
+          id: 'seed-signal-2',
+          workspaceId: workspace.id,
+          projectId: 'seed-project-ecom',
+          integrationId: 'seed-int-github',
+          provider: IntegrationProvider.GITHUB,
+          payload: { pr: 142, title: 'feat: harden payment callback' },
+          interpretation: 'PR liên quan checkout resiliency đã được mở, nên ưu tiên review.',
+        },
+      ],
+    });
+  }
+
+  if (hasTable('WorkspaceInvitation')) {
+    await prisma.workspaceInvitation.createMany({
+      data: [
+        {
+          id: 'seed-invite-1',
+          workspaceId: workspace.id,
+          inviterId: tuan.id,
+          email: 'new.dev@techviet.local',
+          tokenHash: 'seed-token-hash-1',
+          role: WorkspaceMemberRole.member,
+          status: WorkspaceInvitationStatus.pending,
+          expiresAt: new Date('2026-05-30T00:00:00.000Z'),
+        },
+        {
+          id: 'seed-invite-2',
+          workspaceId: workspace.id,
+          inviterId: tuan.id,
+          email: 'security.consultant@techviet.local',
+          tokenHash: 'seed-token-hash-2',
+          role: WorkspaceMemberRole.viewer,
+          status: WorkspaceInvitationStatus.accepted,
+          acceptedAt: new Date('2026-04-10T08:30:00.000Z'),
+          expiresAt: new Date('2026-06-15T00:00:00.000Z'),
+        },
+      ],
+    });
+  }
+
+  if (hasTable('Notification')) {
+    await prisma.notification.createMany({
+      data: [
+        {
+          id: 'seed-noti-1',
+          userId: bao.id,
+          workspaceId: workspace.id,
+          type: 'task.blocked',
+          payload: { taskId: 'seed-task-infra-3', title: 'Fix memory leak ở worker xử lý queue' },
+          neuralPriority: 'HIGH',
+          aiSummary: 'Task urgent đang blocked, cần owner hành động trong hôm nay.',
+        },
+        {
+          id: 'seed-noti-2',
+          userId: tuan.id,
+          workspaceId: workspace.id,
+          type: 'workflow.in_review',
+          payload: { taskId: 'seed-task-ecom-3' },
+          neuralPriority: 'FOCUSED',
+          aiSummary: 'Subtask OTP checkout đã sẵn sàng để phê duyệt.',
+        },
+      ],
+    });
+  }
+
+  if (hasTable('AuditLog')) {
+    await prisma.auditLog.createMany({
+      data: [
+        {
+          id: 'seed-audit-1',
+          workspaceId: workspace.id,
+          actorId: tuan.id,
+          action: 'project_created',
+          entityType: 'project',
+          entityId: 'seed-project-ecom',
+          payload: { key: 'ECOM' },
+        },
+        {
+          id: 'seed-audit-2',
+          workspaceId: workspace.id,
+          actorId: bao.id,
+          action: 'task_status_changed',
+          entityType: 'task',
+          entityId: 'seed-task-infra-3',
+          payload: { from: 'in_progress', to: 'blocked' },
+        },
+      ],
+    });
+  }
+
+  console.log('  ✓ Collaboration + automation data seeded');
   console.log('  ✓ Login: nguyen.minh.tuan@techviet.local / Passw0rd!');
   console.log('✅ Seed complete');
 }

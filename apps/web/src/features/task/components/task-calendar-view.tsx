@@ -129,18 +129,18 @@ function DraggableTaskChip({
       onClick={onClick}
       {...listeners}
       {...attributes}
-      whileHover={{ scale: 1.05, x: 4 }}
-      whileTap={{ scale: 0.95 }}
-      className={`group w-full cursor-grab rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2.5 text-left transition-all hover:bg-white/[0.08] hover:border-white/20 shadow-inner ${isDragging ? 'opacity-0' : ''}`}
+      whileHover={{ scale: 1.02, x: 2 }}
+      whileTap={{ scale: 0.98 }}
+      className={`group w-full cursor-grab rounded-sm border border-white/5 bg-white/[0.03] px-var(--space-3) py-var(--space-2) text-left transition-all hover:bg-white/[0.08] hover:border-white/20 shadow-inner ${isDragging ? 'opacity-0' : ''}`}
       title={`${task.title} - ${statusInfo?.name ?? task.status}`}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <div
           className={`shrink-0 ${colorClass} opacity-40 group-hover:opacity-100 transition-opacity`}
         >
-          {getCategoryIcon(statusInfo?.category, 14)}
+          {getCategoryIcon(statusInfo?.category, 12)}
         </div>
-        <span className="line-clamp-1 text-[11px] font-black uppercase tracking-tight text-white/60 group-hover:text-white transition-colors italic">
+        <span className="line-clamp-1 text-[10px] font-bold uppercase tracking-tight text-white/60 group-hover:text-white transition-colors">
           {task.title}
         </span>
       </div>
@@ -173,12 +173,12 @@ function DroppableDayCell({
   return (
     <div
       ref={setNodeRef}
-      className={`min-h-48 rounded-[2.5rem] border p-5 transition-all duration-700 relative overflow-hidden group/cell ${
+      className={`min-h-[10rem] rounded-md border p-var(--space-4) transition-all duration-300 relative overflow-hidden group/cell ${
         isOver
-          ? 'border-brand-500 bg-brand-500/[0.03] shadow-glow-brand/10 scale-[1.05] z-30'
+          ? 'border-brand-500/50 bg-brand-500/[0.03] shadow-glow-brand/5 scale-[1.02] z-30'
           : cell.inMonth
             ? 'border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/10'
-            : 'border-white/5 bg-white/[0.005] opacity-40 grayscale'
+            : 'border-white/5 bg-white/[0.005] opacity-20 grayscale'
       }`}
     >
       {/* Background Pulse for Over state */}
@@ -188,21 +188,21 @@ function DroppableDayCell({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-brand-500/5 pointer-events-none rounded-[2.5rem] blur-3xl animate-pulse"
+            className="absolute inset-0 bg-brand-500/5 pointer-events-none rounded-md blur-2xl animate-pulse"
           />
         )}
       </AnimatePresence>
 
-      <div className="flex items-center justify-between mb-5 relative z-10">
+      <div className="flex items-center justify-between mb-var(--space-4) relative z-10">
         <p
-          className={`text-[11px] font-black uppercase tracking-[0.3em] italic ${
-            isToday ? 'text-brand-400' : cell.inMonth ? 'text-white/20' : 'text-white/10'
+          className={`text-[10px] font-black uppercase tracking-[0.2em] ${
+            isToday ? 'text-brand-400' : cell.inMonth ? 'text-white/20' : 'text-white/5'
           }`}
         >
           {cell.date.getDate().toString().padStart(2, '0')}
         </p>
         {isToday && (
-          <div className="h-1.5 w-1.5 rounded-full bg-brand-500 shadow-glow-brand animate-pulse" />
+          <div className="h-1 w-1 rounded-full bg-brand-500 shadow-glow-brand animate-pulse" />
         )}
       </div>
 
@@ -232,9 +232,9 @@ function DroppableDayCell({
         </AnimatePresence>
 
         {visibleTasks.length > 3 ? (
-          <div className="px-4 py-2 rounded-xl bg-white/5 border border-white/5 transition-all hover:bg-brand-500/10 hover:border-brand-500/20 group/more">
-            <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] italic group-hover/more:text-brand-400 transition-colors">
-              +{visibleTasks.length - 3} PACKETS
+          <div className="px-var(--space-3) py-var(--space-1) rounded-xs bg-white/5 border border-white/5 transition-all hover:bg-brand-500/10 hover:border-brand-500/20 group/more">
+            <p className="text-[8px] font-bold text-white/20 uppercase tracking-widest group-hover/more:text-brand-400 transition-colors">
+              +{visibleTasks.length - 3} Packets
             </p>
           </div>
         ) : null}
@@ -296,48 +296,48 @@ export function TaskCalendarView({
   return (
     <div className="space-y-10">
       {/* Header nav bar */}
-      <div className="flex items-center justify-between rounded-[3rem] border border-white/5 bg-white/[0.01] px-10 py-6 backdrop-blur-[60px] shadow-luxe relative overflow-hidden group">
-        <div className="absolute inset-0 bg-brand-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+      <div className="flex items-center justify-between rounded-md border border-white/10 bg-white/[0.01] px-var(--space-6) py-var(--space-4) backdrop-blur-2xl shadow-inner relative overflow-hidden group">
+        <div className="absolute inset-0 bg-brand-500/[0.01] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
         <button
           type="button"
           onClick={onPrevMonth}
-          className="flex items-center gap-4 rounded-lg border border-white/5 bg-white/[0.02] px-6 py-3.5 text-[11px] font-black uppercase tracking-[0.4em] text-white/30 hover:bg-white/10 hover:text-white transition-all active:scale-95 italic"
+          className="flex items-center gap-3 rounded-sm border border-white/5 bg-white/[0.02] px-var(--space-4) py-var(--space-2) text-[10px] font-bold uppercase tracking-widest text-white/30 hover:bg-white/10 hover:text-white transition-all active:scale-95"
         >
-          <ChevronLeft size={16} />
-          <span className="hidden sm:inline">PAST_CYCLE</span>
+          <ChevronLeft size={14} />
+          <span className="hidden sm:inline">Past_Cycle</span>
         </button>
 
         {/* View mode toggle */}
-        <div className="flex flex-col items-center gap-4 relative z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse shadow-glow-brand" />
-            <p className="text-lg font-black text-white uppercase tracking-[0.6em] italic pl-2">
+        <div className="flex flex-col items-center gap-2 relative z-10">
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-1 rounded-full bg-brand-500 animate-pulse shadow-glow-brand" />
+            <p className="text-base font-black text-white uppercase tracking-[0.4em] pl-1">
               {calendarMonthLabel}
             </p>
           </div>
-          <div className="flex rounded-lg border border-white/5 bg-slate-950/40 p-1.5 backdrop-blur-xl">
+          <div className="flex rounded-sm border border-white/5 bg-slate-950/40 p-1 backdrop-blur-xl">
             <button
               type="button"
               onClick={() => setViewMode('month')}
-              className={`rounded-xl px-8 py-2.5 text-[10px] font-black uppercase tracking-[0.3em] transition-all italic ${
+              className={`rounded-xs px-6 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all ${
                 viewMode === 'month'
-                  ? 'bg-white text-slate-950 shadow-luxe scale-105'
+                  ? 'bg-white text-slate-950 shadow-inner scale-105'
                   : 'text-white/20 hover:text-white'
               }`}
             >
-              MONTH
+              Month
             </button>
             <button
               type="button"
               onClick={() => setViewMode('week')}
-              className={`rounded-xl px-8 py-2.5 text-[10px] font-black uppercase tracking-[0.3em] transition-all italic ${
+              className={`rounded-xs px-6 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all ${
                 viewMode === 'week'
-                  ? 'bg-white text-slate-950 shadow-luxe scale-105'
+                  ? 'bg-white text-slate-950 shadow-inner scale-105'
                   : 'text-white/20 hover:text-white'
               }`}
             >
-              WEEK
+              Week
             </button>
           </div>
         </div>
@@ -345,10 +345,10 @@ export function TaskCalendarView({
         <button
           type="button"
           onClick={onNextMonth}
-          className="flex items-center gap-4 rounded-lg border border-white/5 bg-white/[0.02] px-6 py-3.5 text-[11px] font-black uppercase tracking-[0.4em] text-white/30 hover:bg-white/10 hover:text-white transition-all active:scale-95 italic"
+          className="flex items-center gap-3 rounded-sm border border-white/5 bg-white/[0.02] px-var(--space-4) py-var(--space-2) text-[10px] font-bold uppercase tracking-widest text-white/30 hover:bg-white/10 hover:text-white transition-all active:scale-95"
         >
-          <span className="hidden sm:inline">FUTURE_CYCLE</span>
-          <ChevronRight size={16} />
+          <span className="hidden sm:inline">Future_Cycle</span>
+          <ChevronRight size={14} />
         </button>
       </div>
 
@@ -395,15 +395,15 @@ export function TaskCalendarView({
                   return (
                     <motion.div
                       initial={{ scale: 1, rotate: 0 }}
-                      animate={{ scale: 1.1, rotate: 3 }}
-                      className="w-full cursor-grabbing rounded-xl border border-brand-500 bg-brand-500/10 px-6 py-5 shadow-glow-brand/30 backdrop-blur-3xl overflow-hidden"
+                      animate={{ scale: 1.05, rotate: 1 }}
+                      className="w-full cursor-grabbing rounded-md border border-brand-500/50 bg-brand-500/10 px-var(--space-4) py-var(--space-3) shadow-glow-brand/20 backdrop-blur-2xl overflow-hidden"
                     >
                       <div className="absolute inset-0 bg-brand-500/5 animate-pulse" />
-                      <div className="flex items-center gap-4 relative z-10">
+                      <div className="flex items-center gap-3 relative z-10">
                         <div className={`shrink-0 ${colorClass}`}>
-                          {getCategoryIcon(statusInfo?.category, 16)}
+                          {getCategoryIcon(statusInfo?.category, 14)}
                         </div>
-                        <span className="line-clamp-1 text-xs font-black uppercase tracking-widest text-white italic">
+                        <span className="line-clamp-1 text-[10px] font-bold uppercase tracking-widest text-white">
                           {found.title}
                         </span>
                       </div>
@@ -419,21 +419,21 @@ export function TaskCalendarView({
       {/* Tasks without due date */}
       {tasksWithoutDueDate.length > 0 ? (
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-[3rem] border border-white/5 bg-white/[0.01] p-10 backdrop-blur-[40px] shadow-glass group/unscheduled relative overflow-hidden"
+          className="rounded-md border border-white/5 bg-white/[0.01] p-var(--space-6) backdrop-blur-2xl shadow-inner group/unscheduled relative overflow-hidden"
         >
-          <div className="absolute inset-0 bg-brand-500/[0.01] opacity-0 group-hover/unscheduled:opacity-100 transition-opacity pointer-events-none" />
-          <div className="flex items-center gap-6 mb-8">
-            <div className="w-12 h-12 rounded-lg bg-white/[0.03] flex items-center justify-center border border-white/5 shadow-inner">
-              <CalendarIcon size={18} className="text-white/20" />
+          <div className="absolute inset-0 bg-brand-500/[0.005] opacity-0 group-hover/unscheduled:opacity-100 transition-opacity pointer-events-none" />
+          <div className="flex items-center gap-4 mb-var(--space-6)">
+            <div className="w-10 h-10 rounded-sm bg-white/[0.03] flex items-center justify-center border border-white/5 shadow-inner">
+              <CalendarIcon size={16} className="text-white/20" />
             </div>
-            <div className="flex flex-col gap-1">
-              <p className="text-[11px] font-black uppercase tracking-[0.5em] text-white/40 italic">
-                UNSCHEDULED_PROTOCOLS
+            <div className="flex flex-col">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
+                Unscheduled_Protocols
               </p>
-              <span className="text-[8px] font-bold text-white/10 uppercase tracking-[0.2em]">
-                WAITING_FOR_ALLOCATION
+              <span className="text-[7px] font-bold text-white/10 uppercase tracking-widest">
+                Waiting_For_Allocation
               </span>
             </div>
           </div>
@@ -447,14 +447,14 @@ export function TaskCalendarView({
                   key={task.id}
                   type="button"
                   onClick={() => onOpenEdit(task)}
-                  className="flex items-center gap-4 rounded-lg border border-white/5 bg-white/[0.03] px-6 py-4 transition-all hover:bg-white/10 hover:border-brand-500/30 hover:scale-105 active:scale-95 group/packet"
+                  className="flex items-center gap-3 rounded-sm border border-white/5 bg-white/[0.03] px-var(--space-4) py-var(--space-3) transition-all hover:bg-white/10 hover:border-brand-500/20 hover:scale-[1.02] active:scale-98 group/packet"
                 >
                   <div
                     className={`${colorClass} opacity-30 group-hover/packet:opacity-100 transition-opacity`}
                   >
-                    {getCategoryIcon(statusInfo?.category, 14)}
+                    {getCategoryIcon(statusInfo?.category, 12)}
                   </div>
-                  <span className="text-[11px] font-black uppercase tracking-tighter text-white/60 group-hover/packet:text-white transition-colors italic">
+                  <span className="text-[10px] font-bold uppercase tracking-tight text-white/60 group-hover/packet:text-white transition-colors">
                     {task.title}
                   </span>
                 </button>

@@ -68,37 +68,37 @@ export function TaskListView({
       .map((s) => ({ key: s.key, label: s.name }));
   };
   return (
-    <div className="overflow-hidden rounded-[3rem] border border-white/5 bg-white/[0.01] backdrop-blur-[40px] shadow-luxe animate-in fade-in slide-in-from-bottom-8 duration-1000 relative group">
+    <div className="overflow-hidden rounded-md border border-white/10 bg-white/[0.01] backdrop-blur-2xl shadow-inner animate-in fade-in slide-in-from-bottom-2 duration-500 relative group">
       {/* Internal Rim Lighting */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
       <table className="min-w-full border-collapse text-sm tabular-nums relative z-10">
         <thead>
           <tr className="bg-white/[0.02] border-b border-white/5">
-            <th className="px-10 py-8 text-left w-20">
+            <th className="px-var(--space-6) py-var(--space-4) text-left w-16">
               <div className="relative flex items-center justify-center">
                 <input
                   type="checkbox"
                   checked={visibleTasks.length > 0 && selectedVisibleCount === visibleTasks.length}
                   onChange={toggleSelectAllVisible}
-                  className="h-5 w-5 rounded-lg border-white/10 bg-white/5 text-brand-500 focus:ring-brand-500/50 shadow-inner cursor-pointer transition-all"
+                  className="h-4 w-4 rounded-sm border-white/10 bg-white/5 text-brand-500 focus:ring-brand-500/50 shadow-inner cursor-pointer transition-all"
                 />
               </div>
             </th>
-            <th className="px-8 py-8 text-left text-[11px] font-black tracking-[0.5em] text-white/20 uppercase italic">
-              OPERATIONAL_TASK
+            <th className="px-var(--space-4) py-var(--space-4) text-left text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">
+              Operational_Task
             </th>
-            <th className="px-8 py-8 text-left text-[11px] font-black tracking-[0.5em] text-white/20 uppercase italic">
-              FREQUENCY_HUB
+            <th className="px-var(--space-4) py-var(--space-4) text-left text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">
+              Frequency_Hub
             </th>
-            <th className="px-8 py-8 text-left text-[11px] font-black tracking-[0.5em] text-white/20 uppercase italic">
-              PRIORITY_RANK
+            <th className="px-var(--space-4) py-var(--space-4) text-left text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">
+              Priority_Rank
             </th>
-            <th className="px-8 py-8 text-left text-[11px] font-black tracking-[0.5em] text-white/20 uppercase italic">
-              OPERATOR_ID
+            <th className="px-var(--space-4) py-var(--space-4) text-left text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">
+              Operator_Id
             </th>
-            <th className="px-10 py-8 text-left text-[11px] font-black tracking-[0.5em] text-white/20 uppercase italic">
-              SYSTEM_SYNC
+            <th className="px-var(--space-6) py-var(--space-4) text-right text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">
+              System_Sync
             </th>
           </tr>
         </thead>
@@ -119,25 +119,28 @@ export function TaskListView({
                   isSelected ? 'bg-brand-500/[0.03]' : ''
                 } ${task.deletedAt ? 'opacity-20 grayscale pointer-events-none' : ''}`}
               >
-                <td className="px-10 py-6" onClick={(event) => event.stopPropagation()}>
+                <td
+                  className="px-var(--space-6) py-var(--space-3)"
+                  onClick={(event) => event.stopPropagation()}
+                >
                   <div className="relative flex items-center justify-center">
                     {isSelected && (
                       <motion.div
                         layoutId={`selected-row-${task.id}`}
-                        className="absolute -left-10 w-1.5 h-12 bg-brand-500 shadow-glow-brand rounded-r-lg"
+                        className="absolute -left-var(--space-6) w-0.5 h-8 bg-brand-500 shadow-glow-brand rounded-r-xs"
                       />
                     )}
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={(e) => onSelectTask(task.id, e)}
-                      className={`h-5 w-5 rounded-lg border-white/10 bg-white/5 text-brand-500 transition-all ${isSelected ? 'opacity-100' : 'opacity-20 group-hover:opacity-100'}`}
+                      className={`h-4 w-4 rounded-sm border-white/10 bg-white/5 text-brand-500 transition-all ${isSelected ? 'opacity-100' : 'opacity-20 group-hover:opacity-100'}`}
                     />
                   </div>
                 </td>
-                <td className="px-8 py-6">
-                  <div className="flex items-center gap-6">
-                    <div className="w-12 h-12 rounded-lg bg-white/[0.03] flex items-center justify-center border border-white/5 shadow-inner transition-all duration-700 group-hover:scale-110 group-hover:shadow-glow-brand/10">
+                <td className="px-var(--space-4) py-var(--space-3)">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-sm bg-white/[0.03] flex items-center justify-center border border-white/5 shadow-inner transition-all duration-300 group-hover:border-white/20">
                       <TaskTypeIcon type={task.type ?? 'task'} />
                     </div>
                     <div className="space-y-1.5">
@@ -170,7 +173,7 @@ export function TaskListView({
                           event.target.value as unknown as ProjectTaskItemDTO['status'],
                         );
                       }}
-                      className="appearance-none rounded-lg border border-white/5 bg-white/[0.02] pl-6 pr-12 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-white/40 focus:bg-white/[0.05] focus:text-white outline-none transition-all cursor-pointer shadow-inner italic"
+                      className="appearance-none rounded-sm border border-white/5 bg-white/[0.02] pl-4 pr-10 py-2 text-[9px] font-bold uppercase tracking-widest text-white/40 focus:bg-white/[0.05] focus:text-white outline-none transition-all cursor-pointer shadow-inner"
                     >
                       {getStatusOptionsForTask(task.status).map((opt) => (
                         <option key={opt.key} value={opt.key} className="bg-slate-950 italic">
@@ -188,20 +191,20 @@ export function TaskListView({
                 </td>
                 <td className="px-8 py-6">
                   {task.assigneeName ? (
-                    <div className="flex items-center gap-5 group/assignee">
-                      <div className="ring-2 ring-white/5 rounded-full p-0.5 transition-all group-hover/assignee:ring-brand-500/30 shadow-luxe">
+                    <div className="flex items-center gap-4 group/assignee">
+                      <div className="ring-1 ring-white/5 rounded-full p-0.5 transition-all group-hover/assignee:ring-brand-500/30">
                         <AssigneeAvatar
                           name={task.assigneeName}
                           color={task.assigneeAvatarColor}
-                          size="lg"
+                          size="md"
                         />
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[11px] font-black text-white/60 uppercase tracking-tight italic group-hover/assignee:text-white transition-colors">
+                        <span className="text-[10px] font-bold text-white/60 uppercase tracking-tight group-hover/assignee:text-white transition-colors">
                           {task.assigneeName}
                         </span>
-                        <span className="text-[8px] font-bold text-white/10 uppercase tracking-widest">
-                          RANK_CERTIFIED
+                        <span className="text-[7px] font-bold text-white/10 uppercase tracking-widest">
+                          Rank_Certified
                         </span>
                       </div>
                     </div>

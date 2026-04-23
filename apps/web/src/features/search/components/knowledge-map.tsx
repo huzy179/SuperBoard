@@ -36,7 +36,7 @@ export function KnowledgeMap({ projectId, onClose, onSelectNode }: KnowledgeMapP
       {/* Header */}
       <div className="p-8 border-b border-white/5 flex items-center justify-between bg-black/40">
         <div className="flex items-center gap-6">
-          <div className="w-14 h-14 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 shadow-glow-brand ring-1 ring-white/10">
+          <div className="w-14 h-14 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 shadow-glow-brand ring-1 ring-white/10">
             <Activity size={28} className="animate-pulse" />
           </div>
           <div className="flex flex-col">
@@ -60,7 +60,7 @@ export function KnowledgeMap({ projectId, onClose, onSelectNode }: KnowledgeMapP
           <button
             onClick={handleGenerateDiary}
             disabled={isGeneratingDiary}
-            className="group relative flex items-center gap-3 px-8 py-3.5 rounded-2xl bg-white/5 border border-indigo-500/20 text-indigo-400 font-black text-[10px] uppercase tracking-widest hover:bg-white/10 hover:border-indigo-500/40 transition-all disabled:opacity-50"
+            className="group relative flex items-center gap-3 px-8 py-3.5 rounded-lg bg-white/5 border border-indigo-500/20 text-indigo-400 font-black text-[10px] uppercase tracking-widest hover:bg-white/10 hover:border-indigo-500/40 transition-all disabled:opacity-50"
           >
             {isGeneratingDiary ? (
               <RefreshCw className="animate-spin" size={14} />
@@ -77,7 +77,7 @@ export function KnowledgeMap({ projectId, onClose, onSelectNode }: KnowledgeMapP
 
           <button
             onClick={onClose}
-            className="w-14 h-14 rounded-2xl bg-white/5 text-white/40 hover:bg-white/10 hover:text-white transition-all flex items-center justify-center border border-white/5 hover:border-white/10 hover:rotate-90"
+            className="w-14 h-14 rounded-lg bg-white/5 text-white/40 hover:bg-white/10 hover:text-white transition-all flex items-center justify-center border border-white/5 hover:border-white/10 hover:rotate-90"
           >
             <X size={24} />
           </button>

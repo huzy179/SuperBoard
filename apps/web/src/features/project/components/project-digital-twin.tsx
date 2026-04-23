@@ -105,7 +105,7 @@ export function ProjectDigitalTwin({ projectId }: { projectId: string }) {
       {/* Top Bar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <div className="w-16 h-16 rounded-[2rem] bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-glow-indigo">
+          <div className="w-16 h-16 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-glow-indigo">
             <Activity size={32} />
           </div>
           <div className="flex flex-col">
@@ -127,7 +127,7 @@ export function ProjectDigitalTwin({ projectId }: { projectId: string }) {
         <div className="flex items-center gap-3">
           <button
             onClick={fetchBaseline}
-            className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-white transition-all"
+            className="p-4 rounded-lg bg-white/5 border border-white/10 text-white/40 hover:text-white transition-all"
           >
             <RefreshCw size={18} />
           </button>
@@ -157,7 +157,7 @@ export function ProjectDigitalTwin({ projectId }: { projectId: string }) {
                 </div>
               </div>
 
-              <div className="space-y-4 p-8 rounded-[2rem] bg-black/40 border border-white/5">
+              <div className="space-y-4 p-8 rounded-xl bg-black/40 border border-white/5">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">
                     Velocity Boost
@@ -209,7 +209,7 @@ export function ProjectDigitalTwin({ projectId }: { projectId: string }) {
         <div className="col-span-12 lg:col-span-7 space-y-10 h-full overflow-hidden flex flex-col">
           {/* Forecast Summary */}
           <div className="grid grid-cols-2 gap-8">
-            <div className="p-8 rounded-[2rem] bg-emerald-500/5 border border-emerald-500/10 space-y-2">
+            <div className="p-8 rounded-xl bg-emerald-500/5 border border-emerald-500/10 space-y-2">
               <div className="flex items-center gap-3 text-emerald-400 mb-2">
                 <Calendar size={16} />
                 <span className="text-[10px] font-black uppercase tracking-widest">
@@ -227,7 +227,7 @@ export function ProjectDigitalTwin({ projectId }: { projectId: string }) {
                 Strategic Horizon
               </p>
             </div>
-            <div className="p-8 rounded-[2rem] bg-rose-500/5 border border-rose-500/10 space-y-2">
+            <div className="p-8 rounded-xl bg-rose-500/5 border border-rose-500/10 space-y-2">
               <div className="flex items-center gap-3 text-rose-400 mb-2">
                 <AlertTriangle size={16} />
                 <span className="text-[10px] font-black uppercase tracking-widest">
@@ -253,7 +253,7 @@ export function ProjectDigitalTwin({ projectId }: { projectId: string }) {
               {currentForecast.predictions.map((p, i) => (
                 <div
                   key={p.taskId}
-                  className={`p-6 rounded-[2rem] border transition-all flex items-center justify-between group ${
+                  className={`p-6 rounded-xl border transition-all flex items-center justify-between group ${
                     p.isAtRisk
                       ? 'bg-rose-500/5 border-rose-500/20 shadow-glow-rose'
                       : 'bg-white/5 border-white/5 hover:bg-white/10'

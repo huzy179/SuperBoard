@@ -59,7 +59,7 @@ export function ProjectCardsGrid({
           onClick={onOpenCreate}
           className="group relative flex flex-col items-center justify-center gap-6 rounded-[2.5rem] border-2 border-dashed border-white/5 bg-white/[0.02] p-10 transition-all duration-500 hover:border-brand-500/50 hover:bg-white/[0.05] hover:scale-[1.02] active:scale-[0.98] min-h-[380px]"
         >
-          <div className="relative p-6 bg-slate-900 rounded-3xl border border-white/5 group-hover:bg-brand-500/10 group-hover:border-brand-500/20 transition-all duration-500 group-hover:shadow-glow-brand">
+          <div className="relative p-6 bg-slate-900 rounded-xl border border-white/5 group-hover:bg-brand-500/10 group-hover:border-brand-500/20 transition-all duration-500 group-hover:shadow-glow-brand">
             <Plus
               size={32}
               className="text-white/20 group-hover:text-brand-400 group-hover:scale-110 transition-all duration-500"

@@ -48,13 +48,13 @@ export default function ProjectReportsPage() {
         <div className="flex justify-between items-center mb-4">
           <div className="space-y-3">
             <div className="h-4 w-32 bg-white/5 rounded-full" />
-            <div className="h-10 w-64 bg-white/10 rounded-2xl" />
+            <div className="h-10 w-64 bg-white/10 rounded-lg" />
           </div>
-          <div className="h-12 w-40 bg-white/5 rounded-2xl" />
+          <div className="h-12 w-40 bg-white/5 rounded-lg" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-32 bg-white/5 rounded-[2rem] border border-white/5" />
+            <div key={i} className="h-32 bg-white/5 rounded-xl border border-white/5" />
           ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -115,7 +115,7 @@ export default function ProjectReportsPage() {
             </button>
 
             {isExportOpen && (
-              <div className="absolute right-0 mt-3 w-64 bg-slate-900 shadow-glass border border-white/10 rounded-3xl overflow-hidden py-2 z-50 animate-in fade-in zoom-in-95 duration-300 backdrop-blur-3xl">
+              <div className="absolute right-0 mt-3 w-64 bg-slate-900 shadow-glass border border-white/10 rounded-xl overflow-hidden py-2 z-50 animate-in fade-in zoom-in-95 duration-300 backdrop-blur-3xl">
                 <button
                   onClick={() => {
                     reportService.exportTasksCsv(projectId);
@@ -148,7 +148,7 @@ export default function ProjectReportsPage() {
           <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-brand-500/50 to-transparent" />
 
           <div className="flex flex-col md:flex-row gap-10 items-start md:items-center">
-            <div className="p-6 bg-brand-500/10 rounded-[2rem] border border-brand-500/20">
+            <div className="p-6 bg-brand-500/10 rounded-xl border border-brand-500/20">
               <Sparkles size={32} className="text-brand-400 animate-pulse" />
             </div>
             <div className="space-y-3 flex-1">
@@ -499,7 +499,7 @@ function StatCard({
       <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
       <div className="relative z-10 flex flex-col h-full justify-between">
         <div className="flex items-center gap-4 mb-8">
-          <div className="p-3 bg-slate-900 rounded-2xl border border-white/5 shadow-luxe group-hover:border-brand-500/30 transition-all">
+          <div className="p-3 bg-slate-900 rounded-lg border border-white/5 shadow-luxe group-hover:border-brand-500/30 transition-all">
             {icon}
           </div>
           <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">
@@ -538,9 +538,9 @@ function HealthCard({
 
   return (
     <div
-      className={`p-8 rounded-[2rem] border transition-all hover:scale-[1.02] flex items-center gap-6 ${variants[color]}`}
+      className={`p-8 rounded-xl border transition-all hover:scale-[1.02] flex items-center gap-6 ${variants[color]}`}
     >
-      <div className="p-4 bg-slate-950/80 rounded-2xl border border-white/5">{icon}</div>
+      <div className="p-4 bg-slate-950/80 rounded-lg border border-white/5">{icon}</div>
       <div>
         <div className="text-3xl font-black tracking-tighter leading-none">{value}</div>
         <div className="text-[9px] font-black uppercase tracking-widest mt-1 opacity-60">

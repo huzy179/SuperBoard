@@ -218,7 +218,7 @@ export function RichTextEditor({
       {menuPos.show && editable && (
         <div
           ref={menuRef}
-          className="fixed z-50 flex items-center gap-1.5 p-1.5 bg-slate-900/90 border border-white/10 rounded-2xl shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-200"
+          className="fixed z-50 flex items-center gap-1.5 p-1.5 bg-slate-900/90 border border-white/10 rounded-lg shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-200"
           style={{
             top: `${menuPos.top}px`,
             left: `${menuPos.left}px`,
@@ -258,7 +258,7 @@ export function RichTextEditor({
       {/* Slash Command Menu */}
       {slashMenu.show && editable && (
         <div
-          className="fixed z-50 w-72 bg-slate-950/90 border border-white/10 rounded-[2rem] shadow-2xl p-3 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-2xl"
+          className="fixed z-50 w-72 bg-slate-950/90 border border-white/10 rounded-xl shadow-2xl p-3 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-2xl"
           style={{ top: `${slashMenu.top}px`, left: `${slashMenu.left}px` }}
         >
           <div className="px-4 py-3 text-[9px] font-black text-white/20 uppercase tracking-[0.3em] border-b border-white/5 mb-2">
@@ -451,7 +451,7 @@ export function RichTextEditor({
                   setSlashMenu((prev) => ({ ...prev, show: false, mode: 'default' }));
                   setTaskQuery('');
                 }}
-                className="w-full p-4 hover:bg-white/[0.03] rounded-2xl transition-all text-left border border-transparent hover:border-white/5 group"
+                className="w-full p-4 hover:bg-white/[0.03] rounded-lg transition-all text-left border border-transparent hover:border-white/5 group"
               >
                 <div className="text-[11px] font-black text-white uppercase tracking-tight truncate group-hover:text-brand-400">
                   {task.title}
@@ -490,7 +490,7 @@ export function RichTextEditor({
       )}
 
       {editable && (
-        <div className="sticky top-20 z-40 flex flex-wrap items-center gap-1.5 border border-white/5 bg-slate-900/60 p-2.5 backdrop-blur-xl mb-12 shadow-2xl rounded-2xl">
+        <div className="sticky top-20 z-40 flex flex-wrap items-center gap-1.5 border border-white/5 bg-slate-900/60 p-2.5 backdrop-blur-xl mb-12 shadow-2xl rounded-lg">
           <MenuButton
             onClick={() => editor.chain().focus().toggleBold().run()}
             active={editor.isActive('bold')}
@@ -662,7 +662,7 @@ function SlashMenuItem({
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-4 p-3 hover:bg-white/[0.03] rounded-2xl transition-all group text-left border border-transparent hover:border-white/5"
+      className="w-full flex items-center gap-4 p-3 hover:bg-white/[0.03] rounded-lg transition-all group text-left border border-transparent hover:border-white/5"
     >
       <div className="w-12 h-12 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:border-brand-500/20 transition-all">
         {icon}

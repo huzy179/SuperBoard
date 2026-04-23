@@ -119,7 +119,7 @@ export function TaskCommentSection({
           </h3>
         </div>
         {viewerCount > 1 ? (
-          <div className="flex items-center gap-4 rounded-2xl bg-brand-500/5 px-6 py-2.5 border border-brand-500/20 shadow-glow-brand/10 backdrop-blur-3xl">
+          <div className="flex items-center gap-4 rounded-lg bg-brand-500/5 px-6 py-2.5 border border-brand-500/20 shadow-glow-brand/10 backdrop-blur-3xl">
             <div className="h-1.5 w-1.5 rounded-full bg-brand-500 animate-pulse" />
             <UsersIcon className="h-3.5 w-3.5 text-brand-400" />
             <span className="text-[10px] font-black uppercase tracking-widest text-brand-400">
@@ -134,7 +134,7 @@ export function TaskCommentSection({
           <div className="space-y-6 px-4">
             {[1, 2].map((i) => (
               <div key={i} className="animate-pulse flex gap-6">
-                <div className="h-12 w-12 rounded-2xl bg-white/5 shadow-inner" />
+                <div className="h-12 w-12 rounded-lg bg-white/5 shadow-inner" />
                 <div className="flex-1 space-y-4">
                   <div className="h-4 w-32 rounded-lg bg-white/5" />
                   <div className="h-4 w-full rounded-lg bg-white/5" />
@@ -176,7 +176,7 @@ export function TaskCommentSection({
               <button
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
-                className="w-full py-6 rounded-[2rem] border border-white/5 bg-white/[0.01] text-[10px] font-black uppercase tracking-[0.5em] text-white/20 hover:text-white hover:bg-white/[0.03] hover:border-white/10 transition-all disabled:opacity-30 shadow-inner group"
+                className="w-full py-6 rounded-xl border border-white/5 bg-white/[0.01] text-[10px] font-black uppercase tracking-[0.5em] text-white/20 hover:text-white hover:bg-white/[0.03] hover:border-white/10 transition-all disabled:opacity-30 shadow-inner group"
               >
                 {isFetchingNextPage ? (
                   'FETCHING_MORE_SIGNALS...'
@@ -213,7 +213,7 @@ export function TaskCommentSection({
             <button
               type="submit"
               disabled={!newComment.trim() || createComment.isPending}
-              className="flex items-center gap-4 rounded-2xl bg-white text-slate-950 px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.3em] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 shadow-luxe group/btn"
+              className="flex items-center gap-4 rounded-lg bg-white text-slate-950 px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.3em] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 shadow-luxe group/btn"
             >
               {createComment.isPending ? 'ENCRYPTING...' : 'TRANSMIT'}
               <Send
@@ -256,9 +256,9 @@ export function TaskCommentSection({
             {history.map((event: TaskHistoryItemDTO) => (
               <div
                 key={event.id}
-                className="group relative flex items-center gap-6 rounded-[2rem] border border-white/5 bg-white/[0.01] px-8 py-5 hover:bg-white/[0.03] hover:border-white/10 transition-all shadow-inner"
+                className="group relative flex items-center gap-6 rounded-xl border border-white/5 bg-white/[0.01] px-8 py-5 hover:bg-white/[0.03] hover:border-white/10 transition-all shadow-inner"
               >
-                <div className="p-3.5 bg-slate-950 rounded-2xl border border-white/10 group-hover:border-indigo-500/40 transition-all shadow-luxe">
+                <div className="p-3.5 bg-slate-950 rounded-lg border border-white/10 group-hover:border-indigo-500/40 transition-all shadow-luxe">
                   <Terminal size={14} className="text-indigo-400" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -412,7 +412,7 @@ function CommentItem({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
               <div
-                className={`w-12 h-12 rounded-2xl flex items-center justify-center text-[10px] font-black border transition-all shadow-inner ${isOwn ? 'bg-brand-500 border-brand-500 text-slate-950 rotate-3' : 'bg-slate-900 border-white/5 text-brand-400'}`}
+                className={`w-12 h-12 rounded-lg flex items-center justify-center text-[10px] font-black border transition-all shadow-inner ${isOwn ? 'bg-brand-500 border-brand-500 text-slate-950 rotate-3' : 'bg-slate-900 border-white/5 text-brand-400'}`}
               >
                 {isOwn ? 'OP' : comment.authorName?.substring(0, 2).toUpperCase()}
               </div>

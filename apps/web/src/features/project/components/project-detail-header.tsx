@@ -136,7 +136,7 @@ export function ProjectDetailHeader({
 
                 <Link
                   href={`/jira/projects/${project.id}/settings/workflow`}
-                  className="p-4 bg-white/5 rounded-2xl text-white/20 hover:text-brand-400 hover:bg-white/10 transition-all hover:rotate-180 border border-white/10 shadow-inner group/settings"
+                  className="p-4 bg-white/5 rounded-lg text-white/20 hover:text-brand-400 hover:bg-white/10 transition-all hover:rotate-180 border border-white/10 shadow-inner group/settings"
                   title="Logic Architect"
                 >
                   <Settings2 size={20} className="group-hover:scale-110 transition-transform" />
@@ -147,7 +147,7 @@ export function ProjectDetailHeader({
                   <span className="text-[10px] font-black uppercase tracking-[0.3em]">
                     MISSION_HEALTH: NOMINAL
                   </span>
-                  <div className="absolute top-16 left-0 w-80 p-6 bg-slate-950/90 border border-white/10 rounded-[2rem] shadow-luxe opacity-0 group-hover/intel:opacity-100 translate-y-3 group-hover/intel:translate-y-0 transition-all pointer-events-none z-50 backdrop-blur-3xl">
+                  <div className="absolute top-16 left-0 w-80 p-6 bg-slate-950/90 border border-white/10 rounded-xl shadow-luxe opacity-0 group-hover/intel:opacity-100 translate-y-3 group-hover/intel:translate-y-0 transition-all pointer-events-none z-50 backdrop-blur-3xl">
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
                         Neural Synopsis
@@ -172,7 +172,7 @@ export function ProjectDetailHeader({
                 {visibleMemberAvatars.map((member) => (
                   <div
                     key={member.id}
-                    className="group/avatar relative inline-flex h-14 w-14 items-center justify-center rounded-2xl border-4 border-slate-950 bg-slate-900 text-[11px] font-black text-white transition-all hover:z-20 hover:scale-110 hover:-translate-y-1 active:scale-95 shadow-luxe"
+                    className="group/avatar relative inline-flex h-14 w-14 items-center justify-center rounded-lg border-4 border-slate-950 bg-slate-900 text-[11px] font-black text-white transition-all hover:z-20 hover:scale-110 hover:-translate-y-1 active:scale-95 shadow-luxe"
                     title={member.fullName}
                   >
                     <div className="absolute inset-x-0 top-0 h-px bg-white/20 rounded-t-2xl" />
@@ -181,7 +181,7 @@ export function ProjectDetailHeader({
                   </div>
                 ))}
                 {project.members.length > 5 && (
-                  <div className="relative inline-flex h-14 w-14 items-center justify-center rounded-2xl border-4 border-slate-950 bg-brand-500 text-[11px] font-black text-white shadow-luxe">
+                  <div className="relative inline-flex h-14 w-14 items-center justify-center rounded-lg border-4 border-slate-950 bg-brand-500 text-[11px] font-black text-white shadow-luxe">
                     <div className="absolute inset-x-0 top-0 h-px bg-white/40 rounded-t-2xl" />+
                     {project.members.length - 5}
                   </div>
@@ -256,7 +256,7 @@ export function ProjectDetailHeader({
 
               <div className="h-10 w-px bg-white/5 mx-2" />
 
-              <div className="flex items-center gap-2 p-1.5 bg-slate-950/80 rounded-[2rem] border border-white/5 shadow-inner">
+              <div className="flex items-center gap-2 p-1.5 bg-slate-950/80 rounded-xl border border-white/5 shadow-inner">
                 {navItems.map((v) => (
                   <button
                     key={v.id}
@@ -296,7 +296,7 @@ export function ProjectDetailHeader({
                 <button
                   type="button"
                   onClick={() => setShowAutomationPanel(true)}
-                  className="w-12 h-12 flex items-center justify-center rounded-2xl transition-all border bg-white/5 text-white/10 border-white/5 hover:text-white hover:bg-white/10 hover:shadow-inner"
+                  className="w-12 h-12 flex items-center justify-center rounded-lg transition-all border bg-white/5 text-white/10 border-white/5 hover:text-white hover:bg-white/10 hover:shadow-inner"
                   title="Automation Matrix"
                 >
                   <Zap size={20} />
@@ -305,7 +305,7 @@ export function ProjectDetailHeader({
                 <button
                   type="button"
                   onClick={() => setShowKnowledgeMap(true)}
-                  className="w-12 h-12 flex items-center justify-center rounded-2xl transition-all border bg-brand-500/5 text-brand-500/40 border-brand-500/10 hover:text-brand-400 hover:bg-brand-500/10 hover:border-brand-500/20 shadow-glow-brand/10"
+                  className="w-12 h-12 flex items-center justify-center rounded-lg transition-all border bg-brand-500/5 text-brand-500/40 border-brand-500/10 hover:text-brand-400 hover:bg-brand-500/10 hover:border-brand-500/20 shadow-glow-brand/10"
                   title="Neural Knowledge Map"
                 >
                   <Activity size={20} />
@@ -314,7 +314,7 @@ export function ProjectDetailHeader({
                 <button
                   type="button"
                   onClick={onCopyFilterLink}
-                  className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all border ${
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg transition-all border ${
                     isCopyLinkSuccess
                       ? 'bg-emerald-500/20 text-emerald-500 border-emerald-500/40 shadow-glow-emerald/20'
                       : 'bg-white/5 text-white/10 border-white/5 hover:text-white hover:bg-white/10'

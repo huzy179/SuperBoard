@@ -57,7 +57,7 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
     <div className="space-y-12 py-10">
       <div className="flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-brand-500/10 rounded-2xl border border-brand-500/20 shadow-glow-brand/10">
+          <div className="p-3 bg-brand-500/10 rounded-lg border border-brand-500/20 shadow-glow-brand/10">
             <Layers className="h-5 w-5 text-brand-400" />
           </div>
           <div className="space-y-1">
@@ -112,7 +112,7 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
 
               <div className="space-y-6 mb-10">
                 <div className="flex items-center gap-6">
-                  <div className="flex-1 p-5 bg-white/5 rounded-2xl border border-white/5 space-y-2">
+                  <div className="flex-1 p-5 bg-white/5 rounded-lg border border-white/5 space-y-2">
                     <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">
                       Nguồn
                     </span>
@@ -121,7 +121,7 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
                     </p>
                   </div>
                   <ArrowRight className="text-white/20" />
-                  <div className="flex-1 p-5 bg-brand-500/5 rounded-2xl border border-brand-500/10 space-y-2">
+                  <div className="flex-1 p-5 bg-brand-500/5 rounded-lg border border-brand-500/10 space-y-2">
                     <span className="text-[8px] font-black text-brand-400/40 uppercase tracking-widest">
                       Đích
                     </span>
@@ -146,7 +146,7 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
                   <button
                     onClick={() => handleApprove(proposal.id)}
                     disabled={!!isApproving}
-                    className="w-full flex items-center justify-center gap-3 px-8 py-5 bg-brand-500 rounded-2xl text-[10px] font-black text-white uppercase tracking-[0.3em] shadow-glow-brand hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+                    className="w-full flex items-center justify-center gap-3 px-8 py-5 bg-brand-500 rounded-lg text-[10px] font-black text-white uppercase tracking-[0.3em] shadow-glow-brand hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
                   >
                     {isApproving === proposal.id ? (
                       <div className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -182,7 +182,7 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
 function ConsoleSkeleton() {
   return (
     <div className="space-y-12 py-10 px-6 animate-pulse">
-      <div className="h-12 w-64 bg-white/5 rounded-2xl" />
+      <div className="h-12 w-64 bg-white/5 rounded-lg" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="h-96 bg-white/5 rounded-[3.5rem]" />
         <div className="h-96 bg-white/5 rounded-[3.5rem]" />

@@ -83,7 +83,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
         {/* Header */}
         <div className="px-10 py-8 flex items-center justify-between border-b border-white/5">
           <div className="flex items-center gap-5">
-            <div className="p-3.5 bg-brand-500/10 rounded-2xl border border-brand-500/20 shadow-glow-brand/5 group">
+            <div className="p-3.5 bg-brand-500/10 rounded-lg border border-brand-500/20 shadow-glow-brand/5 group">
               <Sparkles
                 size={24}
                 className="text-brand-400 group-hover:scale-110 transition-transform"
@@ -103,7 +103,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
           </div>
           <button
             onClick={onClose}
-            className="p-3 hover:bg-white/5 rounded-2xl transition-all text-white/20 hover:text-white"
+            className="p-3 hover:bg-white/5 rounded-lg transition-all text-white/20 hover:text-white"
           >
             <X size={20} />
           </button>
@@ -130,7 +130,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="MÔ TẢ QUY TẮC BẠN MUỐN..."
-                className="relative w-full px-8 py-8 bg-white/[0.02] border border-white/5 rounded-[2rem] focus:bg-white/[0.04] focus:border-brand-500/30 outline-none transition-all font-black text-lg text-white min-h-[160px] resize-none placeholder:text-white/5 tracking-tight"
+                className="relative w-full px-8 py-8 bg-white/[0.02] border border-white/5 rounded-xl focus:bg-white/[0.04] focus:border-brand-500/30 outline-none transition-all font-black text-lg text-white min-h-[160px] resize-none placeholder:text-white/5 tracking-tight"
               />
 
               <div className="absolute bottom-6 right-6 flex items-center gap-4">
@@ -173,7 +173,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
                   {/* Trigger Node */}
                   <div className="p-8 rounded-[2.5rem] bg-slate-900/40 border border-brand-500/20 shadow-glow-brand/5 group/node hover:bg-slate-900/60 transition-all">
                     <div className="flex flex-col items-center text-center gap-5">
-                      <div className="p-4 bg-brand-500/10 rounded-2xl border border-brand-500/30 text-brand-400 group-hover/node:scale-110 transition-transform">
+                      <div className="p-4 bg-brand-500/10 rounded-lg border border-brand-500/30 text-brand-400 group-hover/node:scale-110 transition-transform">
                         <Cpu size={24} />
                       </div>
                       <div className="space-y-1">
@@ -205,7 +205,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
                   {/* Action Node */}
                   <div className="p-8 rounded-[2.5rem] bg-slate-900/40 border border-indigo-500/20 shadow-glow-indigo/5 group/node hover:bg-slate-900/60 transition-all">
                     <div className="flex flex-col items-center text-center gap-5">
-                      <div className="p-4 bg-indigo-500/10 rounded-2xl border border-indigo-500/30 text-indigo-400 group-hover/node:scale-110 transition-transform">
+                      <div className="p-4 bg-indigo-500/10 rounded-lg border border-indigo-500/30 text-indigo-400 group-hover/node:scale-110 transition-transform">
                         <Box size={24} />
                       </div>
                       <div className="space-y-1">
@@ -249,7 +249,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
                       sự kiện {generatedRule.trigger.type} trong cụm thực thi chính.
                     </p>
                   </div>
-                  <div className="bg-black/40 rounded-2xl p-6 border border-white/5 font-mono group-hover:border-brand-500/20 transition-colors">
+                  <div className="bg-black/40 rounded-lg p-6 border border-white/5 font-mono group-hover:border-brand-500/20 transition-colors">
                     <div className="flex items-center gap-4 mb-4 opacity-20">
                       <div className="h-2 w-2 rounded-full bg-rose-500" />
                       <div className="h-2 w-2 rounded-full bg-amber-500" />
@@ -291,7 +291,7 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
             <button
               onClick={handleSave}
               disabled={!generatedRule || saveMutation.isPending}
-              className={`px-10 py-5 rounded-2xl font-black shadow-2xl transition-all duration-300 active:scale-95 flex items-center gap-3 uppercase text-[11px] tracking-[0.2em] relative overflow-hidden group/btn ${
+              className={`px-10 py-5 rounded-lg font-black shadow-2xl transition-all duration-300 active:scale-95 flex items-center gap-3 uppercase text-[11px] tracking-[0.2em] relative overflow-hidden group/btn ${
                 generatedRule && !saveMutation.isPending
                   ? 'bg-brand-500 text-white shadow-glow-brand/20 hover:bg-brand-400'
                   : 'bg-white/5 text-white/10'

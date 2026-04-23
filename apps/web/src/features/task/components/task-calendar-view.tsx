@@ -302,7 +302,7 @@ export function TaskCalendarView({
         <button
           type="button"
           onClick={onPrevMonth}
-          className="flex items-center gap-4 rounded-2xl border border-white/5 bg-white/[0.02] px-6 py-3.5 text-[11px] font-black uppercase tracking-[0.4em] text-white/30 hover:bg-white/10 hover:text-white transition-all active:scale-95 italic"
+          className="flex items-center gap-4 rounded-lg border border-white/5 bg-white/[0.02] px-6 py-3.5 text-[11px] font-black uppercase tracking-[0.4em] text-white/30 hover:bg-white/10 hover:text-white transition-all active:scale-95 italic"
         >
           <ChevronLeft size={16} />
           <span className="hidden sm:inline">PAST_CYCLE</span>
@@ -316,7 +316,7 @@ export function TaskCalendarView({
               {calendarMonthLabel}
             </p>
           </div>
-          <div className="flex rounded-2xl border border-white/5 bg-slate-950/40 p-1.5 backdrop-blur-xl">
+          <div className="flex rounded-lg border border-white/5 bg-slate-950/40 p-1.5 backdrop-blur-xl">
             <button
               type="button"
               onClick={() => setViewMode('month')}
@@ -345,7 +345,7 @@ export function TaskCalendarView({
         <button
           type="button"
           onClick={onNextMonth}
-          className="flex items-center gap-4 rounded-2xl border border-white/5 bg-white/[0.02] px-6 py-3.5 text-[11px] font-black uppercase tracking-[0.4em] text-white/30 hover:bg-white/10 hover:text-white transition-all active:scale-95 italic"
+          className="flex items-center gap-4 rounded-lg border border-white/5 bg-white/[0.02] px-6 py-3.5 text-[11px] font-black uppercase tracking-[0.4em] text-white/30 hover:bg-white/10 hover:text-white transition-all active:scale-95 italic"
         >
           <span className="hidden sm:inline">FUTURE_CYCLE</span>
           <ChevronRight size={16} />
@@ -396,7 +396,7 @@ export function TaskCalendarView({
                     <motion.div
                       initial={{ scale: 1, rotate: 0 }}
                       animate={{ scale: 1.1, rotate: 3 }}
-                      className="w-full cursor-grabbing rounded-[2rem] border border-brand-500 bg-brand-500/10 px-6 py-5 shadow-glow-brand/30 backdrop-blur-3xl overflow-hidden"
+                      className="w-full cursor-grabbing rounded-xl border border-brand-500 bg-brand-500/10 px-6 py-5 shadow-glow-brand/30 backdrop-blur-3xl overflow-hidden"
                     >
                       <div className="absolute inset-0 bg-brand-500/5 animate-pulse" />
                       <div className="flex items-center gap-4 relative z-10">
@@ -425,7 +425,7 @@ export function TaskCalendarView({
         >
           <div className="absolute inset-0 bg-brand-500/[0.01] opacity-0 group-hover/unscheduled:opacity-100 transition-opacity pointer-events-none" />
           <div className="flex items-center gap-6 mb-8">
-            <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-white/5 shadow-inner">
+            <div className="w-12 h-12 rounded-lg bg-white/[0.03] flex items-center justify-center border border-white/5 shadow-inner">
               <CalendarIcon size={18} className="text-white/20" />
             </div>
             <div className="flex flex-col gap-1">
@@ -447,7 +447,7 @@ export function TaskCalendarView({
                   key={task.id}
                   type="button"
                   onClick={() => onOpenEdit(task)}
-                  className="flex items-center gap-4 rounded-2xl border border-white/5 bg-white/[0.03] px-6 py-4 transition-all hover:bg-white/10 hover:border-brand-500/30 hover:scale-105 active:scale-95 group/packet"
+                  className="flex items-center gap-4 rounded-lg border border-white/5 bg-white/[0.03] px-6 py-4 transition-all hover:bg-white/10 hover:border-brand-500/30 hover:scale-105 active:scale-95 group/packet"
                 >
                   <div
                     className={`${colorClass} opacity-30 group-hover/packet:opacity-100 transition-opacity`}

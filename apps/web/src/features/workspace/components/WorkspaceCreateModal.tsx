@@ -77,7 +77,7 @@ export function WorkspaceCreateModal({ onClose, onSuccess }: WorkspaceCreateModa
               <label htmlFor="ws-slug-input" className="form-label">
                 Đường dẫn (Slug — Tuỳ chọn)
               </label>
-              <div className="flex items-center rounded-2xl border border-white/8 bg-white/[0.03] overflow-hidden focus-within:border-brand-500/40 transition-all shadow-inner">
+              <div className="flex items-center rounded-lg border border-white/8 bg-white/[0.03] overflow-hidden focus-within:border-brand-500/40 transition-all shadow-inner">
                 <span className="px-4 text-white/20 text-sm font-mono select-none border-r border-white/8">
                   /
                 </span>

@@ -137,7 +137,7 @@ export function TaskListView({
                 </td>
                 <td className="px-8 py-6">
                   <div className="flex items-center gap-6">
-                    <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-white/5 shadow-inner transition-all duration-700 group-hover:scale-110 group-hover:shadow-glow-brand/10">
+                    <div className="w-12 h-12 rounded-lg bg-white/[0.03] flex items-center justify-center border border-white/5 shadow-inner transition-all duration-700 group-hover:scale-110 group-hover:shadow-glow-brand/10">
                       <TaskTypeIcon type={task.type ?? 'task'} />
                     </div>
                     <div className="space-y-1.5">
@@ -170,7 +170,7 @@ export function TaskListView({
                           event.target.value as unknown as ProjectTaskItemDTO['status'],
                         );
                       }}
-                      className="appearance-none rounded-2xl border border-white/5 bg-white/[0.02] pl-6 pr-12 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-white/40 focus:bg-white/[0.05] focus:text-white outline-none transition-all cursor-pointer shadow-inner italic"
+                      className="appearance-none rounded-lg border border-white/5 bg-white/[0.02] pl-6 pr-12 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-white/40 focus:bg-white/[0.05] focus:text-white outline-none transition-all cursor-pointer shadow-inner italic"
                     >
                       {getStatusOptionsForTask(task.status).map((opt) => (
                         <option key={opt.key} value={opt.key} className="bg-slate-950 italic">

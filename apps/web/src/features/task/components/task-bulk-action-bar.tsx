@@ -75,7 +75,7 @@ export function TaskBulkActionBar(props: TaskBulkActionBarProps) {
           <div className="flex items-center gap-6 pl-6 pr-8 border-r border-white/5 h-12">
             <div className="relative">
               <div className="absolute inset-0 bg-brand-500 blur-lg opacity-40 animate-pulse" />
-              <div className="relative w-10 h-10 bg-brand-500 rounded-2xl flex items-center justify-center text-xs font-black text-white shadow-glow-brand/20">
+              <div className="relative w-10 h-10 bg-brand-500 rounded-lg flex items-center justify-center text-xs font-black text-white shadow-glow-brand/20">
                 {selectedCount}
               </div>
             </div>
@@ -89,7 +89,7 @@ export function TaskBulkActionBar(props: TaskBulkActionBarProps) {
             </div>
             <button
               onClick={onClearSelection}
-              className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white/5 text-white/20 hover:text-rose-400 hover:bg-rose-500/10 transition-all active:scale-95 group/clear"
+              className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 text-white/20 hover:text-rose-400 hover:bg-rose-500/10 transition-all active:scale-95 group/clear"
               title="Clear Selection"
             >
               <X size={16} className="group-hover/clear:rotate-90 transition-transform" />
@@ -194,7 +194,7 @@ export function TaskBulkActionBar(props: TaskBulkActionBarProps) {
                             onApplyPriority();
                             setActiveMenu(null);
                           }}
-                          className={`w-full flex items-center justify-between px-6 py-4 text-left rounded-2xl transition-all duration-300 group/item ${
+                          className={`w-full flex items-center justify-between px-6 py-4 text-left rounded-lg transition-all duration-300 group/item ${
                             bulkPriority === p.key
                               ? 'text-indigo-400 bg-indigo-500/10 border border-indigo-500/10'
                               : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'
@@ -249,7 +249,7 @@ export function TaskBulkActionBar(props: TaskBulkActionBarProps) {
                           onApplyAssignee();
                           setActiveMenu(null);
                         }}
-                        className="w-full px-6 py-4 text-left text-[11px] font-black uppercase tracking-[0.2em] text-rose-400 bg-rose-500/5 hover:bg-rose-500/10 rounded-2xl transition-all mb-2 border border-rose-500/10 italic"
+                        className="w-full px-6 py-4 text-left text-[11px] font-black uppercase tracking-[0.2em] text-rose-400 bg-rose-500/5 hover:bg-rose-500/10 rounded-lg transition-all mb-2 border border-rose-500/10 italic"
                       >
                         DE-SYNC ALL_UNITS
                       </button>
@@ -262,7 +262,7 @@ export function TaskBulkActionBar(props: TaskBulkActionBarProps) {
                               onApplyAssignee();
                               setActiveMenu(null);
                             }}
-                            className={`w-full flex items-center gap-5 px-6 py-4 text-left rounded-2xl transition-all duration-300 group/item ${
+                            className={`w-full flex items-center gap-5 px-6 py-4 text-left rounded-lg transition-all duration-300 group/item ${
                               bulkAssigneeId === m.id
                                 ? 'text-brand-400 bg-brand-500/10 border border-brand-500/10'
                                 : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'

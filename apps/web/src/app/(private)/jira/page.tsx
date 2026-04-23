@@ -91,7 +91,7 @@ export default function JiraHomePage() {
           <button
             type="button"
             onClick={() => setShowCreatePanel((value) => !value)}
-            className="group relative flex items-center gap-3 bg-white px-8 py-4 rounded-[2rem] text-slate-950 font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-luxe overflow-hidden"
+            className="group relative flex items-center gap-3 bg-white px-8 py-4 rounded-xl text-slate-950 font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-luxe overflow-hidden"
           >
             <div className="absolute inset-0 bg-brand-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
             <span className="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors">
@@ -218,7 +218,7 @@ export default function JiraHomePage() {
         {(editError || archiveError) && (
           <div
             role="alert"
-            className="p-6 rounded-[2rem] border border-rose-500/20 bg-rose-500/5 backdrop-blur-3xl animate-in shake duration-500"
+            className="p-6 rounded-xl border border-rose-500/20 bg-rose-500/5 backdrop-blur-3xl animate-in shake duration-500"
           >
             <div className="flex items-center gap-4 text-rose-400">
               <Zap size={20} />

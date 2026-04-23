@@ -111,7 +111,7 @@ export function InviteMemberModal({ workspaceId, onClose }: InviteMemberModalPro
                       key={id}
                       type="button"
                       onClick={() => setRole(id)}
-                      className={`flex flex-col items-center justify-center gap-2 h-20 rounded-2xl border-2 transition-all font-bold text-xs ${
+                      className={`flex flex-col items-center justify-center gap-2 h-20 rounded-lg border-2 transition-all font-bold text-xs ${
                         role === id
                           ? 'border-brand-500/50 bg-brand-500/10 text-brand-400'
                           : 'border-white/8 bg-white/[0.02] text-white/30 hover:border-white/20 hover:text-white/60'
@@ -165,7 +165,7 @@ export function InviteMemberModal({ workspaceId, onClose }: InviteMemberModalPro
               </div>
 
               {/* Note */}
-              <div className="flex gap-3 rounded-2xl bg-amber-500/8 border border-amber-500/20 p-4 text-[11px] font-medium text-amber-400 leading-relaxed">
+              <div className="flex gap-3 rounded-lg bg-amber-500/8 border border-amber-500/20 p-4 text-[11px] font-medium text-amber-400 leading-relaxed">
                 <Info size={15} className="shrink-0 mt-0.5" />
                 <p>
                   <b>Lưu ý:</b> Hệ thống chưa tích hợp Mail Server tự động. Hãy copy liên kết trên

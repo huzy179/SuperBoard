@@ -129,7 +129,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
           {(isAnswering || answer) && (
             <div className="px-6 pb-6">
               <div
-                className={`p-8 rounded-[2rem] border transition-all duration-700 ${
+                className={`p-8 rounded-xl border transition-all duration-700 ${
                   isAnswering
                     ? 'bg-brand-500/5 border-brand-500/10 animate-pulse'
                     : 'bg-brand-500/5 border-brand-500/20 shadow-glow-brand'
@@ -179,7 +179,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
 
           {query.length < 2 ? (
             <div className="px-4 py-20 text-center flex flex-col items-center gap-4">
-              <div className="h-20 w-20 bg-slate-50 rounded-[2rem] flex items-center justify-center text-4xl opacity-50 shadow-inner">
+              <div className="h-20 w-20 bg-slate-50 rounded-xl flex items-center justify-center text-4xl opacity-50 shadow-inner">
                 🔍
               </div>
               <p className="text-xs font-black text-slate-400 uppercase tracking-[0.4em]">
@@ -238,7 +238,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
             !isAnswering &&
             !answer && (
               <div className="px-4 py-20 text-center flex flex-col items-center gap-4">
-                <div className="h-20 w-20 bg-slate-50 rounded-[2rem] flex items-center justify-center text-4xl opacity-50 shadow-inner grayscale">
+                <div className="h-20 w-20 bg-slate-50 rounded-xl flex items-center justify-center text-4xl opacity-50 shadow-inner grayscale">
                   👻
                 </div>
                 <p className="text-xs font-black text-slate-400 uppercase tracking-[0.4em]">

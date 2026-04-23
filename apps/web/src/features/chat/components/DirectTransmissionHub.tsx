@@ -79,7 +79,7 @@ export function DirectTransmissionHub({ channelName, onClose }: DirectTransmissi
               <div className="relative">
                 <div className="h-32 w-32 rounded-full border border-brand-500/20 animate-ping absolute inset-0" />
                 <div className="h-32 w-32 rounded-full border border-brand-500/40 animate-ping absolute inset-0 [animation-delay:0.5s]" />
-                <div className="h-32 w-32 rounded-[2rem] bg-gradient-to-br from-brand-600 to-brand-400 flex items-center justify-center text-3xl font-black text-white shadow-glow-brand/20 relative z-10">
+                <div className="h-32 w-32 rounded-xl bg-gradient-to-br from-brand-600 to-brand-400 flex items-center justify-center text-3xl font-black text-white shadow-glow-brand/20 relative z-10">
                   JD
                 </div>
               </div>
@@ -97,9 +97,9 @@ export function DirectTransmissionHub({ channelName, onClose }: DirectTransmissi
             {[1, 2].map((i) => (
               <div
                 key={i}
-                className="flex-1 rounded-3xl bg-white/[0.02] border border-white/5 relative flex items-center justify-center group overflow-hidden"
+                className="flex-1 rounded-xl bg-white/[0.02] border border-white/5 relative flex items-center justify-center group overflow-hidden"
               >
-                <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center text-[10px] font-black text-white/20 uppercase group-hover:bg-brand-500/10 group-hover:text-brand-400 transition-all">
+                <div className="h-12 w-12 rounded-lg bg-white/5 flex items-center justify-center text-[10px] font-black text-white/20 uppercase group-hover:bg-brand-500/10 group-hover:text-brand-400 transition-all">
                   NODE_{i}
                 </div>
                 <div className="absolute top-3 right-3 h-1.5 w-1.5 rounded-full bg-white/10" />

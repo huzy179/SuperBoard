@@ -63,14 +63,14 @@ export default function AcceptInvitePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
         <div className="max-w-md w-full premium-card p-12 text-center space-y-6">
-          <div className="w-20 h-20 bg-rose-50 text-rose-500 rounded-3xl flex items-center justify-center mx-auto">
+          <div className="w-20 h-20 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center mx-auto">
             <AlertCircle size={40} />
           </div>
           <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Rất tiếc!</h1>
           <p className="text-slate-500 font-medium">{error}</p>
           <button
             onClick={() => router.push('/')}
-            className="w-full px-8 py-4 bg-slate-900 text-white rounded-2xl font-black hover:bg-black transition-all active:scale-95"
+            className="w-full px-8 py-4 bg-slate-900 text-white rounded-lg font-black hover:bg-black transition-all active:scale-95"
           >
             Quay về trang chủ
           </button>
@@ -102,8 +102,8 @@ export default function AcceptInvitePage() {
             </p>
           </div>
 
-          <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 flex items-center gap-4 text-left">
-            <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-2xl border border-slate-100">
+          <div className="p-6 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-4 text-left">
+            <div className="w-12 h-12 bg-white rounded-lg shadow-sm flex items-center justify-center text-2xl border border-slate-100">
               🏢
             </div>
             <div>
@@ -118,7 +118,7 @@ export default function AcceptInvitePage() {
             <button
               onClick={handleJoin}
               disabled={isJoining}
-              className="w-full px-8 py-5 bg-slate-900 hover:bg-black text-white rounded-2xl font-black shadow-2xl shadow-slate-900/30 active:scale-95 transition-all flex items-center justify-center gap-3 uppercase tracking-tight group"
+              className="w-full px-8 py-5 bg-slate-900 hover:bg-black text-white rounded-lg font-black shadow-2xl shadow-slate-900/30 active:scale-95 transition-all flex items-center justify-center gap-3 uppercase tracking-tight group"
             >
               {isJoining ? (
                 <Loader2 className="animate-spin" size={20} />

@@ -102,7 +102,7 @@ export function VectorAtlas() {
 
         {/* Atlas Legend / UI Overlay */}
         <div className="absolute bottom-8 left-8 right-8 flex items-center justify-between pointer-events-none">
-          <div className="flex items-center gap-6 px-6 py-3 bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl pointer-events-auto">
+          <div className="flex items-center gap-6 px-6 py-3 bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-lg pointer-events-auto">
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-brand-500 shadow-glow-brand" />
               <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">
@@ -116,9 +116,9 @@ export function VectorAtlas() {
             </div>
           </div>
 
-          <div className="p-4 bg-brand-500 rounded-2xl shadow-glow-brand pointer-events-auto cursor-help group relative">
+          <div className="p-4 bg-brand-500 rounded-lg shadow-glow-brand pointer-events-auto cursor-help group relative">
             <BrainCircuit className="h-5 w-5 text-white" />
-            <div className="absolute bottom-full right-0 mb-4 w-64 p-4 bg-slate-900 border border-white/10 rounded-2xl opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all pointer-events-none backdrop-blur-3xl shadow-2xl">
+            <div className="absolute bottom-full right-0 mb-4 w-64 p-4 bg-slate-900 border border-white/10 rounded-lg opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all pointer-events-none backdrop-blur-3xl shadow-2xl">
               <p className="text-[10px] font-bold text-white/60 leading-relaxed uppercase tracking-widest">
                 Orbital nodes represent missions and protocols. Convergent paths indicate high
                 semantic similarity and shared conceptual DNA.
@@ -154,7 +154,7 @@ export function VectorAtlas() {
             {diagnosis?.recommendations?.map((rec: string, i: number) => (
               <div
                 key={i}
-                className="flex items-start gap-4 p-4 bg-white/[0.02] border border-white/5 rounded-2xl group hover:border-brand-500/20 transition-all"
+                className="flex items-start gap-4 p-4 bg-white/[0.02] border border-white/5 rounded-lg group hover:border-brand-500/20 transition-all"
               >
                 <div className="p-2 bg-brand-500/10 rounded-lg text-brand-400 group-hover:scale-110 transition-transform">
                   <Zap className="h-3 w-3" />
@@ -187,14 +187,14 @@ export function VectorAtlas() {
                   </h3>
                 </div>
                 <div
-                  className={`p-3 rounded-2xl ${selectedNode.type === 'doc' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-brand-500/10 text-brand-400 border-brand-500/20'} border`}
+                  className={`p-3 rounded-lg ${selectedNode.type === 'doc' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-brand-500/10 text-brand-400 border-brand-500/20'} border`}
                 >
                   {selectedNode.type === 'doc' ? <Layers size={18} /> : <Database size={18} />}
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4 pt-4">
-                <div className="p-4 bg-white/[0.03] border border-white/5 rounded-2xl">
+                <div className="p-4 bg-white/[0.03] border border-white/5 rounded-lg">
                   <span className="block text-[8px] font-black text-white/20 uppercase tracking-widest mb-1">
                     Sector
                   </span>
@@ -202,7 +202,7 @@ export function VectorAtlas() {
                     {selectedNode.projectName}
                   </span>
                 </div>
-                <div className="p-4 bg-white/[0.03] border border-white/5 rounded-2xl">
+                <div className="p-4 bg-white/[0.03] border border-white/5 rounded-lg">
                   <span className="block text-[8px] font-black text-white/20 uppercase tracking-widest mb-1">
                     Density
                   </span>
@@ -212,7 +212,7 @@ export function VectorAtlas() {
                 </div>
               </div>
 
-              <button className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black text-white uppercase tracking-[0.4em] hover:bg-white/10 transition-all flex items-center justify-center gap-2 group">
+              <button className="w-full py-4 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black text-white uppercase tracking-[0.4em] hover:bg-white/10 transition-all flex items-center justify-center gap-2 group">
                 Enter Node Stream
                 <ChevronRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
               </button>

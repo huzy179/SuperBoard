@@ -177,7 +177,7 @@ export default function DashboardPage() {
           <div className="h-10 w-px bg-white/10 hidden md:block" />
           <button
             onClick={() => window.location.reload()}
-            className="p-3 bg-white/[0.03] border border-white/10 rounded-2xl text-white/40 hover:text-white hover:border-white/20 hover:bg-white/[0.05] transition-all group"
+            className="p-3 bg-white/[0.03] border border-white/10 rounded-lg text-white/40 hover:text-white hover:border-white/20 hover:bg-white/[0.05] transition-all group"
           >
             <RefreshCcw className="h-5 w-5 group-hover:rotate-180 transition-transform duration-700" />
           </button>

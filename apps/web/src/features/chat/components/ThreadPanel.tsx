@@ -49,7 +49,7 @@ export function ThreadPanel({ parentMessage, onClose }: ThreadPanelProps) {
 
       <div className="flex-1 overflow-y-auto px-6 py-8 space-y-10 scrollbar-none relative">
         {/* Parent Context Node */}
-        <div className="p-6 rounded-[2rem] bg-white/[0.03] border border-white/5 relative group/parent">
+        <div className="p-6 rounded-xl bg-white/[0.03] border border-white/5 relative group/parent">
           <div className="flex gap-4">
             <div className="relative shrink-0">
               <AssigneeAvatar
@@ -100,7 +100,7 @@ export function ThreadPanel({ parentMessage, onClose }: ThreadPanelProps) {
 
           {/* AI Synthesis Node */}
           {summary && (
-            <div className="mt-6 p-5 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl animate-in zoom-in-95 duration-500 relative overflow-hidden">
+            <div className="mt-6 p-5 bg-emerald-500/5 border border-emerald-500/20 rounded-lg animate-in zoom-in-95 duration-500 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/10 blur-2xl rounded-full" />
               <div className="flex items-center gap-2 mb-3">
                 <ShieldCheck size={12} className="text-emerald-400" />
@@ -126,7 +126,7 @@ export function ThreadPanel({ parentMessage, onClose }: ThreadPanelProps) {
             {replies?.map((reply) => (
               <div key={reply.id} className="relative animate-in slide-in-from-left-4 duration-500">
                 <div className="absolute -left-[23px] top-4 w-5 h-px bg-white/10" />
-                <div className="flex gap-4 p-4 rounded-2xl hover:bg-white/[0.02] transition-all">
+                <div className="flex gap-4 p-4 rounded-lg hover:bg-white/[0.02] transition-all">
                   <div className="relative shrink-0">
                     <AssigneeAvatar
                       name={reply.author?.fullName || ''}

@@ -20,7 +20,7 @@ export function EmojiReactionPicker({ onSelect, isOpen, onClose }: EmojiReaction
             initial={{ opacity: 0, scale: 0.9, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 10 }}
-            className="absolute bottom-full mb-2 right-0 z-50 p-2 bg-slate-900/95 border border-white/10 rounded-2xl shadow-2xl backdrop-blur-xl flex gap-1"
+            className="absolute bottom-full mb-2 right-0 z-50 p-2 bg-slate-900/95 border border-white/10 rounded-lg shadow-2xl backdrop-blur-xl flex gap-1"
           >
             {EMOJIS.map((emoji) => (
               <button

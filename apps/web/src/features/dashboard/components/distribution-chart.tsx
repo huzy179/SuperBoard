@@ -25,7 +25,7 @@ export function DonutDistributionChart({
 
   if (items.length === 0 || total === 0) {
     return (
-      <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-[2rem] opacity-20">
+      <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-xl opacity-20">
         <Cpu size={32} className="mb-4" />
         <p className="text-[10px] font-black uppercase tracking-[0.3em]">{emptyMessage}</p>
       </div>
@@ -92,7 +92,7 @@ export function DonutDistributionChart({
           return (
             <div
               key={item.key}
-              className="group/legend flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-white/10 transition-all hover:bg-white/[0.04]"
+              className="group/legend flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-lg hover:border-white/10 transition-all hover:bg-white/[0.04]"
             >
               <div className="flex items-center gap-4">
                 <div

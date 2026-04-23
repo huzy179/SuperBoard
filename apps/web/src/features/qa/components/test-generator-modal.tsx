@@ -49,7 +49,7 @@ export function TestGeneratorModal({ onClose }: TestGeneratorModalProps) {
         {/* Header */}
         <div className="p-10 border-b border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-glow-indigo">
+            <div className="w-14 h-14 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-glow-indigo">
               <Sparkles size={28} className="animate-pulse" />
             </div>
             <div>
@@ -63,7 +63,7 @@ export function TestGeneratorModal({ onClose }: TestGeneratorModalProps) {
           </div>
           <button
             onClick={onClose}
-            className="w-14 h-14 rounded-2xl bg-white/5 text-white/40 hover:bg-white/10 hover:text-white transition-all flex items-center justify-center border border-white/5"
+            className="w-14 h-14 rounded-lg bg-white/5 text-white/40 hover:bg-white/10 hover:text-white transition-all flex items-center justify-center border border-white/5"
           >
             <X size={24} />
           </button>
@@ -80,20 +80,20 @@ export function TestGeneratorModal({ onClose }: TestGeneratorModalProps) {
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="e.g. Test that a user can create a project, invite a member, and post a comment within 30 seconds."
-                className="w-full h-40 bg-white/5 border border-white/10 rounded-3xl p-6 text-sm text-white placeholder:text-white/10 focus:border-indigo-500/40 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none resize-none scrollbar-hide"
+                className="w-full h-40 bg-white/5 border border-white/10 rounded-xl p-6 text-sm text-white placeholder:text-white/10 focus:border-indigo-500/40 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none resize-none scrollbar-hide"
               />
             </div>
 
             <button
               onClick={handleGenerate}
               disabled={isGenerating || !prompt.trim()}
-              className="w-full py-5 rounded-3xl bg-indigo-600 text-white font-black text-[11px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-indigo-500 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-glow-indigo disabled:opacity-50 disabled:scale-100"
+              className="w-full py-5 rounded-xl bg-indigo-600 text-white font-black text-[11px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-indigo-500 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-glow-indigo disabled:opacity-50 disabled:scale-100"
             >
               {isGenerating ? <RefreshCw className="animate-spin" size={16} /> : <Zap size={16} />}
               {isGenerating ? 'Đang xử lý...' : 'Tạo spec test'}
             </button>
 
-            <div className="mt-auto p-6 rounded-3xl bg-amber-500/5 border border-amber-500/10">
+            <div className="mt-auto p-6 rounded-xl bg-amber-500/5 border border-amber-500/10">
               <p className="text-[10px] font-medium text-amber-500/60 leading-relaxed italic">
                 Synthetic tests utilize the Page Object Model (POM) and assume standard workspace
                 authentication middleware.
@@ -132,7 +132,7 @@ export function TestGeneratorModal({ onClose }: TestGeneratorModalProps) {
               )}
             </div>
 
-            <div className="flex-1 rounded-[2rem] bg-slate-900/50 border border-white/5 p-8 overflow-auto font-mono text-xs text-white/60 leading-relaxed scrollbar-hide">
+            <div className="flex-1 rounded-xl bg-slate-900/50 border border-white/5 p-8 overflow-auto font-mono text-xs text-white/60 leading-relaxed scrollbar-hide">
               {generatedCode ? (
                 <pre className="whitespace-pre-wrap">{generatedCode}</pre>
               ) : (

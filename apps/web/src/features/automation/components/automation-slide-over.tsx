@@ -107,7 +107,7 @@ export function AutomationSlideOver({ workspaceId, projectId, onClose }: Automat
     <div className="fixed inset-y-0 right-0 w-full max-w-xl bg-slate-950/40 backdrop-blur-3xl border-l border-white/5 shadow-2xl z-[150] animate-in slide-in-from-right duration-500 font-sans flex flex-col">
       <div className="p-8 border-b border-white/5 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 shadow-glow-brand">
+          <div className="w-12 h-12 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 shadow-glow-brand">
             <Zap size={24} className="animate-pulse" />
           </div>
           <div className="flex flex-col">
@@ -141,12 +141,12 @@ export function AutomationSlideOver({ workspaceId, projectId, onClose }: Automat
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="VD: 'THÔNG BÁO NẾU TASK DONE KHÔNG CÓ TÓM TẮT'..."
-              className="w-full h-32 bg-slate-900/60 border border-white/5 rounded-3xl p-6 text-sm font-bold text-white placeholder:text-white/5 outline-none focus:border-brand-500/30 transition-all resize-none uppercase tracking-tighter"
+              className="w-full h-32 bg-slate-900/60 border border-white/5 rounded-xl p-6 text-sm font-bold text-white placeholder:text-white/5 outline-none focus:border-brand-500/30 transition-all resize-none uppercase tracking-tighter"
             />
             <button
               onClick={handleGenerate}
               disabled={isGenerating || !prompt.trim()}
-              className={`absolute bottom-6 right-6 px-6 py-3 rounded-2xl flex items-center gap-3 transition-all duration-500 ${
+              className={`absolute bottom-6 right-6 px-6 py-3 rounded-lg flex items-center gap-3 transition-all duration-500 ${
                 isGenerating || !prompt.trim()
                   ? 'bg-white/5 text-white/20'
                   : 'bg-brand-500 text-slate-950 shadow-glow-brand hover:scale-105 active:scale-95'
@@ -230,7 +230,7 @@ export function AutomationSlideOver({ workspaceId, projectId, onClose }: Automat
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => toggleRule(rule.id, rule.isActive)}
-                        className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 border ${
+                        className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-500 border ${
                           rule.isActive
                             ? 'bg-brand-500/20 border-brand-500/30 text-brand-400 shadow-glow-brand hover:bg-brand-500 hover:text-white'
                             : 'bg-white/5 border-white/5 text-white/20 hover:bg-white/10 hover:text-white'
@@ -240,7 +240,7 @@ export function AutomationSlideOver({ workspaceId, projectId, onClose }: Automat
                       </button>
                       <button
                         onClick={() => deleteRule(rule.id)}
-                        className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center text-white/20 hover:bg-red-500/20 hover:text-red-500 hover:border-red-500/30 transition-all duration-500"
+                        className="w-12 h-12 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center text-white/20 hover:bg-red-500/20 hover:text-red-500 hover:border-red-500/30 transition-all duration-500"
                       >
                         <Trash2 size={18} />
                       </button>

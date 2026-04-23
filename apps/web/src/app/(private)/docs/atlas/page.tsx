@@ -26,7 +26,7 @@ export default function DocsAtlasPage() {
         <div className="flex items-center gap-4">
           <Link
             href="/docs"
-            className="flex items-center gap-3 px-6 py-3 bg-white/[0.03] border border-white/10 rounded-2xl text-[10px] font-black text-white/40 uppercase tracking-widest hover:text-white hover:border-white/20 hover:bg-white/[0.05] transition-all group"
+            className="flex items-center gap-3 px-6 py-3 bg-white/[0.03] border border-white/10 rounded-lg text-[10px] font-black text-white/40 uppercase tracking-widest hover:text-white hover:border-white/20 hover:bg-white/[0.05] transition-all group"
           >
             <ChevronLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             Back to Registry
@@ -52,7 +52,7 @@ export default function DocsAtlasPage() {
       {/* Narrative Footer */}
       <div className="p-8 rounded-[2.5rem] border border-white/5 bg-white/[0.01] flex items-center justify-between gap-8 backdrop-blur-3xl">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-white/5 rounded-2xl border border-white/10">
+          <div className="p-3 bg-white/5 rounded-lg border border-white/10">
             <LayoutGrid className="h-5 w-5 text-white/20" />
           </div>
           <div className="space-y-1">

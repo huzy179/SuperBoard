@@ -86,7 +86,7 @@ export function MessageToTaskDialog({ message, isOpen, onClose }: MessageToTaskD
 
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-brand-500/20 rounded-2xl text-brand-400">
+                <div className="p-3 bg-brand-500/20 rounded-lg text-brand-400">
                   <CheckSquare size={24} />
                 </div>
                 <div>
@@ -113,12 +113,12 @@ export function MessageToTaskDialog({ message, isOpen, onClose }: MessageToTaskD
                 </label>
                 <div className="relative">
                   {isLoadingProjects ? (
-                    <div className="w-full h-12 bg-white/[0.03] animate-pulse rounded-2xl" />
+                    <div className="w-full h-12 bg-white/[0.03] animate-pulse rounded-lg" />
                   ) : (
                     <select
                       value={selectedProjectId}
                       onChange={(e) => setSelectedProjectId(e.target.value)}
-                      className="w-full h-12 bg-slate-950/50 border border-white/5 rounded-2xl px-4 text-sm text-white focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all outline-none appearance-none"
+                      className="w-full h-12 bg-slate-950/50 border border-white/5 rounded-lg px-4 text-sm text-white focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all outline-none appearance-none"
                     >
                       {projects.map((p) => (
                         <option key={p.id} value={p.id} className="bg-slate-900 border-none">
@@ -138,7 +138,7 @@ export function MessageToTaskDialog({ message, isOpen, onClose }: MessageToTaskD
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full h-12 bg-slate-950/50 border border-white/5 rounded-2xl px-4 text-sm text-white placeholder:text-white/10 focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all outline-none"
+                  className="w-full h-12 bg-slate-950/50 border border-white/5 rounded-lg px-4 text-sm text-white placeholder:text-white/10 focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all outline-none"
                 />
               </div>
 
@@ -149,14 +149,14 @@ export function MessageToTaskDialog({ message, isOpen, onClose }: MessageToTaskD
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full h-32 bg-slate-950/50 border border-white/5 rounded-2xl p-4 text-sm text-white placeholder:text-white/10 focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all outline-none resize-none"
+                  className="w-full h-32 bg-slate-950/50 border border-white/5 rounded-lg p-4 text-sm text-white placeholder:text-white/10 focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all outline-none resize-none"
                 />
               </div>
 
               <button
                 onClick={handleCreateTask}
                 disabled={isSubmitting || isLoadingProjects}
-                className="w-full py-4 bg-brand-500 text-white rounded-2xl font-black uppercase tracking-[0.2em] italic hover:bg-brand-400 disabled:opacity-50 transition-all flex items-center justify-center gap-3 group shadow-glow-brand/10"
+                className="w-full py-4 bg-brand-500 text-white rounded-lg font-black uppercase tracking-[0.2em] italic hover:bg-brand-400 disabled:opacity-50 transition-all flex items-center justify-center gap-3 group shadow-glow-brand/10"
               >
                 {isSubmitting ? (
                   <Loader2 size={18} className="animate-spin" />

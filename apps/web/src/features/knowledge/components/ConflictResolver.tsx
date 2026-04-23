@@ -52,7 +52,7 @@ export function ConflictResolver() {
     <div className="space-y-12 py-10">
       <div className="flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-red-500/10 rounded-2xl border border-red-500/20 shadow-glow-red/10">
+          <div className="p-3 bg-red-500/10 rounded-lg border border-red-500/20 shadow-glow-red/10">
             <ShieldAlert className="h-5 w-5 text-red-400" />
           </div>
           <div className="space-y-1">
@@ -122,13 +122,13 @@ export function ConflictResolver() {
                 <div className="mt-10 flex gap-3">
                   <button
                     onClick={() => handleResolve(collision.id)}
-                    className="flex-1 px-6 py-4 bg-brand-500 rounded-2xl text-[10px] font-black text-white uppercase tracking-widest shadow-glow-brand hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
+                    className="flex-1 px-6 py-4 bg-brand-500 rounded-lg text-[10px] font-black text-white uppercase tracking-widest shadow-glow-brand hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
                   >
                     <LinkIcon size={14} /> Liên kết
                   </button>
                   <button
                     onClick={() => handleResolve(collision.id)}
-                    className="px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black text-white/40 uppercase tracking-widest hover:bg-white/10 transition-all"
+                    className="px-6 py-4 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black text-white/40 uppercase tracking-widest hover:bg-white/10 transition-all"
                   >
                     Bỏ qua
                   </button>
@@ -164,7 +164,7 @@ export function ConflictResolver() {
 
 function CollisionNodeCard({ node }: { node: CollisionNode }) {
   return (
-    <div className="flex-1 p-5 bg-white/[0.03] border border-white/5 rounded-3xl space-y-3 hover:bg-white/[0.06] transition-all">
+    <div className="flex-1 p-5 bg-white/[0.03] border border-white/5 rounded-xl space-y-3 hover:bg-white/[0.06] transition-all">
       <div className="flex items-center gap-3">
         <div className="p-2 bg-brand-500/10 rounded-lg text-brand-400">
           {node.type === 'task' ? <Briefcase size={14} /> : <FileText size={14} />}
@@ -183,7 +183,7 @@ function CollisionNodeCard({ node }: { node: CollisionNode }) {
 function ResolverSkeleton() {
   return (
     <div className="space-y-12 py-10 px-6 animate-pulse">
-      <div className="h-12 w-64 bg-white/5 rounded-2xl" />
+      <div className="h-12 w-64 bg-white/5 rounded-lg" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="h-96 bg-white/5 rounded-[3.5rem]" />
         <div className="h-96 bg-white/5 rounded-[3.5rem]" />

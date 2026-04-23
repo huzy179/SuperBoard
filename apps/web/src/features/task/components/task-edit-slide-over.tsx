@@ -210,7 +210,7 @@ export function TaskEditSlideOver({
           {/* Elite Specification Header */}
           <header className="flex items-center justify-between border-b border-white/5 px-10 py-10 bg-white/[0.01] backdrop-blur-3xl shadow-inner">
             <div className="flex items-center gap-8">
-              <div className="w-16 h-16 bg-slate-900 rounded-[2rem] border border-white/10 shadow-luxe flex items-center justify-center relative group overflow-hidden">
+              <div className="w-16 h-16 bg-slate-900 rounded-xl border border-white/10 shadow-luxe flex items-center justify-center relative group overflow-hidden">
                 <div className="absolute inset-0 bg-brand-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="relative z-10 scale-125">
                   <TaskTypeIcon type={editingTask.type ?? 'task'} />
@@ -244,7 +244,7 @@ export function TaskEditSlideOver({
                 <button
                   type="button"
                   onClick={() => setShowAiMenu(!showAiMenu)}
-                  className={`group relative flex items-center gap-4 px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500 overflow-hidden border shadow-inner ${
+                  className={`group relative flex items-center gap-4 px-8 py-4 rounded-lg text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500 overflow-hidden border shadow-inner ${
                     isAiThinking
                       ? 'bg-brand-500 text-slate-950 border-brand-500 animate-pulse'
                       : 'bg-white/[0.03] text-brand-400 border-white/10 hover:bg-white/[0.06] hover:border-brand-500/30'
@@ -275,7 +275,7 @@ export function TaskEditSlideOver({
                     <div className="space-y-1">
                       <button
                         onClick={handleAiDecompose}
-                        className="w-full px-6 py-4.5 flex items-center gap-5 text-white/40 hover:text-white hover:bg-white/[0.03] rounded-2xl transition-all text-left group/opt"
+                        className="w-full px-6 py-4.5 flex items-center gap-5 text-white/40 hover:text-white hover:bg-white/[0.03] rounded-lg transition-all text-left group/opt"
                       >
                         <div className="p-3 bg-brand-500/10 rounded-xl text-brand-400 group-hover/opt:bg-brand-500 group-hover/opt:text-slate-950 transition-all shadow-inner">
                           <ListTree size={18} />
@@ -291,7 +291,7 @@ export function TaskEditSlideOver({
                       </button>
                       <button
                         onClick={handleAiRefine}
-                        className="w-full px-6 py-4.5 flex items-center gap-5 text-white/40 hover:text-white hover:bg-white/[0.03] rounded-2xl transition-all text-left group/opt"
+                        className="w-full px-6 py-4.5 flex items-center gap-5 text-white/40 hover:text-white hover:bg-white/[0.03] rounded-lg transition-all text-left group/opt"
                       >
                         <div className="p-3 bg-indigo-500/10 rounded-xl text-indigo-400 group-hover/opt:bg-indigo-500 group-hover/opt:text-white transition-all shadow-inner">
                           <Brain size={18} />
@@ -311,7 +311,7 @@ export function TaskEditSlideOver({
                           const res = await summarizeMutation.mutateAsync(editingTask.id);
                           setAiAnalysis(res.summary);
                         }}
-                        className="w-full px-6 py-4.5 flex items-center gap-5 text-white/40 hover:text-white hover:bg-white/[0.03] rounded-2xl transition-all text-left group/opt"
+                        className="w-full px-6 py-4.5 flex items-center gap-5 text-white/40 hover:text-white hover:bg-white/[0.03] rounded-lg transition-all text-left group/opt"
                       >
                         <div className="p-3 bg-purple-500/10 rounded-xl text-purple-400 group-hover/opt:bg-purple-500 group-hover/opt:text-white transition-all shadow-inner">
                           <Terminal size={18} />
@@ -333,7 +333,7 @@ export function TaskEditSlideOver({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-14 h-14 flex items-center justify-center text-white/10 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all border border-transparent hover:border-white/10 shadow-inner"
+                className="w-14 h-14 flex items-center justify-center text-white/10 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all border border-transparent hover:border-white/10 shadow-inner"
               >
                 <X size={24} />
               </button>
@@ -357,7 +357,7 @@ export function TaskEditSlideOver({
                 >
                   <div className="flex items-start gap-10">
                     <div
-                      className={`p-6 rounded-[2rem] border transition-all duration-1000 shadow-inner ${
+                      className={`p-6 rounded-xl border transition-all duration-1000 shadow-inner ${
                         isAtRisk
                           ? 'bg-amber-500/5 text-amber-500 border-amber-500/10'
                           : 'bg-emerald-500/5 text-emerald-500 border-emerald-500/10'
@@ -448,7 +448,7 @@ export function TaskEditSlideOver({
               ) : intelligence.duplicates && intelligence.duplicates.length > 0 ? (
                 <div className="relative group overflow-hidden rounded-[3rem] border border-amber-500/10 bg-amber-500/[0.01] p-10 shadow-inner animate-in slide-in-from-top-10 duration-1000">
                   <div className="flex items-start gap-10">
-                    <div className="p-6 bg-amber-500/5 rounded-2xl text-amber-500 border border-amber-500/10 shadow-inner group-hover:scale-110 transition-transform">
+                    <div className="p-6 bg-amber-500/5 rounded-lg text-amber-500 border border-amber-500/10 shadow-inner group-hover:scale-110 transition-transform">
                       <Zap size={32} className="animate-pulse" />
                       <h4 className="text-[11px] font-black uppercase tracking-[0.5em] text-amber-500">
                         Phát hiện công việc trùng lặp
@@ -497,7 +497,7 @@ export function TaskEditSlideOver({
               ) : intelligence.suggestions ? (
                 <div className="relative group overflow-hidden rounded-[3rem] border border-cyan-500/10 bg-cyan-500/[0.01] p-10 shadow-inner animate-in slide-in-from-top-10 duration-1000">
                   <div className="flex items-start gap-10">
-                    <div className="p-6 bg-cyan-500/5 rounded-2xl text-cyan-400 border border-cyan-500/10 shadow-inner group-hover:scale-110 transition-transform">
+                    <div className="p-6 bg-cyan-500/5 rounded-lg text-cyan-400 border border-cyan-500/10 shadow-inner group-hover:scale-110 transition-transform">
                       <Brain size={32} className="animate-pulse" />
                     </div>
                     <div className="space-y-6 flex-1">
@@ -546,13 +546,13 @@ export function TaskEditSlideOver({
                   <div className="absolute top-8 right-8">
                     <button
                       onClick={() => setAiAnalysis(null)}
-                      className="w-10 h-10 flex items-center justify-center bg-white/5 rounded-2xl text-white/20 hover:text-rose-500 transition-all border border-transparent hover:border-rose-500/20 shadow-inner"
+                      className="w-10 h-10 flex items-center justify-center bg-white/5 rounded-lg text-white/20 hover:text-rose-500 transition-all border border-transparent hover:border-rose-500/20 shadow-inner"
                     >
                       <X size={16} />
                     </button>
                   </div>
                   <div className="flex items-start gap-10">
-                    <div className="p-6 bg-brand-500/5 rounded-2xl text-brand-400 border border-brand-500/10 shadow-inner group-hover:scale-110 transition-transform">
+                    <div className="p-6 bg-brand-500/5 rounded-lg text-brand-400 border border-brand-500/10 shadow-inner group-hover:scale-110 transition-transform">
                       <Cpu size={32} className="animate-spin-slow" />
                     </div>
                     <div className="space-y-4 flex-1">
@@ -659,7 +659,7 @@ export function TaskEditSlideOver({
                         <Link
                           key={doc.id}
                           href={`/docs/${doc.id}`}
-                          className="flex items-center justify-between p-6 bg-emerald-500/[0.02] border border-emerald-500/10 rounded-[2rem] hover:bg-emerald-500/10 hover:border-emerald-500/30 transition-all group/doc"
+                          className="flex items-center justify-between p-6 bg-emerald-500/[0.02] border border-emerald-500/10 rounded-xl hover:bg-emerald-500/10 hover:border-emerald-500/30 transition-all group/doc"
                         >
                           <div className="flex items-center gap-5">
                             <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-400 group-hover/doc:scale-110 transition-transform">
@@ -736,7 +736,7 @@ export function TaskEditSlideOver({
             {taskUpdateError && (
               <div className="px-10 pb-16">
                 <div className="p-8 bg-rose-500/5 border border-rose-500/20 rounded-[2.5rem] text-rose-500 text-[11px] font-black uppercase tracking-[0.3em] flex items-center gap-6 animate-pulse shadow-glow-rose/5">
-                  <div className="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center shrink-0 border border-rose-500/20 shadow-inner">
+                  <div className="w-12 h-12 rounded-lg bg-rose-500/10 flex items-center justify-center shrink-0 border border-rose-500/20 shadow-inner">
                     <Terminal size={18} />
                   </div>
                   <div className="flex-1">
@@ -755,7 +755,7 @@ export function TaskEditSlideOver({
                 type="button"
                 onClick={onRestore}
                 disabled={isRestoring}
-                className="group relative px-10 py-4 bg-emerald-500 text-slate-950 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 overflow-hidden shadow-glow-emerald/20"
+                className="group relative px-10 py-4 bg-emerald-500 text-slate-950 rounded-lg font-black text-[10px] uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 overflow-hidden shadow-glow-emerald/20"
               >
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                 <span className="relative z-10 flex items-center gap-3">
@@ -767,7 +767,7 @@ export function TaskEditSlideOver({
                 type="button"
                 onClick={onDelete}
                 disabled={isDeleting}
-                className="group px-8 py-4 bg-transparent border border-rose-500/20 text-rose-500/40 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all disabled:opacity-30 flex items-center gap-3"
+                className="group px-8 py-4 bg-transparent border border-rose-500/20 text-rose-500/40 rounded-lg font-black text-[10px] uppercase tracking-[0.2em] hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all disabled:opacity-30 flex items-center gap-3"
               >
                 <Archive size={16} className="group-hover:animate-bounce" />
                 <span>Xóa công việc</span>
@@ -778,7 +778,7 @@ export function TaskEditSlideOver({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-8 py-4 border border-white/5 text-white/20 font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl hover:bg-white/5 hover:text-white transition-all"
+                className="px-8 py-4 border border-white/5 text-white/20 font-black text-[10px] uppercase tracking-[0.2em] rounded-lg hover:bg-white/5 hover:text-white transition-all"
               >
                 Hủy bỏ
               </button>
@@ -786,7 +786,7 @@ export function TaskEditSlideOver({
                 type="submit"
                 form="task-edit-form"
                 disabled={isSaving}
-                className="group relative px-12 py-4 bg-white text-slate-950 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 overflow-hidden shadow-luxe"
+                className="group relative px-12 py-4 bg-white text-slate-950 rounded-lg font-black text-[10px] uppercase tracking-[0.3em] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 overflow-hidden shadow-luxe"
               >
                 <div className="absolute inset-0 bg-brand-500 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                 <span className="relative z-10 flex items-center gap-3 group-hover:text-white transition-colors">

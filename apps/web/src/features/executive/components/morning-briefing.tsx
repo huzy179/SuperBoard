@@ -77,7 +77,7 @@ export function MorningBriefing({
         <div className="flex flex-col items-center text-center mb-16">
           <div className="flex items-center gap-4 mb-8">
             <span className="h-px w-10 bg-white/10" />
-            <div className="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-lg bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center">
               <Sunrise size={24} />
             </div>
             <span className="h-px w-10 bg-white/10" />
@@ -134,7 +134,7 @@ export function MorningBriefing({
                 {data?.commandIntent.map((intent, i) => (
                   <div
                     key={i}
-                    className="flex gap-6 p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 group hover:border-brand-500/20 transition-all cursor-default"
+                    className="flex gap-6 p-6 rounded-xl bg-white/[0.02] border border-white/5 group hover:border-brand-500/20 transition-all cursor-default"
                   >
                     <div className="text-2xl font-black text-brand-500/20 italic opacity-50 group-hover:opacity-80 transition-opacity">
                       0{i + 1}

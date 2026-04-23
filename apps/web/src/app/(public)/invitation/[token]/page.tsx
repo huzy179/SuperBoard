@@ -63,9 +63,9 @@ export default function InvitationPage() {
 
   return (
     <div className="flex min-h-full items-center justify-center px-4 py-10 bg-linear-to-br from-brand-50 via-white to-brand-100">
-      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-10 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-500 text-center">
+      <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-10 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-500 text-center">
         <div className="mb-8 flex justify-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-brand-50 text-4xl shadow-inner animate-bounce duration-1000">
+          <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-brand-50 text-4xl shadow-inner animate-bounce duration-1000">
             ✉️
           </div>
         </div>
@@ -85,7 +85,7 @@ export default function InvitationPage() {
         </div>
 
         {isEmailMismatch && (
-          <div className="mb-8 rounded-2xl border border-amber-200 bg-amber-50/50 p-5 text-left text-sm text-amber-900 shadow-sm">
+          <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50/50 p-5 text-left text-sm text-amber-900 shadow-sm">
             <div className="flex items-center gap-2 font-bold mb-2 text-amber-700">
               <span className="text-lg">⚠️</span>
               <p>Email không trùng khớp!</p>

@@ -166,25 +166,25 @@ export function ProjectCard({
           </button>
 
           {isMenuOpen && (
-            <div className="absolute bottom-12 right-0 w-56 rounded-3xl border border-white/10 bg-slate-900/90 p-2 shadow-glass backdrop-blur-3xl z-50 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="absolute bottom-12 right-0 w-56 rounded-xl border border-white/10 bg-slate-900/90 p-2 shadow-glass backdrop-blur-3xl z-50 animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="px-3 py-2 text-[8px] font-black text-white/20 uppercase tracking-[0.3em] border-b border-white/5 mb-1">
                 Node Configuration
               </div>
               <button
                 onClick={() => onOpen(`${openHref}?view=board`)}
-                className="flex items-center gap-3 w-full rounded-2xl px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all"
+                className="flex items-center gap-3 w-full rounded-lg px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all"
               >
                 <LayoutGrid size={14} className="text-brand-400" /> Open Tactical Board
               </button>
               <button
                 onClick={() => onOpen(`${openHref}?view=list`)}
-                className="flex items-center gap-3 w-full rounded-2xl px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all"
+                className="flex items-center gap-3 w-full rounded-lg px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all"
               >
                 <List size={14} className="text-cyan-400" /> Open Mission List
               </button>
               <button
                 onClick={() => onOpen(`${openHref}?view=calendar`)}
-                className="flex items-center gap-3 w-full rounded-2xl px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all"
+                className="flex items-center gap-3 w-full rounded-lg px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all"
               >
                 <Calendar size={14} className="text-indigo-400" /> Neural Chronos
               </button>
@@ -193,20 +193,20 @@ export function ProjectCard({
 
               <button
                 onClick={() => onOpenEdit(project)}
-                className="flex items-center gap-3 w-full rounded-2xl px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all"
+                className="flex items-center gap-3 w-full rounded-lg px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all"
               >
                 <Settings size={14} /> Edit Mission Spec
               </button>
               <button
                 onClick={() => onClearRememberedContext(project.id)}
                 disabled={!hasRememberedContext(project.id)}
-                className="flex items-center gap-3 w-full rounded-2xl px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all disabled:opacity-20"
+                className="flex items-center gap-3 w-full rounded-lg px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all disabled:opacity-20"
               >
                 <History size={14} /> Deconstruct Context
               </button>
               <button
                 onClick={() => onArchive(project.id)}
-                className="flex items-center gap-3 w-full rounded-2xl px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-rose-400 hover:bg-rose-500/10 transition-all"
+                className="flex items-center gap-3 w-full rounded-lg px-3 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-rose-400 hover:bg-rose-500/10 transition-all"
               >
                 <Archive size={14} /> Terminate Node
               </button>

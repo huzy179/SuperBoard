@@ -105,7 +105,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
         <button
           type="button"
           onClick={() => setSearchOpen(true)}
-          className={`group flex items-center gap-3 rounded-2xl bg-white/[0.02] border border-white/5 transition-all hover:bg-white/[0.08] hover:border-brand-500/30 hover:shadow-glow-brand ${
+          className={`group flex items-center gap-3 rounded-lg bg-white/[0.02] border border-white/5 transition-all hover:bg-white/[0.08] hover:border-brand-500/30 hover:shadow-glow-brand ${
             sidebarCollapsed ? 'p-3' : 'w-full px-4 py-3.5'
           }`}
         >
@@ -137,7 +137,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
           );
           const isHighlighted = !!focusData && !isActive;
 
-          const baseClasses = `flex items-center gap-4 rounded-2xl px-4 py-3.5 text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-500 relative overflow-hidden`;
+          const baseClasses = `flex items-center gap-4 rounded-lg px-4 py-3.5 text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-500 relative overflow-hidden`;
 
           if (item.disabled) {
             return (
@@ -192,7 +192,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
       {/* Footer User Profile */}
       <div className="shrink-0 p-4 border-t border-white/5 bg-white/2">
         <div
-          className={`flex items-center gap-4 rounded-3xl bg-slate-950/50 border border-white/5 p-3 hover:bg-slate-950 transition-all group ${sidebarCollapsed ? 'justify-center' : ''}`}
+          className={`flex items-center gap-4 rounded-xl bg-slate-950/50 border border-white/5 p-3 hover:bg-slate-950 transition-all group ${sidebarCollapsed ? 'justify-center' : ''}`}
         >
           <div className="relative shrink-0">
             <AssigneeAvatar
@@ -268,7 +268,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
-            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/5 text-white/40 hover:text-white transition-all shadow-luxe"
+            className="w-12 h-12 flex items-center justify-center rounded-lg bg-white/5 border border-white/5 text-white/40 hover:text-white transition-all shadow-luxe"
             aria-label="Access Command Menu"
             aria-expanded={sidebarOpen}
             aria-controls="mobile-sidebar"
@@ -281,7 +281,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/5 text-white/40 hover:text-white transition-all shadow-luxe"
+              className="w-12 h-12 flex items-center justify-center rounded-lg bg-white/5 border border-white/5 text-white/40 hover:text-white transition-all shadow-luxe"
               aria-label="Global Search"
             >
               <Search size={22} />

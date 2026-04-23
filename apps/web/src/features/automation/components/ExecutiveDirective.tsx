@@ -49,7 +49,7 @@ export function ExecutiveDirective({ workspaceId }: { workspaceId: string }) {
   return (
     <div className="space-y-10 py-8 px-6">
       <div className="flex items-center gap-4">
-        <div className="p-3 bg-brand-500/10 rounded-2xl border border-brand-500/20">
+        <div className="p-3 bg-brand-500/10 rounded-lg border border-brand-500/20">
           <ShieldAlert className="h-5 w-5 text-brand-400" />
         </div>
         <div className="space-y-1">
@@ -93,7 +93,7 @@ export function ExecutiveDirective({ workspaceId }: { workspaceId: string }) {
               className="relative flex items-start gap-6 group"
             >
               <div
-                className={`mt-1 h-20 w-20 rounded-2xl flex items-center justify-center border z-10 transition-all ${
+                className={`mt-1 h-20 w-20 rounded-lg flex items-center justify-center border z-10 transition-all ${
                   isExecuted
                     ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
                     : 'bg-slate-900 border-white/10 text-brand-400 group-hover:border-brand-500/40'
@@ -147,7 +147,7 @@ export function ExecutiveDirective({ workspaceId }: { workspaceId: string }) {
             <button
               onClick={handleExecute}
               disabled={isExecuting}
-              className="w-full flex items-center justify-center gap-4 px-10 py-6 bg-brand-500 rounded-[2rem] text-[11px] font-black text-white uppercase tracking-[0.4em] shadow-glow-brand hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-4 px-10 py-6 bg-brand-500 rounded-xl text-[11px] font-black text-white uppercase tracking-[0.4em] shadow-glow-brand hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
             >
               {isExecuting ? (
                 <div className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -174,7 +174,7 @@ export function ExecutiveDirective({ workspaceId }: { workspaceId: string }) {
 function DirectiveSkeleton() {
   return (
     <div className="space-y-10 py-8 px-6 animate-pulse">
-      <div className="h-12 w-64 bg-white/5 rounded-2xl" />
+      <div className="h-12 w-64 bg-white/5 rounded-lg" />
       <div className="h-[500px] bg-white/5 rounded-[4rem]" />
     </div>
   );

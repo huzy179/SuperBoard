@@ -55,7 +55,7 @@ export function TaskFilterBar({ members, workflow }: TaskFilterBarProps) {
           <button
             type="button"
             onClick={resetFilters}
-            className="group relative rounded-2xl px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-rose-400 bg-rose-500/5 border border-rose-500/10 hover:bg-rose-500 hover:text-white transition-all active:scale-95 shadow-inner overflow-hidden"
+            className="group relative rounded-lg px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-rose-400 bg-rose-500/5 border border-rose-500/10 hover:bg-rose-500 hover:text-white transition-all active:scale-95 shadow-inner overflow-hidden"
           >
             <span className="relative z-10 italic">RESET_SYSTEMS</span>
           </button>

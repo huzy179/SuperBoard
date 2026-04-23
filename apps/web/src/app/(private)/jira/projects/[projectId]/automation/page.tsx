@@ -45,7 +45,7 @@ export default function AutomationPage() {
           <div className="flex flex-wrap items-end justify-between gap-8">
             <div className="space-y-4">
               <div className="flex items-center gap-4">
-                <div className="p-4 bg-slate-900 rounded-3xl text-brand-400 shadow-luxe border border-white/5">
+                <div className="p-4 bg-slate-900 rounded-xl text-brand-400 shadow-luxe border border-white/5">
                   <Sparkles size={32} className="animate-pulse" />
                 </div>
                 <div>
@@ -71,7 +71,7 @@ export default function AutomationPage() {
 
             <button
               onClick={() => setShowCreateModal(true)}
-              className="group relative px-10 py-5 bg-white text-slate-900 rounded-2xl font-black shadow-luxe hover:scale-105 active:scale-95 transition-all flex items-center gap-3 uppercase text-[11px] tracking-[0.2em] overflow-hidden"
+              className="group relative px-10 py-5 bg-white text-slate-900 rounded-lg font-black shadow-luxe hover:scale-105 active:scale-95 transition-all flex items-center gap-3 uppercase text-[11px] tracking-[0.2em] overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-brand-100 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <Plus size={20} className="relative z-10" />
@@ -112,7 +112,7 @@ export default function AutomationPage() {
 
           <button
             onClick={() => setShowAIDialog(true)}
-            className="group relative z-10 px-10 py-6 bg-slate-100 text-slate-900 rounded-[2rem] font-black shadow-luxe hover:bg-white hover:scale-110 transition-all flex items-center gap-3 active:scale-95 uppercase text-[11px] tracking-[0.2em]"
+            className="group relative z-10 px-10 py-6 bg-slate-100 text-slate-900 rounded-xl font-black shadow-luxe hover:bg-white hover:scale-110 transition-all flex items-center gap-3 active:scale-95 uppercase text-[11px] tracking-[0.2em]"
           >
             <Sparkles
               size={22}

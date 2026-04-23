@@ -92,7 +92,7 @@ export function TaskAttachmentManager({
           className="border-2 border-dashed border-white/5 rounded-[3rem] p-20 flex flex-col items-center justify-center gap-8 cursor-pointer hover:bg-white/[0.02] hover:border-brand-500/20 transition-all group/empty relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-brand-500/[0.01] opacity-0 group-hover/empty:opacity-100 transition-opacity" />
-          <div className="w-20 h-20 rounded-[2rem] bg-slate-950 flex items-center justify-center border border-white/5 group-hover/empty:scale-110 group-hover/empty:rotate-6 transition-all shadow-inner">
+          <div className="w-20 h-20 rounded-xl bg-slate-950 flex items-center justify-center border border-white/5 group-hover/empty:scale-110 group-hover/empty:rotate-6 transition-all shadow-inner">
             <Paperclip className="h-10 w-10 text-white/10 group-hover/empty:text-brand-500 transition-colors" />
           </div>
           <div className="text-center relative z-10">
@@ -110,11 +110,11 @@ export function TaskAttachmentManager({
         {attachments.map((attachment) => (
           <div
             key={attachment.id}
-            className="group/card relative flex items-center gap-8 p-6 border border-white/5 rounded-[2rem] bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/10 transition-all shadow-inner overflow-hidden"
+            className="group/card relative flex items-center gap-8 p-6 border border-white/5 rounded-xl bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/10 transition-all shadow-inner overflow-hidden"
           >
             <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
 
-            <div className="h-16 w-16 shrink-0 bg-slate-950 rounded-2xl border border-white/5 flex items-center justify-center shadow-inner group-hover/card:scale-110 transition-transform duration-700">
+            <div className="h-16 w-16 shrink-0 bg-slate-950 rounded-lg border border-white/5 flex items-center justify-center shadow-inner group-hover/card:scale-110 transition-transform duration-700">
               <FileIcon className="h-8 w-8 text-white/10 group-hover/card:text-white/30 transition-colors" />
             </div>
             <div className="flex-1 min-w-0">
@@ -140,7 +140,7 @@ export function TaskAttachmentManager({
                 href={attachment.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-4 bg-white/[0.03] hover:bg-white text-white/20 hover:text-slate-950 rounded-2xl transition-all shadow-inner"
+                className="p-4 bg-white/[0.03] hover:bg-white text-white/20 hover:text-slate-950 rounded-lg transition-all shadow-inner"
                 title="Extract Stream"
               >
                 <Download className="h-5 w-5" />
@@ -153,7 +153,7 @@ export function TaskAttachmentManager({
                     deleteAttachment(attachment.id);
                   }
                 }}
-                className="p-4 bg-rose-500/5 hover:bg-rose-500 text-rose-500/30 hover:text-white rounded-2xl transition-all shadow-inner"
+                className="p-4 bg-rose-500/5 hover:bg-rose-500 text-rose-500/30 hover:text-white rounded-lg transition-all shadow-inner"
                 title="Protocol Terminate"
               >
                 <X className="h-5 w-5" />
@@ -162,8 +162,8 @@ export function TaskAttachmentManager({
           </div>
         ))}
         {isUploading && (
-          <div className="flex items-center gap-8 p-8 border border-brand-500/20 rounded-[2rem] bg-brand-500/5 animate-pulse shadow-glow-brand/10">
-            <div className="h-16 w-16 bg-brand-500 rounded-2xl flex items-center justify-center shadow-luxe">
+          <div className="flex items-center gap-8 p-8 border border-brand-500/20 rounded-xl bg-brand-500/5 animate-pulse shadow-glow-brand/10">
+            <div className="h-16 w-16 bg-brand-500 rounded-lg flex items-center justify-center shadow-luxe">
               <Loader2 className="h-8 w-8 animate-spin text-slate-950" />
             </div>
             <div className="flex-1 space-y-3">

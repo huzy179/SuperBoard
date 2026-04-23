@@ -38,7 +38,7 @@ export function FullPageError({ title, message, actionLabel, onAction }: FullPag
   return (
     <main className="min-h-screen bg-linear-to-br from-surface-bg via-white to-surface-bg">
       <div className="flex h-screen items-center justify-center px-4">
-        <div className="w-full max-w-md rounded-2xl border border-surface-border bg-surface-card p-8 shadow-sm">
+        <div className="w-full max-w-md rounded-lg border border-surface-border bg-surface-card p-8 shadow-sm">
           <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-rose-50">
             <span className="text-xl">⚠️</span>
           </div>

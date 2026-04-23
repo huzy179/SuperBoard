@@ -110,7 +110,7 @@ export function ProjectCopilot({ projectId }: ProjectCopilotProps) {
       {/* Header */}
       <div className="p-6 border-b border-white/5 bg-white/5 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400">
+          <div className="w-10 h-10 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400">
             <Bot size={20} />
           </div>
           <div>
@@ -195,7 +195,7 @@ export function ProjectCopilot({ projectId }: ProjectCopilotProps) {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Hãy hỏi Copilot về dự án..."
-            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-14 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-brand-500/50 transition-all focus:bg-white/10"
+            className="w-full bg-white/5 border border-white/10 rounded-lg py-4 pl-6 pr-14 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-brand-500/50 transition-all focus:bg-white/10"
           />
           <button
             onClick={handleSend}

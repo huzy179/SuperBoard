@@ -138,7 +138,7 @@ export default function SettingsPage() {
         <button
           type="button"
           onClick={() => setIsCreateModalOpen(true)}
-          className="group relative flex items-center gap-3 bg-white/[0.03] border border-white/5 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-white hover:bg-white/5 hover:border-brand-500/30 transition-all shadow-luxe"
+          className="group relative flex items-center gap-3 bg-white/[0.03] border border-white/5 px-6 py-3 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-white hover:bg-white/5 hover:border-brand-500/30 transition-all shadow-luxe"
         >
           <div className="p-1 bg-white/5 rounded-lg group-hover:bg-brand-500 group-hover:text-slate-950 transition-colors">
             <Plus size={14} />
@@ -189,7 +189,7 @@ export default function SettingsPage() {
               <div className="absolute inset-0 bg-noise opacity-[0.02] pointer-events-none" />
               <div className="relative z-10 space-y-12">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-brand-500/10 rounded-2xl border border-brand-500/20 text-brand-400">
+                  <div className="p-3 bg-brand-500/10 rounded-lg border border-brand-500/20 text-brand-400">
                     <Target size={20} />
                   </div>
                   <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
@@ -214,7 +214,7 @@ export default function SettingsPage() {
                       type="text"
                       value={profileName}
                       onChange={(e) => setProfileName(e.target.value)}
-                      className="w-full bg-slate-950 border border-white/5 rounded-[2rem] px-8 py-5 text-sm font-bold text-white placeholder:text-white/5 focus:outline-none focus:border-brand-500 transition-all shadow-inner"
+                      className="w-full bg-slate-950 border border-white/5 rounded-xl px-8 py-5 text-sm font-bold text-white placeholder:text-white/5 focus:outline-none focus:border-brand-500 transition-all shadow-inner"
                       required
                     />
                   </div>
@@ -228,7 +228,7 @@ export default function SettingsPage() {
                         type="email"
                         value={user?.email}
                         disabled
-                        className="w-full bg-slate-950 border border-white/5 rounded-[2rem] px-8 py-5 text-sm font-bold text-white/20 cursor-not-allowed shadow-inner"
+                        className="w-full bg-slate-950 border border-white/5 rounded-xl px-8 py-5 text-sm font-bold text-white/20 cursor-not-allowed shadow-inner"
                       />
                       <Shield
                         size={14}
@@ -275,7 +275,7 @@ export default function SettingsPage() {
               <div className="relative z-10 space-y-12">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="p-3 bg-cyan-500/10 rounded-2xl border border-cyan-500/20 text-cyan-400">
+                    <div className="p-3 bg-cyan-500/10 rounded-lg border border-cyan-500/20 text-cyan-400">
                       <Zap size={20} />
                     </div>
                     <div>
@@ -317,7 +317,7 @@ export default function SettingsPage() {
                             });
                           }
                         }}
-                        className={`flex items-center justify-between p-6 rounded-[2rem] border transition-all cursor-pointer group ${
+                        className={`flex items-center justify-between p-6 rounded-xl border transition-all cursor-pointer group ${
                           isNotificationToggleEnabled(preferences, item.id)
                             ? 'bg-white/[0.04] border-white/10'
                             : 'bg-transparent border-white/5 opacity-40 grayscale'
@@ -325,7 +325,7 @@ export default function SettingsPage() {
                       >
                         <div className="flex items-center gap-6">
                           <div
-                            className={`p-4 rounded-2xl transition-all ${
+                            className={`p-4 rounded-lg transition-all ${
                               // eslint-disable-next-line @typescript-eslint/no-explicit-any
                               (preferences as any)?.[item.id]
                                 ? 'bg-brand-500 text-slate-950 shadow-glow-brand'
@@ -395,7 +395,7 @@ export default function SettingsPage() {
                       syncWorkflow.mutate()
                     }
                     disabled={syncWorkflow.isPending}
-                    className="px-8 py-3 bg-white/[0.03] border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-brand-500 hover:text-slate-950 hover:border-brand-500 transition-all shadow-luxe"
+                    className="px-8 py-3 bg-white/[0.03] border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-brand-500 hover:text-slate-950 hover:border-brand-500 transition-all shadow-luxe"
                   >
                     {syncWorkflow.isPending ? 'Đang đồng bộ...' : 'Đồng bộ cho toàn workspace'}
                   </button>

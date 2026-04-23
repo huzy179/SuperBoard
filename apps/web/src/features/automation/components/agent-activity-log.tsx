@@ -86,7 +86,7 @@ export function AgentActivityLog({ workspaceId, projectId }: AgentActivityLogPro
         <button
           onClick={fetchLogs}
           disabled={isLoading}
-          className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-white transition-all disabled:opacity-50"
+          className="p-4 rounded-lg bg-white/5 border border-white/10 text-white/40 hover:text-white transition-all disabled:opacity-50"
         >
           <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
         </button>
@@ -94,19 +94,19 @@ export function AgentActivityLog({ workspaceId, projectId }: AgentActivityLogPro
 
       {/* Stats Cards */}
       <div className="grid grid-cols-3 gap-6">
-        <div className="p-6 rounded-3xl bg-white/5 border border-white/5 flex flex-col gap-2">
+        <div className="p-6 rounded-xl bg-white/5 border border-white/5 flex flex-col gap-2">
           <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
             Agent đang hoạt động
           </span>
           <span className="text-2xl font-black text-white tabular-nums">04</span>
         </div>
-        <div className="p-6 rounded-3xl bg-indigo-500/5 border border-indigo-500/10 flex flex-col gap-2 shadow-glow-indigo">
+        <div className="p-6 rounded-xl bg-indigo-500/5 border border-indigo-500/10 flex flex-col gap-2 shadow-glow-indigo">
           <span className="text-[9px] font-black text-indigo-400/40 uppercase tracking-widest">
             Quyết định tự động
           </span>
           <span className="text-2xl font-black text-indigo-400 tabular-nums">{logs.length}</span>
         </div>
-        <div className="p-6 rounded-3xl bg-white/5 border border-white/5 flex flex-col gap-2 text-white/20">
+        <div className="p-6 rounded-xl bg-white/5 border border-white/5 flex flex-col gap-2 text-white/20">
           <span className="text-[9px] font-black uppercase tracking-widest">
             Tỷ lệ ghi đè thủ công
           </span>
@@ -119,7 +119,7 @@ export function AgentActivityLog({ workspaceId, projectId }: AgentActivityLogPro
           logs.map((log) => (
             <div
               key={log.id}
-              className="group flex flex-col gap-4 p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-white/10 transition-all"
+              className="group flex flex-col gap-4 p-6 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-white/10 transition-all"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">

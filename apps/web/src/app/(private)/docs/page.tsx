@@ -28,7 +28,7 @@ export default function DocHomePage() {
   return (
     <div className="flex h-full flex-col bg-slate-50/20">
       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-        <div className="w-20 h-20 mb-6 rounded-3xl bg-white shadow-xl shadow-brand-500/10 flex items-center justify-center border border-brand-100 animate-pulse">
+        <div className="w-20 h-20 mb-6 rounded-xl bg-white shadow-xl shadow-brand-500/10 flex items-center justify-center border border-brand-100 animate-pulse">
           <BookOpen size={32} className="text-brand-600" />
         </div>
 
@@ -111,7 +111,7 @@ function FeatureCard({
     <button
       onClick={onClick}
       disabled={disabled || isPending}
-      className={`flex flex-col items-start p-6 rounded-2xl border transition-all text-left group ${
+      className={`flex flex-col items-start p-6 rounded-lg border transition-all text-left group ${
         disabled
           ? 'bg-slate-50 border-slate-100 cursor-not-allowed opacity-60'
           : variant === 'indigo'

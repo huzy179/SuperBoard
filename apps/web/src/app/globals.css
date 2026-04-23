@@ -3,8 +3,20 @@
 
 :root {
   color-scheme: dark;
-  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --font-sans: var(--font-hanken), system-ui, sans-serif;
+  --font-display: var(--font-sora), system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
+  font-family: var(--font-display);
 }
 
 
@@ -15,30 +27,30 @@
 
 /* Label chuẩn */
 .form-label {
-  @apply flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/40 mb-2;
+  @apply flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-2;
 }
 
-/* Input / Select / Textarea chuẩn — dark glass */
+/* Input / Select / Textarea chuẩn — Technical Dark */
 .form-input {
-  @apply w-full rounded-2xl border border-white/8 bg-white/[0.03] px-5 py-3.5
+  @apply w-full rounded-sm border border-white/5 bg-white/[0.02] px-3 py-2
          text-sm font-medium text-white placeholder:text-white/20
-         focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.05]
-         transition-all shadow-inner;
+         focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.04]
+         transition-all;
 }
 
 .form-input-lg {
-  @apply w-full rounded-2xl border border-white/8 bg-white/[0.03] px-6 py-4
+  @apply w-full rounded-md border border-white/5 bg-white/[0.02] px-4 py-3
          text-base font-medium text-white placeholder:text-white/20
-         focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.05]
-         transition-all shadow-inner;
+         focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.04]
+         transition-all;
 }
 
-/* Select — cần appearance-none vì mỗi browser render khác nhau */
+/* Select */
 .form-select {
-  @apply w-full rounded-2xl border border-white/8 bg-white/[0.03] px-5 py-3.5
+  @apply w-full rounded-sm border border-white/5 bg-white/[0.02] px-3 py-2
          text-sm font-medium text-white placeholder:text-white/20
-         focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.05]
-         transition-all shadow-inner appearance-none cursor-pointer;
+         focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.04]
+         transition-all appearance-none cursor-pointer;
 }
 
 /* Textarea */
@@ -62,14 +74,14 @@
 
 .modal-overlay {
   @apply fixed inset-0 z-50 flex items-center justify-center
-         bg-slate-950/70 backdrop-blur-md
+         bg-slate-950/80 backdrop-blur-sm
          animate-fade-in;
 }
 
 .modal-panel {
-  @apply relative w-full rounded-[2rem] border border-white/8
-         bg-slate-900/95 backdrop-blur-3xl shadow-[0_32px_80px_-12px_rgba(0,0,0,0.8)]
-         animate-zoom-in overflow-hidden;
+  @apply relative w-full rounded-lg border border-white/5
+         bg-surface-card shadow-glass
+         animate-slide-up overflow-hidden;
 }
 
 .modal-header {
@@ -104,60 +116,25 @@
    ============================================================ */
 
 .btn {
-  @apply inline-flex items-center justify-center gap-2 font-black text-[11px]
-         uppercase tracking-[0.15em] transition-all duration-300
+  @apply inline-flex items-center justify-center gap-2 font-bold text-[10px]
+         uppercase tracking-[0.2em] transition-all duration-200
          active:scale-95 disabled:opacity-40 disabled:pointer-events-none
-         rounded-2xl px-6 py-3.5;
-}
-
-.btn-sm {
-  @apply inline-flex items-center justify-center gap-2 font-black text-[10px]
-         uppercase tracking-[0.15em] transition-all duration-300
-         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
-         rounded-2xl px-4 py-2.5;
-}
-
-.btn-lg {
-  @apply inline-flex items-center justify-center gap-2 font-black text-xs
-         uppercase tracking-[0.15em] transition-all duration-300
-         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
-         rounded-2xl px-8 py-4;
+         rounded-sm px-4 py-2;
 }
 
 .btn-primary {
-  @apply inline-flex items-center justify-center gap-2 font-black text-[11px]
-         uppercase tracking-[0.15em] transition-all duration-300
-         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
-         rounded-2xl px-6 py-3.5
-         bg-brand-500 text-slate-950 hover:bg-brand-400
-         shadow-[0_4px_24px_-4px_oklch(0.68_0.13_160/0.4)];
+  @apply btn bg-brand-500 text-slate-950 hover:bg-brand-400
+         shadow-[0_2px_12px_oklch(0.68_0.13_160/0.2)];
 }
 
 .btn-secondary {
-  @apply inline-flex items-center justify-center gap-2 font-black text-[11px]
-         uppercase tracking-[0.15em] transition-all duration-300
-         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
-         rounded-2xl px-6 py-3.5
-         bg-white/[0.04] text-white/50 border border-white/8
+  @apply btn bg-white/[0.04] text-white/70 border border-white/10
          hover:bg-white/[0.08] hover:text-white hover:border-white/20;
 }
 
-.btn-danger {
-  @apply inline-flex items-center justify-center gap-2 font-black text-[11px]
-         uppercase tracking-[0.15em] transition-all duration-300
-         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
-         rounded-2xl px-6 py-3.5
-         bg-transparent text-rose-400/60 border border-rose-500/20
-         hover:bg-rose-500 hover:text-white hover:border-rose-500;
-}
-
 .btn-ghost {
-  @apply inline-flex items-center justify-center gap-2 font-black text-[11px]
-         uppercase tracking-[0.15em] transition-all duration-300
-         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
-         rounded-2xl px-6 py-3.5
-         bg-transparent text-white/30
-         hover:bg-white/[0.04] hover:text-white;
+  @apply btn bg-transparent text-white/40
+         hover:bg-white/[0.05] hover:text-white;
 }
 
 /* Loading spinner dùng trong btn */
@@ -192,19 +169,19 @@
 
 /* Dark glass utility classes — used for unified dark aesthetic across all components */
 .dark-glass-panel {
-  @apply bg-slate-950/80 backdrop-blur-3xl border border-white/5 shadow-glass rounded-[2rem];
+  @apply bg-surface-card border border-surface-border shadow-glass rounded-lg;
 }
 
 .dark-glass-card {
-  @apply bg-white/[0.02] border border-white/5 shadow-glass rounded-2xl;
+  @apply bg-white/[0.01] border border-white/5 shadow-sm rounded-md;
 }
 
 .dark-glass-input {
-  @apply bg-white/[0.03] border border-white/10 text-white placeholder:text-white/20 rounded-xl;
+  @apply bg-white/[0.02] border border-white/5 text-white placeholder:text-white/20 rounded-sm;
 }
 
 .dark-glass-badge {
-  @apply bg-white/[0.03] border border-white/5 text-white/60 rounded-lg text-[10px] font-black uppercase tracking-widest;
+  @apply bg-white/[0.04] border border-white/10 text-white/70 rounded-xs text-[9px] font-bold uppercase tracking-widest px-2 py-0.5;
 }
 
 .dark-glass-chip {
@@ -243,8 +220,8 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-.text-luxe-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-br from-slate-900 via-brand-700 to-indigo-800;
+.text-luxe-accent {
+  @apply text-brand-400 font-bold tracking-tight;
 }
 
 body {

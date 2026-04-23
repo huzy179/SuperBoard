@@ -81,7 +81,7 @@ export function AutomationList({ workspaceId, projectId }: AutomationListProps) 
               {/* Trigger Hub */}
               <div className="relative z-10 flex flex-col items-center gap-4 min-w-[140px]">
                 <div
-                  className={`p-5 rounded-2xl border transition-all ${
+                  className={`p-5 rounded-lg border transition-all ${
                     rule.isActive
                       ? 'bg-brand-500/10 border-brand-500/30 text-brand-400 shadow-glow-brand/10'
                       : 'bg-white/5 border-white/10 text-white/20'
@@ -126,7 +126,7 @@ export function AutomationList({ workspaceId, projectId }: AutomationListProps) 
               {/* Action Node */}
               <div className="relative z-10 flex flex-col items-center gap-4 min-w-[140px] ml-auto">
                 <div
-                  className={`p-5 rounded-2xl border transition-all ${
+                  className={`p-5 rounded-lg border transition-all ${
                     rule.isActive
                       ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400 shadow-glow-indigo/10'
                       : 'bg-white/5 border-white/10 text-white/20'
@@ -145,7 +145,7 @@ export function AutomationList({ workspaceId, projectId }: AutomationListProps) 
               </div>
 
               {/* Command Controls */}
-              <div className="flex flex-col gap-3 relative z-10 p-2 bg-black/40 rounded-2xl border border-white/5 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+              <div className="flex flex-col gap-3 relative z-10 p-2 bg-black/40 rounded-lg border border-white/5 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
                 <button
                   onClick={() => toggleMutation.mutate(rule)}
                   className={`p-3 rounded-xl transition-all relative group/icon ${

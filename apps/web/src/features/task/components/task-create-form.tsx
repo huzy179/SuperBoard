@@ -118,7 +118,7 @@ export function TaskCreateForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative mb-8 rounded-[2rem] border border-white/8 bg-white/[0.02] p-8 shadow-inner backdrop-blur-xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-500"
+      className="relative mb-8 rounded-xl border border-white/8 bg-white/[0.02] p-8 shadow-inner backdrop-blur-xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-500"
     >
       {/* Decorative glow */}
       <div className="absolute -top-20 -right-20 w-56 h-56 bg-brand-500/5 rounded-full blur-[80px] pointer-events-none" />

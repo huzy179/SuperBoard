@@ -93,7 +93,7 @@ export function DocPropertyBar({ classification, status, ownerName }: DocPropert
       <div className="flex-1" />
 
       {/* Access Log Fragment */}
-      <div className="flex items-center gap-4 px-6 py-2.5 bg-white/[0.02] border border-white/5 rounded-2xl">
+      <div className="flex items-center gap-4 px-6 py-2.5 bg-white/[0.02] border border-white/5 rounded-lg">
         <div className="flex -space-x-2">
           {[1, 2].map((i) => (
             <div

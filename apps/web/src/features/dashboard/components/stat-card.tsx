@@ -40,7 +40,7 @@ export function StatCard({ label, value, icon, color, trend, delay }: StatCardPr
         <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100" />
         <div className="flex items-start justify-between relative z-10 mb-8">
           <div
-            className={`p-4 rounded-2xl border ${colorMap[color]} transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6`}
+            className={`p-4 rounded-lg border ${colorMap[color]} transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6`}
           >
             {icon}
           </div>

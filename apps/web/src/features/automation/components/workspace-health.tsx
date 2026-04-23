@@ -69,7 +69,7 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <div className="w-16 h-16 rounded-[2rem] bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shadow-glow-rose">
+          <div className="w-16 h-16 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shadow-glow-rose">
             <Heart size={32} className="animate-pulse" />
           </div>
           <div>
@@ -91,7 +91,7 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
         <button
           onClick={handleHeal}
           disabled={isHealing}
-          className="px-8 py-4 rounded-2xl bg-indigo-600 text-white font-black text-[11px] uppercase tracking-[0.3em] flex items-center gap-3 hover:bg-indigo-500 transition-all shadow-glow-indigo disabled:opacity-50"
+          className="px-8 py-4 rounded-lg bg-indigo-600 text-white font-black text-[11px] uppercase tracking-[0.3em] flex items-center gap-3 hover:bg-indigo-500 transition-all shadow-glow-indigo disabled:opacity-50"
         >
           {isHealing ? <RefreshCw className="animate-spin" size={16} /> : <Zap size={16} />}
           Chạy dọn dẹp
@@ -121,7 +121,7 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
 
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                      <div className="w-12 h-12 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
                         <GitMerge size={22} />
                       </div>
                       <div className="flex flex-col">

@@ -36,8 +36,8 @@ export default function PublicDocPage() {
   if (isError || !doc) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
-        <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl border border-slate-200 p-10 text-center animate-in fade-in zoom-in duration-500">
-          <div className="mx-auto w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mb-6 border border-red-100">
+        <div className="max-w-md w-full bg-white rounded-xl shadow-2xl border border-slate-200 p-10 text-center animate-in fade-in zoom-in duration-500">
+          <div className="mx-auto w-16 h-16 bg-red-50 rounded-lg flex items-center justify-center mb-6 border border-red-100">
             <ShieldCheck size={32} className="text-red-600" />
           </div>
           <h1 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">Access Denied</h1>
@@ -94,7 +94,7 @@ export default function PublicDocPage() {
 
             <div className="flex flex-wrap items-center gap-6">
               <div className="flex items-center gap-3 group">
-                <div className="h-10 w-10 bg-slate-100 rounded-2xl flex items-center justify-center border border-slate-200 shadow-inner group-hover:scale-110 transition-transform">
+                <div className="h-10 w-10 bg-slate-100 rounded-lg flex items-center justify-center border border-slate-200 shadow-inner group-hover:scale-110 transition-transform">
                   <User size={20} className="text-slate-500" />
                 </div>
                 <div className="flex flex-col">
@@ -110,7 +110,7 @@ export default function PublicDocPage() {
               <div className="h-10 w-px bg-slate-100" />
 
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 bg-slate-100 rounded-2xl flex items-center justify-center border border-slate-200 shadow-inner">
+                <div className="h-10 w-10 bg-slate-100 rounded-lg flex items-center justify-center border border-slate-200 shadow-inner">
                   <Clock size={20} className="text-slate-500" />
                 </div>
                 <div className="flex flex-col">
@@ -125,14 +125,14 @@ export default function PublicDocPage() {
             </div>
           </header>
 
-          <section className="prose prose-slate lg:prose-xl max-w-none prose-h1:text-4xl prose-h1:font-black prose-p:leading-relaxed prose-pre:bg-slate-900 prose-pre:text-white prose-pre:rounded-2xl selection:bg-brand-500/20">
+          <section className="prose prose-slate lg:prose-xl max-w-none prose-h1:text-4xl prose-h1:font-black prose-p:leading-relaxed prose-pre:bg-slate-900 prose-pre:text-white prose-pre:rounded-lg selection:bg-brand-500/20">
             <RichTextEditor content={doc.content} onChange={() => {}} editable={false} />
           </section>
 
           <footer className="mt-32 pt-12 border-t border-slate-100 flex flex-col lg:flex-row items-center justify-between gap-8 opacity-50 grayscale hover:opacity-100 hover:grayscale-0 transition-all group/footer">
             <div className="flex items-center gap-4">
               <span className="text-sm font-bold text-slate-400">Published with</span>
-              <div className="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-2xl border border-slate-200 shadow-inner group-hover/footer:border-brand-200 group-hover/footer:bg-brand-50 transition-colors">
+              <div className="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-lg border border-slate-200 shadow-inner group-hover/footer:border-brand-200 group-hover/footer:bg-brand-50 transition-colors">
                 <div className="h-4 w-4 bg-brand-600 rounded flex items-center justify-center text-white text-[10px] font-black">
                   S
                 </div>

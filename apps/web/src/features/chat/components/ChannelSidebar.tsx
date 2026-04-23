@@ -42,7 +42,7 @@ export function ChannelSidebar() {
             {isLoading ? (
               <div className="px-3 py-2 space-y-4">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-10 bg-white/5 rounded-2xl animate-pulse" />
+                  <div key={i} className="h-10 bg-white/5 rounded-lg animate-pulse" />
                 ))}
               </div>
             ) : (
@@ -52,7 +52,7 @@ export function ChannelSidebar() {
                   <Link
                     key={channel.id}
                     href={`/chat/${channel.id}`}
-                    className={`flex items-center gap-4 px-4 py-3 rounded-2xl text-[13px] font-black uppercase tracking-tight transition-all group/item relative overflow-hidden border ${
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg text-[13px] font-black uppercase tracking-tight transition-all group/item relative overflow-hidden border ${
                       isActive
                         ? 'bg-brand-500/10 border-brand-500/20 text-white shadow-glow-brand/5'
                         : 'border-transparent text-white/30 hover:bg-white/[0.03] hover:text-white hover:border-white/5'
@@ -93,7 +93,7 @@ export function ChannelSidebar() {
           </div>
 
           <div className="px-3 space-y-4">
-            <div className="p-5 rounded-[2rem] border border-dashed border-white/5 bg-white/[0.01] flex flex-col items-center justify-center text-center group/empty">
+            <div className="p-5 rounded-xl border border-dashed border-white/5 bg-white/[0.01] flex flex-col items-center justify-center text-center group/empty">
               <Cpu
                 size={24}
                 className="text-white/5 mb-3 group-hover/empty:text-brand-500/20 transition-colors"
@@ -113,7 +113,7 @@ export function ChannelSidebar() {
         <div className="absolute top-0 left-0 w-32 h-32 bg-brand-500/5 blur-3xl rounded-full -translate-x-16 -translate-y-16" />
         <div className="flex items-center gap-4 relative z-10">
           <div className="relative group/avatar">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-400 border border-brand-500/30 flex items-center justify-center text-white text-sm font-black shadow-glow-brand/10 group-hover/avatar:scale-110 transition-transform">
+            <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-brand-600 to-brand-400 border border-brand-500/30 flex items-center justify-center text-white text-sm font-black shadow-glow-brand/10 group-hover/avatar:scale-110 transition-transform">
               {activeWorkspace?.name.charAt(0)}
             </div>
             <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-slate-950 rounded-full border-2 border-slate-950">

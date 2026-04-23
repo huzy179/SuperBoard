@@ -158,7 +158,7 @@ export default function DocDetailPage() {
             <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/[0.05] blur-3xl rounded-full translate-x-32 -translate-y-32" />
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <div className="bg-emerald-500/10 p-2.5 rounded-2xl text-emerald-400 border border-emerald-500/30 shadow-glow-emerald/10">
+                <div className="bg-emerald-500/10 p-2.5 rounded-lg text-emerald-400 border border-emerald-500/30 shadow-glow-emerald/10">
                   <ShieldCheck size={18} />
                 </div>
                 <div>

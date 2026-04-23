@@ -84,7 +84,7 @@ export function WorkspaceMemberSettings({
         {canManage && (
           <button
             onClick={() => setIsInviteModalOpen(true)}
-            className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white px-6 py-3 rounded-2xl font-black text-sm transition-all active:scale-95 shadow-xl shadow-slate-900/10"
+            className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white px-6 py-3 rounded-lg font-black text-sm transition-all active:scale-95 shadow-xl shadow-slate-900/10"
           >
             <UserPlus size={18} />
             <span>Mời thành viên</span>
@@ -93,7 +93,7 @@ export function WorkspaceMemberSettings({
       </div>
 
       {/* Filters Area */}
-      <div className="flex flex-wrap items-center gap-3 p-2 bg-slate-50 rounded-[2rem] border border-slate-100">
+      <div className="flex flex-wrap items-center gap-3 p-2 bg-slate-50 rounded-xl border border-slate-100">
         <div className="relative flex-1 min-w-[240px]">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
           <input
@@ -101,7 +101,7 @@ export function WorkspaceMemberSettings({
             placeholder="Tìm theo tên hoặc email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl text-sm focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all outline-none"
+            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-lg text-sm focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all outline-none"
           />
         </div>
 
@@ -246,7 +246,7 @@ export function WorkspaceMemberSettings({
                 className="premium-card p-5 group flex items-center justify-between"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center border border-slate-100">
+                  <div className="w-12 h-12 bg-slate-50 text-slate-400 rounded-lg flex items-center justify-center border border-slate-100">
                     <Mail size={20} />
                   </div>
                   <div>

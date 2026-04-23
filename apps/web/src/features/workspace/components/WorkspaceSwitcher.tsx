@@ -45,7 +45,7 @@ export function WorkspaceSwitcher({ showLabel = true }: { showLabel?: boolean })
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute left-3 top-20 right-3 z-50 glass-panel p-1 rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+          <div className="absolute left-3 top-20 right-3 z-50 glass-panel p-1 rounded-lg shadow-2xl animate-in fade-in zoom-in-95 duration-200">
             <div className="bg-slate-900 rounded-xl overflow-hidden py-2">
               <p className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white/30">
                 Your Workspaces

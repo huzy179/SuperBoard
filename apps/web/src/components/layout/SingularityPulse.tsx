@@ -103,7 +103,7 @@ export function SingularityPulse() {
           </motion.div>
         </AnimatePresence>
 
-        <div className="absolute top-full right-0 mt-4 w-72 p-6 bg-slate-900/95 border border-white/10 rounded-3xl shadow-2xl backdrop-blur-3xl opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all translate-y-2 group-hover:translate-y-0 z-50">
+        <div className="absolute top-full right-0 mt-4 w-72 p-6 bg-slate-900/95 border border-white/10 rounded-xl shadow-2xl backdrop-blur-3xl opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all translate-y-2 group-hover:translate-y-0 z-50">
           <div className="space-y-6">
             <div className="flex items-center justify-between border-b border-white/5 pb-4">
               <div className="flex items-center gap-2">
@@ -120,7 +120,7 @@ export function SingularityPulse() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 bg-white/5 rounded-2xl space-y-1">
+              <div className="p-3 bg-white/5 rounded-lg space-y-1">
                 <div className="flex items-center gap-1.5 opacity-40">
                   <Activity size={10} />
                   <span className="text-[8px] font-black uppercase tracking-widest">
@@ -129,7 +129,7 @@ export function SingularityPulse() {
                 </div>
                 <p className="text-sm font-black text-white">{stats.healed}</p>
               </div>
-              <div className="p-3 bg-white/5 rounded-2xl space-y-1">
+              <div className="p-3 bg-white/5 rounded-lg space-y-1">
                 <div className="flex items-center gap-1.5 opacity-40">
                   <Zap size={10} />
                   <span className="text-[8px] font-black uppercase tracking-widest">
@@ -142,7 +142,7 @@ export function SingularityPulse() {
             {hasProposals && (
               <Link
                 href="/automation/symbiosis"
-                className="flex items-center justify-between p-4 bg-brand-500/10 border border-brand-500/20 rounded-2xl hover:bg-brand-500/20 transition-all group/link"
+                className="flex items-center justify-between p-4 bg-brand-500/10 border border-brand-500/20 rounded-lg hover:bg-brand-500/20 transition-all group/link"
               >
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-brand-500/20 rounded-lg">
@@ -161,7 +161,7 @@ export function SingularityPulse() {
 
             <button
               onClick={() => setShowVoid(true)}
-              className="w-full flex items-center justify-center gap-3 py-4 bg-white text-slate-900 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] shadow-glow-white hover:scale-[1.02] transition-all"
+              className="w-full flex items-center justify-center gap-3 py-4 bg-white text-slate-900 rounded-lg text-[9px] font-black uppercase tracking-[0.2em] shadow-glow-white hover:scale-[1.02] transition-all"
             >
               <BrainCircuit size={14} /> Final Ascension
             </button>

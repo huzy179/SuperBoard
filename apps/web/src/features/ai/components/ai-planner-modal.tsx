@@ -87,7 +87,7 @@ export function AiPlannerModal({
         {/* Header */}
         <div className="p-8 border-b border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+            <div className="w-12 h-12 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
               <Target size={24} />
             </div>
             <div>
@@ -125,7 +125,7 @@ export function AiPlannerModal({
                     value={goal}
                     onChange={(e) => setGoal(e.target.value)}
                     placeholder="Ví dụ: Triển khai hệ thống thanh toán Stripe với hỗ trợ subscription..."
-                    className="w-full h-32 bg-white/5 border border-white/10 rounded-3xl p-6 text-white text-lg placeholder:text-white/20 focus:outline-none focus:border-indigo-500/50 transition-all resize-none"
+                    className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-6 text-white text-lg placeholder:text-white/20 focus:outline-none focus:border-indigo-500/50 transition-all resize-none"
                   />
                   <div className="absolute bottom-4 right-4 flex items-center gap-2">
                     <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">
@@ -137,7 +137,7 @@ export function AiPlannerModal({
                 <button
                   onClick={handleGenerate}
                   disabled={!goal.trim() || isLoading}
-                  className="w-full bg-white text-slate-950 h-16 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+                  className="w-full bg-white text-slate-950 h-16 rounded-lg font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
                 >
                   {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} />}
                   <span>Tạo kế hoạch với AI</span>
@@ -172,7 +172,7 @@ export function AiPlannerModal({
                       setSelectedTasks(next);
                     }}
                     className={`
-                                    group relative p-6 rounded-[2rem] border transition-all cursor-pointer
+                                    group relative p-6 rounded-xl border transition-all cursor-pointer
                                     ${
                                       selectedTasks.has(idx)
                                         ? 'bg-indigo-500/10 border-indigo-500/30'
@@ -246,14 +246,14 @@ export function AiPlannerModal({
             <div className="flex items-center gap-4">
               <button
                 onClick={onClose}
-                className="px-8 h-14 rounded-2xl text-[10px] font-black text-white/40 hover:text-white transition-all uppercase tracking-widest"
+                className="px-8 h-14 rounded-lg text-[10px] font-black text-white/40 hover:text-white transition-all uppercase tracking-widest"
               >
                 Huỷ
               </button>
               <button
                 onClick={handleExecute}
                 disabled={selectedTasks.size === 0 || isLoading}
-                className="px-8 h-14 rounded-2xl bg-indigo-500 text-white shadow-glow-brand font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50"
+                className="px-8 h-14 rounded-lg bg-indigo-500 text-white shadow-glow-brand font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50"
               >
                 {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Layers size={16} />}
                 <span>Thực thi kế hoạch</span>

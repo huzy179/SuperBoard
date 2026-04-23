@@ -173,7 +173,7 @@ export function MissionCommandBriefing({
                   </div>
                 </div>
 
-                <p className="text-xs font-bold text-white uppercase tracking-tight italic leading-relaxed text-white/60 relative z-10 bg-slate-950/50 p-4 rounded-2xl border border-white/5">
+                <p className="text-xs font-bold text-white uppercase tracking-tight italic leading-relaxed text-white/60 relative z-10 bg-slate-950/50 p-4 rounded-lg border border-white/5">
                   "{simulatedForecast?.prediction || forecast.prediction}"
                 </p>
 
@@ -249,7 +249,7 @@ export function MissionCommandBriefing({
               </div>
             </div>
 
-            <div className="flex items-center gap-2 bg-white/[0.01] border border-white/5 p-2 rounded-2xl w-fit ml-4">
+            <div className="flex items-center gap-2 bg-white/[0.01] border border-white/5 p-2 rounded-lg w-fit ml-4">
               <button
                 onClick={() => setShowExecutive(false)}
                 className={`text-[10px] font-black uppercase tracking-[0.2em] px-8 py-3 rounded-xl transition-all ${!showExecutive ? 'bg-white text-slate-950 shadow-luxe' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
@@ -332,7 +332,7 @@ export function MissionCommandBriefing({
 
             <div className="flex items-center justify-between py-8 px-10 bg-white/[0.01] border border-white/5 rounded-[2.5rem] shadow-inner ml-4 mr-4 group hover:bg-white/[0.02] transition-all">
               <div className="flex items-center gap-6">
-                <div className="h-12 w-12 bg-brand-500/10 rounded-2xl flex items-center justify-center border border-brand-500/30 group-hover:border-brand-500 transition-all">
+                <div className="h-12 w-12 bg-brand-500/10 rounded-lg flex items-center justify-center border border-brand-500/30 group-hover:border-brand-500 transition-all">
                   <Zap className="h-6 w-6 text-brand-500 fill-brand-500/20" />
                 </div>
                 <div className="space-y-1">
@@ -385,7 +385,7 @@ function SlantCard({
 }) {
   return (
     <div
-      className={`p-6 bg-white/5 border rounded-3xl space-y-3 transition-all ${urgent ? 'border-red-500/40 bg-red-500/5 shadow-glow-red/5' : 'border-white/10'}`}
+      className={`p-6 bg-white/5 border rounded-xl space-y-3 transition-all ${urgent ? 'border-red-500/40 bg-red-500/5 shadow-glow-red/5' : 'border-white/10'}`}
     >
       <div className="flex items-center gap-3">
         <div

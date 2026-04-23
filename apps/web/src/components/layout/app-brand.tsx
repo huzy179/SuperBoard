@@ -7,7 +7,7 @@ export function AppBrand({ subtitle, variant = 'light' }: AppBrandProps) {
   const isDark = variant === 'dark';
   return (
     <div className="flex items-center gap-4">
-      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900 shadow-luxe group relative overflow-hidden">
+      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-900 shadow-luxe group relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-brand-400 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity" />
         <span className="relative text-[11px] font-black tracking-[0.2em] text-white">SB</span>
       </div>

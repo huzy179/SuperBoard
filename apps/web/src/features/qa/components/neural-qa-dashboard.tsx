@@ -76,7 +76,7 @@ export function NeuralQaDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <div className="w-16 h-16 rounded-[2rem] bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shadow-glow-rose">
+          <div className="w-16 h-16 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shadow-glow-rose">
             <ShieldAlert size={32} />
           </div>
           <div className="flex flex-col">
@@ -95,7 +95,7 @@ export function NeuralQaDashboard() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 px-6 py-4 rounded-3xl bg-white/5 border border-white/10 group">
+        <div className="flex items-center gap-4 px-6 py-4 rounded-xl bg-white/5 border border-white/10 group">
           <Activity size={16} className="text-emerald-400 animate-pulse" />
           <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">
             Tình trạng hệ thống: 98.4%
@@ -120,7 +120,7 @@ export function NeuralQaDashboard() {
               <div
                 key={error.id}
                 onClick={() => setSelectedError(error)}
-                className={`p-6 rounded-[2rem] border transition-all cursor-pointer group select-none ${
+                className={`p-6 rounded-xl border transition-all cursor-pointer group select-none ${
                   selectedError?.id === error.id
                     ? 'bg-rose-500/10 border-rose-500/30 shadow-glow-rose'
                     : 'bg-white/5 border-white/5 hover:border-white/10'
@@ -155,7 +155,7 @@ export function NeuralQaDashboard() {
             <div className="p-10 rounded-[3rem] bg-white/5 border border-white/10 backdrop-blur-3xl space-y-8 animate-in slide-in-from-right duration-500">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="p-4 rounded-2xl bg-indigo-500/10 text-indigo-400">
+                  <div className="p-4 rounded-lg bg-indigo-500/10 text-indigo-400">
                     <FileSearch size={24} />
                   </div>
                   <div>
@@ -170,7 +170,7 @@ export function NeuralQaDashboard() {
                 <button
                   onClick={() => handleDiagnose(selectedError)}
                   disabled={!!isDiagnosing}
-                  className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-indigo-500/20 text-indigo-400 font-black text-[10px] uppercase tracking-widest hover:bg-indigo-500/30 transition-all shadow-glow-indigo disabled:opacity-50"
+                  className="flex items-center gap-3 px-6 py-3 rounded-lg bg-indigo-500/20 text-indigo-400 font-black text-[10px] uppercase tracking-widest hover:bg-indigo-500/30 transition-all shadow-glow-indigo disabled:opacity-50"
                 >
                   {isDiagnosing ? (
                     <RefreshCw className="animate-spin" size={14} />
@@ -181,7 +181,7 @@ export function NeuralQaDashboard() {
                 </button>
               </div>
 
-              <div className="p-8 rounded-[2rem] bg-black/40 border border-white/5 font-mono text-[11px] text-white/60 leading-relaxed max-h-[400px] overflow-auto scrollbar-hide">
+              <div className="p-8 rounded-xl bg-black/40 border border-white/5 font-mono text-[11px] text-white/60 leading-relaxed max-h-[400px] overflow-auto scrollbar-hide">
                 {selectedError.stack ? (
                   <div className="space-y-4">
                     <div className="text-rose-400/80 font-bold tracking-tight mb-4 uppercase">
@@ -204,7 +204,7 @@ export function NeuralQaDashboard() {
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="p-6 rounded-3xl bg-emerald-500/5 border border-emerald-500/20 space-y-2">
+                <div className="p-6 rounded-xl bg-emerald-500/5 border border-emerald-500/20 space-y-2">
                   <div className="flex items-center gap-2 text-emerald-400 mb-2">
                     <CheckCircle2 size={14} />
                     <span className="text-[10px] font-black uppercase tracking-widest">
@@ -216,7 +216,7 @@ export function NeuralQaDashboard() {
                     injection at line 142.
                   </p>
                 </div>
-                <div className="p-6 rounded-3xl bg-white/5 border border-white/10 flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-white/10 transition-all">
+                <div className="p-6 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-white/10 transition-all">
                   <Code
                     size={20}
                     className="text-indigo-400 mb-2 group-hover:scale-110 transition-transform"

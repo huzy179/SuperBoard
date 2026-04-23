@@ -65,11 +65,11 @@ export function MessageInput({ channelId }: MessageInputProps) {
   return (
     <div className="max-w-4xl mx-auto relative group">
       {/* High-fidelity rim lighting proxy */}
-      <div className="absolute -inset-px bg-gradient-to-r from-brand-500/20 via-transparent to-brand-500/20 rounded-[2rem] opacity-0 group-focus-within:opacity-100 transition-opacity blur-sm pointer-events-none" />
+      <div className="absolute -inset-px bg-gradient-to-r from-brand-500/20 via-transparent to-brand-500/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity blur-sm pointer-events-none" />
 
-      <div className="relative flex flex-col p-2 rounded-[2rem] bg-slate-950/80 backdrop-blur-3xl border border-white/5 shadow-2xl focus-within:border-brand-500/30 transition-all">
+      <div className="relative flex flex-col p-2 rounded-xl bg-slate-950/80 backdrop-blur-3xl border border-white/5 shadow-2xl focus-within:border-brand-500/30 transition-all">
         <div className="flex items-end gap-2 px-2 pb-2">
-          <button className="p-3 text-white/20 hover:text-brand-400 hover:bg-white/5 rounded-2xl transition-all">
+          <button className="p-3 text-white/20 hover:text-brand-400 hover:bg-white/5 rounded-lg transition-all">
             <Paperclip size={20} />
           </button>
 
@@ -84,7 +84,7 @@ export function MessageInput({ channelId }: MessageInputProps) {
           />
 
           <div className="flex items-center gap-2 self-center pb-1">
-            <button className="p-3 text-white/20 hover:text-amber-400 hover:bg-white/5 rounded-2xl transition-all">
+            <button className="p-3 text-white/20 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-all">
               <Smile size={20} />
             </button>
 
@@ -93,7 +93,7 @@ export function MessageInput({ channelId }: MessageInputProps) {
             <button
               onClick={handleSend}
               disabled={!content.trim() || sendMessageMutation.isPending}
-              className={`p-4 rounded-2xl transition-all group/send active:scale-95 ${
+              className={`p-4 rounded-lg transition-all group/send active:scale-95 ${
                 content.trim()
                   ? 'bg-brand-500 text-white shadow-glow-brand/20 hover:bg-brand-400'
                   : 'bg-white/5 text-white/10'
@@ -109,7 +109,7 @@ export function MessageInput({ channelId }: MessageInputProps) {
         </div>
 
         {/* Terminal Metadata Footer */}
-        <div className="flex items-center justify-between px-6 py-2 border-t border-white/5 bg-black/20 rounded-b-[1.8rem]">
+        <div className="flex items-center justify-between px-6 py-2 border-t border-white/5 bg-black/20 rounded-b-lg">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
               <div className="h-1 w-1 bg-brand-500 rounded-full animate-pulse" />

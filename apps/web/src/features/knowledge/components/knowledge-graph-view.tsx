@@ -156,7 +156,7 @@ export function KnowledgeGraphView({
       <div className="absolute top-10 right-10 z-20 flex gap-4">
         <button
           onClick={fetchData}
-          className="p-4 rounded-3xl bg-white/5 text-white/40 hover:bg-white/10 hover:text-white transition-all shadow-luxe border border-white/5"
+          className="p-4 rounded-xl bg-white/5 text-white/40 hover:bg-white/10 hover:text-white transition-all shadow-luxe border border-white/5"
         >
           <RefreshCw size={18} />
         </button>
@@ -198,7 +198,7 @@ export function KnowledgeGraphView({
               }}
             >
               <div
-                className={`p-4 rounded-2xl border transition-all duration-500 shadow-luxe hover:scale-125 hover:z-30 ${
+                className={`p-4 rounded-lg border transition-all duration-500 shadow-luxe hover:scale-125 hover:z-30 ${
                   node.type === 'task'
                     ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400'
                     : node.type === 'doc'

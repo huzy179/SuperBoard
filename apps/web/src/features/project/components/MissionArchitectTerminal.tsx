@@ -173,7 +173,7 @@ export function MissionArchitectTerminal() {
 
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-brand-500/20 rounded-2xl text-brand-400">
+                  <div className="p-3 bg-brand-500/20 rounded-lg text-brand-400">
                     <Sparkles size={24} />
                   </div>
                   <div>
@@ -200,7 +200,7 @@ export function MissionArchitectTerminal() {
                       value={goal}
                       onChange={(e) => setGoal(e.target.value)}
                       placeholder="Nhập mục tiêu chiến lược của bạn... (ví dụ: Xây dựng hệ thống thanh toán tự động)"
-                      className="w-full h-32 bg-slate-950/50 border border-white/5 rounded-2xl p-6 text-white text-sm placeholder:text-white/10 focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all outline-none resize-none"
+                      className="w-full h-32 bg-slate-950/50 border border-white/5 rounded-lg p-6 text-white text-sm placeholder:text-white/10 focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all outline-none resize-none"
                     />
                   </div>
 
@@ -229,7 +229,7 @@ export function MissionArchitectTerminal() {
                     ) : (
                       <button
                         onClick={() => fileInputRef.current?.click()}
-                        className="h-20 w-20 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center gap-1 hover:border-brand-500/40 transition-colors"
+                        className="h-20 w-20 border-2 border-dashed border-white/10 rounded-lg flex flex-col items-center justify-center gap-1 hover:border-brand-500/40 transition-colors"
                       >
                         <Upload size={16} className="text-white/20" />
                         <span className="text-[8px] font-black text-white/20 uppercase">
@@ -240,7 +240,7 @@ export function MissionArchitectTerminal() {
                     <button
                       onClick={handleAnalyze}
                       disabled={isAnalyzing || (!goal.trim() && !imageEncoded)}
-                      className="flex-1 h-20 bg-brand-500 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-brand-400 disabled:opacity-50 transition-all flex items-center justify-center"
+                      className="flex-1 h-20 bg-brand-500 text-white rounded-lg font-black uppercase tracking-widest hover:bg-brand-400 disabled:opacity-50 transition-all flex items-center justify-center"
                     >
                       {isAnalyzing ? <Activity className="animate-spin" /> : 'Phân tích kiến trúc'}
                     </button>
@@ -278,7 +278,7 @@ export function MissionArchitectTerminal() {
                           {suggestedTasks.map((t, i) => (
                             <div
                               key={i}
-                              className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.04] transition-colors group/item"
+                              className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-lg hover:bg-white/[0.04] transition-colors group/item"
                             >
                               <div className="flex flex-col gap-1">
                                 <div className="flex items-center gap-3">
@@ -302,7 +302,7 @@ export function MissionArchitectTerminal() {
                         </div>
                         <button
                           onClick={handleDeploy}
-                          className="w-full py-4 bg-brand-500 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-brand-400 transition-all flex items-center justify-center gap-2"
+                          className="w-full py-4 bg-brand-500 text-white rounded-lg font-black uppercase tracking-widest hover:bg-brand-400 transition-all flex items-center justify-center gap-2"
                         >
                           <CheckCircle2 size={18} />
                           Triển khai nhiệm vụ
@@ -321,7 +321,7 @@ export function MissionArchitectTerminal() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white/5 p-4 rounded-2xl">
+                    <div className="bg-white/5 p-4 rounded-lg">
                       <h3 className="text-[10px] font-black text-white/30 uppercase mb-2">
                         Statuses
                       </h3>
@@ -337,7 +337,7 @@ export function MissionArchitectTerminal() {
                         ))}
                       </div>
                     </div>
-                    <div className="bg-white/5 p-4 rounded-2xl flex flex-col justify-center">
+                    <div className="bg-white/5 p-4 rounded-lg flex flex-col justify-center">
                       <h3 className="text-[10px] font-black text-white/30 uppercase mb-2">Tasks</h3>
                       <span className="text-2xl font-black text-white">
                         {plan.tasks?.length || 0}
@@ -348,14 +348,14 @@ export function MissionArchitectTerminal() {
                   <div className="flex gap-4">
                     <button
                       onClick={() => setPlan(null)}
-                      className="flex-1 py-4 bg-white/5 border border-white/5 rounded-2xl text-xs font-black uppercase text-white hover:bg-white/10 transition-colors"
+                      className="flex-1 py-4 bg-white/5 border border-white/5 rounded-lg text-xs font-black uppercase text-white hover:bg-white/10 transition-colors"
                     >
                       Hủy
                     </button>
                     <button
                       onClick={handleDeploy}
                       disabled={isDeploying}
-                      className="flex-[2] py-4 bg-brand-500 text-white rounded-2xl text-xs font-black uppercase flex items-center justify-center gap-2 hover:bg-brand-400 transition-all"
+                      className="flex-[2] py-4 bg-brand-500 text-white rounded-lg text-xs font-black uppercase flex items-center justify-center gap-2 hover:bg-brand-400 transition-all"
                     >
                       {isDeploying ? (
                         <Activity className="animate-spin" />

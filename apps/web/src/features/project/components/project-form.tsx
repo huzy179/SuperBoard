@@ -37,7 +37,7 @@ export function ProjectForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="relative mb-10 rounded-[2rem] border border-white/8 bg-white/[0.02] p-10 shadow-inner backdrop-blur-3xl overflow-hidden"
+      className="relative mb-10 rounded-xl border border-white/8 bg-white/[0.02] p-10 shadow-inner backdrop-blur-3xl overflow-hidden"
     >
       {/* Color aura */}
       <div
@@ -61,7 +61,7 @@ export function ProjectForm({
           <button
             type="button"
             onClick={onCancel}
-            className="p-3 rounded-2xl bg-white/[0.03] border border-white/8 text-white/20 hover:text-white hover:bg-white/[0.08] transition-all"
+            className="p-3 rounded-lg bg-white/[0.03] border border-white/8 text-white/20 hover:text-white hover:bg-white/[0.08] transition-all"
           >
             <X size={18} />
           </button>
@@ -110,7 +110,7 @@ export function ProjectForm({
               <Palette size={10} />
               Màu sắc
             </label>
-            <div className="flex items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.03] p-2 pl-4 shadow-inner focus-within:border-brand-500/40 transition-all">
+            <div className="flex items-center gap-3 rounded-lg border border-white/8 bg-white/[0.03] p-2 pl-4 shadow-inner focus-within:border-brand-500/40 transition-all">
               <div
                 className="h-8 w-8 rounded-xl flex-shrink-0 shadow-inner"
                 style={{ backgroundColor: color || '#6366f1' }}

@@ -56,7 +56,7 @@ export function ProjectMemoirGallery({ projectId }: { projectId: string }) {
       {/* Cinematic Header */}
       <div className="flex items-center justify-between relative z-10">
         <div className="flex items-center gap-6">
-          <div className="w-16 h-16 rounded-[2rem] bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center">
+          <div className="w-16 h-16 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center">
             <Book size={32} />
           </div>
           <div>
@@ -70,7 +70,7 @@ export function ProjectMemoirGallery({ projectId }: { projectId: string }) {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="flex bg-white/[0.03] border border-white/5 p-1.5 rounded-2xl">
+          <div className="flex bg-white/[0.03] border border-white/5 p-1.5 rounded-lg">
             {['executive', 'technical', 'celebratory'].map((p) => (
               <button
                 key={p}
@@ -88,7 +88,7 @@ export function ProjectMemoirGallery({ projectId }: { projectId: string }) {
           <button
             onClick={generateMemoir}
             disabled={isGenerating}
-            className="px-8 py-4 rounded-2xl bg-brand-500/10 border border-brand-500/20 text-brand-400 font-black text-[11px] uppercase tracking-[0.3em] flex items-center gap-3 hover:bg-brand-500/20 transition-all disabled:opacity-50"
+            className="px-8 py-4 rounded-lg bg-brand-500/10 border border-brand-500/20 text-brand-400 font-black text-[11px] uppercase tracking-[0.3em] flex items-center gap-3 hover:bg-brand-500/20 transition-all disabled:opacity-50"
           >
             {isGenerating ? <History size={16} className="animate-spin" /> : <Plus size={16} />}
             Tạo memoir

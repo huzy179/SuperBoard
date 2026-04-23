@@ -88,7 +88,7 @@ export function NeuralBriefing({ projectId }: NeuralBriefingProps) {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl group-hover:bg-brand-500/5 transition-all">
+            <div className="p-6 bg-white/[0.02] border border-white/5 rounded-lg group-hover:bg-brand-500/5 transition-all">
               <div className="flex justify-between items-center mb-2">
                 <div className="text-[10px] font-black text-brand-400 uppercase tracking-widest">
                   Sự hội tụ (Convergence)
@@ -101,7 +101,7 @@ export function NeuralBriefing({ projectId }: NeuralBriefingProps) {
             </div>
             <div
               onClick={handleExportDataset}
-              className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl group-hover:bg-indigo-500/5 transition-all cursor-pointer"
+              className="p-6 bg-white/[0.02] border border-white/5 rounded-lg group-hover:bg-indigo-500/5 transition-all cursor-pointer"
             >
               <div className="flex justify-between items-center mb-2">
                 <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">
@@ -133,7 +133,7 @@ export function NeuralBriefing({ projectId }: NeuralBriefingProps) {
             </div>
             <button
               onClick={toggleProvider}
-              className="p-3 bg-white/5 rounded-2xl hover:bg-white/10 transition-all border border-white/5"
+              className="p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-all border border-white/5"
             >
               {isLocalMode ? (
                 <HardDrive className="text-brand-400" size={20} />

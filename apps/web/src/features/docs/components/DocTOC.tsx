@@ -103,7 +103,7 @@ export function DocTOC({ content }: DocTOCProps) {
         </nav>
 
         {/* Tactical Metadata */}
-        <div className="mt-12 p-5 rounded-2xl border border-white/5 bg-white/[0.01] space-y-3">
+        <div className="mt-12 p-5 rounded-lg border border-white/5 bg-white/[0.01] space-y-3">
           <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-white/20">
             <span>Nodes_Indexed</span>
             <span className="text-brand-500">{items.length}</span>

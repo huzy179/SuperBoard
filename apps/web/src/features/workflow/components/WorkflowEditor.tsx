@@ -196,7 +196,7 @@ export function WorkflowEditor({
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSaveStatusName(status.id)}
-                        className="w-full px-6 py-4 bg-slate-950/80 border border-brand-500/30 rounded-2xl text-base font-black text-white shadow-luxe outline-none focus:border-brand-500 transition-all uppercase"
+                        className="w-full px-6 py-4 bg-slate-950/80 border border-brand-500/30 rounded-lg text-base font-black text-white shadow-luxe outline-none focus:border-brand-500 transition-all uppercase"
                       />
                       <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[8px] font-black text-brand-500/50 uppercase tracking-widest">
                         COMMIT_READY
@@ -231,14 +231,14 @@ export function WorkflowEditor({
                   value={newStatusName}
                   onChange={(e) => setNewStatusName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleAddStatus()}
-                  className="w-full px-10 py-6 bg-white/[0.01] border border-white/5 rounded-[2rem] focus:bg-white/[0.02] focus:border-brand-500/40 outline-none transition-all font-black text-xl text-white shadow-inner uppercase placeholder:text-white/5"
+                  className="w-full px-10 py-6 bg-white/[0.01] border border-white/5 rounded-xl focus:bg-white/[0.02] focus:border-brand-500/40 outline-none transition-all font-black text-xl text-white shadow-inner uppercase placeholder:text-white/5"
                 />
               </div>
               <div className="relative">
                 <select
                   value={newStatusCategory}
                   onChange={(e) => setNewStatusCategory(e.target.value as WorkflowStatusCategory)}
-                  className="w-full appearance-none px-10 py-6 rounded-[2rem] border border-white/5 bg-white/[0.01] focus:bg-white/[0.02] focus:border-brand-500/40 outline-none transition-all font-black uppercase text-xs tracking-[0.2em] text-white/60 shadow-inner"
+                  className="w-full appearance-none px-10 py-6 rounded-xl border border-white/5 bg-white/[0.01] focus:bg-white/[0.02] focus:border-brand-500/40 outline-none transition-all font-black uppercase text-xs tracking-[0.2em] text-white/60 shadow-inner"
                 >
                   <option value="todo">Chưa thực hiện</option>
                   <option value="in_progress">Đang thực hiện</option>
@@ -254,7 +254,7 @@ export function WorkflowEditor({
               <button
                 onClick={handleAddStatus}
                 disabled={isPending || !newStatusName.trim()}
-                className="relative overflow-hidden px-10 py-6 bg-brand-500 hover:scale-105 disabled:bg-white/5 disabled:scale-100 text-white font-black rounded-[2rem] shadow-glow-brand/20 transition-all active:scale-95 uppercase text-[11px] tracking-[0.3em] group/btn"
+                className="relative overflow-hidden px-10 py-6 bg-brand-500 hover:scale-105 disabled:bg-white/5 disabled:scale-100 text-white font-black rounded-xl shadow-glow-brand/20 transition-all active:scale-95 uppercase text-[11px] tracking-[0.3em] group/btn"
               >
                 <div className="absolute inset-x-0 top-0 h-px bg-white/40" />
                 {isPending ? 'Propagating...' : 'Register Node'}
@@ -281,7 +281,7 @@ export function WorkflowEditor({
             <button
               onClick={handleSaveTransitions}
               disabled={isPending}
-              className="relative overflow-hidden px-12 py-4 bg-emerald-500 hover:scale-105 text-white text-[10px] font-black rounded-2xl shadow-glow-emerald/20 transition-all active:scale-95 uppercase tracking-[0.3em]"
+              className="relative overflow-hidden px-12 py-4 bg-emerald-500 hover:scale-105 text-white text-[10px] font-black rounded-lg shadow-glow-emerald/20 transition-all active:scale-95 uppercase tracking-[0.3em]"
             >
               <div className="absolute inset-x-0 top-0 h-px bg-white/40" />
               {isPending ? 'Syncing...' : 'Commit Matrix'}
@@ -306,7 +306,7 @@ export function WorkflowEditor({
                 {statuses.map((s) => (
                   <th
                     key={s.id}
-                    className="p-6 border-b border-white/5 group/th transition-all hover:bg-white/[0.02] rounded-3xl"
+                    className="p-6 border-b border-white/5 group/th transition-all hover:bg-white/[0.02] rounded-xl"
                   >
                     <span className="text-xs font-black text-white/40 group-hover/th:text-white uppercase tracking-widest transition-colors block">
                       {s.name}
@@ -330,13 +330,13 @@ export function WorkflowEditor({
                     return (
                       <td key={to.id} className="p-3">
                         {isSelf ? (
-                          <div className="h-10 w-full bg-white/[0.02] rounded-2xl flex items-center justify-center opacity-10">
+                          <div className="h-10 w-full bg-white/[0.02] rounded-lg flex items-center justify-center opacity-10">
                             <span className="text-[8px] font-black">X</span>
                           </div>
                         ) : (
                           <button
                             onClick={() => toggleTransition(from.id, to.id)}
-                            className={`group h-12 w-full rounded-2xl flex items-center justify-center transition-all duration-500 border shadow-inner ${
+                            className={`group h-12 w-full rounded-lg flex items-center justify-center transition-all duration-500 border shadow-inner ${
                               isAllowed
                                 ? 'bg-white/10 border-white/20 text-emerald-400 shadow-glow-emerald/10 scale-105 z-10'
                                 : 'bg-white/[0.01] border-white/5 text-white/5 hover:border-brand-500/30'
@@ -352,7 +352,7 @@ export function WorkflowEditor({
                             {isAllowed && (
                               <motion.div
                                 layoutId={`trans-${from.id}-${to.id}`}
-                                className="absolute inset-0 border-2 border-emerald-500/40 rounded-2xl animate-pulse pointer-events-none"
+                                className="absolute inset-0 border-2 border-emerald-500/40 rounded-lg animate-pulse pointer-events-none"
                               />
                             )}
                           </button>

@@ -33,7 +33,7 @@ export function ProjectSkeleton() {
               {[1, 2, 3].map((j) => (
                 <div
                   key={j}
-                  className="h-32 w-full rounded-[2rem] bg-white/[0.02] border border-white/5 p-5 space-y-4"
+                  className="h-32 w-full rounded-xl bg-white/[0.02] border border-white/5 p-5 space-y-4"
                 >
                   <div className="flex justify-between">
                     <div className="h-3 w-12 rounded-full bg-white/5 animate-pulse" />

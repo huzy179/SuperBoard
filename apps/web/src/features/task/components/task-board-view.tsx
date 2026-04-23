@@ -259,7 +259,7 @@ export function TaskBoardView({
               </div>
               <div className="flex items-center gap-4">
                 <div className="h-2 w-2 rounded-full bg-white/5" />
-                <span className="tabular-nums inline-flex h-8 min-w-10 items-center justify-center rounded-2xl bg-white/5 px-2.5 text-[10px] font-black font-mono text-white/40 border border-white/5 shadow-inner">
+                <span className="tabular-nums inline-flex h-8 min-w-10 items-center justify-center rounded-lg bg-white/5 px-2.5 text-[10px] font-black font-mono text-white/40 border border-white/5 shadow-inner">
                   {tasks.length.toString().padStart(2, '0')}
                 </span>
               </div>
@@ -410,7 +410,7 @@ export function TaskBoardView({
               <button
                 type="button"
                 onClick={() => onAddTask(column.key)}
-                className="group w-full flex items-center justify-center gap-4 rounded-2xl border border-dashed border-white/10 py-4 text-[10px] font-black uppercase tracking-[0.4em] text-white/10 transition-all hover:border-brand-500/40 hover:bg-brand-500/5 hover:text-brand-400 shadow-inner group/add"
+                className="group w-full flex items-center justify-center gap-4 rounded-lg border border-dashed border-white/10 py-4 text-[10px] font-black uppercase tracking-[0.4em] text-white/10 transition-all hover:border-brand-500/40 hover:bg-brand-500/5 hover:text-brand-400 shadow-inner group/add"
               >
                 <div className="w-5 h-5 flex items-center justify-center rounded-lg bg-white/5 border border-white/5 group-hover/add:bg-brand-500 group-hover/add:text-white transition-all">
                   <span className="text-sm font-bold translate-y-[-1px] group-hover/add:rotate-90 transition-transform">

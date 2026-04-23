@@ -46,7 +46,7 @@ export function TaskSubtaskManager({
         >
           <div className="absolute inset-0 bg-brand-500/[0.01] opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="flex items-center gap-8 relative z-10">
-            <div className="w-16 h-16 bg-slate-950 rounded-2xl flex items-center justify-center border border-white/5 group-hover:scale-110 group-hover:rotate-6 transition-all shadow-inner">
+            <div className="w-16 h-16 bg-slate-950 rounded-lg flex items-center justify-center border border-white/5 group-hover:scale-110 group-hover:rotate-6 transition-all shadow-inner">
               <ArrowUpRight size={24} className="text-brand-400" />
             </div>
             <div className="space-y-1.5">
@@ -145,7 +145,7 @@ export function TaskSubtaskManager({
             {subtasks.map((subtask) => (
               <div
                 key={subtask.id}
-                className={`group/node flex items-center gap-8 rounded-[2rem] border border-white/5 bg-white/[0.01] p-6 hover:bg-white/[0.03] hover:border-brand-500/20 transition-all shadow-inner relative overflow-hidden ${subtask.status === 'done' ? 'opacity-30' : ''}`}
+                className={`group/node flex items-center gap-8 rounded-xl border border-white/5 bg-white/[0.01] p-6 hover:bg-white/[0.03] hover:border-brand-500/20 transition-all shadow-inner relative overflow-hidden ${subtask.status === 'done' ? 'opacity-30' : ''}`}
               >
                 <div className="relative z-10">
                   <input
@@ -153,7 +153,7 @@ export function TaskSubtaskManager({
                     checked={subtask.status === 'done'}
                     onChange={() => onToggleSubtaskDone(subtask)}
                     disabled={subtaskPendingTaskId === subtask.id}
-                    className="peer h-10 w-10 rounded-2xl border-2 border-white/5 bg-transparent text-brand-500 focus:ring-offset-0 focus:ring-0 checked:bg-brand-500/10 checked:border-brand-500/40 transition-all appearance-none cursor-pointer hover:border-brand-500/20 shadow-inner"
+                    className="peer h-10 w-10 rounded-lg border-2 border-white/5 bg-transparent text-brand-500 focus:ring-offset-0 focus:ring-0 checked:bg-brand-500/10 checked:border-brand-500/40 transition-all appearance-none cursor-pointer hover:border-brand-500/20 shadow-inner"
                   />
                   <CheckCircle2
                     size={22}
@@ -186,7 +186,7 @@ export function TaskSubtaskManager({
                   type="button"
                   onClick={() => onDeleteSubtask(subtask.id)}
                   disabled={subtaskPendingTaskId === subtask.id}
-                  className="opacity-0 group-hover/node:opacity-100 p-4 rounded-2xl text-rose-500/30 hover:text-white hover:bg-rose-500 transition-all disabled:opacity-30 relative z-10"
+                  className="opacity-0 group-hover/node:opacity-100 p-4 rounded-lg text-rose-500/30 hover:text-white hover:bg-rose-500 transition-all disabled:opacity-30 relative z-10"
                 >
                   <Trash2 size={20} />
                 </button>
@@ -212,7 +212,7 @@ export function TaskSubtaskManager({
               }
             }}
             placeholder="DECLARE_NEW_OBJECTIVE..."
-            className="flex-1 rounded-[2rem] border border-white/5 bg-white/[0.01] px-10 py-6 text-sm font-black text-white/70 focus:outline-none focus:border-brand-500/30 focus:bg-white/[0.03] transition-all placeholder:text-white/5 shadow-inner uppercase italic tracking-tight"
+            className="flex-1 rounded-xl border border-white/5 bg-white/[0.01] px-10 py-6 text-sm font-black text-white/70 focus:outline-none focus:border-brand-500/30 focus:bg-white/[0.03] transition-all placeholder:text-white/5 shadow-inner uppercase italic tracking-tight"
           />
           <button
             type="button"

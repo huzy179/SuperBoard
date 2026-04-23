@@ -54,7 +54,7 @@ export function TheVoid({ onClose }: { onClose: () => void }) {
 
       <header className="relative z-10 flex items-center justify-between p-10 border-b border-white/5 backdrop-blur-md">
         <div className="flex items-center gap-6">
-          <div className="h-12 w-12 bg-brand-500 rounded-2xl flex items-center justify-center shadow-glow-brand animate-pulse">
+          <div className="h-12 w-12 bg-brand-500 rounded-lg flex items-center justify-center shadow-glow-brand animate-pulse">
             <BrainCircuit size={24} />
           </div>
           <div>
@@ -143,7 +143,7 @@ export function TheVoid({ onClose }: { onClose: () => void }) {
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="p-6 bg-white/5 border border-white/10 rounded-3xl space-y-2 backdrop-blur-xl">
+    <div className="p-6 bg-white/5 border border-white/10 rounded-xl space-y-2 backdrop-blur-xl">
       <div className="flex items-center gap-2 text-white/20">
         {icon}
         <span className="text-[8px] font-black uppercase tracking-widest">{label}</span>

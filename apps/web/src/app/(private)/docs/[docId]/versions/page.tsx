@@ -65,7 +65,7 @@ export default function VersionHistoryPage() {
       <div className="flex flex-1 overflow-hidden">
         {/* Main Preview Area */}
         <div className="flex-1 overflow-y-auto bg-slate-200/20 p-8 sm:p-12 lg:p-20">
-          <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-2xl border border-slate-200 min-h-full overflow-hidden p-12">
+          <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-lg border border-slate-200 min-h-full overflow-hidden p-12">
             <div className="mb-8">
               <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight mb-4">
                 {doc?.title}

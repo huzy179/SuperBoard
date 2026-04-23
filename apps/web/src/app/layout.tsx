@@ -1,11 +1,24 @@
 import type { ReactNode } from 'react';
 import './globals.css';
+import { Sora, Hanken_Grotesk } from 'next/font/google';
 import { Toaster } from 'sonner';
+
+const sora = Sora({
+  subsets: ['latin', 'vietnamese'],
+  variable: '--font-sora',
+  display: 'swap',
+});
+
+const hanken = Hanken_Grotesk({
+  subsets: ['latin', 'vietnamese'],
+  variable: '--font-hanken',
+  display: 'swap',
+});
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="vi">
-      <body className="min-h-screen bg-slate-950 text-slate-50 selection:bg-brand-500/30 selection:text-white">
+    <html lang="vi" className={`${sora.variable} ${hanken.variable}`}>
+      <body className="min-h-screen bg-surface-bg font-sans text-slate-200 antialiased selection:bg-brand-500/20 selection:text-white">
         {children}
         <Toaster
           position="top-center"
@@ -15,18 +28,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           theme="dark"
           toastOptions={{
             style: {
-              background: 'rgba(2, 6, 23, 0.8)',
-              backdropFilter: 'blur(32px)',
-              border: '1px solid rgba(255, 255, 255, 0.05)',
-              borderRadius: '24px',
-              padding: '16px 24px',
-              boxShadow:
-                '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(37, 99, 235, 0.05)',
-              fontSize: '12px',
-              fontWeight: '800',
+              background: 'oklch(0.16 0.01 260 / 0.8)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid oklch(1 0 0 / 0.05)',
+              borderRadius: '12px',
+              padding: '12px 20px',
+              boxShadow: 'var(--shadow-glass)',
+              fontSize: '11px',
+              fontWeight: '700',
               textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              fontFamily: 'inherit',
+              letterSpacing: '0.15em',
+              fontFamily: 'var(--font-sora)',
             },
             className: 'shadow-glass',
           }}

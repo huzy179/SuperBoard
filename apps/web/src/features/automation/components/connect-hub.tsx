@@ -73,7 +73,7 @@ export function ConnectHub({ workspaceId }: { workspaceId: string }) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <div className="w-16 h-16 rounded-[2rem] bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-glow-indigo">
+          <div className="w-16 h-16 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-glow-indigo">
             <Share2 size={32} />
           </div>
           <div>
@@ -90,7 +90,7 @@ export function ConnectHub({ workspaceId }: { workspaceId: string }) {
           </div>
         </div>
 
-        <div className="flex gap-2 p-1.5 rounded-2xl bg-white/5 border border-white/5">
+        <div className="flex gap-2 p-1.5 rounded-lg bg-white/5 border border-white/5">
           <button
             onClick={() => setActiveTab('connections')}
             className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'connections' ? 'bg-white/10 text-white border border-white/10' : 'text-white/40 hover:text-white'}`}
@@ -131,7 +131,7 @@ export function ConnectHub({ workspaceId }: { workspaceId: string }) {
               <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl -mr-16 -mt-16 group-hover:bg-indigo-500/10 transition-colors" />
 
               <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center">
                   {getProviderIcon(integration.provider)}
                 </div>
                 <div

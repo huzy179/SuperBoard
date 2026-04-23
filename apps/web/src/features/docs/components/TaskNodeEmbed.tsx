@@ -15,7 +15,7 @@ export function TaskNodeEmbed(
   const content = (
     <motion.div
       whileHover={{ scale: 1.01, x: 4 }}
-      className="my-8 p-6 bg-slate-900/40 border border-white/5 rounded-[2rem] shadow-glass relative group cursor-pointer overflow-hidden"
+      className="my-8 p-6 bg-slate-900/40 border border-white/5 rounded-xl shadow-glass relative group cursor-pointer overflow-hidden"
     >
       <div className="absolute inset-0 bg-gradient-to-r from-brand-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
@@ -57,7 +57,7 @@ export function TaskNodeEmbed(
           </div>
         </div>
 
-        <button className="p-3 bg-white/5 border border-white/5 text-white/20 rounded-2xl hover:bg-brand-500 hover:text-white hover:border-brand-500 transition-all group/btn">
+        <button className="p-3 bg-white/5 border border-white/5 text-white/20 rounded-lg hover:bg-brand-500 hover:text-white hover:border-brand-500 transition-all group/btn">
           <ExternalLink size={18} className="group-hover/btn:scale-110 transition-transform" />
         </button>
       </div>

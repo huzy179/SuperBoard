@@ -122,7 +122,7 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
 
                   <div className="relative group/bubble">
                     <div
-                      className={`relative text-[14px] leading-relaxed break-words whitespace-pre-wrap px-5 py-3.5 rounded-2xl border transition-all duration-500 shadow-inner group-hover/bubble:shadow-glow-brand/5 ${
+                      className={`relative text-[14px] leading-relaxed break-words whitespace-pre-wrap px-5 py-3.5 rounded-lg border transition-all duration-500 shadow-inner group-hover/bubble:shadow-glow-brand/5 ${
                         showHeader ? (isMe ? 'rounded-tr-none' : 'rounded-tl-none') : ''
                       } ${
                         isMe
@@ -136,7 +136,7 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
                       </div>
 
                       {/* Physical noise texture proxy */}
-                      <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 rounded-2xl" />
+                      <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 rounded-lg" />
                     </div>
 
                     {/* Reaction System */}
@@ -232,7 +232,7 @@ function NeuralLinkPreview({ content }: { content: string }) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mt-4 p-4 bg-black/40 border border-white/5 rounded-2xl group/preview hover:border-brand-500/30 transition-all cursor-pointer relative overflow-hidden"
+      className="mt-4 p-4 bg-black/40 border border-white/5 rounded-lg group/preview hover:border-brand-500/30 transition-all cursor-pointer relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 via-transparent to-transparent opacity-0 group-hover/preview:opacity-100 transition-opacity" />
 

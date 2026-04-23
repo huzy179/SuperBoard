@@ -46,7 +46,7 @@ function LoginContent() {
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
         <div className="relative z-10 flex flex-col items-center text-center">
-          <div className="mb-8 p-4 bg-slate-900 rounded-[2rem] shadow-2xl border border-white/10">
+          <div className="mb-8 p-4 bg-slate-900 rounded-xl shadow-2xl border border-white/10">
             <AppBrand subtitle="SECURE PORTAL" variant="dark" />
           </div>
 
@@ -63,7 +63,7 @@ function LoginContent() {
                 Identity Email
               </label>
               <div className="relative group/input">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-500 to-indigo-500 rounded-2xl blur opacity-0 group-focus-within/input:opacity-20 transition duration-500" />
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-500 to-indigo-500 rounded-lg blur opacity-0 group-focus-within/input:opacity-20 transition duration-500" />
                 <input
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
@@ -71,7 +71,7 @@ function LoginContent() {
                   required
                   autoComplete="email"
                   placeholder="name@company.com"
-                  className="relative w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm font-bold text-white placeholder:text-white/20 outline-none transition-all focus:bg-white/10 focus:border-brand-500/50 shadow-inner"
+                  className="relative w-full rounded-lg border border-white/10 bg-white/5 px-6 py-4 text-sm font-bold text-white placeholder:text-white/20 outline-none transition-all focus:bg-white/10 focus:border-brand-500/50 shadow-inner"
                 />
               </div>
             </div>
@@ -81,7 +81,7 @@ function LoginContent() {
                 Access Secret
               </label>
               <div className="relative group/input">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-500 to-indigo-500 rounded-2xl blur opacity-0 group-focus-within/input:opacity-20 transition duration-500" />
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-500 to-indigo-500 rounded-lg blur opacity-0 group-focus-within/input:opacity-20 transition duration-500" />
                 <input
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
@@ -89,7 +89,7 @@ function LoginContent() {
                   required
                   autoComplete="current-password"
                   placeholder="••••••••"
-                  className="relative w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm font-bold text-white placeholder:text-white/20 outline-none transition-all focus:bg-white/10 focus:border-brand-500/50 shadow-inner"
+                  className="relative w-full rounded-lg border border-white/10 bg-white/5 px-6 py-4 text-sm font-bold text-white placeholder:text-white/20 outline-none transition-all focus:bg-white/10 focus:border-brand-500/50 shadow-inner"
                 />
               </div>
             </div>
@@ -97,7 +97,7 @@ function LoginContent() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full h-16 rounded-2xl bg-white text-slate-900 text-xs font-black uppercase tracking-[0.3em] transition-all hover:scale-[1.02] active:scale-95 disabled:bg-slate-700 disabled:text-white/30 disabled:hover:scale-100 overflow-hidden shadow-2xl"
+              className="group relative w-full h-16 rounded-lg bg-white text-slate-900 text-xs font-black uppercase tracking-[0.3em] transition-all hover:scale-[1.02] active:scale-95 disabled:bg-slate-700 disabled:text-white/30 disabled:hover:scale-100 overflow-hidden shadow-2xl"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-brand-100 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <span className="relative flex items-center justify-center gap-3">
@@ -111,7 +111,7 @@ function LoginContent() {
           </form>
 
           {error ? (
-            <div className="mt-8 flex items-center gap-3 text-rose-400 bg-rose-500/10 border border-rose-500/20 px-6 py-4 rounded-2xl animate-in slide-in-from-top-2 duration-300">
+            <div className="mt-8 flex items-center gap-3 text-rose-400 bg-rose-500/10 border border-rose-500/20 px-6 py-4 rounded-lg animate-in slide-in-from-top-2 duration-300">
               <span className="text-xs font-black uppercase tracking-widest">{error}</span>
             </div>
           ) : null}

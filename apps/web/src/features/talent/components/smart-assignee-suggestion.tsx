@@ -78,7 +78,7 @@ export function SmartAssigneeSuggestion({
             key={user.id}
             onClick={() => onAssign(user.id)}
             className={`
-              group relative p-3 rounded-2xl border transition-all cursor-pointer
+              group relative p-3 rounded-lg border transition-all cursor-pointer
               ${
                 currentAssigneeId === user.id
                   ? 'bg-emerald-500/10 border-emerald-500/30'

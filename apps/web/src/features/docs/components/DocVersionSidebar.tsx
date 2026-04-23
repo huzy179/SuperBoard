@@ -49,7 +49,7 @@ export function DocVersionSidebar({ docId, onClose, onRestore }: DocVersionSideb
           </div>
         ) : versions?.length === 0 ? (
           <div className="text-center py-20 px-10">
-            <div className="w-20 h-20 bg-white/[0.02] border border-white/5 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-white/5">
+            <div className="w-20 h-20 bg-white/[0.02] border border-white/5 rounded-xl flex items-center justify-center mx-auto mb-6 text-white/5">
               <Clock size={32} />
             </div>
             <h4 className="text-[11px] font-black text-white/40 uppercase tracking-widest mb-2">
@@ -63,7 +63,7 @@ export function DocVersionSidebar({ docId, onClose, onRestore }: DocVersionSideb
           versions?.map((version, idx) => (
             <div
               key={version.id}
-              className="group relative p-5 rounded-[2rem] bg-white/[0.02] border border-white/5 hover:border-brand-500/30 hover:bg-brand-500/[0.03] transition-all duration-500 overflow-hidden"
+              className="group relative p-5 rounded-xl bg-white/[0.02] border border-white/5 hover:border-brand-500/30 hover:bg-brand-500/[0.03] transition-all duration-500 overflow-hidden"
             >
               {/* Luxury Detail */}
               <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/[0.01] blur-xl rounded-full" />
@@ -86,7 +86,7 @@ export function DocVersionSidebar({ docId, onClose, onRestore }: DocVersionSideb
 
                 <button
                   onClick={() => onRestore(version.content)}
-                  className="p-3 opacity-0 group-hover:opacity-100 bg-brand-500 text-white rounded-2xl shadow-glow-brand/20 transition-all hover:scale-110 active:scale-95 flex items-center gap-2"
+                  className="p-3 opacity-0 group-hover:opacity-100 bg-brand-500 text-white rounded-lg shadow-glow-brand/20 transition-all hover:scale-110 active:scale-95 flex items-center gap-2"
                   title="Restore Sequence"
                 >
                   <RotateCcw size={16} />

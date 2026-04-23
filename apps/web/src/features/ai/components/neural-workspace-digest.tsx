@@ -73,7 +73,7 @@ export function NeuralWorkspaceDigest({ workspaceId }: NeuralWorkspaceDigestProp
           {/* Left Column: Visual Metrics */}
           <div className="w-full md:w-64 space-y-8 border-b md:border-b-0 md:border-r border-white/5 pb-8 md:pb-0 md:pr-10">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400">
+              <div className="w-12 h-12 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400">
                 <Sparkles size={24} className="animate-pulse" />
               </div>
               <div>
@@ -87,7 +87,7 @@ export function NeuralWorkspaceDigest({ workspaceId }: NeuralWorkspaceDigestProp
             </div>
 
             <div className="space-y-4">
-              <div className="p-4 bg-white/5 rounded-2xl border border-white/5 transition-all hover:bg-white/10">
+              <div className="p-4 bg-white/5 rounded-lg border border-white/5 transition-all hover:bg-white/10">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">
                     Tiến độ workspace
@@ -100,7 +100,7 @@ export function NeuralWorkspaceDigest({ workspaceId }: NeuralWorkspaceDigestProp
                 </div>
               </div>
 
-              <div className="p-4 bg-white/5 rounded-2xl border border-white/5 transition-all hover:bg-white/10">
+              <div className="p-4 bg-white/5 rounded-lg border border-white/5 transition-all hover:bg-white/10">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[9px] font-black text-rose-400/40 uppercase tracking-[0.2em]">
                     Rủi ro đa dự án
@@ -117,7 +117,7 @@ export function NeuralWorkspaceDigest({ workspaceId }: NeuralWorkspaceDigestProp
             <button
               onClick={() => fetchDigest(true)}
               disabled={isRefreshing}
-              className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-white/5 border border-white/5 text-[9px] font-black text-white/40 uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all active:scale-95"
+              className="w-full flex items-center justify-center gap-3 py-4 rounded-lg bg-white/5 border border-white/5 text-[9px] font-black text-white/40 uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all active:scale-95"
             >
               <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
               {isRefreshing ? 'Đang đồng bộ...' : 'Đồng bộ AI'}

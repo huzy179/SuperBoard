@@ -269,7 +269,7 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
           {/* Neural Search Header */}
           <div className="p-8 border-b border-white/5 flex items-center gap-6 relative group">
             <div
-              className={`w-14 h-14 rounded-2xl flex items-center justify-center border transition-all duration-700 ${
+              className={`w-14 h-14 rounded-lg flex items-center justify-center border transition-all duration-700 ${
                 query
                   ? 'bg-brand-500/20 border-brand-500/40 text-brand-400 shadow-glow-brand'
                   : 'bg-white/5 border-white/5 text-white/20'
@@ -332,7 +332,7 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
                             <div className="absolute inset-y-2 left-0 w-1 bg-brand-500 rounded-full shadow-glow-brand animate-pulse" />
                           )}
                           <div
-                            className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 border ${
+                            className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-500 border ${
                               isSelected
                                 ? 'bg-brand-500/20 border-brand-500/30 text-brand-400 shadow-glow-brand'
                                 : 'bg-white/5 border-white/5 group-hover:bg-white/10'
@@ -372,7 +372,7 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
               ))
             ) : (
               <div className="py-24 text-center space-y-6">
-                <div className="w-20 h-20 bg-slate-950 text-white/5 rounded-[2rem] flex items-center justify-center mx-auto border border-white/5 shadow-inner transition-transform hover:scale-110 duration-700">
+                <div className="w-20 h-20 bg-slate-950 text-white/5 rounded-xl flex items-center justify-center mx-auto border border-white/5 shadow-inner transition-transform hover:scale-110 duration-700">
                   <Cpu size={40} />
                 </div>
                 <div className="space-y-2 px-12">

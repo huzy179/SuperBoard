@@ -71,13 +71,13 @@ export function MissionTimeline({ projectId }: { projectId: string }) {
         <div className="flex items-center gap-4">
           <button
             onClick={() => scroll('left')}
-            className="w-12 h-12 flex items-center justify-center bg-white/[0.01] border border-white/5 rounded-2xl hover:bg-white/5 hover:border-white/10 transition-all active:scale-95 shadow-inner group"
+            className="w-12 h-12 flex items-center justify-center bg-white/[0.01] border border-white/5 rounded-lg hover:bg-white/5 hover:border-white/10 transition-all active:scale-95 shadow-inner group"
           >
             <ChevronLeft size={20} className="text-white/20 group-hover:text-white" />
           </button>
           <button
             onClick={() => scroll('right')}
-            className="w-12 h-12 flex items-center justify-center bg-white/[0.01] border border-white/5 rounded-2xl hover:bg-white/5 hover:border-white/10 transition-all active:scale-95 shadow-inner group"
+            className="w-12 h-12 flex items-center justify-center bg-white/[0.01] border border-white/5 rounded-lg hover:bg-white/5 hover:border-white/10 transition-all active:scale-95 shadow-inner group"
           >
             <ChevronRight size={20} className="text-white/20 group-hover:text-white" />
           </button>
@@ -250,7 +250,7 @@ function TimelineNode({
         </div>
 
         <div
-          className={`px-6 py-3 rounded-2xl border transition-all duration-700 backdrop-blur-md ${isSelected ? 'border-brand-500/40 bg-brand-500/10 scale-110 shadow-luxe' : 'bg-white/[0.01] border-white/5 group-hover:bg-white/[0.03] group-hover:border-white/10'}`}
+          className={`px-6 py-3 rounded-lg border transition-all duration-700 backdrop-blur-md ${isSelected ? 'border-brand-500/40 bg-brand-500/10 scale-110 shadow-luxe' : 'bg-white/[0.01] border-white/5 group-hover:bg-white/[0.03] group-hover:border-white/10'}`}
         >
           <span
             className={`text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap ${isSelected ? 'text-white' : 'text-white/20'}`}
@@ -272,8 +272,8 @@ function TimelineSkeleton() {
           <div className="h-8 w-64 bg-white/5 rounded-xl" />
         </div>
         <div className="flex gap-4">
-          <div className="h-12 w-12 bg-white/5 rounded-2xl" />
-          <div className="h-12 w-12 bg-white/5 rounded-2xl" />
+          <div className="h-12 w-12 bg-white/5 rounded-lg" />
+          <div className="h-12 w-12 bg-white/5 rounded-lg" />
         </div>
       </div>
       <div className="flex gap-20 px-32 overflow-hidden">
@@ -281,7 +281,7 @@ function TimelineSkeleton() {
           <div key={i} className="flex flex-col items-center gap-8 flex-shrink-0">
             <div className="h-4 w-12 bg-white/5 rounded-full" />
             <div className="h-16 w-16 bg-white/5 rounded-full" />
-            <div className="h-10 w-24 bg-white/5 rounded-2xl" />
+            <div className="h-10 w-24 bg-white/5 rounded-lg" />
           </div>
         ))}
       </div>

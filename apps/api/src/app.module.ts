@@ -9,9 +9,6 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { HealthController } from './health.controller';
 import { validateEnv } from './config/env';
 import { HealthService } from './health.service';
-import { QueueService } from './common/queue.service';
-import { WorkerService } from './common/worker.service';
-import { RedisService } from './common/redis.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { NotificationModule } from './modules/notification/notification.module';
@@ -31,6 +28,9 @@ import { KnowledgeModule } from './modules/knowledge/knowledge.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
+import { CommonModule } from './common/common.module';
+import { WorkerModule } from './common/worker.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -42,6 +42,8 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
     }),
+    CommonModule,
+    WorkerModule,
     AuthModule,
     ProjectModule,
     WorkspaceModule,
@@ -63,9 +65,6 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
   controllers: [HealthController],
   providers: [
     HealthService,
-    RedisService,
-    QueueService,
-    WorkerService,
     {
       provide: APP_GUARD,
       useClass: BearerAuthGuard,

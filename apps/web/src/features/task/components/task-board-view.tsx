@@ -206,11 +206,11 @@ export function TaskBoardView({
             key={column.key}
             layout
             variants={columnVariants}
-            className={`min-w-[22rem] shrink-0 rounded-lg border bg-white/[0.01] backdrop-blur-xl transition-all duration-500 flex flex-col max-h-[78vh] relative group/column ${
+            className={`min-w-[20rem] shrink-0 rounded-md border bg-white/[0.01] backdrop-blur-xl transition-all duration-300 flex flex-col max-h-[78vh] relative group/column ${
               isDragOver
                 ? isAllowedTarget
-                  ? 'border-brand-500/50 bg-brand-500/[0.02] shadow-[0_0_20px_rgba(var(--color-brand-500),0.1)]'
-                  : 'border-rose-500/50 bg-rose-500/5 opacity-70 cursor-no-drop'
+                  ? 'border-brand-500/40 bg-brand-500/[0.03] shadow-glow-brand/5 scale-[1.01] z-20'
+                  : 'border-rose-500/40 bg-rose-500/[0.05] opacity-80 cursor-no-drop'
                 : isBlocked
                   ? 'opacity-20 grayscale border-white/5'
                   : 'border-white/5 shadow-glass'
@@ -241,10 +241,10 @@ export function TaskBoardView({
             )}
 
             {/* Column Header */}
-            <div className="flex items-center justify-between px-var(--space-6) py-var(--space-4) border-b border-white/5 relative z-10 bg-white/[0.01] rounded-t-lg">
-              <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-between px-var(--space-5) py-var(--space-3) border-b border-white/5 relative z-10 bg-white/[0.01] rounded-t-md">
+              <div className="flex flex-col gap-0.5">
                 <span
-                  className={`text-[8px] font-black uppercase tracking-[0.3em] transition-colors duration-500 ${isDragOver ? 'text-brand-400' : 'text-white/10'}`}
+                  className={`text-[7px] font-black uppercase tracking-[0.4em] transition-colors duration-500 ${isDragOver ? 'text-brand-400' : 'text-white/10'}`}
                 >
                   {theme.label}
                 </span>
@@ -260,8 +260,8 @@ export function TaskBoardView({
                   </h3>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="tabular-nums inline-flex h-6 min-w-8 items-center justify-center rounded-xs bg-white/5 px-2 text-[9px] font-bold font-mono text-white/30 border border-white/5">
+              <div className="flex items-center gap-2">
+                <span className="tabular-nums inline-flex h-5 min-w-7 items-center justify-center rounded-xs bg-white/5 px-2 text-[8px] font-bold font-mono text-white/30 border border-white/5">
                   {tasks.length.toString().padStart(2, '0')}
                 </span>
               </div>

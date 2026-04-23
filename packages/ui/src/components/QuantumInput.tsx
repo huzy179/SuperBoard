@@ -18,38 +18,40 @@ export function QuantumInput({ label, error, icon, className = '', ...props }: Q
         </label>
       )}
 
-      <div className="relative overflow-hidden rounded-2xl">
+      <div className="relative overflow-hidden rounded-md border border-white/5 group-focus-within:border-brand-500/30 transition-all duration-300">
         {/* Rim Lighting Effect */}
-        <div className="absolute inset-0 rounded-2xl border border-white/5 group-focus-within:border-brand-500/50 transition-colors pointer-events-none z-10" />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
         {/* Inner Glow */}
-        <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-brand-500/50 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity blur-[1px]" />
+        <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-brand-500/20 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity" />
 
-        <div className="relative flex items-center bg-slate-950/40 backdrop-blur-xl transition-all group-focus-within:bg-slate-950/60 shadow-glass">
+        <div className="relative flex items-center bg-white/[0.01] backdrop-blur-xl transition-all group-focus-within:bg-white/[0.03] shadow-inner">
           {icon && (
-            <div className="pl-4 text-white/20 group-focus-within:text-brand-400 transition-colors">
+            <div className="pl-var(--space-4) text-white/20 group-focus-within:text-brand-400 transition-colors">
               {icon}
             </div>
           )}
 
           <input
             {...props}
-            className="w-full bg-transparent px-5 py-4 text-sm text-white placeholder:text-white/10 outline-none transition-all font-medium"
+            className="w-full bg-transparent px-var(--space-4) py-var(--space-3) text-sm text-white placeholder:text-white/10 outline-none transition-all font-bold tracking-tight"
           />
         </div>
 
-        {/* Focus Pulse Animation */}
-        <motion.div
-          className="absolute inset-0 bg-brand-500/5 opacity-0 pointer-events-none"
-          animate={{
-            opacity: [0, 0.05, 0],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
+        {/* Selection Beam Animation */}
+        <div className="absolute bottom-0 left-0 w-full h-[1px] overflow-hidden">
+          <motion.div
+            className="w-1/3 h-full bg-brand-500"
+            animate={{
+              x: ['-100%', '300%'],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+          />
+        </div>
       </div>
 
       {error && (

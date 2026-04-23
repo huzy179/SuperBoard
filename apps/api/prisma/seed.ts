@@ -441,6 +441,7 @@ const LABELS = [
   { id: 'seed-label-backend', name: 'Backend', color: '#2563eb' },
   { id: 'seed-label-frontend', name: 'Frontend', color: '#db2777' },
   { id: 'seed-label-uiux', name: 'UI/UX', color: '#f43f5e' },
+  { id: 'seed-label-docs', name: 'Tài liệu', color: '#6b7280' },
   { id: 'seed-label-security', name: 'Bảo mật', color: '#dc2626' },
   { id: 'seed-label-devops', name: 'DevOps', color: '#d97706' },
   { id: 'seed-label-qa', name: 'Kiểm thử', color: '#059669' },
@@ -629,6 +630,62 @@ async function cleanupSeedData() {
   if (hasTable('WorkspaceWorkflowStatus')) {
     await prisma.workspaceWorkflowStatus.deleteMany({ where: { id: { startsWith: 'seed-wws-' } } });
   }
+  if (hasTable('TaskEmbedding')) {
+    await prisma.taskEmbedding.deleteMany({ where: { taskId: { startsWith: 'seed-task-' } } });
+  }
+  if (hasTable('ProjectEmbedding')) {
+    await prisma.projectEmbedding.deleteMany({
+      where: { projectId: { startsWith: 'seed-project-' } },
+    });
+  }
+  if (hasTable('DocEmbedding')) {
+    await prisma.docEmbedding.deleteMany({ where: { docId: { startsWith: 'seed-doc-' } } });
+  }
+  if (hasTable('SignalEmbedding')) {
+    await prisma.signalEmbedding.deleteMany({
+      where: { signalId: { startsWith: 'seed-signal-' } },
+    });
+  }
+}
+
+const EMBEDDING_DIMENSIONS = 768;
+
+function stableSeed(input: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < input.length; i += 1) {
+    hash ^= input.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function buildFakeVector(seed: string, dimensions = EMBEDDING_DIMENSIONS): string {
+  let state = stableSeed(seed) || 1;
+  const values: string[] = [];
+
+  for (let i = 0; i < dimensions; i += 1) {
+    state ^= state << 13;
+    state ^= state >>> 17;
+    state ^= state << 5;
+    const normalized = (state >>> 0) / 4294967295;
+    values.push((normalized * 2 - 1).toFixed(6));
+  }
+
+  return `[${values.join(',')}]`;
+}
+
+async function upsertEmbedding(
+  table: string,
+  keyColumn: string,
+  keyValue: string,
+  vectorSeed: string,
+) {
+  const vectorStr = buildFakeVector(vectorSeed);
+  await prisma.$executeRawUnsafe(
+    `INSERT INTO "${table}" ("${keyColumn}", "vector", "updatedAt") VALUES ($1, $2::vector, NOW()) ON CONFLICT ("${keyColumn}") DO UPDATE SET "vector" = $2::vector, "updatedAt" = NOW();`,
+    keyValue,
+    vectorStr,
+  );
 }
 
 async function main() {
@@ -1552,6 +1609,86 @@ async function main() {
         },
       ],
     });
+  }
+
+  if (hasTable('ProjectEmbedding')) {
+    for (const project of PROJECT_SPECS) {
+      await upsertEmbedding(
+        'ProjectEmbedding',
+        'projectId',
+        project.id,
+        `${project.name}\n${project.description}`,
+      );
+    }
+  }
+
+  if (hasTable('TaskEmbedding')) {
+    for (const task of TASKS) {
+      await upsertEmbedding(
+        'TaskEmbedding',
+        'taskId',
+        task.id,
+        `${task.title}\n${task.description}`,
+      );
+    }
+  }
+
+  if (hasTable('DocEmbedding')) {
+    const docSeeds = [
+      {
+        id: 'seed-doc-architecture',
+        title: 'Kiến trúc checkout resilient',
+        content: 'Thiết kế retry + idempotency cho callback payment.',
+      },
+      {
+        id: 'seed-doc-slo',
+        title: 'SLO handbook',
+        content: 'Mục tiêu availability: 99.9% cho API thanh toán.',
+      },
+      {
+        id: 'seed-doc-banking-architecture',
+        title: 'Banking transaction lifecycle',
+        content: 'Chuỗi xử lý chuyển khoản: initiate verify settle reconcile.',
+      },
+      {
+        id: 'seed-doc-hr-handbook',
+        title: 'HR operations handbook',
+        content: 'Quy trình onboarding offboarding và duyệt nghỉ phép.',
+      },
+      {
+        id: 'seed-doc-infra-runbook',
+        title: 'Incident and rollout runbook',
+        content: 'Checklist rollback communication và incident handoff.',
+      },
+    ];
+
+    for (const doc of docSeeds) {
+      await upsertEmbedding('DocEmbedding', 'docId', doc.id, `${doc.title}\n${doc.content}`);
+    }
+  }
+
+  if (hasTable('SignalEmbedding')) {
+    const signalSeeds = [
+      {
+        id: 'seed-signal-1',
+        interpretation: 'Tín hiệu cảnh báo SLO degradation cần điều tra ngay.',
+        payload: { text: 'p95 latency vượt ngưỡng 900ms trong 10 phút' },
+      },
+      {
+        id: 'seed-signal-2',
+        interpretation: 'PR liên quan checkout resiliency đã được mở, nên ưu tiên review.',
+        payload: { pr: 142, title: 'feat: harden payment callback' },
+      },
+    ];
+
+    for (const signal of signalSeeds) {
+      await upsertEmbedding(
+        'SignalEmbedding',
+        'signalId',
+        signal.id,
+        `${signal.interpretation}\n${JSON.stringify(signal.payload)}`,
+      );
+    }
   }
 
   console.log('  ✓ Collaboration + automation data seeded');

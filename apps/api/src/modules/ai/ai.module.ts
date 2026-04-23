@@ -6,12 +6,16 @@ import { AiService } from './ai.service';
 import { TaskModule } from '../task/task.module';
 import { ChatModule } from '../chat/chat.module';
 import { ProjectModule } from '../project/project.module';
+import { DocModule } from '../doc/doc.module';
+import { AnalyticsModule } from '../analytics/analytics.module';
 
 @Module({
   imports: [
     forwardRef(() => TaskModule),
     ChatModule,
     forwardRef(() => ProjectModule),
+    DocModule,
+    forwardRef(() => AnalyticsModule),
     ClientsModule.register([
       {
         name: 'AI_PACKAGE',

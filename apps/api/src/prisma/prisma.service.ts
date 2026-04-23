@@ -13,8 +13,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     });
     // Cast needed: @prisma/adapter-pg bundles its own @types/pg internally,
     // which conflicts with the workspace @types/pg@8.x (Pool.connect return type mismatch).
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const adapter = new PrismaPg(pool as any);
+    const adapter = new PrismaPg(pool);
     super({ adapter });
 
     return this.$extends({

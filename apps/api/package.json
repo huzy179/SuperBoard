@@ -64,7 +64,7 @@
     "@types/express": "^5.0.3",
     "@types/node": "^25.5.0",
     "@types/nodemailer": "^8.0.0",
-    "@types/pg": "^8.20.0",
+    "@types/pg": "8.11.11",
     "prisma": "7.5.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",

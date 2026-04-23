@@ -20,7 +20,7 @@ import { DocService } from '../doc/doc.service';
 
 @Module({
   imports: [
-    NotificationModule,
+    forwardRef(() => NotificationModule),
     forwardRef(() => AiModule),
     TalentModule,
     forwardRef(() => ProjectModule),

@@ -21,7 +21,7 @@ import { BriefingService } from './briefing.service';
 @Module({
   imports: [
     AuthModule,
-    NotificationModule,
+    forwardRef(() => NotificationModule),
     forwardRef(() => AiModule),
     forwardRef(() => KnowledgeModule),
     forwardRef(() => ProjectModule),

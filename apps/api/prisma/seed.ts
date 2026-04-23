@@ -440,6 +440,7 @@ const TASKS: TaskSeed[] = [
 const LABELS = [
   { id: 'seed-label-backend', name: 'Backend', color: '#2563eb' },
   { id: 'seed-label-frontend', name: 'Frontend', color: '#db2777' },
+  { id: 'seed-label-uiux', name: 'UI/UX', color: '#f43f5e' },
   { id: 'seed-label-security', name: 'Bảo mật', color: '#dc2626' },
   { id: 'seed-label-devops', name: 'DevOps', color: '#d97706' },
   { id: 'seed-label-qa', name: 'Kiểm thử', color: '#059669' },

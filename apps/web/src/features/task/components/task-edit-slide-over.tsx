@@ -208,66 +208,66 @@ export function TaskEditSlideOver({
 
         <div className="relative z-10 flex h-full flex-col">
           {/* Elite Specification Header */}
-          <header className="flex items-center justify-between border-b border-white/5 px-10 py-10 bg-white/[0.01] backdrop-blur-3xl shadow-inner">
-            <div className="flex items-center gap-8">
-              <div className="w-16 h-16 bg-slate-900 rounded-xl border border-white/10 shadow-luxe flex items-center justify-center relative group overflow-hidden">
+          <header className="flex items-center justify-between border-b border-white/5 px-var(--space-8) py-var(--space-6) bg-white/[0.01] backdrop-blur-xl shadow-inner">
+            <div className="flex items-center gap-var(--space-6)">
+              <div className="w-12 h-12 bg-slate-900 rounded-md border border-white/10 shadow-luxe flex items-center justify-center relative group overflow-hidden">
                 <div className="absolute inset-0 bg-brand-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative z-10 scale-125">
+                <div className="relative z-10 scale-110">
                   <TaskTypeIcon type={editingTask.type ?? 'task'} />
                 </div>
               </div>
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-3">
                   {projectKey && editingTask.number && (
-                    <div className="flex items-center gap-3">
-                      <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/30">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/40">
                         {projectKey}-{editingTask.number}
                       </span>
-                      <div className="h-1.5 w-1.5 rounded-full bg-white/10" />
+                      <div className="h-1 w-1 rounded-full bg-white/10" />
                     </div>
                   )}
-                  <span className="text-[10px] font-black uppercase tracking-[0.5em] text-brand-400">
-                    Đang hoạt động
+                  <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-brand-400">
+                    Live Protocol
                   </span>
                 </div>
                 <h2
                   id="task-detail-title"
-                  className="text-3xl font-black text-white tracking-tighter uppercase leading-none"
+                  className="text-xl font-black text-white tracking-tight uppercase leading-none"
                 >
-                  Chi tiết công việc
+                  Mission Briefing
                 </h2>
               </div>
             </div>
 
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-4">
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setShowAiMenu(!showAiMenu)}
-                  className={`group relative flex items-center gap-4 px-8 py-4 rounded-lg text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500 overflow-hidden border shadow-inner ${
+                  className={`group relative flex items-center gap-3 px-var(--space-6) py-var(--space-3) rounded-sm text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 overflow-hidden border shadow-inner ${
                     isAiThinking
                       ? 'bg-brand-500 text-slate-950 border-brand-500 animate-pulse'
                       : 'bg-white/[0.03] text-brand-400 border-white/10 hover:bg-white/[0.06] hover:border-brand-500/30'
                   }`}
                 >
                   <Sparkles
-                    size={18}
+                    size={14}
                     className={
                       isAiThinking
                         ? 'animate-spin'
                         : 'group-hover:animate-pulse group-hover:rotate-12 transition-transform'
                     }
                   />
-                  <span>Công cụ AI</span>
+                  <span>AI_TOOLS</span>
                   <ChevronDown
-                    size={14}
-                    className={`transition-transform duration-700 ${showAiMenu ? 'rotate-180' : ''}`}
+                    size={12}
+                    className={`transition-transform duration-500 ${showAiMenu ? 'rotate-180' : ''}`}
                   />
                 </button>
 
                 {showAiMenu && (
-                  <div className="absolute right-0 mt-5 w-80 bg-slate-950/95 border border-white/10 rounded-[2.5rem] shadow-luxe backdrop-blur-3xl overflow-hidden p-2 z-50 animate-in fade-in zoom-in-95 duration-500">
-                    <div className="px-6 py-4 border-b border-white/5 mb-2">
+                  <div className="absolute right-0 mt-5 w-80 bg-slate-950/95 border border-white/10 rounded-md shadow-luxe backdrop-blur-3xl overflow-hidden p-2 z-50 animate-in fade-in zoom-in-95 duration-500">
+                    <div className="px-var(--space-4) py-var(--space-3) border-b border-white/5 mb-2">
                       <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em]">
                         Chọn chức năng AI
                       </span>
@@ -275,32 +275,32 @@ export function TaskEditSlideOver({
                     <div className="space-y-1">
                       <button
                         onClick={handleAiDecompose}
-                        className="w-full px-6 py-4.5 flex items-center gap-5 text-white/40 hover:text-white hover:bg-white/[0.03] rounded-lg transition-all text-left group/opt"
+                        className="w-full px-var(--space-4) py-var(--space-3) flex items-center gap-4 text-white/40 hover:text-white hover:bg-white/[0.03] rounded-sm transition-all text-left group/opt"
                       >
-                        <div className="p-3 bg-brand-500/10 rounded-xl text-brand-400 group-hover/opt:bg-brand-500 group-hover/opt:text-slate-950 transition-all shadow-inner">
-                          <ListTree size={18} />
+                        <div className="p-2.5 bg-brand-500/10 rounded-xs text-brand-400 group-hover/opt:bg-brand-500 group-hover/opt:text-slate-950 transition-all shadow-inner">
+                          <ListTree size={16} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <span className="text-xs font-black uppercase tracking-widest block">
                             Phân tách thông minh
                           </span>
-                          <span className="text-[9px] text-white/20 font-medium uppercase tracking-widest truncate mt-1">
+                          <span className="text-[9px] text-white/20 font-medium uppercase tracking-widest truncate mt-0.5">
                             AI tự động chia nhỏ công việc
                           </span>
                         </div>
                       </button>
                       <button
                         onClick={handleAiRefine}
-                        className="w-full px-6 py-4.5 flex items-center gap-5 text-white/40 hover:text-white hover:bg-white/[0.03] rounded-lg transition-all text-left group/opt"
+                        className="w-full px-var(--space-4) py-var(--space-3) flex items-center gap-4 text-white/40 hover:text-white hover:bg-white/[0.03] rounded-sm transition-all text-left group/opt"
                       >
-                        <div className="p-3 bg-indigo-500/10 rounded-xl text-indigo-400 group-hover/opt:bg-indigo-500 group-hover/opt:text-white transition-all shadow-inner">
-                          <Brain size={18} />
+                        <div className="p-2.5 bg-indigo-500/10 rounded-xs text-indigo-400 group-hover/opt:bg-indigo-500 group-hover/opt:text-white transition-all shadow-inner">
+                          <Brain size={16} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <span className="text-xs font-black uppercase tracking-widest block">
                             Tối ưu nội dung
                           </span>
-                          <span className="text-[9px] text-white/20 font-medium uppercase tracking-widest truncate mt-1">
+                          <span className="text-[9px] text-white/20 font-medium uppercase tracking-widest truncate mt-0.5">
                             AI cải thiện mô tả & story points
                           </span>
                         </div>
@@ -311,16 +311,16 @@ export function TaskEditSlideOver({
                           const res = await summarizeMutation.mutateAsync(editingTask.id);
                           setAiAnalysis(res.summary);
                         }}
-                        className="w-full px-6 py-4.5 flex items-center gap-5 text-white/40 hover:text-white hover:bg-white/[0.03] rounded-lg transition-all text-left group/opt"
+                        className="w-full px-var(--space-4) py-var(--space-3) flex items-center gap-4 text-white/40 hover:text-white hover:bg-white/[0.03] rounded-sm transition-all text-left group/opt"
                       >
-                        <div className="p-3 bg-purple-500/10 rounded-xl text-purple-400 group-hover/opt:bg-purple-500 group-hover/opt:text-white transition-all shadow-inner">
-                          <Terminal size={18} />
+                        <div className="p-2.5 bg-purple-500/10 rounded-xs text-purple-400 group-hover/opt:bg-purple-500 group-hover/opt:text-white transition-all shadow-inner">
+                          <Terminal size={16} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <span className="text-xs font-black uppercase tracking-widest block">
                             Tóm tắt thông minh
                           </span>
-                          <span className="text-[9px] text-white/20 font-medium uppercase tracking-widest truncate mt-1">
+                          <span className="text-[9px] text-white/20 font-medium uppercase tracking-widest truncate mt-0.5">
                             AI phân tích & tóm tắt công việc
                           </span>
                         </div>
@@ -349,86 +349,86 @@ export function TaskEditSlideOver({
               {/* Dự đoán tiến độ */}
               {taskPrediction && (
                 <div
-                  className={`relative group overflow-hidden rounded-[3rem] border p-10 shadow-inner animate-in slide-in-from-top-10 duration-1000 backdrop-blur-3xl ${
+                  className={`relative group overflow-hidden rounded-md border p-var(--space-6) shadow-inner animate-in slide-in-from-top-10 duration-1000 backdrop-blur-3xl ${
                     isAtRisk
-                      ? 'border-amber-500/10 bg-amber-500/[0.01] shadow-glow-amber/5'
-                      : 'border-emerald-500/10 bg-emerald-500/[0.01] shadow-glow-emerald/5'
+                      ? 'border-amber-500/20 bg-amber-500/[0.02] shadow-[0_0_20px_rgba(245,158,11,0.05)]'
+                      : 'border-emerald-500/20 bg-emerald-500/[0.02] shadow-[0_0_20px_rgba(16,185,129,0.05)]'
                   }`}
                 >
-                  <div className="flex items-start gap-10">
+                  <div className="flex items-start gap-var(--space-6)">
                     <div
-                      className={`p-6 rounded-xl border transition-all duration-1000 shadow-inner ${
+                      className={`p-var(--space-3) rounded-sm border transition-all duration-1000 shadow-inner ${
                         isAtRisk
-                          ? 'bg-amber-500/5 text-amber-500 border-amber-500/10'
-                          : 'bg-emerald-500/5 text-emerald-500 border-emerald-500/10'
+                          ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                          : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                       }`}
                     >
                       <Target
-                        size={32}
+                        size={24}
                         className={isAtRisk ? 'animate-pulse' : 'animate-spin-slow'}
                       />
                     </div>
-                    <div className="space-y-6 flex-1 pt-1">
+                    <div className="space-y-4 flex-1 pt-0.5">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3">
                           <h4
-                            className={`text-[11px] font-black uppercase tracking-[0.5em] ${isAtRisk ? 'text-amber-500' : 'text-emerald-500'}`}
+                            className={`text-[10px] font-black uppercase tracking-[0.4em] ${isAtRisk ? 'text-amber-500' : 'text-emerald-500'}`}
                           >
                             Dự báo tiến độ
                           </h4>
                           <div
-                            className={`h-1.5 w-1.5 rounded-full animate-pulse ${isAtRisk ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                            className={`h-1 w-1 rounded-full animate-pulse ${isAtRisk ? 'bg-amber-500' : 'bg-emerald-500'}`}
                           />
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/10">
-                          Độ tin cậy: {Math.round(taskPrediction.confidence * 100)}%
+                        <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-white/20">
+                          Confidence: {Math.round(taskPrediction.confidence * 100)}%
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                        <div className="space-y-2">
-                          <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
-                            Dự kiến hoàn thành
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-var(--space-6)">
+                        <div className="space-y-1">
+                          <p className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]">
+                            Estimated Completion
                           </p>
-                          <p className="text-3xl font-black text-white tracking-tighter uppercase">
-                            {formatDate(taskPrediction.estimatedCompletionDate)}
+                          <p className="text-xl font-black text-white tracking-tight">
+                            {formatDate(taskPrediction.estimatedCompletionDate).toUpperCase()}
                           </p>
                           {isAtRisk && (
-                            <p className="text-[10px] font-black text-amber-500/40 uppercase tracking-widest flex items-center gap-2 mt-2">
-                              <Zap size={10} /> Nguy cơ trễ hạn
+                            <p className="text-[9px] font-bold text-amber-500/60 uppercase tracking-widest flex items-center gap-1.5 mt-1.5">
+                              <Zap size={10} /> Mission Delay Risk
                             </p>
                           )}
                         </div>
-                        <div className="space-y-2">
-                          <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
-                            Mức độ rủi ro
+                        <div className="space-y-1">
+                          <p className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]">
+                            Risk Status
                           </p>
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-3">
                             <span
-                              className={`text-3xl font-black uppercase tracking-tighter ${isAtRisk ? 'text-amber-500 decoration-amber-500/30 underline decoration-4 underline-offset-8' : 'text-emerald-400'}`}
+                              className={`text-xl font-black uppercase tracking-tight ${isAtRisk ? 'text-amber-500' : 'text-emerald-400'}`}
                             >
-                              {isAtRisk ? 'Có rủi ro' : 'Bình thường'}
+                              {isAtRisk ? 'High Risk' : 'Normal'}
                             </span>
                           </div>
                         </div>
                       </div>
 
                       {isAtRisk && (
-                        <div className="mt-8 pt-8 border-t border-white/5 space-y-5 bg-white/[0.01] -mx-10 px-10 rounded-b-[3rem]">
-                          <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
-                            Đề xuất phân công lại cho
+                        <div className="mt-6 pt-6 border-t border-white/5 space-y-4 bg-white/[0.01] -mx-var(--space-6) px-var(--space-6) rounded-b-md">
+                          <p className="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em]">
+                            Recommended Redirection
                           </p>
-                          <div className="flex items-center gap-5">
-                            <span className="text-[11px] font-bold text-white/60 uppercase tracking-widest">
-                              GIAO CHO:
+                          <div className="flex items-center gap-4">
+                            <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
+                              REASSIGN TO:
                             </span>
-                            <div className="flex gap-3">
+                            <div className="flex gap-2">
                               {members.slice(0, 2).map((m) => (
                                 <button
                                   key={m.id}
                                   type="button"
                                   onClick={() => setEditAssigneeId(m.id)}
-                                  className="px-5 py-2.5 rounded-xl bg-slate-950 border border-white/5 text-[10px] font-black text-white/30 uppercase tracking-widest hover:bg-brand-500 hover:text-slate-950 hover:border-brand-500 transition-all shadow-inner"
+                                  className="px-4 py-2 rounded-xs bg-slate-950 border border-white/10 text-[9px] font-bold text-white/40 uppercase tracking-widest hover:bg-brand-500 hover:text-slate-950 hover:border-brand-500 transition-all"
                                 >
                                   {m.fullName.split(' ')[0]}
                                 </button>
@@ -444,23 +444,22 @@ export function TaskEditSlideOver({
 
               {/* Proactive Intelligence Alerts */}
               {intelligence === undefined ? (
-                <div className="animate-pulse rounded-[3rem] bg-white/[0.01] border border-white/5 p-10 h-32" />
+                <div className="animate-pulse rounded-md bg-white/[0.01] border border-white/5 p-var(--space-6) h-32" />
               ) : intelligence.duplicates && intelligence.duplicates.length > 0 ? (
-                <div className="relative group overflow-hidden rounded-[3rem] border border-amber-500/10 bg-amber-500/[0.01] p-10 shadow-inner animate-in slide-in-from-top-10 duration-1000">
-                  <div className="flex items-start gap-10">
-                    <div className="p-6 bg-amber-500/5 rounded-lg text-amber-500 border border-amber-500/10 shadow-inner group-hover:scale-110 transition-transform">
-                      <Zap size={32} className="animate-pulse" />
-                      <h4 className="text-[11px] font-black uppercase tracking-[0.5em] text-amber-500">
-                        Phát hiện công việc trùng lặp
-                      </h4>
-                      <div className="h-px flex-1 bg-gradient-to-r from-amber-500/20 to-transparent" />
+                <div className="relative group overflow-hidden rounded-md border border-amber-500/10 bg-amber-500/[0.01] p-var(--space-6) shadow-inner animate-in slide-in-from-top-10 duration-1000">
+                  <div className="flex items-start gap-var(--space-6)">
+                    <div className="p-var(--space-3) bg-amber-500/5 rounded-sm text-amber-500 border border-amber-500/10 shadow-inner group-hover:scale-110 transition-transform">
+                      <Zap size={24} className="animate-pulse" />
                     </div>
-                    <div className="space-y-4 flex-1">
-                      <p className="text-base text-white/80 leading-relaxed font-bold tracking-tight">
-                        Tìm thấy {intelligence.duplicates.length} công việc có thể trùng lặp trong
+                    <div className="space-y-3 flex-1 pt-0.5">
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-500">
+                        Collision Detected
+                      </h4>
+                      <p className="text-sm text-white/80 leading-relaxed font-bold tracking-tight">
+                        Found {intelligence.duplicates.length} potential duplicate tasks in
                         workspace.
                       </p>
-                      <div className="flex flex-col gap-3 mt-6">
+                      <div className="flex flex-col gap-2 mt-4">
                         {intelligence.duplicates.map((dup) => (
                           <button
                             key={dup.id}
@@ -469,17 +468,17 @@ export function TaskEditSlideOver({
                               const task = tasks.find((t) => t.id === dup.id);
                               if (task) handleOpenEdit(task);
                             }}
-                            className="flex items-center justify-between px-8 py-5 rounded-[1.5rem] bg-white/[0.02] border border-white/5 hover:border-amber-500/30 hover:bg-white/[0.05] transition-all group/dup shadow-inner"
+                            className="flex items-center justify-between px-var(--space-4) py-var(--space-3) rounded-xs bg-white/[0.02] border border-white/5 hover:border-amber-500/30 hover:bg-white/[0.05] transition-all group/dup shadow-inner"
                           >
-                            <span className="text-sm font-black text-white/40 group-hover/dup:text-white truncate uppercase tracking-tight">
+                            <span className="text-[10px] font-bold text-white/40 group-hover/dup:text-white truncate uppercase tracking-tight">
                               {dup.title}
                             </span>
-                            <div className="flex items-center gap-4">
-                              <span className="text-[10px] font-black text-amber-500/30 tracking-widest">
+                            <div className="flex items-center gap-3">
+                              <span className="text-[8px] font-black text-amber-500/30 tracking-widest">
                                 {Math.round(dup.score * 100)}% SYNC
                               </span>
                               <ChevronDown
-                                size={14}
+                                size={12}
                                 className="-rotate-90 text-white/10 group-hover/dup:text-amber-500"
                               />
                             </div>
@@ -493,22 +492,22 @@ export function TaskEditSlideOver({
 
               {/* Neural Prediction Insights */}
               {intelligence === undefined ? (
-                <div className="animate-pulse rounded-[3rem] bg-white/[0.01] border border-white/5 p-10 h-32" />
+                <div className="animate-pulse rounded-md bg-white/[0.01] border border-white/5 p-var(--space-6) h-32" />
               ) : intelligence.suggestions ? (
-                <div className="relative group overflow-hidden rounded-[3rem] border border-cyan-500/10 bg-cyan-500/[0.01] p-10 shadow-inner animate-in slide-in-from-top-10 duration-1000">
-                  <div className="flex items-start gap-10">
-                    <div className="p-6 bg-cyan-500/5 rounded-lg text-cyan-400 border border-cyan-500/10 shadow-inner group-hover:scale-110 transition-transform">
-                      <Brain size={32} className="animate-pulse" />
+                <div className="relative group overflow-hidden rounded-md border border-cyan-500/10 bg-cyan-500/[0.01] p-var(--space-6) shadow-inner animate-in slide-in-from-top-10 duration-1000">
+                  <div className="flex items-start gap-var(--space-6)">
+                    <div className="p-var(--space-3) bg-cyan-500/5 rounded-sm text-cyan-400 border border-cyan-500/10 shadow-inner group-hover:scale-110 transition-transform">
+                      <Brain size={24} className="animate-pulse" />
                     </div>
-                    <div className="space-y-6 flex-1">
+                    <div className="space-y-4 flex-1 pt-0.5">
                       <div className="flex items-center gap-4">
-                        <h4 className="text-[11px] font-black uppercase tracking-[0.5em] text-cyan-400">
-                          Gợi ý từ AI
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400">
+                          Neural Suggestions
                         </h4>
                         <div className="h-px flex-1 bg-gradient-to-r from-cyan-500/20 to-transparent" />
                       </div>
 
-                      <div className="flex flex-wrap gap-4">
+                      <div className="flex flex-wrap gap-3">
                         {intelligence.suggestions.priority &&
                           intelligence.suggestions.priority !== editPriority && (
                             <button
@@ -516,9 +515,9 @@ export function TaskEditSlideOver({
                               onClick={() =>
                                 setEditPriority(intelligence.suggestions.priority as TaskPriority)
                               }
-                              className="px-6 py-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-cyan-500 hover:text-slate-950 transition-all shadow-glow-cyan/10"
+                              className="px-var(--space-4) py-var(--space-2) rounded-xs bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[9px] font-bold uppercase tracking-[0.2em] hover:bg-cyan-500 hover:text-slate-950 transition-all shadow-glow-cyan/10"
                             >
-                              Đặt ưu tiên: {intelligence.suggestions.priority}
+                              Set Priority: {intelligence.suggestions.priority.toUpperCase()}
                             </button>
                           )}
 
@@ -529,9 +528,9 @@ export function TaskEditSlideOver({
                             onClick={() => {
                               toast.info(`Applying classification: ${label}`);
                             }}
-                            className="px-6 py-3 rounded-xl bg-white/[0.04] border border-white/5 text-white/30 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-white/10 hover:text-white transition-all shadow-inner"
+                            className="px-var(--space-4) py-var(--space-2) rounded-xs bg-white/[0.04] border border-white/5 text-white/30 text-[9px] font-bold uppercase tracking-[0.2em] hover:bg-white/10 hover:text-white transition-all shadow-inner"
                           >
-                            + {label}
+                            + {label.toUpperCase()}
                           </button>
                         ))}
                       </div>
@@ -542,34 +541,34 @@ export function TaskEditSlideOver({
 
               {/* Intelligent Analytical Briefing */}
               {aiAnalysis ? (
-                <div className="relative group overflow-hidden rounded-[3rem] border border-brand-500/10 bg-brand-500/[0.01] p-10 shadow-inner animate-in slide-in-from-top-10 duration-1000">
-                  <div className="absolute top-8 right-8">
+                <div className="relative group overflow-hidden rounded-md border border-brand-500/10 bg-brand-500/[0.01] p-var(--space-6) shadow-inner animate-in slide-in-from-top-10 duration-1000">
+                  <div className="absolute top-6 right-6">
                     <button
                       onClick={() => setAiAnalysis(null)}
-                      className="w-10 h-10 flex items-center justify-center bg-white/5 rounded-lg text-white/20 hover:text-rose-500 transition-all border border-transparent hover:border-rose-500/20 shadow-inner"
+                      className="w-8 h-8 flex items-center justify-center bg-white/5 rounded-sm text-white/20 hover:text-rose-500 transition-all border border-transparent hover:border-rose-500/20 shadow-inner"
                     >
-                      <X size={16} />
+                      <X size={14} />
                     </button>
                   </div>
-                  <div className="flex items-start gap-10">
-                    <div className="p-6 bg-brand-500/5 rounded-lg text-brand-400 border border-brand-500/10 shadow-inner group-hover:scale-110 transition-transform">
-                      <Cpu size={32} className="animate-spin-slow" />
+                  <div className="flex items-start gap-var(--space-6)">
+                    <div className="p-var(--space-3) bg-brand-500/10 rounded-sm text-brand-400 border border-brand-500/10 shadow-inner group-hover:scale-110 transition-transform">
+                      <Cpu size={24} className="animate-spin-slow" />
                     </div>
-                    <div className="space-y-4 flex-1">
+                    <div className="space-y-3 flex-1 pt-0.5">
                       <div className="flex items-center gap-4">
-                        <h4 className="text-[11px] font-black uppercase tracking-[0.5em] text-brand-400">
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-400">
                           Phân tích AI
                         </h4>
                         <div className="h-px flex-1 bg-gradient-to-r from-brand-500/20 to-transparent" />
                       </div>
-                      <p className="text-base text-white/90 leading-relaxed font-bold italic tracking-tight opacity-80 decoration-brand-500/20 underline decoration-2 underline-offset-4">
+                      <p className="text-sm text-white/80 leading-relaxed font-bold italic tracking-tight opacity-90">
                         "{aiAnalysis}"
                       </p>
                     </div>
                   </div>
                 </div>
               ) : summarizeMutation.isPending ? (
-                <div className="animate-pulse rounded-[3rem] bg-white/[0.01] border border-white/5 p-10 h-32" />
+                <div className="animate-pulse rounded-md bg-white/[0.01] border border-white/5 p-var(--space-6) h-24" />
               ) : null}
 
               <section className="space-y-24">
@@ -608,15 +607,15 @@ export function TaskEditSlideOver({
                     <textarea
                       value={editDescription}
                       onChange={(e) => setEditDescription(e.target.value)}
-                      rows={10}
-                      className="w-full rounded-[3rem] border border-white/5 bg-white/[0.01] px-10 py-10 text-base font-bold text-white/[0.7] focus:outline-none focus:border-brand-500/20 focus:bg-white/[0.02] transition-all placeholder:text-white/5 shadow-inner elite-scrollbar leading-relaxed"
+                      rows={12}
+                      className="w-full rounded-md border border-white/5 bg-white/[0.01] px-var(--space-6) py-var(--space-6) text-sm font-bold text-white/70 focus:outline-none focus:border-brand-500/20 focus:bg-white/[0.02] transition-all placeholder:text-white/5 shadow-inner elite-scrollbar leading-relaxed"
                       placeholder="Mô tả chi tiết về công việc này..."
                     />
-                    <div className="absolute bottom-10 right-10 flex items-center gap-3 opacity-20 group-hover:opacity-100 transition-opacity">
-                      <span className="text-[9px] font-black text-white uppercase tracking-[0.4em]">
-                        Đã lưu mã hóa
+                    <div className="absolute bottom-6 right-6 flex items-center gap-2.5 opacity-20 group-hover:opacity-100 transition-opacity">
+                      <span className="text-[8px] font-black text-white uppercase tracking-[0.3em]">
+                        SECURE_SIGNAL
                       </span>
-                      <ShieldCheck size={14} className="text-white" />
+                      <ShieldCheck size={12} className="text-brand-500" />
                     </div>
                   </div>
                 </div>
@@ -685,8 +684,8 @@ export function TaskEditSlideOver({
                 )}
               </section>
 
-              <div className="border-t border-white/5 pt-20 bg-white/[0.01] -mx-10 px-10 rounded-t-[3rem]">
-                <div className="flex items-center gap-6 px-4 mb-12">
+              <div className="border-t border-white/5 pt-16 bg-white/[0.01] -mx-var(--space-8) px-var(--space-8) rounded-t-lg">
+                <div className="flex items-center gap-6 px-4 mb-10">
                   <label className="text-[10px] font-black text-white/10 uppercase tracking-[0.5em]">
                     Bình luận & Phản hồi
                   </label>
@@ -700,32 +699,32 @@ export function TaskEditSlideOver({
               </div>
 
               {/* History Timeline Integration Proxy */}
-              <div className="flex flex-wrap items-center gap-10 py-8 px-10 border border-white/5 rounded-[2.5rem] bg-white/[0.01] shadow-inner">
-                <div className="flex items-center gap-4 group/hist">
+              <div className="flex flex-wrap items-center gap-var(--space-8) py-var(--space-4) px-var(--space-6) border border-white/5 rounded-md bg-white/[0.01] shadow-inner">
+                <div className="flex items-center gap-3 group/hist">
                   <History
-                    size={16}
-                    className="text-brand-500 group-hover:rotate-12 transition-transform"
+                    size={14}
+                    className="text-brand-500/60 group-hover:rotate-12 transition-transform"
                   />
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/80">
-                      Ngày tạo
+                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/60">
+                      Created
                     </span>
-                    <span className="text-[9px] font-bold text-white/20 uppercase tracking-widest mt-0.5">
+                    <span className="text-[8px] font-bold text-white/20 uppercase tracking-widest mt-0.5">
                       {formatDate(editingTask.createdAt)}
                     </span>
                   </div>
                 </div>
-                <div className="h-8 w-px bg-white/5" />
-                <div className="flex items-center gap-4 group/hist">
+                <div className="h-6 w-px bg-white/5" />
+                <div className="flex items-center gap-3 group/hist">
                   <Zap
-                    size={16}
-                    className="text-cyan-500 group-hover:scale-125 transition-transform"
+                    size={14}
+                    className="text-cyan-500/60 group-hover:scale-110 transition-transform"
                   />
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/80">
-                      Cập nhật lần cuối
+                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/60">
+                      Last Update
                     </span>
-                    <span className="text-[9px] font-bold text-white/20 uppercase tracking-widest mt-0.5">
+                    <span className="text-[8px] font-bold text-white/20 uppercase tracking-widest mt-0.5">
                       {formatDate(editingTask.updatedAt)}
                     </span>
                   </div>
@@ -749,17 +748,17 @@ export function TaskEditSlideOver({
           </form>
 
           {/* Secure Commitment Footer */}
-          <footer className="flex items-center justify-between border-t border-white/5 bg-white/[0.02] px-10 py-8 backdrop-blur-xl">
+          <footer className="flex items-center justify-between border-t border-white/5 bg-white/[0.02] px-var(--space-8) py-var(--space-6) backdrop-blur-xl">
             {editingTask.deletedAt ? (
               <button
                 type="button"
                 onClick={onRestore}
                 disabled={isRestoring}
-                className="group relative px-10 py-4 bg-emerald-500 text-slate-950 rounded-lg font-black text-[10px] uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 overflow-hidden shadow-glow-emerald/20"
+                className="group relative px-var(--space-8) py-var(--space-3) bg-brand-500 text-slate-950 rounded-sm font-black text-[10px] uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 overflow-hidden shadow-[0_0_20px_rgba(var(--color-brand-500),0.2)]"
               >
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-                <span className="relative z-10 flex items-center gap-3">
-                  <Archive size={16} /> Khôi phục
+                <span className="relative z-10 flex items-center gap-2">
+                  <Archive size={14} /> Khôi phục
                 </span>
               </button>
             ) : (
@@ -767,18 +766,18 @@ export function TaskEditSlideOver({
                 type="button"
                 onClick={onDelete}
                 disabled={isDeleting}
-                className="group px-8 py-4 bg-transparent border border-rose-500/20 text-rose-500/40 rounded-lg font-black text-[10px] uppercase tracking-[0.2em] hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all disabled:opacity-30 flex items-center gap-3"
+                className="group px-var(--space-6) py-var(--space-3) bg-transparent border border-rose-500/20 text-rose-500/40 rounded-sm font-black text-[10px] uppercase tracking-[0.2em] hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all disabled:opacity-30 flex items-center gap-2"
               >
-                <Archive size={16} className="group-hover:animate-bounce" />
+                <Archive size={14} className="group-hover:animate-bounce" />
                 <span>Xóa công việc</span>
               </button>
             )}
 
-            <div className="flex gap-6">
+            <div className="flex gap-var(--space-4)">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-8 py-4 border border-white/5 text-white/20 font-black text-[10px] uppercase tracking-[0.2em] rounded-lg hover:bg-white/5 hover:text-white transition-all"
+                className="px-var(--space-6) py-var(--space-3) border border-white/5 text-white/20 font-black text-[10px] uppercase tracking-[0.2em] rounded-sm hover:bg-white/5 hover:text-white transition-all"
               >
                 Hủy bỏ
               </button>
@@ -786,14 +785,14 @@ export function TaskEditSlideOver({
                 type="submit"
                 form="task-edit-form"
                 disabled={isSaving}
-                className="group relative px-12 py-4 bg-white text-slate-950 rounded-lg font-black text-[10px] uppercase tracking-[0.3em] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 overflow-hidden shadow-luxe"
+                className="group relative px-var(--space-8) py-var(--space-3) bg-white text-slate-950 rounded-sm font-black text-[10px] uppercase tracking-[0.3em] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 overflow-hidden shadow-luxe"
               >
                 <div className="absolute inset-0 bg-brand-500 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-                <span className="relative z-10 flex items-center gap-3 group-hover:text-white transition-colors">
+                <span className="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors">
                   {isSaving ? (
-                    <Cpu className="animate-spin" size={16} />
+                    <Cpu className="animate-spin" size={14} />
                   ) : (
-                    <ShieldCheck className="size-4" />
+                    <ShieldCheck size={14} />
                   )}
                   {isSaving ? 'Đang lưu...' : 'Lưu thay đổi'}
                 </span>

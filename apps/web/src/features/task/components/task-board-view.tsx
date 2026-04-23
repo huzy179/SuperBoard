@@ -190,7 +190,7 @@ export function TaskBoardView({
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="flex gap-8 overflow-x-auto pb-12 pt-4 elite-scrollbar"
+      className="flex gap-var(--space-6) overflow-x-auto pb-var(--space-8) pt-var(--space-4) elite-scrollbar"
     >
       {columns.map((column) => {
         const tasks = boardData.get(column.key) ?? [];
@@ -206,14 +206,14 @@ export function TaskBoardView({
             key={column.key}
             layout
             variants={columnVariants}
-            className={`min-w-[24rem] shrink-0 rounded-[3rem] border bg-white/[0.01] backdrop-blur-[40px] transition-all duration-700 flex flex-col max-h-[75vh] relative group/column ${
+            className={`min-w-[22rem] shrink-0 rounded-lg border bg-white/[0.01] backdrop-blur-xl transition-all duration-500 flex flex-col max-h-[78vh] relative group/column ${
               isDragOver
                 ? isAllowedTarget
-                  ? 'border-brand-500 bg-brand-500/[0.03] shadow-glow-brand/10 scale-[1.02] z-20'
-                  : 'border-rose-500 bg-rose-500/10 opacity-70 cursor-no-drop'
+                  ? 'border-brand-500/50 bg-brand-500/[0.02] shadow-[0_0_20px_rgba(var(--color-brand-500),0.1)]'
+                  : 'border-rose-500/50 bg-rose-500/5 opacity-70 cursor-no-drop'
                 : isBlocked
-                  ? 'opacity-30 grayscale border-white/5'
-                  : 'border-white/5 shadow-luxe'
+                  ? 'opacity-20 grayscale border-white/5'
+                  : 'border-white/5 shadow-glass'
             }`}
             onDragOver={(e) => {
               onDragOver(e);
@@ -236,49 +236,51 @@ export function TaskBoardView({
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="absolute inset-0 bg-brand-500/5 pointer-events-none rounded-[3rem] blur-3xl"
+                className="absolute inset-0 bg-brand-500/5 pointer-events-none rounded-lg blur-2xl"
               />
             )}
 
             {/* Column Header */}
-            <div className="flex items-center justify-between px-8 py-6 border-b border-white/5 relative z-10 bg-white/[0.02] rounded-t-[3rem]">
-              <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between px-var(--space-6) py-var(--space-4) border-b border-white/5 relative z-10 bg-white/[0.01] rounded-t-lg">
+              <div className="flex flex-col gap-1">
                 <span
-                  className={`text-[9px] font-black uppercase tracking-[0.4em] italic leading-none transition-colors duration-500 ${isDragOver ? 'text-brand-400' : 'text-white/20'}`}
+                  className={`text-[8px] font-black uppercase tracking-[0.3em] transition-colors duration-500 ${isDragOver ? 'text-brand-400' : 'text-white/10'}`}
                 >
                   {theme.label}
                 </span>
-                <div className="flex items-center gap-3">
-                  <span className={`text-xs animate-pulse ${theme.color}`}>{theme.indicator}</span>
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-1 h-1 rounded-full animate-pulse ${theme.bg.replace('/10', '')} shadow-[0_0_8px_currentColor]`}
+                    style={{ color: theme.color.replace('text-', '') }}
+                  />
                   <h3
-                    className={`text-base font-black uppercase tracking-tighter italic transition-colors duration-500 ${isDragOver ? 'text-white' : 'text-white/80'}`}
+                    className={`text-sm font-black uppercase tracking-tight transition-colors duration-500 ${isDragOver ? 'text-white' : 'text-white/70'}`}
                   >
                     {column.label}
                   </h3>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="h-2 w-2 rounded-full bg-white/5" />
-                <span className="tabular-nums inline-flex h-8 min-w-10 items-center justify-center rounded-lg bg-white/5 px-2.5 text-[10px] font-black font-mono text-white/40 border border-white/5 shadow-inner">
+              <div className="flex items-center gap-3">
+                <span className="tabular-nums inline-flex h-6 min-w-8 items-center justify-center rounded-xs bg-white/5 px-2 text-[9px] font-bold font-mono text-white/30 border border-white/5">
                   {tasks.length.toString().padStart(2, '0')}
                 </span>
               </div>
             </div>
 
             {/* Task List Container */}
-            <div className="flex-1 overflow-y-auto space-y-5 p-6 min-h-[200px] elite-scrollbar relative z-10">
+            <div className="flex-1 overflow-y-auto space-y-var(--space-3) p-var(--space-4) min-h-[200px] elite-scrollbar relative z-10">
               <AnimatePresence mode="popLayout">
                 {tasks.length === 0 ? (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="flex flex-col items-center justify-center py-24 rounded-[2.5rem] border-2 border-dashed border-white/5 bg-slate-950/20 group/empty"
+                    className="flex flex-col items-center justify-center py-16 rounded-md border border-dashed border-white/5 bg-white/[0.01] group/empty"
                   >
-                    <div className="w-16 h-16 rounded-[1.5rem] bg-white/[0.02] border border-white/5 flex items-center justify-center mb-6 group-hover/empty:scale-110 group-hover/empty:rotate-12 transition-all duration-700">
-                      <span className="text-white/5 text-3xl font-black grayscale">∅</span>
+                    <div className="w-12 h-12 rounded-sm bg-white/[0.02] border border-white/5 flex items-center justify-center mb-4 group-hover/empty:bg-white/[0.04] transition-all duration-500">
+                      <span className="text-white/5 text-xl font-black">∅</span>
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/10 italic">
-                      No Signal Packets
+                    <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/10">
+                      Empty Node
                     </p>
                   </motion.div>
                 ) : (
@@ -286,10 +288,10 @@ export function TaskBoardView({
                     <motion.div
                       key={task.id}
                       layout
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ type: 'spring', damping: 25, stiffness: 120 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ type: 'spring', damping: 25, stiffness: 150 }}
                     >
                       <QuantumCard
                         hoverEffect={true}
@@ -302,15 +304,15 @@ export function TaskBoardView({
                         }
                         className={`${
                           isUpdatePending && updatingTaskId === task.id
-                            ? 'opacity-60 grayscale scale-95'
+                            ? 'opacity-50 grayscale'
                             : isDragDropLocked
                               ? 'cursor-not-allowed opacity-80'
                               : 'cursor-grab active:cursor-grabbing'
                         } ${
                           selectedTaskIds.has(task.id)
-                            ? 'ring-2 ring-brand-500/40 bg-brand-500/5 shadow-glow-brand/10'
+                            ? 'ring-1 ring-brand-500/30 bg-brand-500/5'
                             : ''
-                        } ${task.deletedAt ? 'opacity-30 grayscale' : ''}`}
+                        } ${task.deletedAt ? 'opacity-20 grayscale' : ''}`}
                       >
                         <article
                           draggable={!isUpdatePending && !isDragDropLocked}
@@ -327,12 +329,12 @@ export function TaskBoardView({
                               onOpenEdit(task);
                             }
                           }}
-                          className="p-6 space-y-5"
+                          className="p-var(--space-4) space-y-var(--space-4)"
                         >
                           {/* Top Protocols */}
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/[0.03] border border-white/5 shadow-inner">
+                            <div className="flex items-center gap-2">
+                              <div className="w-7 h-7 flex items-center justify-center rounded-xs bg-white/[0.03] border border-white/5">
                                 <TaskTypeIcon type={task.type ?? 'task'} />
                               </div>
                               <TaskIdBadge projectKey={projectKey} number={task.number} />
@@ -343,20 +345,20 @@ export function TaskBoardView({
                           </div>
 
                           {/* Mission Title */}
-                          <div className="space-y-2">
+                          <div className="space-y-1">
                             {atRiskTaskIds?.has(task.id) && (
-                              <div className="flex items-center gap-2 mb-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shadow-glow-amber" />
-                                <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest italic">
-                                  MISSION_AT_RISK
+                              <div className="flex items-center gap-1.5 mb-1">
+                                <div className="w-1 h-1 rounded-full bg-amber-500 animate-pulse shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
+                                <span className="text-[8px] font-black text-amber-500/80 uppercase tracking-widest">
+                                  At Risk
                                 </span>
                               </div>
                             )}
                             <h4
-                              className={`text-base font-black tracking-tighter leading-tight transition-colors italic uppercase ${
+                              className={`text-sm font-bold tracking-tight leading-snug transition-colors ${
                                 task.deletedAt
                                   ? 'text-white/10 line-through'
-                                  : 'text-white/90 group-hover:text-white'
+                                  : 'text-white/80 group-hover:text-white'
                               }`}
                             >
                               {task.title}
@@ -365,22 +367,22 @@ export function TaskBoardView({
 
                           {/* Labels Track */}
                           {task.labels && task.labels.length > 0 ? (
-                            <div className="pt-1">
+                            <div className="pt-0.5">
                               <LabelDots labels={task.labels} />
                             </div>
                           ) : null}
 
                           {/* Tactical Metadata Footer */}
-                          <div className="flex items-center justify-between pt-5 border-t border-white/5">
-                            <div className="flex items-center gap-4">
+                          <div className="flex items-center justify-between pt-var(--space-3) border-t border-white/5">
+                            <div className="flex items-center gap-3">
                               <PriorityBadge priority={task.priority} />
                               {task.dueDate ? (
-                                <div className="flex items-center gap-2.5 px-3 py-1 bg-white/[0.02] rounded-lg border border-white/5">
+                                <div className="flex items-center gap-1.5 px-1.5 py-0.5 bg-white/[0.02] rounded-xs border border-white/5">
                                   <div
-                                    className={`h-1.5 w-1.5 rounded-full ${isTaskOverdue(task.dueDate) && task.status !== 'done' ? 'bg-rose-500 animate-pulse shadow-glow-rose' : 'bg-white/10'}`}
+                                    className={`h-1 w-1 rounded-full ${isTaskOverdue(task.dueDate) && task.status !== 'done' ? 'bg-rose-500 animate-pulse' : 'bg-white/10'}`}
                                   />
                                   <span
-                                    className={`text-[9px] font-black tracking-widest uppercase italic ${isTaskOverdue(task.dueDate) && task.status !== 'done' ? 'text-rose-400' : 'text-white/20'}`}
+                                    className={`text-[8px] font-bold tracking-widest uppercase ${isTaskOverdue(task.dueDate) && task.status !== 'done' ? 'text-rose-400' : 'text-white/20'}`}
                                   >
                                     {formatDate(task.dueDate).toUpperCase()}
                                   </span>
@@ -388,11 +390,11 @@ export function TaskBoardView({
                               ) : null}
                             </div>
                             {task.assigneeName ? (
-                              <div className="ring-4 ring-slate-950/80 rounded-full scale-110 shadow-luxe">
+                              <div className="ring-2 ring-slate-950 rounded-full scale-90">
                                 <AssigneeAvatar
                                   name={task.assigneeName}
                                   color={task.assigneeAvatarColor}
-                                  size="md"
+                                  size="xs"
                                 />
                               </div>
                             ) : null}
@@ -406,18 +408,16 @@ export function TaskBoardView({
             </div>
 
             {/* Signal Input Footer */}
-            <div className="px-6 pb-6 relative z-10">
+            <div className="px-var(--space-4) pb-var(--space-4) relative z-10">
               <button
                 type="button"
                 onClick={() => onAddTask(column.key)}
-                className="group w-full flex items-center justify-center gap-4 rounded-lg border border-dashed border-white/10 py-4 text-[10px] font-black uppercase tracking-[0.4em] text-white/10 transition-all hover:border-brand-500/40 hover:bg-brand-500/5 hover:text-brand-400 shadow-inner group/add"
+                className="group w-full flex items-center justify-center gap-3 rounded-xs border border-dashed border-white/5 py-2.5 text-[9px] font-bold uppercase tracking-[0.2em] text-white/10 transition-all hover:border-brand-500/20 hover:bg-brand-500/5 hover:text-brand-400 group/add"
               >
-                <div className="w-5 h-5 flex items-center justify-center rounded-lg bg-white/5 border border-white/5 group-hover/add:bg-brand-500 group-hover/add:text-white transition-all">
-                  <span className="text-sm font-bold translate-y-[-1px] group-hover/add:rotate-90 transition-transform">
-                    +
-                  </span>
+                <div className="w-4 h-4 flex items-center justify-center rounded-xs bg-white/5 border border-white/5 group-hover/add:bg-brand-500 group-hover/add:text-slate-950 transition-all">
+                  <span className="text-xs font-bold translate-y-[-0.5px]">+</span>
                 </div>
-                <span className="italic">INJECT_TASK_SIGNAL</span>
+                <span>Inject Signal</span>
               </button>
             </div>
           </motion.div>

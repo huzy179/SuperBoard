@@ -35,22 +35,20 @@ export function QuantumCard({
   return (
     <motion.div
       whileHover={
-        hoverEffect
-          ? { y: -4, transition: { duration: 0.4, ease: [0.175, 0.885, 0.32, 1.275] } }
-          : {}
+        hoverEffect ? { y: -2, transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] } } : {}
       }
-      className={`group relative rounded-[2.5rem] border border-white/5 bg-white/[0.01] backdrop-blur-3xl transition-all duration-500 ${hoverEffect ? 'hover:bg-white/[0.03] hover:border-white/10 hover:shadow-inner' : ''} ${glows[glowColor]} ${className}`}
+      className={`group relative rounded-card border border-white/5 bg-white/[0.01] backdrop-blur-xl transition-all duration-300 ${hoverEffect ? 'hover:bg-white/[0.02] hover:border-white/10' : ''} ${glows[glowColor]} ${className}`}
     >
       {/* Internal Grain Texture */}
-      <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      <div className="absolute inset-0 opacity-[0.015] pointer-events-none mix-blend-overlay bg-[url('data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20256%20256%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cfilter%20id%3D%22noiseFilter%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.8%22%20numOctaves%3D%224%22%20stitchTiles%3D%22stitch%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url(%23noiseFilter)%22%2F%3E%3C%2Fsvg%3E')] rounded-card" />
 
       {/* Rim Light Effect */}
-      <div className="absolute inset-0 rounded-[2.5rem] pointer-events-none border border-white/5 group-hover:border-white/10 transition-colors" />
+      <div className="absolute inset-0 rounded-card pointer-events-none border border-white/5 group-hover:border-white/10 transition-colors" />
 
       {/* Background Glow Orb */}
       {glowColor !== 'none' && (
         <div
-          className={`absolute inset-x-12 -bottom-4 h-8 ${glowBase[glowColor]} blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700`}
+          className={`absolute inset-x-8 -bottom-2 h-4 ${glowBase[glowColor]} blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
         />
       )}
 
@@ -71,16 +69,16 @@ export function QuantumCardHeader({
   children?: ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between p-8 pb-4">
-      <div className="space-y-1.5">
-        <div className="flex items-center gap-2.5">
+    <div className="flex items-start justify-between p-var(--space-6) pb-var(--space-3)">
+      <div className="space-y-1">
+        <div className="flex items-center gap-var(--space-2)">
           {icon && <div className="text-brand-400">{icon}</div>}
-          <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20">
             {title}
           </h3>
         </div>
         {subtitle && (
-          <p className="text-xl font-black text-white uppercase tracking-tight leading-none">
+          <p className="text-lg font-black text-white uppercase tracking-tight leading-none">
             {subtitle}
           </p>
         )}
@@ -97,5 +95,5 @@ export function QuantumCardContent({
   children: ReactNode;
   className?: string;
 }) {
-  return <div className={`p-8 pt-4 ${className}`}>{children}</div>;
+  return <div className={`p-var(--space-6) pt-var(--space-2) ${className}`}>{children}</div>;
 }

@@ -15,7 +15,7 @@ import { TaskModule } from '../task/task.module';
 @Module({
   imports: [
     AuthModule,
-    NotificationModule,
+    forwardRef(() => NotificationModule),
     WorkflowModule,
     forwardRef(() => AiModule),
     forwardRef(() => AutomationModule),

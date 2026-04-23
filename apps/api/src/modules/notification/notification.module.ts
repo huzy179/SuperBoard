@@ -1,5 +1,6 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
+import { AiModule } from '../ai/ai.module';
 import { NotificationController } from './notification.controller';
 import { PreferenceController } from './preference.controller';
 import { NotificationService } from './notification.service';
@@ -7,7 +8,7 @@ import { EmailService } from './email.service';
 import { NotificationGateway } from './notification.gateway';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, forwardRef(() => AiModule)],
   controllers: [NotificationController, PreferenceController],
   providers: [NotificationService, EmailService, NotificationGateway],
   exports: [NotificationService, EmailService],

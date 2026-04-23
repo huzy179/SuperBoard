@@ -14,7 +14,7 @@ import { AutomationModule } from '../automation/automation.module';
   imports: [
     AuthModule,
     WorkflowModule,
-    NotificationModule,
+    forwardRef(() => NotificationModule),
     forwardRef(() => AiModule),
     AutomationModule,
     ProjectEventsModule,

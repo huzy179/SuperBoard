@@ -11,7 +11,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     const pool = new Pool({
       connectionString: configService.getOrThrow<string>('DATABASE_URL'),
     });
-    const adapter = new PrismaPg(pool);
+    // Cast needed: @prisma/adapter-pg bundles its own @types/pg internally,
+    // which conflicts with the workspace @types/pg@8.x (Pool.connect return type mismatch).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const adapter = new PrismaPg(pool as any);
     super({ adapter });
 
     return this.$extends({

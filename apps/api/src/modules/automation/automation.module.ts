@@ -14,9 +14,6 @@ import { SingularityService } from './singularity.service';
 import { SymbiosisService } from './symbiosis.service';
 import { ExecutiveService } from './executive.service';
 import { ProjectModule } from '../project/project.module';
-import { DiagnosisService } from '../knowledge/diagnosis.service';
-import { ChronologyService } from '../analytics/chronology.service';
-import { DocService } from '../doc/doc.service';
 import { KnowledgeModule } from '../knowledge/knowledge.module';
 import { AnalyticsModule } from '../analytics/analytics.module';
 import { SearchModule } from '../search/search.module';
@@ -39,10 +36,13 @@ import { SearchModule } from '../search/search.module';
     SingularityService,
     SymbiosisService,
     ExecutiveService,
-    DiagnosisService,
-    ChronologyService,
-    DocService,
   ],
-  exports: [AutomationService, SingularityService, SymbiosisService, ExecutiveService],
+  exports: [
+    AutomationService,
+    SingularityService,
+    SymbiosisService,
+    ExecutiveService,
+    NeuralAgentService,
+  ],
 })
 export class AutomationModule {}

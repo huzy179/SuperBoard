@@ -40,6 +40,14 @@ import { BriefingService } from './briefing.service';
     SimulationService,
     BriefingService,
   ],
-  exports: [ReportService, CommandService, ForecastService, SimulationService, BriefingService],
+  exports: [
+    ReportService,
+    CommandService,
+    ForecastService,
+    SimulationService,
+    BriefingService,
+    WorkflowAutomationService,
+    ChronologyService,
+  ],
 })
 export class AnalyticsModule {}

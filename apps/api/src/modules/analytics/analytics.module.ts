@@ -6,6 +6,7 @@ import { KnowledgeModule } from '../knowledge/knowledge.module';
 import { ProjectModule } from '../project/project.module';
 import { WorkflowModule } from '../workflow/workflow.module';
 import { ProjectEventsModule } from '../project-events/project-events.module';
+import { DocModule } from '../doc/doc.module';
 
 import { ReportController } from './report.controller';
 import { ExecutiveController } from './executive.controller';
@@ -27,6 +28,7 @@ import { BriefingService } from './briefing.service';
     forwardRef(() => ProjectModule),
     WorkflowModule,
     ProjectEventsModule,
+    DocModule,
   ],
   controllers: [ReportController, ExecutiveController],
   providers: [

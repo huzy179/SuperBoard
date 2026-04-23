@@ -17,6 +17,9 @@ import { ProjectModule } from '../project/project.module';
 import { DiagnosisService } from '../knowledge/diagnosis.service';
 import { ChronologyService } from '../analytics/chronology.service';
 import { DocService } from '../doc/doc.service';
+import { KnowledgeModule } from '../knowledge/knowledge.module';
+import { AnalyticsModule } from '../analytics/analytics.module';
+import { SearchModule } from '../search/search.module';
 
 @Module({
   imports: [
@@ -24,6 +27,9 @@ import { DocService } from '../doc/doc.service';
     forwardRef(() => AiModule),
     TalentModule,
     forwardRef(() => ProjectModule),
+    forwardRef(() => KnowledgeModule),
+    forwardRef(() => AnalyticsModule),
+    forwardRef(() => SearchModule),
   ],
   controllers: [AutomationController, AgentController, ConnectController, ConsciousnessController],
   providers: [

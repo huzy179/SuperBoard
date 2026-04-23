@@ -8,9 +8,16 @@ import { SearchModule } from '../search/search.module';
 import { ProjectModule } from '../project/project.module';
 import { DocModule } from '../doc/doc.module';
 import { AiModule } from '../ai/ai.module';
+import { AnalyticsModule } from '../analytics/analytics.module';
 
 @Module({
-  imports: [SearchModule, forwardRef(() => ProjectModule), DocModule, forwardRef(() => AiModule)],
+  imports: [
+    SearchModule,
+    forwardRef(() => ProjectModule),
+    DocModule,
+    forwardRef(() => AiModule),
+    forwardRef(() => AnalyticsModule),
+  ],
   controllers: [KnowledgeController, QaController],
   providers: [GraphService, DiaryService, DiagnosisService],
   exports: [GraphService, DiaryService, DiagnosisService],

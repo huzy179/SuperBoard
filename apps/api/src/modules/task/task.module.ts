@@ -9,6 +9,7 @@ import { WorkflowModule } from '../workflow/workflow.module';
 import { NotificationModule } from '../notification/notification.module';
 import { AiModule } from '../ai/ai.module';
 import { AutomationModule } from '../automation/automation.module';
+import { AnalyticsModule } from '../analytics/analytics.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AutomationModule } from '../automation/automation.module';
     forwardRef(() => AiModule),
     AutomationModule,
     ProjectEventsModule,
+    forwardRef(() => AnalyticsModule),
   ],
   controllers: [TaskController],
   providers: [TaskService, CommentService, MentionService],

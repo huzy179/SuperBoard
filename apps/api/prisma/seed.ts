@@ -212,6 +212,34 @@ const TASKS: TaskSeed[] = [
     parentTaskId: 'seed-task-ecom-2',
   },
   {
+    id: 'seed-task-ecom-4',
+    projectId: 'seed-project-ecom',
+    number: 4,
+    title: 'Thiết kế bộ lọc sản phẩm đa chiều',
+    description: 'Facet filter theo brand, price, rating và availability.',
+    type: TaskType.task,
+    priority: TaskPriority.medium,
+    status: 'todo',
+    storyPoints: 5,
+    assigneeEmail: 'pham.ngoc.anh@techviet.local',
+    dueDate: '2026-05-07',
+    position: '2200',
+  },
+  {
+    id: 'seed-task-ecom-5',
+    projectId: 'seed-project-ecom',
+    number: 5,
+    title: 'Tối ưu trải nghiệm trang checkout mobile',
+    description: 'Rút ngắn form, lưu địa chỉ gần nhất và payment fallback.',
+    type: TaskType.story,
+    priority: TaskPriority.high,
+    status: 'in_progress',
+    storyPoints: 8,
+    assigneeEmail: 'vo.thi.mai@techviet.local',
+    dueDate: '2026-05-10',
+    position: '2300',
+  },
+  {
     id: 'seed-task-bank-1',
     projectId: 'seed-project-banking',
     number: 1,
@@ -254,6 +282,34 @@ const TASKS: TaskSeed[] = [
     position: '3000',
   },
   {
+    id: 'seed-task-bank-4',
+    projectId: 'seed-project-banking',
+    number: 4,
+    title: 'Tích hợp màn hình lịch sử giao dịch realtime',
+    description: 'Timeline giao dịch theo account, hỗ trợ pull-to-refresh.',
+    type: TaskType.task,
+    priority: TaskPriority.medium,
+    status: 'in_review',
+    storyPoints: 5,
+    assigneeEmail: 'tran.thi.lan@techviet.local',
+    dueDate: '2026-05-11',
+    position: '3200',
+  },
+  {
+    id: 'seed-task-bank-5',
+    projectId: 'seed-project-banking',
+    number: 5,
+    title: 'Đảm bảo tokenization cho thẻ nội địa',
+    description: 'Không lưu PAN thô, audit theo chuẩn PCI tối thiểu.',
+    type: TaskType.bug,
+    priority: TaskPriority.urgent,
+    status: 'todo',
+    storyPoints: 8,
+    assigneeEmail: 'le.van.duc@techviet.local',
+    dueDate: '2026-05-15',
+    position: '3300',
+  },
+  {
     id: 'seed-task-hr-1',
     projectId: 'seed-project-hr',
     number: 1,
@@ -280,6 +336,34 @@ const TASKS: TaskSeed[] = [
     assigneeEmail: 'pham.ngoc.anh@techviet.local',
     dueDate: '2026-05-08',
     position: '2000',
+  },
+  {
+    id: 'seed-task-hr-3',
+    projectId: 'seed-project-hr',
+    number: 3,
+    title: 'Báo cáo payroll và thưởng tháng',
+    description: 'Tính lương gross/net, thưởng KPI và xuất file PDF.',
+    type: TaskType.story,
+    priority: TaskPriority.medium,
+    status: 'in_progress',
+    storyPoints: 8,
+    assigneeEmail: 'le.van.duc@techviet.local',
+    dueDate: '2026-05-12',
+    position: '2100',
+  },
+  {
+    id: 'seed-task-hr-4',
+    projectId: 'seed-project-hr',
+    number: 4,
+    title: 'Onboarding checklist cho nhân viên mới',
+    description: 'Provision account, gửi welcome email và checklist 7 ngày.',
+    type: TaskType.task,
+    priority: TaskPriority.low,
+    status: 'todo',
+    storyPoints: 3,
+    assigneeEmail: null,
+    dueDate: '2026-05-16',
+    position: '2200',
   },
   {
     id: 'seed-task-infra-1',
@@ -323,6 +407,34 @@ const TASKS: TaskSeed[] = [
     dueDate: '2026-04-26',
     position: '3000',
   },
+  {
+    id: 'seed-task-infra-4',
+    projectId: 'seed-project-infra',
+    number: 4,
+    title: 'Thiết lập HPA cho API critical services',
+    description: 'Autoscaling theo CPU và RPS với min 2 replicas.',
+    type: TaskType.task,
+    priority: TaskPriority.high,
+    status: 'in_progress',
+    storyPoints: 5,
+    assigneeEmail: 'nguyen.minh.tuan@techviet.local',
+    dueDate: '2026-05-09',
+    position: '3200',
+  },
+  {
+    id: 'seed-task-infra-5',
+    projectId: 'seed-project-infra',
+    number: 5,
+    title: 'Chuẩn hóa log pipeline và alert rule',
+    description: 'Log JSON, retention policy và cảnh báo error burst.',
+    type: TaskType.story,
+    priority: TaskPriority.medium,
+    status: 'todo',
+    storyPoints: 8,
+    assigneeEmail: 'hoang.quoc.bao@techviet.local',
+    dueDate: '2026-05-18',
+    position: '3300',
+  },
 ];
 
 const LABELS = [
@@ -338,12 +450,20 @@ const TASK_LABELS = [
   ['seed-task-ecom-2', 'seed-label-backend'],
   ['seed-task-ecom-2', 'seed-label-product'],
   ['seed-task-ecom-3', 'seed-label-security'],
+  ['seed-task-ecom-4', 'seed-label-uiux'],
+  ['seed-task-ecom-5', 'seed-label-uiux'],
   ['seed-task-bank-2', 'seed-label-security'],
   ['seed-task-bank-3', 'seed-label-qa'],
+  ['seed-task-bank-4', 'seed-label-uiux'],
+  ['seed-task-bank-5', 'seed-label-security'],
   ['seed-task-hr-2', 'seed-label-product'],
+  ['seed-task-hr-3', 'seed-label-product'],
+  ['seed-task-hr-4', 'seed-label-docs'],
   ['seed-task-infra-1', 'seed-label-devops'],
   ['seed-task-infra-2', 'seed-label-devops'],
   ['seed-task-infra-3', 'seed-label-backend'],
+  ['seed-task-infra-4', 'seed-label-devops'],
+  ['seed-task-infra-5', 'seed-label-devops'],
 ] as const;
 
 const COMMENTS = [
@@ -364,6 +484,30 @@ const COMMENTS = [
     taskId: 'seed-task-infra-3',
     authorEmail: 'le.van.duc@techviet.local',
     content: 'Leak xảy ra khi worker nhận batch > 100 events. Đang bóc tách root cause.',
+  },
+  {
+    id: 'seed-cmt-4',
+    taskId: 'seed-task-ecom-4',
+    authorEmail: 'vo.thi.mai@techviet.local',
+    content: 'Filter UI nên cho phép multi-select và giữ state khi back/forward.',
+  },
+  {
+    id: 'seed-cmt-5',
+    taskId: 'seed-task-bank-4',
+    authorEmail: 'tran.thi.lan@techviet.local',
+    content: 'Màn hình history realtime đã đủ cho demo, còn polish empty state.',
+  },
+  {
+    id: 'seed-cmt-6',
+    taskId: 'seed-task-hr-3',
+    authorEmail: 'nguyen.minh.tuan@techviet.local',
+    content: 'Payroll phải khóa dữ liệu trước ngày chốt lương để tránh lệch số.',
+  },
+  {
+    id: 'seed-cmt-7',
+    taskId: 'seed-task-infra-4',
+    authorEmail: 'hoang.quoc.bao@techviet.local',
+    content: 'HPA policy cần theo dõi cả memory khi spike traffic ban đêm.',
   },
 ] as const;
 
@@ -411,6 +555,9 @@ async function cleanupSeedData() {
   if (hasTable('DocVersion')) {
     await prisma.docVersion.deleteMany({ where: { docId: { startsWith: 'seed-doc-' } } });
   }
+  if (hasTable('Attachment')) {
+    await prisma.attachment.deleteMany({ where: { id: { startsWith: 'seed-att-' } } });
+  }
   if (hasTable('Comment')) {
     await prisma.comment.deleteMany({ where: { id: { startsWith: 'seed-cmt-' } } });
   }
@@ -443,6 +590,9 @@ async function cleanupSeedData() {
   }
   if (hasTable('SignalLog')) {
     await prisma.signalLog.deleteMany({ where: { id: { startsWith: 'seed-signal-' } } });
+  }
+  if (hasTable('ProjectMemoir')) {
+    await prisma.projectMemoir.deleteMany({ where: { id: { startsWith: 'seed-memoir-' } } });
   }
   if (hasTable('ExternalIntegration')) {
     await prisma.externalIntegration.deleteMany({ where: { id: { startsWith: 'seed-int-' } } });
@@ -890,6 +1040,7 @@ async function main() {
   }
 
   const tuan = usersByEmail.get('nguyen.minh.tuan@techviet.local')!;
+  const lan = usersByEmail.get('tran.thi.lan@techviet.local')!;
   const duc = usersByEmail.get('le.van.duc@techviet.local')!;
   const bao = usersByEmail.get('hoang.quoc.bao@techviet.local')!;
 
@@ -999,6 +1150,81 @@ async function main() {
         },
       },
     });
+
+    await prisma.doc.upsert({
+      where: { id: 'seed-doc-banking-architecture' },
+      update: { title: 'Banking transaction lifecycle', projectId: 'seed-project-banking' },
+      create: {
+        id: 'seed-doc-banking-architecture',
+        workspaceId: workspace.id,
+        title: 'Banking transaction lifecycle',
+        projectId: 'seed-project-banking',
+        createdById: tuan.id,
+        lastEditedBy: bao.id,
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: 'Chuỗi xử lý chuyển khoản: initiate → verify → settle → reconcile.',
+                },
+              ],
+            },
+          ],
+        },
+      },
+    });
+
+    await prisma.doc.upsert({
+      where: { id: 'seed-doc-hr-handbook' },
+      update: { title: 'HR operations handbook', projectId: 'seed-project-hr' },
+      create: {
+        id: 'seed-doc-hr-handbook',
+        workspaceId: workspace.id,
+        title: 'HR operations handbook',
+        projectId: 'seed-project-hr',
+        createdById: lan.id,
+        lastEditedBy: lan.id,
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                { type: 'text', text: 'Quy trình onboarding, offboarding và duyệt nghỉ phép.' },
+              ],
+            },
+          ],
+        },
+      },
+    });
+
+    await prisma.doc.upsert({
+      where: { id: 'seed-doc-infra-runbook' },
+      update: { title: 'Incident and rollout runbook', projectId: 'seed-project-infra' },
+      create: {
+        id: 'seed-doc-infra-runbook',
+        workspaceId: workspace.id,
+        title: 'Incident and rollout runbook',
+        projectId: 'seed-project-infra',
+        createdById: bao.id,
+        lastEditedBy: bao.id,
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                { type: 'text', text: 'Checklist rollback, communication và incident handoff.' },
+              ],
+            },
+          ],
+        },
+      },
+    });
   }
 
   if (hasTable('DocVersion')) {
@@ -1014,6 +1240,21 @@ async function main() {
           docId: 'seed-doc-slo',
           content: { version: 1, note: 'Khởi tạo SLO baseline' },
         },
+        {
+          id: 'seed-docv-3',
+          docId: 'seed-doc-banking-architecture',
+          content: { version: 1, note: 'Khởi tạo transaction lifecycle' },
+        },
+        {
+          id: 'seed-docv-4',
+          docId: 'seed-doc-hr-handbook',
+          content: { version: 1, note: 'Khởi tạo HR handbook' },
+        },
+        {
+          id: 'seed-docv-5',
+          docId: 'seed-doc-infra-runbook',
+          content: { version: 1, note: 'Khởi tạo incident runbook' },
+        },
       ],
     });
   }
@@ -1028,6 +1269,102 @@ async function main() {
           strength: 0.95,
         },
         { taskId: 'seed-task-infra-2', docId: 'seed-doc-slo', type: 'manual', strength: 0.9 },
+        {
+          taskId: 'seed-task-bank-1',
+          docId: 'seed-doc-banking-architecture',
+          type: 'manual',
+          strength: 0.9,
+        },
+        {
+          taskId: 'seed-task-hr-1',
+          docId: 'seed-doc-hr-handbook',
+          type: 'manual',
+          strength: 0.85,
+        },
+        {
+          taskId: 'seed-task-infra-3',
+          docId: 'seed-doc-infra-runbook',
+          type: 'manual',
+          strength: 0.92,
+        },
+      ],
+    });
+  }
+
+  if (hasTable('ProjectMemoir')) {
+    await prisma.projectMemoir.createMany({
+      data: [
+        {
+          id: 'seed-memoir-ecom-1',
+          projectId: 'seed-project-ecom',
+          title: 'Retail launch momentum',
+          content:
+            'Project ecom cần ưu tiên checkout reliability và UI polish cho mobile conversion.',
+          persona: 'executive',
+        },
+        {
+          id: 'seed-memoir-bank-1',
+          projectId: 'seed-project-banking',
+          title: 'Risk-first banking',
+          content:
+            'Mọi thay đổi transaction flow phải đi kèm observability và rollback plan rõ ràng.',
+          persona: 'technical',
+        },
+        {
+          id: 'seed-memoir-hr-1',
+          projectId: 'seed-project-hr',
+          title: 'People ops clarity',
+          content: 'HR portal cần ưu tiên đơn giản hoá chấm công, nghỉ phép và payroll reporting.',
+          persona: 'celebratory',
+        },
+        {
+          id: 'seed-memoir-infra-1',
+          projectId: 'seed-project-infra',
+          title: 'Reliability guardrails',
+          content:
+            'Infra backlog xoay quanh SLO, alerting, deployment safety và incident response.',
+          persona: 'technical',
+        },
+      ],
+    });
+  }
+
+  if (hasTable('Attachment')) {
+    await prisma.attachment.createMany({
+      data: [
+        {
+          id: 'seed-att-1',
+          name: 'checkout-wireframe.png',
+          key: 'seed/attachments/checkout-wireframe.png',
+          url: 'https://cdn.techviet.local/seed/checkout-wireframe.png',
+          size: BigInt(284112),
+          mimeType: 'image/png',
+          taskId: 'seed-task-ecom-5',
+          aiContext: 'Wireframe checkout mobile with condensed address flow.',
+          aiMetadata: { source: 'figma-export', confidence: 0.93 },
+        },
+        {
+          id: 'seed-att-2',
+          name: 'incident-runbook.pdf',
+          key: 'seed/attachments/incident-runbook.pdf',
+          url: 'https://cdn.techviet.local/seed/incident-runbook.pdf',
+          size: BigInt(821004),
+          mimeType: 'application/pdf',
+          taskId: 'seed-task-infra-3',
+          aiContext: 'Runbook for memory leak incident response.',
+          aiMetadata: { source: 'docs-export', confidence: 0.89 },
+        },
+        {
+          id: 'seed-att-3',
+          name: 'payroll-report-sample.xlsx',
+          key: 'seed/attachments/payroll-report-sample.xlsx',
+          url: 'https://cdn.techviet.local/seed/payroll-report-sample.xlsx',
+          size: BigInt(145212),
+          mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          taskId: 'seed-task-hr-3',
+          aiContext: 'Sample payroll report for HR verification.',
+          aiMetadata: { source: 'generated', confidence: 0.84 },
+        },
       ],
     });
   }

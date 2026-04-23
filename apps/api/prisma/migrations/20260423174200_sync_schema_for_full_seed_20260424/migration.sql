@@ -4,37 +4,50 @@
   - A unique constraint covering the columns `[username]` on the table `User` will be added. If there are existing duplicate values, this will fail.
 
 */
--- CreateEnum
-CREATE TYPE "TaskLinkType" AS ENUM ('blocks', 'relates_to', 'duplicates');
+
+CREATE EXTENSION IF NOT EXISTS vector;
 
 -- CreateEnum
-CREATE TYPE "IntegrationProvider" AS ENUM ('SLACK', 'DISCORD', 'GITHUB', 'GITLAB', 'ZAPIER');
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'TaskLinkType') THEN
+        CREATE TYPE "TaskLinkType" AS ENUM ('blocks', 'relates_to', 'duplicates');
+    END IF;
+END $$;
+
+-- CreateEnum
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'IntegrationProvider') THEN
+        CREATE TYPE "IntegrationProvider" AS ENUM ('SLACK', 'DISCORD', 'GITHUB', 'GITLAB', 'ZAPIER');
+    END IF;
+END $$;
 
 -- AlterTable
-ALTER TABLE "Attachment" ADD COLUMN     "aiContext" TEXT,
-ADD COLUMN     "aiMetadata" JSONB;
+ALTER TABLE "Attachment" ADD COLUMN IF NOT EXISTS "aiContext" TEXT,
+ADD COLUMN IF NOT EXISTS "aiMetadata" JSONB;
 
 -- AlterTable
-ALTER TABLE "Doc" ADD COLUMN     "projectId" TEXT,
-ADD COLUMN     "summary" TEXT;
+ALTER TABLE "Doc" ADD COLUMN IF NOT EXISTS "projectId" TEXT,
+ADD COLUMN IF NOT EXISTS "summary" TEXT;
 
 -- AlterTable
-ALTER TABLE "Notification" ADD COLUMN     "aiSummary" TEXT,
-ADD COLUMN     "neuralPriority" TEXT NOT NULL DEFAULT 'AMBIENT';
+ALTER TABLE "Notification" ADD COLUMN IF NOT EXISTS "aiSummary" TEXT,
+ADD COLUMN IF NOT EXISTS "neuralPriority" TEXT NOT NULL DEFAULT 'AMBIENT';
 
 -- AlterTable
-ALTER TABLE "NotificationPreference" ADD COLUMN     "commentMentionEmail" BOOLEAN NOT NULL DEFAULT true,
-ADD COLUMN     "commentMentionInApp" BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE "NotificationPreference" ADD COLUMN IF NOT EXISTS "commentMentionEmail" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN IF NOT EXISTS "commentMentionInApp" BOOLEAN NOT NULL DEFAULT true;
 
 -- AlterTable
-ALTER TABLE "Task" ADD COLUMN     "summary" TEXT;
+ALTER TABLE "Task" ADD COLUMN IF NOT EXISTS "summary" TEXT;
 
 -- AlterTable
-ALTER TABLE "User" ADD COLUMN     "aiSkillProfile" JSONB,
-ADD COLUMN     "username" TEXT;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "aiSkillProfile" JSONB,
+ADD COLUMN IF NOT EXISTS "username" TEXT;
 
 -- CreateTable
-CREATE TABLE "ProjectMemoir" (
+CREATE TABLE IF NOT EXISTS "ProjectMemoir" (
     "id" TEXT NOT NULL,
     "projectId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
@@ -46,7 +59,7 @@ CREATE TABLE "ProjectMemoir" (
 );
 
 -- CreateTable
-CREATE TABLE "TaskLink" (
+CREATE TABLE IF NOT EXISTS "TaskLink" (
     "id" TEXT NOT NULL,
     "sourceTaskId" TEXT NOT NULL,
     "targetTaskId" TEXT NOT NULL,

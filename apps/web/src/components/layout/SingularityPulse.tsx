@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Activity, Zap, ExternalLink, Globe } from 'lucide-react';
-import { useWorkspaces } from '@/features/workspace/hooks/use-workspaces';
+import { useWorkspaces } from '@/features/system/workspace/hooks/use-workspaces';
 import Link from 'next/link';
-import { TheVoid } from '@/features/automation/components/TheVoid';
+import { TheVoid } from '@/features/specialized/automation/components/TheVoid';
 
 type ConsciousnessState = 'observing' | 'analyzing' | 'correcting';
 

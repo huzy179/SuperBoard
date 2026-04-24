@@ -1,9 +1,9 @@
 'use client';
 
 import { Plus, BookOpen, Share2, Shield, ShieldAlert } from 'lucide-react';
-import { useWorkspaces } from '@/features/workspace/hooks/use-workspaces';
+import { useWorkspaces } from '@/features/system/workspace/hooks/use-workspaces';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createDoc } from '@/features/docs/api/doc-service';
+import { createDoc } from '@/features/collaboration/docs/api/doc-service';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 

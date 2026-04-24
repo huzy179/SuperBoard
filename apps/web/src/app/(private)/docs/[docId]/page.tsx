@@ -1,12 +1,12 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useDoc, useSummarizeDoc } from '@/features/docs/hooks/use-doc';
-import { useAuthSession } from '@/features/auth/hooks/use-auth-session';
-import { RichTextEditor } from '@/features/docs/components/RichTextEditor';
-import { DocTOC } from '@/features/docs/components/DocTOC';
-import { DocVersionSidebar } from '@/features/docs/components/DocVersionSidebar';
-import { AssigneeAvatar } from '@/features/task/components/task-badges';
+import { useDoc, useSummarizeDoc } from '@/features/collaboration/docs/hooks/use-doc';
+import { useAuthSession } from '@/features/system/auth/hooks/use-auth-session';
+import { RichTextEditor } from '@/features/collaboration/docs/components/RichTextEditor';
+import { DocTOC } from '@/features/collaboration/docs/components/DocTOC';
+import { DocVersionSidebar } from '@/features/collaboration/docs/components/DocVersionSidebar';
+import { AssigneeAvatar } from '@/features/operations/task/components/task-badges';
 import { useState } from 'react';
 import {
   Settings,

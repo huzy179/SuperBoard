@@ -1,8 +1,8 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useDoc, useDocVersions } from '@/features/docs/hooks/use-doc';
-import { RichTextEditor } from '@/features/docs/components/RichTextEditor';
+import { useDoc, useDocVersions } from '@/features/collaboration/docs/hooks/use-doc';
+import { RichTextEditor } from '@/features/collaboration/docs/components/RichTextEditor';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { ChevronLeft, Clock, RotateCcw, FileText, Check } from 'lucide-react';

@@ -1,9 +1,9 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useChannels } from '@/features/chat/hooks/use-chat';
-import { useWorkspaces } from '@/features/workspace/hooks/use-workspaces';
-import { ChatShell } from '@/features/chat/components/ChatShell';
+import { useChannels } from '@/features/collaboration/chat/hooks/use-chat';
+import { useWorkspaces } from '@/features/system/workspace/hooks/use-workspaces';
+import { ChatShell } from '@/features/collaboration/chat/components/ChatShell';
 import { SectionSkeleton, FullPageError } from '@/components/ui/page-states';
 
 export default function ChannelPage() {

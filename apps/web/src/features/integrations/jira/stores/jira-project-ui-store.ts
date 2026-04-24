@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import type { SortDirection, TaskSortBy } from '@/lib/helpers/task-view';
+import type { SortDirection, TaskSortBy } from '@/features/operations/task/utils/task-view';
 
 export type ViewMode = 'board' | 'list' | 'calendar' | 'insights';
 

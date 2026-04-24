@@ -6,11 +6,11 @@ import type { AuthUserDTO } from '@superboard/shared';
 import type { NavItem } from '@/lib/navigation';
 import { isNavItemActive } from '@/lib/navigation';
 import { AppBrand } from './app-brand';
-import { NotificationBell } from '@/components/notifications/notification-bell';
-import { CommandPalette } from '@/components/search/CommandPalette';
+import { NotificationBell } from '@/features/system/notifications/components/notification-bell';
+import { CommandPalette } from '@/features/system/search/components/CommandPalette';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
-import { AssigneeAvatar } from '@/features/task/components/task-badges';
-import { WorkspaceSwitcher } from '@/features/workspace/components/WorkspaceSwitcher';
+import { AssigneeAvatar } from '@/features/operations/task/components/task-badges';
+import { WorkspaceSwitcher } from '@/features/system/workspace/components/WorkspaceSwitcher';
 import { SingularityPulse } from './SingularityPulse';
 import {
   MessageSquare,

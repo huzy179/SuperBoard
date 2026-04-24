@@ -12,15 +12,15 @@ import {
   TrendingUp,
   Zap,
 } from 'lucide-react';
-import { AdaptiveWidget } from '@/components/dashboard/adaptive-widget';
+import { AdaptiveWidget } from '@/features/operations/dashboard/components/adaptive-widget';
 import { FullPageError } from '@/components/ui/page-states';
-import { useDashboardStats } from '@/features/dashboard/hooks';
+import { useDashboardStats } from '@/features/operations/dashboard/hooks';
 import { STATUS_LABELS } from '@/lib/constants/task';
 import type { DashboardStatsDTO } from '@superboard/shared';
 
-import { StatCard } from '@/features/dashboard/components/stat-card';
-import { DonutDistributionChart } from '@/features/dashboard/components/distribution-chart';
-import { DashboardSkeleton } from '@/features/dashboard/components/dashboard-skeleton';
+import { StatCard } from '@/features/operations/dashboard/components/stat-card';
+import { DonutDistributionChart } from '@/features/operations/dashboard/components/distribution-chart';
+import { DashboardSkeleton } from '@/features/operations/dashboard/components/dashboard-skeleton';
 
 const CHART_COLOR_CLASSES = [
   'text-brand-500',

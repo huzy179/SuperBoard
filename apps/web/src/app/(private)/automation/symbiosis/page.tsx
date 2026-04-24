@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { SymbiosisConsole } from '@/features/automation/components/SymbiosisConsole';
+import { SymbiosisConsole } from '@/features/specialized/automation/components/SymbiosisConsole';
 
 export default function SymbiosisPage() {
   const searchParams = useSearchParams();

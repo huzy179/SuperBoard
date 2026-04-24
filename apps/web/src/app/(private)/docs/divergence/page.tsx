@@ -1,6 +1,6 @@
 'use client';
 
-import { ConflictResolver } from '@/features/knowledge/components/ConflictResolver';
+import { ConflictResolver } from '@/features/intelligence/knowledge/components/ConflictResolver';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 

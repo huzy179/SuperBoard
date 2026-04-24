@@ -4,7 +4,7 @@ import {
   useProjectContextMemory,
   useProjectCrudForm,
   useProjectFavorites,
-} from '@/features/project/hooks/project-core';
+} from '@/features/operations/project/hooks/project-core';
 import {
   filterProjectsByQuery,
   sortProjectsWithFavorites,

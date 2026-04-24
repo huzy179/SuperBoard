@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useWorkspaces } from '@/features/workspace/hooks/use-workspaces';
-import { useChannels } from '@/features/chat/hooks/use-chat';
+import { useWorkspaces } from '@/features/system/workspace/hooks/use-workspaces';
+import { useChannels } from '@/features/collaboration/chat/hooks/use-chat';
 import { SectionSkeleton } from '@/components/ui/page-states';
 
 export default function ChatHomePage() {

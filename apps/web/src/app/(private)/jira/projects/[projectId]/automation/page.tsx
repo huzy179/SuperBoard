@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Sparkles, Plus } from 'lucide-react';
-import { AutomationList } from '@/features/automation/components/AutomationList';
-import { CreateRuleModal } from '@/features/automation/components/CreateRuleModal';
-import { AIAutomationDialog } from '@/features/automation/components/AIAutomationDialog';
-import { useProjectDetail } from '@/features/board/hooks';
+import { AutomationList } from '@/features/specialized/automation/components/AutomationList';
+import { CreateRuleModal } from '@/features/specialized/automation/components/CreateRuleModal';
+import { AIAutomationDialog } from '@/features/specialized/automation/components/AIAutomationDialog';
+import { useProjectDetail } from '@/features/operations/board/hooks';
 import { FullPageLoader } from '@/components/ui/page-states';
 
 export default function AutomationPage() {

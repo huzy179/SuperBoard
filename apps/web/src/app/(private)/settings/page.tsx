@@ -2,13 +2,13 @@
 
 import { useState, type ReactNode } from 'react';
 import { FullPageError, FullPageLoader } from '@/components/ui/page-states';
-import { useAuthSession } from '@/features/auth/hooks';
-import { useUpdateProfile } from '@/features/user/hooks/user-profile';
+import { useAuthSession } from '@/features/system/auth/hooks';
+import { useUpdateProfile } from '@/features/system/user/hooks/user-profile';
 import {
   useNotificationPreferences,
   useUpdateNotificationPreferences,
-} from '@/features/notifications/hooks/notification-preferences';
-import { useWorkspaceMembers, useWorkspace } from '@/features/workspace/hooks';
+} from '@/features/system/notifications/hooks/notification-preferences';
+import { useWorkspaceMembers, useWorkspace } from '@/features/system/workspace/hooks';
 import {
   useWorkspaceWorkflow,
   useCreateWorkspaceStatus,
@@ -16,11 +16,11 @@ import {
   useDeleteWorkspaceStatus,
   useUpdateWorkspaceTransitions,
   useSyncWorkspaceWorkflow,
-} from '@/features/workflow/hooks/use-workflow';
-import { WorkflowEditor } from '@/features/workflow/components/WorkflowEditor';
-import { WorkspaceCreateModal } from '@/features/workspace/components/WorkspaceCreateModal';
-import { AvatarUpload } from '@/components/user/AvatarUpload';
-import { WorkspaceMemberSettings } from '@/features/workspace/components/WorkspaceMemberSettings';
+} from '@/features/operations/workflow/hooks/use-workflow';
+import { WorkflowEditor } from '@/features/operations/workflow/components/WorkflowEditor';
+import { WorkspaceCreateModal } from '@/features/system/workspace/components/WorkspaceCreateModal';
+import { AvatarUpload } from '@/features/system/user/components/AvatarUpload';
+import { WorkspaceMemberSettings } from '@/features/system/workspace/components/WorkspaceMemberSettings';
 import {
   Shield,
   User,

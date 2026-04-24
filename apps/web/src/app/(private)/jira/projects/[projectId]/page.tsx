@@ -5,30 +5,30 @@ import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigat
 import type { CreateTaskRequestDTO, ProjectMemberDTO } from '@superboard/shared';
 import { FullPageError } from '@/components/ui/page-states';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
-import { ProjectSkeleton } from '@/features/project/components/ProjectSkeleton';
+import { ProjectSkeleton } from '@/features/operations/project/components/ProjectSkeleton';
 
-import { ProjectDetailHeader } from '@/features/project/components/project-detail-header';
-import { ProjectViewManager } from '@/features/project/components/ProjectViewManager';
-import { ProjectOverlayManager } from '@/features/project/components/ProjectOverlayManager';
-import { TaskCreateForm } from '@/features/task/components/task-create-form';
-import { TaskFilterBar } from '@/features/task/components/task-filter-bar';
-import { TaskBulkActionBar } from '@/features/task/components/task-bulk-action-bar';
-import { MissionArchitectTerminal } from '@/features/project/components/MissionArchitectTerminal';
+import { ProjectDetailHeader } from '@/features/operations/project/components/project-detail-header';
+import { ProjectViewManager } from '@/features/operations/project/components/ProjectViewManager';
+import { ProjectOverlayManager } from '@/features/operations/project/components/ProjectOverlayManager';
+import { TaskCreateForm } from '@/features/operations/task/components/task-create-form';
+import { TaskFilterBar } from '@/features/operations/task/components/task-filter-bar';
+import { TaskBulkActionBar } from '@/features/operations/task/components/task-bulk-action-bar';
+import { MissionArchitectTerminal } from '@/features/operations/project/components/MissionArchitectTerminal';
 
 import {
   ProjectDetailProvider,
   useProjectDetailContext,
-} from '@/features/project/context/ProjectDetailContext';
-import { useAuthSession } from '@/features/auth/hooks';
-import { useProjectDetail } from '@/features/project/hooks/use-project-detail';
-import { useProjectCalendar } from '@/features/project/hooks/use-project-calendar';
-import { useProjectHeaderActions } from '@/features/project/hooks/use-project-header-actions';
-import { usePredictiveHealth } from '@/features/project/hooks/use-predictive-health';
-import { useTaskBulkActions } from '@/features/task/hooks/use-task-bulk-actions';
-import { useTaskDragDrop } from '@/features/task/hooks/use-task-drag-drop';
-import { useTaskEditPanel } from '@/features/task/hooks/use-task-edit-panel';
-import { useTaskSelection } from '@/features/task/hooks/use-task-selection';
-import { useProjectWorkflow } from '@/features/workflow/hooks/use-workflow';
+} from '@/features/operations/project/context/ProjectDetailContext';
+import { useAuthSession } from '@/features/system/auth/hooks';
+import { useProjectDetail } from '@/features/operations/project/hooks/use-project-detail';
+import { useProjectCalendar } from '@/features/operations/project/hooks/use-project-calendar';
+import { useProjectHeaderActions } from '@/features/operations/project/hooks/use-project-header-actions';
+import { usePredictiveHealth } from '@/features/operations/project/hooks/use-predictive-health';
+import { useTaskBulkActions } from '@/features/operations/task/hooks/use-task-bulk-actions';
+import { useTaskDragDrop } from '@/features/operations/task/hooks/use-task-drag-drop';
+import { useTaskEditPanel } from '@/features/operations/task/hooks/use-task-edit-panel';
+import { useTaskSelection } from '@/features/operations/task/hooks/use-task-selection';
+import { useProjectWorkflow } from '@/features/operations/workflow/hooks/use-workflow';
 import {
   useCreateTask,
   useUpdateTask,
@@ -36,10 +36,13 @@ import {
   useArchiveTask,
   useRestoreTask,
   useBulkTaskOperation,
-} from '@/features/task/hooks/use-task-mutations';
-import { useProjectUrlState } from '@/features/project/hooks/use-project-url-state';
+} from '@/features/operations/task/hooks/use-task-mutations';
+import { useProjectUrlState } from '@/features/operations/project/hooks/use-project-url-state';
 import { BOARD_COLUMNS, PRIORITY_OPTIONS, TASK_TYPE_OPTIONS } from '@/lib/constants/task';
-import { filterAndSortProjectTasks, buildBoardData } from '@/lib/helpers/task-view';
+import {
+  filterAndSortProjectTasks,
+  buildBoardData,
+} from '@/features/operations/task/utils/task-view';
 
 export default function ProjectDetailPage() {
   const params = useParams<{ projectId: string }>();

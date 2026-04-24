@@ -3,7 +3,7 @@
 import { Suspense, FormEvent, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FullPageLoader } from '@/components/ui/page-states';
-import { useRedirectAuthenticated } from '@/features/auth/hooks';
+import { useRedirectAuthenticated } from '@/features/system/auth/hooks';
 import { setAccessToken } from '@/lib/auth-storage';
 import { login } from '@/lib/services/auth-service';
 import { AppBrand } from '@/components/layout/app-brand';

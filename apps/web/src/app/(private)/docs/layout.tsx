@@ -3,9 +3,9 @@
 import { type ReactNode, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useWorkspaces } from '@/features/workspace/hooks/use-workspaces';
+import { useWorkspaces } from '@/features/system/workspace/hooks/use-workspaces';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getWorkspaceDocs, createDoc } from '@/features/docs/api/doc-service';
+import { getWorkspaceDocs, createDoc } from '@/features/collaboration/docs/api/doc-service';
 import {
   FileText,
   ChevronRight,

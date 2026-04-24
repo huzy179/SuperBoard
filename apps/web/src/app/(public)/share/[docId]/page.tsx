@@ -2,8 +2,8 @@
 
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { getPublicDoc } from '@/features/docs/api/doc-service';
-import { RichTextEditor } from '@/features/docs/components/RichTextEditor';
+import { getPublicDoc } from '@/features/collaboration/docs/api/doc-service';
+import { RichTextEditor } from '@/features/collaboration/docs/components/RichTextEditor';
 import { User, Clock, ShieldCheck, Globe } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';

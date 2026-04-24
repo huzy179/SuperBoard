@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Sparkles, AlertCircle, Loader2, ArrowRight, LogIn } from 'lucide-react';
 import { apiGet, apiPost } from '@/lib/api-client';
-import { useAuthSession } from '@/features/auth/hooks';
+import { useAuthSession } from '@/features/system/auth/hooks';
 import { toast } from 'sonner';
 
 export default function AcceptInvitePage() {

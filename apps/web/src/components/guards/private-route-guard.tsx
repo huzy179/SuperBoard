@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import type { AuthUserDTO } from '@superboard/shared';
 import { FullPageError, FullPageLoader } from '@/components/ui/page-states';
-import { useAuthSession } from '@/features/auth/hooks';
+import { useAuthSession } from '@/features/system/auth/hooks';
 
 type GuardRenderProps = {
   user: AuthUserDTO;

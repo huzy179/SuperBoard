@@ -1,6 +1,6 @@
 'use client';
 
-import { VectorAtlas } from '@/features/knowledge/components/VectorAtlas';
+import { VectorAtlas } from '@/features/intelligence/knowledge/components/VectorAtlas';
 import { BrainCircuit, ChevronLeft, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 

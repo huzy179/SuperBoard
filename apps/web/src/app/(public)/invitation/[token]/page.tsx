@@ -1,8 +1,8 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useAuthSession } from '@/features/auth/hooks';
-import { useInvitationByToken, useAcceptInvitation } from '@/features/workspace/hooks';
+import { useAuthSession } from '@/features/system/auth/hooks';
+import { useInvitationByToken, useAcceptInvitation } from '@/features/system/workspace/hooks';
 import { FullPageLoader, FullPageError } from '@/components/ui/page-states';
 import { useState } from 'react';
 

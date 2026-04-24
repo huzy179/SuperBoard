@@ -1,6 +1,6 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
-import { TaskNodeEmbed } from '@/features/docs/components/TaskNodeEmbed';
+import { TaskNodeEmbed } from '@/features/collaboration/docs/components/TaskNodeEmbed';
 
 export interface JiraTaskOptions {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

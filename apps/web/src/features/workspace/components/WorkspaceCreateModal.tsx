@@ -75,19 +75,19 @@ export function WorkspaceCreateModal({ onClose, onSuccess }: WorkspaceCreateModa
             {/* Slug */}
             <div>
               <label htmlFor="ws-slug-input" className="form-label">
-                Đường dẫn (Slug — Tuỳ chọn)
+                Workspace_Protocol_Slug (Optional)
               </label>
-              <div className="flex items-center rounded-lg border border-white/8 bg-white/[0.03] overflow-hidden focus-within:border-brand-500/40 transition-all shadow-inner">
-                <span className="px-4 text-white/20 text-sm font-mono select-none border-r border-white/8">
-                  /
+              <div className="flex items-center rounded-sm border border-white/10 bg-white/[0.01] overflow-hidden focus-within:border-brand-500/40 transition-all shadow-inner">
+                <span className="px-3 text-white/20 text-[10px] font-mono select-none border-r border-white/10">
+                  UPLINK://
                 </span>
                 <input
                   id="ws-slug-input"
                   type="text"
                   value={slug}
                   onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                  placeholder="tech-viet"
-                  className="flex-1 bg-transparent px-4 py-3.5 text-sm font-medium text-white placeholder:text-white/20 focus:outline-none"
+                  placeholder="alpha-sector-01"
+                  className="flex-1 bg-transparent px-4 py-3 text-sm font-bold text-white placeholder:text-white/10 focus:outline-none"
                 />
               </div>
             </div>

@@ -77,48 +77,48 @@ export function MessageToTaskDialog({ message, isOpen, onClose }: MessageToTaskD
             className="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-[100]"
           />
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-slate-900/90 border border-white/10 rounded-[2.5rem] shadow-luxe p-8 z-[101] overflow-hidden"
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-slate-950 border border-white/10 rounded-md shadow-luxe p-8 z-[101] overflow-hidden backdrop-blur-3xl"
           >
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-500 to-transparent" />
 
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-brand-500/20 rounded-lg text-brand-400">
-                  <CheckSquare size={24} />
+                <div className="p-2.5 bg-brand-500/10 rounded-sm text-brand-400 border border-brand-500/20 shadow-inner">
+                  <CheckSquare size={18} />
                 </div>
                 <div>
-                  <h2 className="text-xl font-black text-white uppercase tracking-tight italic">
-                    Chuyển thành Task
+                  <h2 className="text-sm font-black text-white uppercase tracking-widest">
+                    HANDOFF_TO_PROJECT
                   </h2>
-                  <p className="text-[10px] text-white/40 uppercase tracking-[0.3em] font-black italic">
-                    Cross-Platform Operational Handoff
+                  <p className="text-[8px] text-white/20 uppercase tracking-[0.3em] font-bold">
+                    CROSS_PLATFORM_OPERATIONAL_SYNC
                   </p>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 text-white/20 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+                className="p-1.5 text-white/20 hover:text-white hover:bg-white/[0.03] rounded-sm transition-all border border-transparent hover:border-white/5"
               >
-                <X size={20} />
+                <X size={16} />
               </button>
             </div>
 
             <div className="space-y-6">
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">
-                  <Target size={12} /> Dự án đích
+                <label className="flex items-center gap-2 text-[8px] font-bold text-white/20 uppercase tracking-widest ml-1">
+                  <Target size={10} /> DESTINATION_NODE
                 </label>
                 <div className="relative">
                   {isLoadingProjects ? (
-                    <div className="w-full h-12 bg-white/[0.03] animate-pulse rounded-lg" />
+                    <div className="w-full h-11 bg-white/[0.02] animate-pulse rounded-sm" />
                   ) : (
                     <select
                       value={selectedProjectId}
                       onChange={(e) => setSelectedProjectId(e.target.value)}
-                      className="w-full h-12 bg-slate-950/50 border border-white/5 rounded-lg px-4 text-sm text-white focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all outline-none appearance-none"
+                      className="w-full h-11 bg-slate-950/50 border border-white/10 rounded-sm px-4 text-xs text-white focus:border-brand-500/30 focus:ring-0 transition-all outline-none appearance-none font-bold uppercase tracking-tight"
                     >
                       {projects.map((p) => (
                         <option key={p.id} value={p.id} className="bg-slate-900 border-none">
@@ -131,39 +131,39 @@ export function MessageToTaskDialog({ message, isOpen, onClose }: MessageToTaskD
               </div>
 
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">
-                  <Type size={12} /> Tiêu đề Task
+                <label className="flex items-center gap-2 text-[8px] font-bold text-white/20 uppercase tracking-widest ml-1">
+                  <Type size={10} /> VECTOR_LABEL
                 </label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full h-12 bg-slate-950/50 border border-white/5 rounded-lg px-4 text-sm text-white placeholder:text-white/10 focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all outline-none"
+                  className="w-full h-11 bg-slate-950/50 border border-white/10 rounded-sm px-4 text-xs text-white placeholder:text-white/5 focus:border-brand-500/30 focus:ring-0 transition-all outline-none font-bold uppercase tracking-tight"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">
-                  <AlignLeft size={12} /> Chi tiết
+                <label className="flex items-center gap-2 text-[8px] font-bold text-white/20 uppercase tracking-widest ml-1">
+                  <AlignLeft size={10} /> METADATA_PAYLOAD
                 </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full h-32 bg-slate-950/50 border border-white/5 rounded-lg p-4 text-sm text-white placeholder:text-white/10 focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all outline-none resize-none"
+                  className="w-full h-32 bg-slate-950/50 border border-white/10 rounded-sm p-4 text-xs text-white placeholder:text-white/5 focus:border-brand-500/30 focus:ring-0 transition-all outline-none resize-none font-bold uppercase tracking-tight"
                 />
               </div>
 
               <button
                 onClick={handleCreateTask}
                 disabled={isSubmitting || isLoadingProjects}
-                className="w-full py-4 bg-brand-500 text-white rounded-lg font-black uppercase tracking-[0.2em] italic hover:bg-brand-400 disabled:opacity-50 transition-all flex items-center justify-center gap-3 group shadow-glow-brand/10"
+                className="w-full py-4 bg-brand-500 text-white rounded-sm font-black uppercase tracking-[0.2em] hover:bg-brand-400 disabled:opacity-50 transition-all flex items-center justify-center gap-3 group shadow-glow-brand/10 border border-brand-400/20 active:scale-95"
               >
                 {isSubmitting ? (
-                  <Loader2 size={18} className="animate-spin" />
+                  <Loader2 size={16} className="animate-spin" />
                 ) : (
-                  <Box size={18} className="group-hover:scale-110 transition-transform" />
+                  <Box size={16} className="group-hover:scale-110 transition-transform" />
                 )}
-                Xác nhận triển khai
+                CONFIRM_DEPLOYMENT
               </button>
             </div>
           </motion.div>

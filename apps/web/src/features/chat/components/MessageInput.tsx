@@ -65,12 +65,12 @@ export function MessageInput({ channelId }: MessageInputProps) {
   return (
     <div className="max-w-4xl mx-auto relative group">
       {/* High-fidelity rim lighting proxy */}
-      <div className="absolute -inset-px bg-gradient-to-r from-brand-500/20 via-transparent to-brand-500/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity blur-sm pointer-events-none" />
+      <div className="absolute -inset-px bg-gradient-to-r from-brand-500/10 via-transparent to-brand-500/10 rounded-md opacity-0 group-focus-within:opacity-100 transition-opacity blur-sm pointer-events-none" />
 
-      <div className="relative flex flex-col p-2 rounded-xl bg-slate-950/80 backdrop-blur-3xl border border-white/5 shadow-2xl focus-within:border-brand-500/30 transition-all">
-        <div className="flex items-end gap-2 px-2 pb-2">
-          <button className="p-3 text-white/20 hover:text-brand-400 hover:bg-white/5 rounded-lg transition-all">
-            <Paperclip size={20} />
+      <div className="relative flex flex-col p-var(--space-2) rounded-md bg-slate-950/80 backdrop-blur-3xl border border-white/10 shadow-inner focus-within:border-brand-500/30 transition-all">
+        <div className="flex items-end gap-var(--space-2) px-var(--space-2) pb-var(--space-2)">
+          <button className="p-3 text-white/20 hover:text-brand-400 hover:bg-white/[0.03] rounded-sm transition-all border border-transparent hover:border-white/5">
+            <Paperclip size={18} />
           </button>
 
           <textarea
@@ -79,56 +79,60 @@ export function MessageInput({ channelId }: MessageInputProps) {
             value={content}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="Nhắn tin..."
-            className="flex-1 bg-transparent border-none focus:ring-0 resize-none py-4 text-[14px] text-white min-h-[52px] max-h-[200px] placeholder:text-white/10 font-medium uppercase tracking-tight"
+            placeholder="TRANSMIT_SIGNAL..."
+            className="flex-1 bg-transparent border-none focus:ring-0 resize-none py-4 text-[13px] text-white min-h-[52px] max-h-[200px] placeholder:text-white/5 font-bold uppercase tracking-tight"
           />
 
-          <div className="flex items-center gap-2 self-center pb-1">
-            <button className="p-3 text-white/20 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-all">
-              <Smile size={20} />
+          <div className="flex items-center gap-var(--space-2) self-center pb-1">
+            <button className="p-3 text-white/20 hover:text-amber-400 hover:bg-white/[0.03] rounded-sm transition-all border border-transparent hover:border-white/5">
+              <Smile size={18} />
             </button>
 
-            <div className="h-8 w-px bg-white/5 mx-1" />
+            <div className="h-6 w-px bg-white/5 mx-var(--space-1)" />
 
             <button
               onClick={handleSend}
               disabled={!content.trim() || sendMessageMutation.isPending}
-              className={`p-4 rounded-lg transition-all group/send active:scale-95 ${
+              className={`p-3.5 rounded-sm transition-all group/send active:scale-95 border ${
                 content.trim()
-                  ? 'bg-brand-500 text-white shadow-glow-brand/20 hover:bg-brand-400'
-                  : 'bg-white/5 text-white/10'
+                  ? 'bg-brand-500 text-white border-brand-400/20 shadow-glow-brand/10 hover:bg-brand-400'
+                  : 'bg-white/5 text-white/5 border-transparent'
               }`}
             >
               {sendMessageMutation.isPending ? (
-                <Zap className="h-5 w-5 animate-pulse" />
+                <Zap className="h-4 w-4 animate-pulse" />
               ) : (
-                <Send className="h-5 w-5 group-hover/send:translate-x-1 group-hover/send:-translate-y-1 transition-transform" />
+                <Send className="h-4 w-4 group-hover/send:translate-x-0.5 group-hover/send:-translate-y-0.5 transition-transform" />
               )}
             </button>
           </div>
         </div>
 
         {/* Terminal Metadata Footer */}
-        <div className="flex items-center justify-between px-6 py-2 border-t border-white/5 bg-black/20 rounded-b-lg">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between px-var(--space-5) py-1.5 border-t border-white/5 bg-black/20 rounded-b-md">
+          <div className="flex items-center gap-var(--space-4)">
             <div className="flex items-center gap-1.5">
-              <div className="h-1 w-1 bg-brand-500 rounded-full animate-pulse" />
-              <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">
-                Kết nối ổn định
+              <div className="h-1 w-1 bg-brand-500 rounded-full animate-pulse shadow-glow-brand" />
+              <span className="text-[8px] font-bold text-white/20 uppercase tracking-widest">
+                SIGNAL_UPLINK_STABLE
               </span>
             </div>
-            <div className="h-3 w-px bg-white/5" />
-            <button className="flex items-center gap-1.5 text-[9px] font-black text-white/20 uppercase tracking-[0.2em] hover:text-brand-400 transition-colors">
+            <div className="h-2 w-px bg-white/5" />
+            <button className="flex items-center gap-1.5 text-[8px] font-bold text-white/20 uppercase tracking-widest hover:text-brand-400 transition-colors">
               <Sparkles size={10} />
-              Tự động hóa AI
+              AI_NEURAL_SYNAPSE
             </button>
           </div>
 
-          <div className="flex items-center gap-4 text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">
-            <div className="flex items-center gap-1.5">
-              <span className="p-1 bg-white/5 rounded text-[8px]">Ctrl</span>
+          <div className="flex items-center gap-4 text-[8px] font-bold text-white/10 uppercase tracking-widest">
+            <div className="flex items-center gap-1">
+              <span className="px-1 py-0.5 bg-white/5 rounded-xs border border-white/5 text-[7px]">
+                Ctrl
+              </span>
               <span>+</span>
-              <span className="p-1 bg-white/5 rounded text-[8px]">ENTER</span>
+              <span className="px-1 py-0.5 bg-white/5 rounded-xs border border-white/5 text-[7px]">
+                ENTER
+              </span>
             </div>
           </div>
         </div>

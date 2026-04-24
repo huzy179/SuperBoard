@@ -139,7 +139,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
           );
           const isHighlighted = !!focusData && !isActive;
 
-          const baseClasses = `flex items-center gap-4 rounded-lg px-4 py-3.5 text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-500 relative overflow-hidden`;
+          const baseClasses = `flex items-center gap-4 rounded-sm px-4 py-3.5 text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-500 relative overflow-hidden`;
 
           if (item.disabled) {
             return (
@@ -184,7 +184,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
                 </span>
               )}
               {!sidebarCollapsed && isActive && (
-                <div className="ml-auto w-1 h-3 rounded-full bg-brand-500 shadow-glow-brand relative z-10" />
+                <div className="ml-auto w-1 h-3 rounded-xs bg-brand-500 shadow-glow-brand relative z-10" />
               )}
             </Link>
           );

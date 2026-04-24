@@ -14,8 +14,8 @@ export function PublicShell({ children }: PublicShellProps) {
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/20 blur-[150px] rounded-full animate-pulse delay-1000" />
         <div className="absolute top-[30%] right-[10%] w-[30%] h-[30%] bg-violet-500/10 blur-[120px] rounded-full animate-pulse delay-500" />
 
-        {/* Physical Noise Texture */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+        {/* Physical Noise Texture Proxy */}
+        <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20256%20256%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cfilter%20id%3D%22noiseFilter%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.8%22%20numOctaves%3D%224%22%20stitchTiles%3D%22stitch%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url(%23noiseFilter)%22%2F%3E%3C%2Fsvg%3E')]" />
       </div>
 
       <header className="relative z-10 border-b border-white/5 bg-transparent backdrop-blur-sm">

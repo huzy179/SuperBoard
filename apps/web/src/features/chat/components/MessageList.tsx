@@ -236,7 +236,7 @@ function NeuralLinkPreview({ content }: { content: string }) {
     <motion.div
       initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mt-var(--space-4) p-var(--space-4) bg-black/40 border border-white/10 rounded-md group/preview hover:border-brand-500/30 transition-all cursor-pointer relative overflow-hidden shadow-inner"
+      className="mt-var(--space-3) p-var(--space-3) bg-black/40 border border-white/10 rounded-sm group/preview hover:border-brand-500/30 transition-all cursor-pointer relative overflow-hidden shadow-inner"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 via-transparent to-transparent opacity-0 group-hover/preview:opacity-100 transition-opacity" />
 

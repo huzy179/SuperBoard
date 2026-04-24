@@ -22,9 +22,9 @@ interface WorkspaceMemberSettingsProps {
 }
 
 const ROLE_BADGE_COLORS: Record<string, string> = {
-  owner: 'bg-purple-100 text-purple-700',
-  admin: 'bg-blue-100 text-blue-700',
-  member: 'bg-slate-100 text-slate-600',
+  owner: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+  admin: 'bg-brand-500/10 text-brand-400 border-brand-500/20',
+  member: 'bg-white/5 text-white/40 border-white/10',
 };
 
 export function WorkspaceMemberSettings({
@@ -84,33 +84,32 @@ export function WorkspaceMemberSettings({
         {canManage && (
           <button
             onClick={() => setIsInviteModalOpen(true)}
-            className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white px-6 py-3 rounded-lg font-black text-sm transition-all active:scale-95 shadow-xl shadow-slate-900/10"
+            className="flex items-center justify-center gap-2 bg-white text-slate-950 px-5 py-2.5 rounded-sm font-black text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-inner"
           >
-            <UserPlus size={18} />
-            <span>Mời thành viên</span>
+            <UserPlus size={16} />
+            <span>Mời_Thành_Viên</span>
           </button>
         )}
       </div>
 
-      {/* Filters Area */}
-      <div className="flex flex-wrap items-center gap-3 p-2 bg-slate-50 rounded-xl border border-slate-100">
+      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-950 border border-white/10 rounded-md">
         <div className="relative flex-1 min-w-[240px]">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/20" size={16} />
           <input
             type="text"
             placeholder="Tìm theo tên hoặc email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-lg text-sm focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all outline-none"
+            className="w-full pl-10 pr-4 py-2 bg-white/[0.02] border border-white/5 rounded-sm text-sm font-bold text-white placeholder:text-white/10 outline-none transition-all focus:bg-white/[0.05] focus:border-brand-500/30"
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <Filter size={16} className="text-slate-400 ml-2" />
+          <Filter size={14} className="text-white/20 ml-2" />
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value as 'all' | 'owner' | 'admin' | 'member')}
-            className="bg-white border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none hover:border-slate-300 transition-all"
+            className="bg-white/[0.03] border border-white/10 rounded-sm px-3 py-2 text-[11px] font-bold text-white/60 outline-none hover:bg-white/[0.05] transition-all uppercase tracking-tight"
           >
             <option value="all">Tất cả vai trò</option>
             <option value="owner">Chủ sở hữu</option>
@@ -121,80 +120,84 @@ export function WorkspaceMemberSettings({
 
         <button
           onClick={() => setSortByJoinDate((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
-          className="px-6 py-3 bg-white border border-slate-100 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all"
+          className="px-4 py-2 bg-white/[0.03] border border-white/10 rounded-sm text-[11px] font-bold text-white/60 hover:bg-white/[0.05] transition-all uppercase tracking-tight"
         >
           {sortByJoinDate === 'desc' ? 'Mới nhất' : 'Cũ nhất'}
         </button>
       </div>
 
       {/* Members Table */}
-      <div className="premium-card overflow-hidden">
+      <div className="bg-slate-950/40 border border-white/10 rounded-md overflow-hidden shadow-inner">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-slate-50/50 border-b border-slate-100">
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                Thành viên
+            <tr className="bg-white/[0.02] border-b border-white/10">
+              <th className="px-6 py-3 text-[9px] font-bold uppercase tracking-widest text-white/20">
+                THÀNH_VIÊN
               </th>
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                Vai trò
+              <th className="px-6 py-3 text-[9px] font-bold uppercase tracking-widest text-white/20">
+                VAI_TRÒ
               </th>
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                Ngày tham gia
+              <th className="px-6 py-3 text-[9px] font-bold uppercase tracking-widest text-white/20">
+                NGÀY_GIA_NHẬP
               </th>
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">
-                Thao tác
+              <th className="px-6 py-3 text-[9px] font-bold uppercase tracking-widest text-white/20 text-right">
+                THAO_TÁC
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-50">
+          <tbody className="divide-y divide-white/5">
             {filteredMembers.map((m) => (
               <tr key={m.id} className="group hover:bg-slate-50/30 transition-colors">
-                <td className="px-6 py-5">
+                <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <AssigneeAvatar name={m.fullName} color={m.avatarColor} size="md" />
+                    <AssigneeAvatar name={m.fullName} color={m.avatarColor} size="sm" />
                     <div>
-                      <p className="font-bold text-slate-900 leading-none mb-1">{m.fullName}</p>
-                      <p className="text-xs text-slate-500 font-medium">{m.email}</p>
+                      <p className="font-bold text-white leading-none mb-1 uppercase text-[12px] tracking-tight">
+                        {m.fullName}
+                      </p>
+                      <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">
+                        {m.email}
+                      </p>
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-5">
+                <td className="px-6 py-4">
                   {canManage && m.role !== 'owner' && m.userId !== currentUserId ? (
                     <select
                       value={m.role}
                       onChange={(e) => updateRole.mutate({ memberId: m.id, role: e.target.value })}
                       disabled={updateRole.isPending}
-                      className="bg-transparent border-none text-sm font-bold text-brand-600 focus:ring-0 cursor-pointer hover:underline"
+                      className="bg-transparent border-none text-[10px] font-black uppercase tracking-widest text-brand-400 focus:ring-0 cursor-pointer hover:text-brand-300"
                     >
                       {ROLE_OPTIONS.filter((r) => r.key !== 'owner').map((r) => (
-                        <option key={r.key} value={r.key}>
-                          {r.label}
+                        <option key={r.key} value={r.key} className="bg-slate-950">
+                          {r.label.toUpperCase()}
                         </option>
                       ))}
                     </select>
                   ) : (
                     <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${ROLE_BADGE_COLORS[m.role]}`}
+                      className={`px-2 py-0.5 rounded-xs text-[8px] font-bold uppercase tracking-widest border ${ROLE_BADGE_COLORS[m.role]}`}
                     >
                       {m.role}
                     </span>
                   )}
                 </td>
-                <td className="px-6 py-5 text-sm font-medium text-slate-500">
+                <td className="px-6 py-4 text-[10px] font-bold text-white/20 uppercase tracking-widest">
                   {formatDate(m.joinedAt)}
                 </td>
-                <td className="px-6 py-5 text-right">
-                  <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <td className="px-6 py-4 text-right">
+                  <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     {isOwner && m.role !== 'owner' && (
                       <button
                         onClick={() =>
                           confirm(`Chuyển quyền sở hữu cho ${m.fullName}?`) &&
                           transferOwnership.mutate(m.id)
                         }
-                        className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
+                        className="p-1.5 text-amber-500/50 hover:text-amber-400 hover:bg-white/5 rounded-xs transition-all"
                         title="Chuyển quyền sở hữu"
                       >
-                        <ShieldAlert size={18} />
+                        <ShieldAlert size={14} />
                       </button>
                     )}
                     {m.userId !== currentUserId && m.role !== 'owner' && (
@@ -202,10 +205,10 @@ export function WorkspaceMemberSettings({
                         onClick={() =>
                           confirm(`Xóa ${m.fullName} khỏi workspace?`) && removeMember.mutate(m.id)
                         }
-                        className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
+                        className="p-1.5 text-rose-500/50 hover:text-rose-400 hover:bg-white/5 rounded-xs transition-all"
                         title="Xóa thành viên"
                       >
-                        <Trash2 size={18} />
+                        <Trash2 size={14} />
                       </button>
                     )}
                   </div>
@@ -216,12 +219,12 @@ export function WorkspaceMemberSettings({
         </table>
         {filteredMembers.length === 0 && (
           <div className="p-20 text-center space-y-2">
-            <Search className="mx-auto text-slate-200 mb-4" size={48} />
-            <p className="font-black text-slate-900 uppercase tracking-tight">
-              Không tìm thấy thành viên
+            <Search className="mx-auto text-white/5 mb-4" size={40} />
+            <p className="font-bold text-white uppercase tracking-tight text-[11px]">
+              No_Members_Found_In_Sector
             </p>
-            <p className="text-sm text-slate-500 font-medium">
-              Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.
+            <p className="text-[9px] text-white/20 font-bold uppercase tracking-widest">
+              Modify uplink filters or search query.
             </p>
           </div>
         )}
@@ -229,13 +232,13 @@ export function WorkspaceMemberSettings({
 
       {/* Pending Invitations Section */}
       {canManage && (invitations?.length ?? 0) > 0 && (
-        <div className="space-y-6 pt-10 border-t border-slate-100 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-200">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-brand-50 text-brand-600 rounded-lg flex items-center justify-center font-bold text-sm">
+        <div className="space-y-6 pt-10 border-t border-white/5 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-200">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 bg-brand-500/10 text-brand-400 border border-brand-500/20 rounded-sm flex items-center justify-center font-black text-[10px] shadow-inner">
               {invitations?.length}
             </div>
-            <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">
-              Lời mời đang chờ
+            <h3 className="text-[11px] font-black text-white uppercase tracking-widest">
+              PENDING_INVITATION_NODES
             </h3>
           </div>
 
@@ -243,16 +246,18 @@ export function WorkspaceMemberSettings({
             {invitations?.map((inv: WorkspaceInvitationItemDTO) => (
               <div
                 key={inv.id}
-                className="premium-card p-5 group flex items-center justify-between"
+                className="bg-slate-950/40 border border-white/10 p-4 rounded-md group flex items-center justify-between shadow-inner"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-slate-50 text-slate-400 rounded-lg flex items-center justify-center border border-slate-100">
-                    <Mail size={20} />
+                  <div className="w-10 h-10 bg-white/5 text-white/10 rounded-sm flex items-center justify-center border border-white/5 group-hover:border-brand-500/20 group-hover:text-brand-400 transition-all">
+                    <Mail size={16} />
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-900 leading-none mb-1">{inv.email}</h4>
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                      <span>{inv.role}</span>
+                    <h4 className="font-bold text-white leading-none mb-1 uppercase text-[12px] tracking-tight">
+                      {inv.email}
+                    </h4>
+                    <div className="flex items-center gap-2 text-[8px] font-bold text-white/20 uppercase tracking-widest">
+                      <span className="text-brand-400/60">{inv.role}</span>
                       <span>•</span>
                       <span className="flex items-center gap-1">
                         <Clock size={10} /> {formatDate(inv.expiresAt)}
@@ -265,10 +270,10 @@ export function WorkspaceMemberSettings({
                   onClick={() =>
                     confirm(`Thu hồi lời mời cho ${inv.email}?`) && revokeInvitation.mutate(inv.id)
                   }
-                  className="p-2 text-rose-500 hover:bg-rose-50 rounded-xl opacity-0 group-hover:opacity-100 transition-all border border-transparent hover:border-rose-100"
+                  className="p-1.5 text-rose-500/50 hover:text-rose-400 hover:bg-white/5 rounded-xs opacity-0 group-hover:opacity-100 transition-all"
                   title="Thu hồi lời mời"
                 >
-                  <Trash2 size={18} />
+                  <Trash2 size={14} />
                 </button>
               </div>
             ))}

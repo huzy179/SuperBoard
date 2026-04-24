@@ -111,13 +111,13 @@ export function InviteMemberModal({ workspaceId, onClose }: InviteMemberModalPro
                       key={id}
                       type="button"
                       onClick={() => setRole(id)}
-                      className={`flex flex-col items-center justify-center gap-2 h-20 rounded-lg border-2 transition-all font-bold text-xs ${
+                      className={`flex flex-col items-center justify-center gap-2 h-20 rounded-sm border transition-all font-bold text-[10px] uppercase tracking-tight ${
                         role === id
-                          ? 'border-brand-500/50 bg-brand-500/10 text-brand-400'
-                          : 'border-white/8 bg-white/[0.02] text-white/30 hover:border-white/20 hover:text-white/60'
+                          ? 'border-brand-500/50 bg-brand-500/10 text-brand-400 shadow-inner'
+                          : 'border-white/5 bg-white/[0.02] text-white/20 hover:border-white/10 hover:text-white/40'
                       }`}
                     >
-                      <Icon size={16} />
+                      <Icon size={14} />
                       <span>{label}</span>
                     </button>
                   ))}
@@ -136,14 +136,14 @@ export function InviteMemberModal({ workspaceId, onClose }: InviteMemberModalPro
             /* Success state */
             <div className="space-y-6 animate-in fade-in duration-500">
               <div className="text-center space-y-2">
-                <div className="w-14 h-14 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-[1.5rem] flex items-center justify-center mx-auto mb-4">
-                  <Check size={28} />
+                <div className="w-12 h-12 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-sm flex items-center justify-center mx-auto mb-4 shadow-inner">
+                  <Check size={20} />
                 </div>
-                <h4 className="text-base font-black text-white tracking-tight">
-                  Liên kết đã được tạo!
+                <h4 className="text-sm font-black text-white uppercase tracking-tight">
+                  Uplink_Generated_Successfully
                 </h4>
-                <p className="text-sm text-white/40 font-medium">
-                  Gửi liên kết này trực tiếp cho đồng nghiệp của bạn.
+                <p className="text-[11px] text-white/30 font-bold uppercase tracking-wide">
+                  Share this secure access node with your peer.
                 </p>
               </div>
 
@@ -153,23 +153,23 @@ export function InviteMemberModal({ workspaceId, onClose }: InviteMemberModalPro
                 <button
                   type="button"
                   onClick={handleCopyLink}
-                  className={`absolute right-2 top-1/2 -translate-y-1/2 h-9 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 ${
+                  className={`absolute right-1.5 top-1/2 -translate-y-1/2 h-8 px-3 rounded-xs text-[9px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 ${
                     isCopied
                       ? 'bg-emerald-500 text-white'
-                      : 'bg-white/10 text-white/60 hover:bg-white/20 hover:text-white'
+                      : 'bg-white/10 text-white/40 hover:bg-white/20 hover:text-white'
                   }`}
                 >
-                  {isCopied ? <Check size={13} /> : <Copy size={13} />}
-                  <span>{isCopied ? 'Đã chép' : 'Sao chép'}</span>
+                  {isCopied ? <Check size={11} /> : <Copy size={11} />}
+                  <span>{isCopied ? 'COPIED' : 'COPY_NODE'}</span>
                 </button>
               </div>
 
               {/* Note */}
-              <div className="flex gap-3 rounded-lg bg-amber-500/8 border border-amber-500/20 p-4 text-[11px] font-medium text-amber-400 leading-relaxed">
-                <Info size={15} className="shrink-0 mt-0.5" />
+              <div className="flex gap-3 rounded-sm bg-amber-500/5 border border-amber-500/20 p-var(--space-4) text-[10px] font-bold text-amber-400/80 leading-relaxed uppercase tracking-tight">
+                <Info size={12} className="shrink-0 mt-0.5" />
                 <p>
-                  <b>Lưu ý:</b> Hệ thống chưa tích hợp Mail Server tự động. Hãy copy liên kết trên
-                  và gửi qua các kênh chat cho đồng nghiệp.
+                  <b>NOTICE:</b> Mail server integration is currently offline. Manual peer-to-peer
+                  transmission required.
                 </p>
               </div>
             </div>

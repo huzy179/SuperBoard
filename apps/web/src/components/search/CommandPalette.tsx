@@ -261,7 +261,7 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
       {/* Neural Backdrop */}
       <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-2xl" onClick={onClose} />
 
-      <div className="relative w-full max-w-2xl overflow-hidden rounded-[2.5rem] border border-white/5 bg-slate-900/60 shadow-glass animate-in zoom-in-95 duration-500">
+      <div className="relative w-full max-w-2xl overflow-hidden rounded-md border border-white/10 bg-slate-950/80 shadow-inner animate-in zoom-in-95 duration-500 backdrop-blur-3xl">
         {/* Rim Light */}
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent" />
 
@@ -269,13 +269,13 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
           {/* Neural Search Header */}
           <div className="p-8 border-b border-white/5 flex items-center gap-6 relative group">
             <div
-              className={`w-14 h-14 rounded-lg flex items-center justify-center border transition-all duration-700 ${
+              className={`w-12 h-12 rounded-sm flex items-center justify-center border transition-all duration-700 ${
                 query
                   ? 'bg-brand-500/20 border-brand-500/40 text-brand-400 shadow-glow-brand'
                   : 'bg-white/5 border-white/5 text-white/20'
               }`}
             >
-              {query ? <Zap size={24} className="animate-pulse" /> : <Terminal size={24} />}
+              {query ? <Zap size={20} className="animate-pulse" /> : <Terminal size={20} />}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
@@ -296,7 +296,7 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
               />
             </div>
             <div className="flex items-center gap-2">
-              <kbd className="hidden sm:flex h-10 px-3 items-center justify-center bg-slate-950 text-white/20 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/5 group-hover:text-brand-400 transition-colors">
+              <kbd className="hidden sm:flex h-8 px-2 items-center justify-center bg-slate-950 text-white/20 rounded-sm text-[9px] font-bold uppercase tracking-widest border border-white/10 group-hover:text-brand-400 transition-colors">
                 ESC
               </kbd>
             </div>
@@ -322,17 +322,17 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
                         <button
                           key={item.id}
                           onClick={item.handler}
-                          className={`w-full flex items-center gap-6 px-4 py-4 rounded-[1.5rem] transition-all duration-500 text-left relative group ${
+                          className={`w-full flex items-center gap-6 px-4 py-3 rounded-sm transition-all duration-500 text-left relative group ${
                             isSelected
-                              ? 'bg-white/[0.05] text-white'
-                              : 'hover:bg-white/[0.02] text-white/40'
+                              ? 'bg-white/[0.04] text-white'
+                              : 'hover:bg-white/[0.01] text-white/40'
                           }`}
                         >
                           {isSelected && (
                             <div className="absolute inset-y-2 left-0 w-1 bg-brand-500 rounded-full shadow-glow-brand animate-pulse" />
                           )}
                           <div
-                            className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-500 border ${
+                            className={`w-10 h-10 rounded-sm flex items-center justify-center transition-all duration-500 border ${
                               isSelected
                                 ? 'bg-brand-500/20 border-brand-500/30 text-brand-400 shadow-glow-brand'
                                 : 'bg-white/5 border-white/5 group-hover:bg-white/10'
@@ -356,11 +356,11 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
                           </div>
                           {isSelected && (
                             <div className="flex items-center gap-3 pr-2 animate-in slide-in-from-right-4 duration-500">
-                              <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">
-                                Execute
+                              <span className="text-[8px] font-bold uppercase tracking-widest text-white/20">
+                                EXECUTE
                               </span>
-                              <div className="p-2 bg-brand-500 rounded-lg text-slate-950 shadow-glow-brand">
-                                <ArrowRight size={14} />
+                              <div className="p-1.5 bg-brand-500 rounded-sm text-slate-950 shadow-glow-brand">
+                                <ArrowRight size={12} />
                               </div>
                             </div>
                           )}
@@ -372,8 +372,8 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
               ))
             ) : (
               <div className="py-24 text-center space-y-6">
-                <div className="w-20 h-20 bg-slate-950 text-white/5 rounded-xl flex items-center justify-center mx-auto border border-white/5 shadow-inner transition-transform hover:scale-110 duration-700">
-                  <Cpu size={40} />
+                <div className="w-16 h-16 bg-slate-950 text-white/5 rounded-sm flex items-center justify-center mx-auto border border-white/10 shadow-inner transition-transform hover:scale-110 duration-700">
+                  <Cpu size={32} />
                 </div>
                 <div className="space-y-2 px-12">
                   <p className="font-black text-white/40 uppercase tracking-[0.3em]">
@@ -421,15 +421,15 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-6 text-[9px] font-black uppercase tracking-[0.2em] text-white/20">
+            <div className="flex items-center gap-6 text-[9px] font-bold uppercase tracking-widest text-white/20">
               <div className="flex items-center gap-2">
-                <kbd className="px-2 py-1 bg-slate-900 border border-white/10 rounded-lg text-white/40 group-hover:text-brand-400 transition-colors">
+                <kbd className="px-2 py-1 bg-slate-900 border border-white/10 rounded-sm text-white/40 group-hover:text-brand-400 transition-colors">
                   ↑↓
                 </kbd>
                 <span>Navigate</span>
               </div>
               <div className="flex items-center gap-2">
-                <kbd className="px-2 py-1 bg-slate-900 border border-white/10 rounded-lg text-white/40">
+                <kbd className="px-2 py-1 bg-slate-900 border border-white/10 rounded-sm text-white/40">
                   ↵
                 </kbd>
                 <span>Initialize</span>

@@ -4,8 +4,8 @@ import { Suspense, FormEvent, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FullPageLoader } from '@/components/ui/page-states';
 import { useRedirectAuthenticated } from '@/features/system/auth/hooks';
-import { setAccessToken } from '@/lib/auth-storage';
-import { login } from '@/lib/services/auth-service';
+import { setAccessToken } from '@/features/system/auth/utils/auth-storage';
+import { login } from '@/features/system/auth/api/auth-service';
 import { AppBrand } from '@/components/layout/app-brand';
 
 function LoginContent() {

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import type { ProjectTaskItemDTO, TaskTypeDTO } from '@superboard/shared';
 import type { TaskPriority } from '@/lib/constants/task';
-import { toDateInputValue } from '@/lib/helpers';
+import { toDateInputValue } from '@/lib/utils';
 
 type BulkTaskInput = {
   taskIds: string[];

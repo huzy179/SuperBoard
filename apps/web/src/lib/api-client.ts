@@ -1,5 +1,5 @@
 import type { ApiResponse } from '@superboard/shared';
-import { getAccessToken } from './auth-storage';
+import { getAccessToken } from '@/features/system/auth/utils/auth-storage';
 
 type RequestInitOptions = {
   auth?: boolean;

@@ -1,8 +1,8 @@
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import type { AuthUserDTO } from '@superboard/shared';
-import { clearAccessToken, getAccessToken } from '@/lib/auth-storage';
-import { getCurrentUser } from '@/lib/services/auth-service';
+import { clearAccessToken, getAccessToken } from '@/features/system/auth/utils/auth-storage';
+import { getCurrentUser } from '@/features/system/auth/api/auth-service';
 
 type UseAuthSessionResult = {
   loading: boolean;

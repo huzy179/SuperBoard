@@ -1,5 +1,5 @@
 import { io, Socket } from 'socket.io-client';
-import { getAccessToken } from '../auth-storage';
+import { getAccessToken } from '@/features/system/auth/utils/auth-storage';
 import type { Message } from '@superboard/shared';
 
 export type ChatSocketEvents = {

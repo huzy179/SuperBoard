@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import type { ProjectItemDTO } from '@superboard/shared';
 import { formatDate } from '@/lib/format-date';
-import { percentOf } from '@/lib/helpers';
+import { percentOf } from '@/lib/utils';
 import {
   MoreHorizontal,
   LayoutGrid,

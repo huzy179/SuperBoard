@@ -7,7 +7,7 @@ import {
   deleteTaskComment,
   getTaskComments,
   updateTaskComment,
-} from '@/lib/services/comment-service';
+} from '@/features/operations/task/api/comment-service';
 import { getTaskHistory } from '@/features/operations/task/api/task-service';
 import {
   publishTaskCommentsUpdated,

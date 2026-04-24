@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import type { ProjectDetailDTO } from '@superboard/shared';
 import { formatDate } from '@/lib/format-date';
-import { getInitials } from '@/lib/helpers';
+import { getInitials } from '@/lib/utils';
 import { MissionTimeline } from './MissionTimeline';
 import { MissionCommandBriefing } from './MissionCommandBriefing';
 import {

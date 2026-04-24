@@ -15,7 +15,7 @@ import type {
   UpdateTaskRequestDTO,
 } from '@superboard/shared';
 import type { TaskPriority } from '@/lib/constants/task';
-import { toDateInputValue } from '@/lib/helpers';
+import { toDateInputValue } from '@/lib/utils';
 
 type UseTaskEditPanelParams = {
   projectId: string;

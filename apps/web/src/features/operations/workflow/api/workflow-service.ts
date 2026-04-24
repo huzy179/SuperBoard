@@ -1,39 +1,25 @@
-import { apiGet, apiPost, apiRequest } from '@/lib/api-client';
+import { apiGet, apiPost, apiPatch, apiDelete } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
-import type { WorkflowStatusCategory } from '@superboard/shared';
+import type {
+  WorkflowStatusDTO,
+  CreateWorkflowStatusRequestDTO,
+  UpdateWorkflowStatusRequestDTO,
+  DeleteStatusRequestDTO,
+  UpdateTransitionsRequestDTO,
+  WorkflowStatusTemplateDTO,
+} from '@superboard/shared';
 
-export interface ProjectWorkflowDTO {
-  statuses: {
-    id: string;
-    key: string;
-    name: string;
-    category: WorkflowStatusCategory;
-    position: number;
-    isSystem: boolean;
-  }[];
-  transitions: {
-    id: string;
-    fromStatusId: string;
-    toStatusId: string;
-  }[];
-}
-
-export async function getProjectWorkflow(projectId: string): Promise<ProjectWorkflowDTO> {
-  return apiGet<ProjectWorkflowDTO>(API_ENDPOINTS.workflow.projectWorkflow(projectId), {
+export async function getProjectWorkflow(projectId: string): Promise<WorkflowStatusTemplateDTO> {
+  return apiGet<WorkflowStatusTemplateDTO>(API_ENDPOINTS.workflow.projectWorkflow(projectId), {
     auth: true,
   });
 }
 
 export async function createProjectStatus(
   projectId: string,
-  payload: {
-    key: string;
-    name: string;
-    category: WorkflowStatusCategory;
-    position?: number;
-  },
-): Promise<void> {
-  return apiPost(API_ENDPOINTS.workflow.projectStatuses(projectId), payload, {
+  data: CreateWorkflowStatusRequestDTO,
+): Promise<WorkflowStatusDTO> {
+  return apiPost<WorkflowStatusDTO>(API_ENDPOINTS.workflow.projectStatuses(projectId), data, {
     auth: true,
   });
 }
@@ -41,59 +27,47 @@ export async function createProjectStatus(
 export async function updateProjectStatus(
   projectId: string,
   statusId: string,
-  payload: {
-    name?: string;
-    category?: WorkflowStatusCategory;
-    position?: number;
-  },
-): Promise<void> {
-  return apiRequest(API_ENDPOINTS.workflow.statusDetail(projectId, statusId), {
-    auth: true,
-    method: 'PATCH',
-    body: payload,
-  });
+  data: UpdateWorkflowStatusRequestDTO,
+): Promise<WorkflowStatusDTO> {
+  return apiPatch<WorkflowStatusDTO>(
+    API_ENDPOINTS.workflow.statusDetail(projectId, statusId),
+    data,
+    { auth: true },
+  );
 }
 
 export async function deleteProjectStatus(
   projectId: string,
   statusId: string,
-  payload: { migrateToId: string },
+  data: DeleteStatusRequestDTO,
 ): Promise<void> {
-  return apiRequest(API_ENDPOINTS.workflow.statusDetail(projectId, statusId), {
+  await apiDelete(API_ENDPOINTS.workflow.statusDetail(projectId, statusId), {
     auth: true,
-    method: 'DELETE',
-    body: payload,
+    body: data,
   });
 }
 
 export async function updateProjectTransitions(
   projectId: string,
-  payload: {
-    transitions: { fromStatusId: string; toStatusId: string }[];
-  },
+  data: UpdateTransitionsRequestDTO,
 ): Promise<void> {
-  return apiPost(API_ENDPOINTS.workflow.transitions(projectId), payload, {
-    auth: true,
-  });
+  await apiPost(API_ENDPOINTS.workflow.transitions(projectId), data, { auth: true });
 }
 
-// Workspace Workflow
-export async function getWorkspaceWorkflow(workspaceId: string): Promise<ProjectWorkflowDTO> {
-  return apiGet<ProjectWorkflowDTO>(API_ENDPOINTS.workflow.workspaceWorkflow(workspaceId), {
+// Workspace Workflow Functions
+export async function getWorkspaceWorkflow(
+  workspaceId: string,
+): Promise<WorkflowStatusTemplateDTO> {
+  return apiGet<WorkflowStatusTemplateDTO>(API_ENDPOINTS.workflow.workspaceWorkflow(workspaceId), {
     auth: true,
   });
 }
 
 export async function createWorkspaceStatus(
   workspaceId: string,
-  payload: {
-    key: string;
-    name: string;
-    category: WorkflowStatusCategory;
-    position?: number;
-  },
-): Promise<void> {
-  return apiPost(API_ENDPOINTS.workflow.workspaceStatuses(workspaceId), payload, {
+  data: CreateWorkflowStatusRequestDTO,
+): Promise<WorkflowStatusDTO> {
+  return apiPost<WorkflowStatusDTO>(API_ENDPOINTS.workflow.workspaceStatuses(workspaceId), data, {
     auth: true,
   });
 }
@@ -101,48 +75,39 @@ export async function createWorkspaceStatus(
 export async function updateWorkspaceStatus(
   workspaceId: string,
   statusId: string,
-  payload: {
-    name?: string;
-    category?: WorkflowStatusCategory;
-    position?: number;
-  },
-): Promise<void> {
-  return apiRequest(API_ENDPOINTS.workflow.workspaceStatusDetail(workspaceId, statusId), {
-    auth: true,
-    method: 'PATCH',
-    body: payload,
-  });
+  data: UpdateWorkflowStatusRequestDTO,
+): Promise<WorkflowStatusDTO> {
+  return apiPatch<WorkflowStatusDTO>(
+    API_ENDPOINTS.workflow.workspaceStatusDetail(workspaceId, statusId),
+    data,
+    { auth: true },
+  );
 }
 
 export async function deleteWorkspaceStatus(
   workspaceId: string,
   statusId: string,
-  payload?: { migrateToId?: string },
+  data?: DeleteStatusRequestDTO,
 ): Promise<void> {
-  return apiRequest(API_ENDPOINTS.workflow.workspaceStatusDetail(workspaceId, statusId), {
+  await apiDelete(API_ENDPOINTS.workflow.workspaceStatusDetail(workspaceId, statusId), {
     auth: true,
-    method: 'DELETE',
-    body: payload,
+    body: data,
   });
 }
 
 export async function updateWorkspaceTransitions(
   workspaceId: string,
-  payload: {
-    transitions: { fromStatusId: string; toStatusId: string }[];
-  },
+  data: UpdateTransitionsRequestDTO,
 ): Promise<void> {
-  return apiPost(API_ENDPOINTS.workflow.workspaceTransitions(workspaceId), payload, {
-    auth: true,
-  });
+  await apiPost(API_ENDPOINTS.workflow.workspaceTransitions(workspaceId), data, { auth: true });
 }
 
-export async function syncWorkspaceWorkflow(workspaceId: string): Promise<void> {
-  return apiPost(
+export async function syncWorkspaceWorkflow(workspaceId: string): Promise<{ success: boolean }> {
+  return apiPost<{ success: boolean }>(
     API_ENDPOINTS.workflow.syncTemplate(workspaceId),
     {},
-    {
-      auth: true,
-    },
+    { auth: true },
   );
 }
+
+export type ProjectWorkflowDTO = WorkflowStatusTemplateDTO;

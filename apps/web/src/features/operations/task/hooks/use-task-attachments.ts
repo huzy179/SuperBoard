@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { uploadTaskAttachment, deleteAttachment } from '@/lib/services/upload-service';
+import { uploadTaskAttachment, deleteAttachment } from '@/features/system/user/api/upload-service';
 
 export function useUploadAttachment(projectId: string, taskId: string) {
   const queryClient = useQueryClient();

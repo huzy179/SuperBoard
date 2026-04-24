@@ -369,10 +369,13 @@ export default function SettingsPage() {
                 isLoading={isWorkflowLoading}
                 title="Quy trình mặc định của workspace"
                 description="Thiết lập trạng thái và luồng chuyển trạng thái cho tất cả dự án trong workspace."
-                onAddStatus={(data) => createWorkspaceStatus.mutateAsync(data)}
-                onUpdateStatus={(statusId, data) =>
-                  updateWorkspaceStatus.mutateAsync({ statusId, data })
-                }
+                onAddStatus={async (data) => {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  await createWorkspaceStatus.mutateAsync(data as any);
+                }}
+                onUpdateStatus={async (statusId, data) => {
+                  await updateWorkspaceStatus.mutateAsync({ statusId, data });
+                }}
                 onDeleteStatus={async (statusId) => {
                   if (confirm('Bạn có chắc muốn xóa trạng thái này?')) {
                     await deleteWorkspaceStatus.mutateAsync({ statusId });

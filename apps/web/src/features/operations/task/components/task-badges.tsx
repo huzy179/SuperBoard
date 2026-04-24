@@ -5,7 +5,7 @@ import {
   PRIORITY_LABELS,
   type TaskPriority,
 } from '@/lib/constants/task';
-import { getInitials } from '@/lib/helpers';
+import { getInitials } from '@/lib/utils';
 
 export function TaskTypeIcon({ type }: { type: TaskTypeDTO }) {
   const config = TASK_TYPE_ICONS[type] ?? TASK_TYPE_ICONS.task;

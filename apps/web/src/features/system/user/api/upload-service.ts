@@ -1,5 +1,5 @@
-import { apiPost, apiDelete } from '../api-client';
-import { API_ENDPOINTS } from '../api/endpoints';
+import { apiPost, apiDelete } from '@/lib/api-client';
+import { API_ENDPOINTS } from '@/lib/api/endpoints';
 import type { ProjectTaskAttachmentDTO } from '@superboard/shared';
 
 export async function uploadTaskAttachment(

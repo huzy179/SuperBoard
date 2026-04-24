@@ -14,7 +14,7 @@ import {
   updateWorkspaceTransitions,
   syncWorkspaceWorkflow,
 } from '../api/workflow-service';
-import { WorkflowStatusCategory } from '@superboard/shared';
+import { WorkflowStatusCategory, DeleteStatusRequestDTO } from '@superboard/shared';
 
 const workflowQueryKey = (projectId: string) => ['projects', projectId, 'workflow'] as const;
 
@@ -129,7 +129,7 @@ export function useUpdateWorkspaceStatus(workspaceId: string) {
 export function useDeleteWorkspaceStatus(workspaceId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ statusId, data }: { statusId: string; data?: { migrateToId?: string } }) =>
+    mutationFn: ({ statusId, data }: { statusId: string; data?: DeleteStatusRequestDTO }) =>
       deleteWorkspaceStatus(workspaceId, statusId, data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: workspaceWorkflowQueryKey(workspaceId) });

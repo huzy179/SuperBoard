@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Sparkles, UserPlus, Check, Activity } from 'lucide-react';
 import { toast } from 'sonner';
-import { getInitials } from '@/lib/helpers';
+import { getInitials } from '@/lib/utils';
 
 interface Suggestion {
   id: string;

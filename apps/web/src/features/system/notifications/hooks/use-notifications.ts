@@ -4,7 +4,7 @@ import {
   getNotifications,
   markAllNotificationsRead,
   markNotificationRead,
-} from '@/lib/services/notification-service';
+} from '@/features/system/notifications/api/notification-service';
 
 export function useNotifications() {
   return useQuery<NotificationListDataDTO>({

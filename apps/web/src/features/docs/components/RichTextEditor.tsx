@@ -26,7 +26,7 @@ import {
 import { processText } from '../api/doc-service';
 import { DocPropertyBar } from './DocPropertyBar';
 import { TaskNodeEmbed } from './TaskNodeEmbed';
-import { JiraTask } from '../extensions/jira-task';
+import { JiraTask } from '@/features/integrations/jira/components/JiraTaskExtension';
 import { toast } from 'sonner';
 import { useSearch } from '@/features/search/hooks/use-search';
 

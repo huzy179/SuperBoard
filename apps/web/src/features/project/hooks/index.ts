@@ -2,7 +2,6 @@ export * from './use-projects';
 export * from './use-project-detail';
 export * from './use-project-mutations';
 export * from './use-project-url-state';
-export * from './use-jira-projects-page';
 export * from './use-project-calendar';
 export * from './use-predictive-health';
 export * from './use-project-favorites';

@@ -9,7 +9,7 @@ import {
   filterProjectsByQuery,
   sortProjectsWithFavorites,
   splitProjectsByUpdatedToday,
-} from '@/lib/helpers/jira-projects-page';
+} from '../utils/jira-helpers';
 
 export type JiraProjectSortKey = 'updated_desc' | 'updated_asc' | 'name_asc' | 'name_desc';
 

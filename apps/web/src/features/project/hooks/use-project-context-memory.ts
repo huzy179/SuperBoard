@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { LAST_PROJECT_QUERY_KEY, LAST_PROJECT_VIEW_KEY } from '@/lib/constants/project';
-import type { ViewMode } from '@/stores/jira-project-ui-store';
+import type { ViewMode } from '@/features/integrations/jira/stores/jira-project-ui-store';
 
 export function useProjectContextMemory() {
   const [projectLastViews, setProjectLastViews] = useState<Record<string, ViewMode>>({});

@@ -4,13 +4,13 @@ import { Sora, Hanken_Grotesk } from 'next/font/google';
 import { Toaster } from 'sonner';
 
 const sora = Sora({
-  subsets: ['latin', 'vietnamese'],
+  subsets: ['latin', 'latin-ext'],
   variable: '--font-sora',
   display: 'swap',
 });
 
 const hanken = Hanken_Grotesk({
-  subsets: ['latin', 'vietnamese'],
+  subsets: ['latin', 'latin-ext'],
   variable: '--font-hanken',
   display: 'swap',
 });

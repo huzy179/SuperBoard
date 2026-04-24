@@ -10,16 +10,16 @@ interface DocPropertyBarProps {
 
 export function DocPropertyBar({ classification, status, ownerName }: DocPropertyBarProps) {
   return (
-    <div className="flex flex-wrap items-center gap-6 py-8 border-y border-white/5 mb-12">
+    <div className="flex flex-wrap items-center gap-var(--space-6) py-var(--space-6) border-y border-white/10 mb-var(--space-12)">
       {/* Classification Node */}
       <div className="flex items-center gap-3 group">
         <div
-          className={`p-2 rounded-xl border ${
+          className={`p-1.5 rounded-sm border ${
             classification === 'TOP_SECRET'
-              ? 'bg-rose-500/10 border-rose-500/20 text-rose-400 shadow-glow-rose/5'
+              ? 'bg-rose-500/10 border-rose-500/20 text-rose-400 shadow-inner'
               : classification === 'INTERNAL'
-                ? 'bg-brand-500/10 border-brand-500/20 text-brand-400'
-                : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                ? 'bg-brand-500/10 border-brand-500/20 text-brand-400 shadow-inner'
+                : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 shadow-inner'
           }`}
         >
           {classification === 'TOP_SECRET' ? (
@@ -31,11 +31,11 @@ export function DocPropertyBar({ classification, status, ownerName }: DocPropert
           )}
         </div>
         <div>
-          <div className="text-[10px] font-black text-white/20 uppercase tracking-widest mb-0.5">
-            Classification
+          <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest mb-0.5">
+            CLASSIFICATION
           </div>
           <div
-            className={`text-[11px] font-black uppercase tracking-[0.2em] italic ${
+            className={`text-[10px] font-bold uppercase tracking-widest ${
               classification === 'TOP_SECRET'
                 ? 'text-rose-400/80'
                 : classification === 'INTERNAL'
@@ -52,18 +52,18 @@ export function DocPropertyBar({ classification, status, ownerName }: DocPropert
 
       {/* Operational Status */}
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-white/5 border border-white/10 rounded-xl text-white/40">
+        <div className="p-1.5 bg-white/5 border border-white/10 rounded-sm text-white/20">
           <Zap size={14} />
         </div>
         <div>
-          <div className="text-[10px] font-black text-white/20 uppercase tracking-widest mb-0.5">
-            Op Status
+          <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest mb-0.5">
+            STATUS
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-black text-white/80 uppercase tracking-[0.2em] italic">
+            <span className="text-[10px] font-bold text-white/80 uppercase tracking-widest">
               {status}
             </span>
-            <div className="h-1.5 w-1.5 rounded-full bg-brand-500 animate-pulse shadow-glow-brand" />
+            <div className="h-1 w-1 rounded-full bg-brand-500 animate-pulse shadow-glow-brand" />
           </div>
         </div>
       </div>
@@ -73,18 +73,18 @@ export function DocPropertyBar({ classification, status, ownerName }: DocPropert
       {/* Asset Ownership */}
       <div className="flex items-center gap-3">
         <div className="relative">
-          <div className="h-10 w-10 rounded-xl bg-slate-800 border border-white/10 flex items-center justify-center text-white/40 font-black text-xs">
+          <div className="h-8 w-8 rounded-sm bg-slate-900 border border-white/10 flex items-center justify-center text-white/20 font-black text-[10px]">
             {ownerName.charAt(0)}
           </div>
-          <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-slate-950 rounded-full border-2 border-slate-950 flex items-center justify-center">
+          <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 bg-slate-950 rounded-full border-2 border-slate-950 flex items-center justify-center">
             <div className="h-full w-full bg-emerald-500 rounded-full" />
           </div>
         </div>
         <div>
-          <div className="text-[10px] font-black text-white/20 uppercase tracking-widest mb-0.5">
-            Asset Owner
+          <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest mb-0.5">
+            OWNER
           </div>
-          <div className="text-[11px] font-black text-white/60 uppercase tracking-wider">
+          <div className="text-[10px] font-bold text-white/60 uppercase tracking-tight">
             {ownerName}
           </div>
         </div>
@@ -93,22 +93,22 @@ export function DocPropertyBar({ classification, status, ownerName }: DocPropert
       <div className="flex-1" />
 
       {/* Access Log Fragment */}
-      <div className="flex items-center gap-4 px-6 py-2.5 bg-white/[0.02] border border-white/5 rounded-lg">
-        <div className="flex -space-x-2">
+      <div className="flex items-center gap-3 px-4 py-1.5 bg-white/[0.01] border border-white/5 rounded-sm">
+        <div className="flex -space-x-1.5">
           {[1, 2].map((i) => (
             <div
               key={i}
-              className="h-6 w-6 rounded-lg border-2 border-slate-950 bg-slate-800 flex items-center justify-center text-[8px] font-black text-white/20"
+              className="h-5 w-5 rounded-full border border-slate-950 bg-slate-800 flex items-center justify-center text-[7px] font-bold text-white/20"
             >
               U{i}
             </div>
           ))}
         </div>
-        <div className="h-3 w-px bg-white/5" />
+        <div className="h-2 w-px bg-white/10" />
         <div className="flex items-center gap-2">
-          <Eye size={12} className="text-white/20" />
-          <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
-            14 Active Uplinks
+          <Eye size={10} className="text-white/20" />
+          <span className="text-[8px] font-bold text-white/10 uppercase tracking-widest">
+            14_Uplinks
           </span>
         </div>
       </div>

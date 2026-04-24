@@ -28,28 +28,29 @@ export function StatCard({ label, value, icon, color, trend, delay }: StatCardPr
 
   return (
     <div
-      className="group relative animate-in slide-in-from-bottom-8 duration-700"
+      className="group relative animate-in slide-in-from-bottom-4 duration-500"
       style={{ animationDelay: `${delay * 100}ms`, animationFillMode: 'both' }}
     >
       <div
-        className={`absolute inset-x-8 -bottom-4 h-8 ${glowMap[color]} blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700`}
+        className={`absolute inset-x-8 -bottom-2 h-4 ${glowMap[color]} blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
       />
       <div
-        className={`relative h-full rounded-[2.5rem] border border-white/5 bg-white/[0.01] p-8 backdrop-blur-3xl transition-all duration-500 hover:bg-white/[0.03] hover:-translate-y-2 hover:border-white/10 shadow-inner overflow-hidden`}
+        className={`relative h-full rounded-md border border-white/10 bg-white/[0.01] p-var(--space-6) backdrop-blur-2xl transition-all duration-300 hover:bg-white/[0.03] hover:-translate-y-1 hover:border-brand-500/20 shadow-inner overflow-hidden`}
       >
-        <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100" />
-        <div className="flex items-start justify-between relative z-10 mb-8">
+        <div className="absolute inset-0 opacity-[0.01] pointer-events-none bg-[url('data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20256%20256%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cfilter%20id%3D%22noiseFilter%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.8%22%20numOctaves%3D%224%22%20stitchTiles%3D%22stitch%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url(%23noiseFilter)%22%2F%3E%3C%2Fsvg%3E')]" />
+
+        <div className="flex items-start justify-between relative z-10 mb-var(--space-8)">
           <div
-            className={`p-4 rounded-lg border ${colorMap[color]} transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6`}
+            className={`p-var(--space-3) rounded-sm border ${colorMap[color]} transition-transform duration-500 group-hover:scale-105 group-hover:rotate-3`}
           >
             {icon}
           </div>
           <div className="text-right">
-            <span className="block text-[8px] font-black uppercase tracking-[0.3em] text-white/20 mb-1">
+            <span className="block text-[8px] font-black uppercase tracking-[0.4em] text-white/10 mb-1">
               Telemetry
             </span>
             <span
-              className={`text-[10px] font-black uppercase tracking-widest ${color === 'rose' ? 'text-rose-500 animate-pulse' : 'text-white/40'}`}
+              className={`text-[9px] font-bold uppercase tracking-widest ${color === 'rose' ? 'text-rose-500 animate-pulse' : 'text-white/30'}`}
             >
               {trend}
             </span>
@@ -57,12 +58,12 @@ export function StatCard({ label, value, icon, color, trend, delay }: StatCardPr
         </div>
         <div className="relative z-10">
           <p
-            className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-2 pl-1"
+            className="text-[9px] font-bold text-white/20 uppercase tracking-[0.4em] mb-1 pl-1"
             title="Strategic Protocol"
           >
             {label}
           </p>
-          <p className="text-5xl font-black text-white tracking-tighter tabular-nums leading-none">
+          <p className="text-4xl font-black text-white tracking-tighter tabular-nums leading-none">
             {value}
           </p>
         </div>

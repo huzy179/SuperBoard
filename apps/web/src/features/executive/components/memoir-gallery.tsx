@@ -52,33 +52,33 @@ export function ProjectMemoirGallery({ projectId }: { projectId: string }) {
   };
 
   return (
-    <div className="flex flex-col gap-10 p-10 bg-white/[0.02] rounded-[2.5rem] border border-white/5 min-h-[800px] relative overflow-hidden backdrop-blur-3xl">
+    <div className="flex flex-col gap-var(--space-10) p-var(--space-10) bg-white/[0.01] rounded-md border border-white/10 min-h-[700px] relative overflow-hidden backdrop-blur-2xl shadow-inner">
       {/* Cinematic Header */}
       <div className="flex items-center justify-between relative z-10">
         <div className="flex items-center gap-6">
-          <div className="w-16 h-16 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center">
-            <Book size={32} />
+          <div className="w-12 h-12 rounded-sm bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center shadow-inner">
+            <Book size={24} />
           </div>
           <div>
-            <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter">
-              Tài liệu dự án
+            <h2 className="text-2xl font-black text-white uppercase tracking-tight">
+              Project_Archives
             </h2>
-            <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em] mt-1">
-              Nhật ký hoạt động dự án
+            <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.4em] mt-0.5">
+              Operational_History_Log
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="flex bg-white/[0.03] border border-white/5 p-1.5 rounded-lg">
+          <div className="flex bg-slate-950/40 border border-white/5 p-1 rounded-sm">
             {['executive', 'technical', 'celebratory'].map((p) => (
               <button
                 key={p}
                 onClick={() => setActivePersona(p)}
-                className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${
+                className={`px-4 py-1.5 rounded-xs text-[9px] font-bold uppercase tracking-widest transition-all ${
                   activePersona === p
-                    ? 'bg-brand-500/10 text-brand-400 border border-brand-500/20'
-                    : 'text-white/40 hover:text-white'
+                    ? 'bg-white text-slate-950 shadow-inner'
+                    : 'text-white/20 hover:text-white'
                 }`}
               >
                 {p}
@@ -88,10 +88,10 @@ export function ProjectMemoirGallery({ projectId }: { projectId: string }) {
           <button
             onClick={generateMemoir}
             disabled={isGenerating}
-            className="px-8 py-4 rounded-lg bg-brand-500/10 border border-brand-500/20 text-brand-400 font-black text-[11px] uppercase tracking-[0.3em] flex items-center gap-3 hover:bg-brand-500/20 transition-all disabled:opacity-50"
+            className="px-6 py-3 rounded-sm bg-brand-500/10 border border-brand-500/20 text-brand-400 font-bold text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-brand-500/20 transition-all disabled:opacity-50"
           >
-            {isGenerating ? <History size={16} className="animate-spin" /> : <Plus size={16} />}
-            Tạo memoir
+            {isGenerating ? <History size={14} className="animate-spin" /> : <Plus size={14} />}
+            Generate_Memoir
           </button>
         </div>
       </div>
@@ -102,30 +102,30 @@ export function ProjectMemoirGallery({ projectId }: { projectId: string }) {
           <div
             key={memoir.id}
             onClick={() => setSelectedMemoir(memoir)}
-            className="aspect-[3/4] p-10 rounded-[2.5rem] bg-white/[0.02] border border-white/5 hover:border-brand-500/20 hover:bg-white/[0.03] transition-all cursor-pointer group flex flex-col justify-between shadow-glass"
+            className="aspect-[4/5] p-var(--space-8) rounded-md bg-white/[0.01] border border-white/5 hover:border-brand-500/20 hover:bg-white/[0.02] transition-all cursor-pointer group flex flex-col justify-between shadow-inner relative overflow-hidden"
           >
             <div>
-              <div className="flex items-center gap-3 mb-8">
-                <span className="px-3 py-1 bg-brand-500/10 text-[9px] font-black text-brand-400 rounded-lg uppercase tracking-widest border border-brand-500/20 italic">
+              <div className="flex items-center gap-3 mb-var(--space-6)">
+                <span className="px-var(--space-2) py-0.5 bg-brand-500/10 text-[8px] font-bold text-brand-400 rounded-xs uppercase tracking-widest border border-brand-500/20">
                   {memoir.persona}
                 </span>
                 <div className="flex-1 h-px bg-white/5" />
-                <span className="text-[10px] font-bold text-white/30 font-mono tracking-tighter">
+                <span className="text-[9px] font-bold text-white/10 font-mono tracking-tight">
                   {new Date(memoir.createdAt).toLocaleDateString()}
                 </span>
               </div>
-              <h3 className="text-2xl font-black text-white leading-tight tracking-tighter uppercase italic group-hover:text-brand-400 transition-colors">
+              <h3 className="text-xl font-black text-white leading-tight tracking-tight uppercase group-hover:text-brand-400 transition-colors">
                 {memoir.title}
               </h3>
             </div>
 
             <div className="flex items-end justify-between">
-              <div className="w-12 h-12 rounded-full border border-white/5 flex items-center justify-center text-white/20 group-hover:bg-brand-500/10 group-hover:text-brand-400 transition-all">
-                <Sparkles size={20} />
+              <div className="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center text-white/10 group-hover:bg-brand-500/5 group-hover:text-brand-400 transition-all">
+                <Sparkles size={18} />
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-black text-white/30 uppercase tracking-widest">
-                Xem thêm
-                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              <div className="flex items-center gap-2 text-[9px] font-bold text-white/20 uppercase tracking-widest">
+                Access_Node
+                <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           </div>
@@ -153,20 +153,20 @@ export function ProjectMemoirGallery({ projectId }: { projectId: string }) {
             <X size={28} />
           </button>
 
-          <div className="w-full max-w-4xl max-h-full overflow-y-auto bg-slate-950/90 backdrop-blur-3xl rounded-[3rem] p-20 shadow-glass border border-white/5 relative animate-in slide-in-from-bottom-10 duration-700 scrollbar-hide select-none">
-            <div className="flex flex-col items-center text-center mb-16 px-10">
-              <div className="flex items-center gap-4 mb-8">
-                <span className="h-px w-10 bg-white/10" />
-                <span className="text-[11px] font-black text-brand-400 uppercase tracking-[0.4em] italic">
+          <div className="w-full max-w-3xl max-h-full overflow-y-auto bg-slate-950/95 backdrop-blur-3xl rounded-md p-var(--space-12) shadow-inner border border-white/10 relative animate-in slide-in-from-bottom-4 duration-500 scrollbar-hide select-none">
+            <div className="flex flex-col items-center text-center mb-var(--space-12) px-var(--space-10)">
+              <div className="flex items-center gap-4 mb-var(--space-6)">
+                <span className="h-px w-8 bg-white/10" />
+                <span className="text-[10px] font-bold text-brand-400 uppercase tracking-widest">
                   {selectedMemoir.persona}
                 </span>
-                <span className="h-px w-10 bg-white/10" />
+                <span className="h-px w-8 bg-white/10" />
               </div>
-              <h2 className="text-5xl font-black text-white tracking-tighter leading-[0.9] uppercase italic mb-6">
+              <h2 className="text-4xl font-black text-white tracking-tighter leading-tight uppercase mb-4">
                 {selectedMemoir.title}
               </h2>
-              <span className="text-xs font-bold text-white/30 tracking-[0.2em]">
-                {new Date(selectedMemoir.createdAt).toLocaleDateString()}
+              <span className="text-[10px] font-bold text-white/20 tracking-widest uppercase">
+                Timestamp: {new Date(selectedMemoir.createdAt).toLocaleDateString()}
               </span>
             </div>
 

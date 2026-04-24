@@ -30,22 +30,22 @@ export function DirectTransmissionHub({ channelName, onClose }: DirectTransmissi
     >
       {/* Background Neural Grid */}
       <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_50%_50%,_rgba(var(--brand-500-rgb),0.1),transparent_70%)]" />
-      <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      <div className="absolute inset-0 opacity-[0.01] pointer-events-none bg-[url('data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%25%20256%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cfilter%20id%3D%22noiseFilter%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.8%22%20numOctaves%3D%224%22%20stitchTiles%3D%22stitch%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url(%23noiseFilter)%22%2F%3E%3C%2Fsvg%3E')]" />
 
-      <div className="relative w-full max-w-5xl aspect-video bg-slate-900/60 border border-white/10 rounded-[3rem] shadow-luxe overflow-hidden flex flex-col">
+      <div className="relative w-full max-w-4xl aspect-video bg-slate-900/60 border border-white/10 rounded-md shadow-inner overflow-hidden flex flex-col backdrop-blur-2xl">
         {/* Top Status Bar */}
         <div className="p-8 flex items-center justify-between relative z-10">
-          <div className="flex items-center gap-4">
-            <div className="p-2.5 bg-brand-500/10 border border-brand-500/20 rounded-xl">
-              <ShieldCheck className="text-brand-400" size={18} />
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-brand-500/10 border border-brand-500/20 rounded-sm">
+              <ShieldCheck className="text-brand-400" size={16} />
             </div>
             <div>
-              <h2 className="text-[11px] font-black text-brand-400 uppercase tracking-[0.3em] mb-1 italic">
-                Secure Peer Link Established
+              <h2 className="text-[9px] font-bold text-brand-400 uppercase tracking-widest mb-1">
+                SECURE_PEER_LINK_ACTIVE
               </h2>
               <div className="flex items-center gap-3">
-                <span className="text-xl font-black text-white uppercase tracking-tighter italic">
-                  TRANSMISSION_{channelName.toUpperCase()}
+                <span className="text-lg font-black text-white uppercase tracking-tight">
+                  UPLINK_{channelName.toUpperCase()}
                 </span>
                 <div className="flex gap-1">
                   {[1, 2, 3].map((i) => (
@@ -56,16 +56,16 @@ export function DirectTransmissionHub({ channelName, onClose }: DirectTransmissi
             </div>
           </div>
 
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-6">
             <div className="text-right">
-              <div className="text-[10px] font-black text-white/20 uppercase tracking-widest mb-1">
-                Signal Integrity
+              <div className="text-[8px] font-bold text-white/20 uppercase tracking-widest mb-1">
+                SIGNAL_INTEGRITY
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-lg font-black text-white font-mono">
+              <div className="flex items-center gap-2">
+                <span className="text-base font-black text-white font-mono">
                   {signalStrength.toFixed(1)}%
                 </span>
-                <Wifi size={16} className="text-emerald-500" />
+                <Wifi size={14} className="text-emerald-500/50" />
               </div>
             </div>
           </div>
@@ -74,35 +74,34 @@ export function DirectTransmissionHub({ channelName, onClose }: DirectTransmissi
         {/* Main Feed Area */}
         <div className="flex-1 px-8 pb-32 flex gap-6 relative">
           {/* Active Speaker Node */}
-          <div className="flex-1 rounded-[2.5rem] bg-black/40 border border-white/5 relative overflow-hidden group">
+          <div className="flex-1 rounded-sm bg-black/40 border border-white/5 relative overflow-hidden group">
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="relative">
-                <div className="h-32 w-32 rounded-full border border-brand-500/20 animate-ping absolute inset-0" />
-                <div className="h-32 w-32 rounded-full border border-brand-500/40 animate-ping absolute inset-0 [animation-delay:0.5s]" />
-                <div className="h-32 w-32 rounded-xl bg-gradient-to-br from-brand-600 to-brand-400 flex items-center justify-center text-3xl font-black text-white shadow-glow-brand/20 relative z-10">
+                <div className="h-24 w-24 rounded-full border border-brand-500/10 animate-ping absolute inset-0" />
+                <div className="h-24 w-24 rounded-sm bg-gradient-to-br from-brand-600 to-brand-400 flex items-center justify-center text-2xl font-black text-white shadow-inner relative z-10">
                   JD
                 </div>
               </div>
             </div>
-            <div className="absolute bottom-6 left-6 flex items-center gap-3 px-4 py-2 bg-slate-900/80 backdrop-blur-xl rounded-xl border border-white/10">
-              <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-glow-emerald animate-pulse" />
-              <span className="text-[10px] font-black text-white uppercase tracking-widest">
-                Main Uplink: JOHN DOE
+            <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-slate-950/80 backdrop-blur-2xl rounded-sm border border-white/10">
+              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-glow-emerald animate-pulse" />
+              <span className="text-[9px] font-bold text-white uppercase tracking-widest">
+                Source_Node: JOHN_DOE
               </span>
             </div>
           </div>
 
           {/* Sidebar Feeds */}
-          <div className="w-64 flex flex-col gap-4">
+          <div className="w-48 flex flex-col gap-3">
             {[1, 2].map((i) => (
               <div
                 key={i}
-                className="flex-1 rounded-xl bg-white/[0.02] border border-white/5 relative flex items-center justify-center group overflow-hidden"
+                className="flex-1 rounded-sm bg-white/[0.01] border border-white/5 relative flex items-center justify-center group overflow-hidden"
               >
-                <div className="h-12 w-12 rounded-lg bg-white/5 flex items-center justify-center text-[10px] font-black text-white/20 uppercase group-hover:bg-brand-500/10 group-hover:text-brand-400 transition-all">
-                  NODE_{i}
+                <div className="h-10 w-10 rounded-xs bg-white/[0.02] flex items-center justify-center text-[9px] font-bold text-white/10 uppercase group-hover:bg-brand-500/10 group-hover:text-brand-400 transition-all border border-transparent group-hover:border-brand-500/20">
+                  U_{i}
                 </div>
-                <div className="absolute top-3 right-3 h-1.5 w-1.5 rounded-full bg-white/10" />
+                <div className="absolute top-2 right-2 h-1 w-1 rounded-full bg-white/5" />
               </div>
             ))}
           </div>
@@ -121,26 +120,26 @@ export function DirectTransmissionHub({ channelName, onClose }: DirectTransmissi
         </div>
 
         {/* Global Controls */}
-        <div className="absolute bottom-0 inset-x-0 p-8 flex justify-center items-center pointer-events-none">
-          <div className="flex items-center gap-4 p-2 bg-slate-900/90 backdrop-blur-3xl border border-white/10 rounded-full shadow-2xl pointer-events-auto">
+        <div className="absolute bottom-0 inset-x-0 p-var(--space-8) flex justify-center items-center pointer-events-none">
+          <div className="flex items-center gap-3 p-1.5 bg-slate-950/90 backdrop-blur-3xl border border-white/10 rounded-sm shadow-2xl pointer-events-auto">
             <ControlBtn
               active={isMuted}
               onClick={() => setIsMuted(!isMuted)}
-              icon={isMuted ? <MicOff size={20} /> : <Mic size={20} />}
+              icon={isMuted ? <MicOff size={18} /> : <Mic size={18} />}
               danger={isMuted}
             />
             <ControlBtn
               active={isVideoOff}
               onClick={() => setIsVideoOff(!isVideoOff)}
-              icon={isVideoOff ? <VideoOff size={20} /> : <Video size={20} />}
+              icon={isVideoOff ? <VideoOff size={18} /> : <Video size={18} />}
               danger={isVideoOff}
             />
-            <div className="w-px h-8 bg-white/5 mx-2" />
+            <div className="w-px h-6 bg-white/5 mx-1" />
             <button
               onClick={onClose}
-              className="h-14 w-14 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shadow-glow-rose/10 active:scale-95"
+              className="h-11 w-20 rounded-sm bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shadow-inner active:scale-95"
             >
-              <PhoneOff size={24} />
+              <PhoneOff size={20} />
             </button>
           </div>
         </div>
@@ -173,12 +172,12 @@ function ControlBtn({
   return (
     <button
       onClick={onClick}
-      className={`h-14 w-14 rounded-full flex items-center justify-center transition-all border ${
+      className={`h-11 w-11 rounded-sm flex items-center justify-center transition-all border ${
         active
           ? danger
             ? 'bg-rose-500 text-white border-rose-400'
             : 'bg-brand-500 text-white border-brand-400'
-          : 'bg-white/5 text-white animate-fade-in hover:bg-white/10 border-white/5'
+          : 'bg-white/5 text-white/40 hover:bg-white/10 border-white/5'
       } active:scale-95`}
     >
       {icon}

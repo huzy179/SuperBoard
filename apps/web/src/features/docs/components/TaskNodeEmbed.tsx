@@ -14,42 +14,42 @@ export function TaskNodeEmbed(
 
   const content = (
     <motion.div
-      whileHover={{ scale: 1.01, x: 4 }}
-      className="my-8 p-6 bg-slate-900/40 border border-white/5 rounded-xl shadow-glass relative group cursor-pointer overflow-hidden"
+      whileHover={{ x: 4 }}
+      className="my-var(--space-8) p-var(--space-6) bg-slate-900/20 border border-white/10 rounded-md shadow-inner relative group cursor-pointer overflow-hidden"
     >
       <div className="absolute inset-0 bg-gradient-to-r from-brand-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
       <div className="flex items-start justify-between relative z-10">
         <div className="flex gap-6 items-start">
           {/* Neural Node Icon */}
-          <div className="h-16 w-16 rounded-[1.5rem] bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 shadow-glow-brand/5">
-            <Layout size={28} />
+          <div className="h-12 w-12 rounded-sm bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 shadow-inner">
+            <Layout size={20} />
           </div>
 
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-[10px] font-black text-brand-400 uppercase tracking-[0.3em] italic">
-                Jria Task Node
+            <div className="flex items-center gap-3 mb-1">
+              <span className="text-[9px] font-bold text-brand-400 uppercase tracking-widest">
+                Jira_Task_Node
               </span>
-              <div className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-md text-[9px] font-black text-white/40 font-mono">
+              <div className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded-xs text-[8px] font-bold text-white/20 font-mono">
                 {taskId}
               </div>
             </div>
-            <h3 className="text-lg font-black text-white uppercase tracking-tight mb-4 group-hover:text-brand-400 transition-colors">
+            <h3 className="text-[15px] font-black text-white uppercase tracking-tight mb-3 group-hover:text-brand-400 transition-colors">
               {title}
             </h3>
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse shadow-glow-amber" />
-                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest italic">
+                <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse shadow-glow-amber" />
+                <span className="text-[9px] font-bold text-white/20 uppercase tracking-widest">
                   {status}
                 </span>
               </div>
-              <div className="w-px h-3 bg-white/5" />
+              <div className="w-px h-2 bg-white/10" />
               <div className="flex items-center gap-2">
-                <User size={12} className="text-white/20" />
-                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">
+                <User size={10} className="text-white/20" />
+                <span className="text-[9px] font-bold text-white/20 uppercase tracking-widest">
                   {assignee || 'Unassigned'}
                 </span>
               </div>
@@ -57,8 +57,8 @@ export function TaskNodeEmbed(
           </div>
         </div>
 
-        <button className="p-3 bg-white/5 border border-white/5 text-white/20 rounded-lg hover:bg-brand-500 hover:text-white hover:border-brand-500 transition-all group/btn">
-          <ExternalLink size={18} className="group-hover/btn:scale-110 transition-transform" />
+        <button className="p-2 bg-white/5 border border-white/5 text-white/20 rounded-sm hover:bg-brand-500 hover:text-white hover:border-brand-500 transition-all group/btn">
+          <ExternalLink size={14} className="group-hover/btn:scale-110 transition-transform" />
         </button>
       </div>
 

@@ -208,7 +208,7 @@ export function RichTextEditor({
 
   if (!editor) {
     return (
-      <div className="animate-pulse bg-white/[0.02] h-[500px] rounded-[2.5rem] border border-white/5" />
+      <div className="animate-pulse bg-white/[0.01] h-[500px] rounded-md border border-white/5" />
     );
   }
 
@@ -218,7 +218,7 @@ export function RichTextEditor({
       {menuPos.show && editable && (
         <div
           ref={menuRef}
-          className="fixed z-50 flex items-center gap-1.5 p-1.5 bg-slate-900/90 border border-white/10 rounded-lg shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-200"
+          className="fixed z-50 flex items-center gap-1 p-1 bg-slate-950/95 border border-white/10 rounded-sm shadow-2xl backdrop-blur-2xl animate-in zoom-in-95 duration-200"
           style={{
             top: `${menuPos.top}px`,
             left: `${menuPos.left}px`,
@@ -258,7 +258,7 @@ export function RichTextEditor({
       {/* Slash Command Menu */}
       {slashMenu.show && editable && (
         <div
-          className="fixed z-50 w-72 bg-slate-950/90 border border-white/10 rounded-xl shadow-2xl p-3 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-2xl"
+          className="fixed z-50 w-64 bg-slate-950/95 border border-white/10 rounded-md shadow-2xl p-2 animate-in fade-in slide-in-from-top-2 duration-300 backdrop-blur-3xl"
           style={{ top: `${slashMenu.top}px`, left: `${slashMenu.left}px` }}
         >
           <div className="px-4 py-3 text-[9px] font-black text-white/20 uppercase tracking-[0.3em] border-b border-white/5 mb-2">
@@ -406,7 +406,7 @@ export function RichTextEditor({
       {/* Task Search Mode */}
       {slashMenu.show && slashMenu.mode === 'task_search' && (
         <div
-          className="fixed z-50 w-80 bg-slate-950/95 border border-white/10 rounded-[2.5rem] shadow-2xl p-4 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-3xl overflow-hidden"
+          className="fixed z-50 w-72 bg-slate-950/98 border border-white/10 rounded-md shadow-2xl p-4 animate-in fade-in slide-in-from-top-2 duration-300 backdrop-blur-3xl overflow-hidden"
           style={{ top: `${slashMenu.top}px`, left: `${slashMenu.left}px` }}
         >
           <div className="flex items-center gap-3 mb-4 px-2">
@@ -451,7 +451,7 @@ export function RichTextEditor({
                   setSlashMenu((prev) => ({ ...prev, show: false, mode: 'default' }));
                   setTaskQuery('');
                 }}
-                className="w-full p-4 hover:bg-white/[0.03] rounded-lg transition-all text-left border border-transparent hover:border-white/5 group"
+                className="w-full p-var(--space-3) hover:bg-white/[0.03] rounded-sm transition-all text-left border border-transparent hover:border-white/5 group"
               >
                 <div className="text-[11px] font-black text-white uppercase tracking-tight truncate group-hover:text-brand-400">
                   {task.title}
@@ -490,7 +490,7 @@ export function RichTextEditor({
       )}
 
       {editable && (
-        <div className="sticky top-20 z-40 flex flex-wrap items-center gap-1.5 border border-white/5 bg-slate-900/60 p-2.5 backdrop-blur-xl mb-12 shadow-2xl rounded-lg">
+        <div className="sticky top-20 z-40 flex flex-wrap items-center gap-1 border border-white/10 bg-slate-950/80 p-2 backdrop-blur-2xl mb-var(--space-12) shadow-inner rounded-md">
           <MenuButton
             onClick={() => editor.chain().focus().toggleBold().run()}
             active={editor.isActive('bold')}
@@ -524,12 +524,12 @@ export function RichTextEditor({
             icon={<Code size={16} />}
           />
           <div className="flex-1" />
-          <div className="flex items-center gap-2.5 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 font-black text-[9px] uppercase tracking-widest">
-            <div className="relative flex h-2 w-2">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-sm text-emerald-400 font-bold text-[8px] uppercase tracking-widest">
+            <div className="relative flex h-1.5 w-1.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-glow-emerald"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500 shadow-glow-emerald"></span>
             </div>
-            Kết nối AI đang hoạt động
+            AI_Synapse_Active
           </div>
         </div>
       )}
@@ -539,7 +539,7 @@ export function RichTextEditor({
           {/* Notion-style Header */}
           <div className="relative group mb-20">
             {/* Cover Image */}
-            <div className="h-64 md:h-80 w-full rounded-[3rem] overflow-hidden relative border border-white/5 mb-[-5rem] shadow-glass group/cover bg-gradient-to-br from-brand-500/20 via-slate-900/90 to-slate-950">
+            <div className="h-48 md:h-56 w-full rounded-md overflow-hidden relative border border-white/10 mb-[-3rem] shadow-inner group/cover bg-gradient-to-br from-brand-500/20 via-slate-900/90 to-slate-950">
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
             </div>
 
@@ -552,7 +552,7 @@ export function RichTextEditor({
                   const nextIcon = ICONS[(ICONS.indexOf(currentIcon) + 1) % ICONS.length]!;
                   setIcon(nextIcon);
                 }}
-                className="w-32 h-32 bg-slate-900 rounded-[2.5rem] shadow-glow-brand/5 flex items-center justify-center text-6xl border border-white/10 transform transition hover:scale-110 cursor-pointer active:scale-95 group/icon"
+                className="w-24 h-24 bg-slate-950 rounded-sm shadow-inner flex items-center justify-center text-5xl border border-white/10 transform transition hover:scale-105 cursor-pointer active:scale-95 group/icon"
               >
                 <span className="group-hover/icon:scale-110 transition-transform">{icon}</span>
               </div>
@@ -613,7 +613,7 @@ function BubbleItem({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest ${className}`}
+      className={`flex items-center gap-2 px-2.5 py-1.5 rounded-sm transition-all text-[9px] font-bold uppercase tracking-widest ${className}`}
     >
       {icon}
       <span>{label}</span>
@@ -637,11 +637,11 @@ function MenuButton({
   return (
     <button
       onClick={onClick}
-      className={`h-11 flex items-center justify-center rounded-xl transition-all font-black text-[11px] border ${
+      className={`h-9 flex items-center justify-center rounded-sm transition-all font-bold text-[10px] border ${
         active
-          ? 'bg-brand-500/10 text-brand-400 border-brand-500/30'
+          ? 'bg-white text-slate-950 border-white'
           : 'text-white/30 border-transparent hover:bg-white/5 hover:text-white'
-      } ${label ? 'px-4' : 'w-11'} ${className}`}
+      } ${label ? 'px-3' : 'w-9'} ${className}`}
     >
       {icon || label}
     </button>
@@ -662,16 +662,16 @@ function SlashMenuItem({
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-4 p-3 hover:bg-white/[0.03] rounded-lg transition-all group text-left border border-transparent hover:border-white/5"
+      className="w-full flex items-center gap-3 p-2 hover:bg-white/[0.03] rounded-sm transition-all group text-left border border-transparent hover:border-white/5"
     >
-      <div className="w-12 h-12 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:border-brand-500/20 transition-all">
+      <div className="w-10 h-10 rounded-sm bg-white/[0.02] border border-white/5 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:border-brand-500/20 transition-all">
         {icon}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-[12px] font-black text-white uppercase tracking-wider group-hover:text-brand-400 transition-colors">
+        <div className="text-[11px] font-bold text-white uppercase tracking-tight group-hover:text-brand-400 transition-colors">
           {title}
         </div>
-        <div className="text-[10px] text-white/20 group-hover:text-white/40 truncate font-medium">
+        <div className="text-[9px] text-white/20 group-hover:text-white/40 truncate font-bold">
           {desc}
         </div>
       </div>

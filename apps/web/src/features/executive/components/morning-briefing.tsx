@@ -50,12 +50,12 @@ export function MorningBriefing({
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 backdrop-blur-3xl">
-        <div className="flex flex-col items-center gap-6">
-          <div className="w-16 h-16 rounded-full bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 animate-pulse">
-            <Sunrise size={32} />
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-sm bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 animate-pulse">
+            <Sunrise size={24} />
           </div>
-          <span className="text-[10px] font-black text-brand-400 uppercase tracking-[0.5em] animate-pulse">
-            Đang tải dữ liệu...
+          <span className="text-[9px] font-bold text-brand-400 uppercase tracking-widest animate-pulse">
+            Syncing_Intelligence...
           </span>
         </div>
       </div>
@@ -63,8 +63,8 @@ export function MorningBriefing({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center p-10 bg-slate-950/60 backdrop-blur-3xl animate-in fade-in duration-700 overflow-y-auto scrollbar-hide">
-      <div className="w-full max-w-4xl bg-slate-950/80 backdrop-blur-3xl rounded-[3rem] shadow-glass border border-white/5 p-16 relative my-10 animate-in zoom-in-95 slide-in-from-bottom-10 duration-1000">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center p-var(--space-10) bg-slate-950/80 backdrop-blur-3xl animate-in fade-in duration-500 overflow-y-auto scrollbar-hide">
+      <div className="w-full max-w-3xl bg-slate-950/90 backdrop-blur-3xl rounded-md shadow-inner border border-white/10 p-var(--space-12) relative my-10 animate-in slide-in-from-bottom-4 duration-700">
         {/* Close button */}
         <button
           onClick={onClose}
@@ -73,17 +73,16 @@ export function MorningBriefing({
           <X size={24} />
         </button>
 
-        {/* Narrative Header */}
-        <div className="flex flex-col items-center text-center mb-16">
-          <div className="flex items-center gap-4 mb-8">
-            <span className="h-px w-10 bg-white/10" />
-            <div className="w-12 h-12 rounded-lg bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center">
-              <Sunrise size={24} />
+        <div className="flex flex-col items-center text-center mb-var(--space-12)">
+          <div className="flex items-center gap-4 mb-var(--space-6)">
+            <span className="h-px w-8 bg-white/10" />
+            <div className="w-10 h-10 rounded-sm bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center">
+              <Sunrise size={20} />
             </div>
-            <span className="h-px w-10 bg-white/10" />
+            <span className="h-px w-8 bg-white/10" />
           </div>
-          <h1 className="text-5xl font-black text-white tracking-tighter leading-[0.9] uppercase italic mb-4">
-            Báo cáo buổi sáng
+          <h1 className="text-4xl font-black text-white tracking-tighter uppercase mb-4">
+            Daily_Briefing
           </h1>
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em]">
@@ -96,59 +95,53 @@ export function MorningBriefing({
           </div>
         </div>
 
-        <div className="space-y-16">
+        <div className="space-y-var(--space-12)">
           {/* Tình trạng hoạt động */}
-          <div className="relative p-12 rounded-[2.5rem] bg-white/[0.02] border border-white/5 overflow-hidden group hover:border-brand-500/20 transition-all duration-700">
+          <div className="relative p-var(--space-10) rounded-md bg-white/[0.01] border border-white/5 overflow-hidden group hover:border-brand-500/20 transition-all duration-500 shadow-inner">
             <div className="absolute top-0 right-0 p-8 text-white/5 group-hover:text-white/10 transition-colors">
               <Wind size={60} strokeWidth={1} />
             </div>
 
-            <h3 className="text-[11px] font-black text-brand-400 uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
-              <Activity size={14} className="animate-pulse" />
-              Tình trạng hoạt động
+            <h3 className="text-[9px] font-bold text-brand-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <Activity size={12} className="animate-pulse" />
+              Operational_Status
             </h3>
 
-            <p className="text-2xl font-black text-white/80 leading-snug italic tracking-tighter">
+            <p className="text-xl font-bold text-white/80 leading-snug tracking-tight">
               "{data?.pulse}"
             </p>
 
-            <div className="mt-8 flex items-center gap-2">
-              <div className="px-3 py-1 bg-white/[0.02] rounded-lg border border-white/5 text-[9px] font-black text-white/40 uppercase tracking-widest">
-                Ổn định
+            <div className="mt-6 flex items-center gap-2">
+              <div className="px-var(--space-3) py-1 bg-white/[0.02] rounded-xs border border-white/5 text-[8px] font-bold text-white/30 uppercase tracking-widest">
+                Stable
               </div>
-              <div className="px-3 py-1 bg-white/[0.02] rounded-lg border border-white/5 text-[9px] font-black text-brand-400 uppercase tracking-widest italic">
-                Hợp tác tốt
+              <div className="px-var(--space-3) py-1 bg-white/[0.02] rounded-xs border border-white/5 text-[8px] font-bold text-brand-400 uppercase tracking-widest">
+                Synergy_High
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-var(--space-10)">
             {/* Command Intent */}
-            <div className="space-y-8">
-              <h3 className="text-[11px] font-black text-white/40 uppercase tracking-[0.4em] px-2 flex items-center gap-3">
-                <Target size={14} className="text-brand-400" />
-                Mục tiêu chính
+            <div className="space-y-var(--space-6)">
+              <h3 className="text-[9px] font-bold text-white/30 uppercase tracking-widest px-1 flex items-center gap-2">
+                <Target size={12} className="text-brand-400" />
+                Strategic_Goals
               </h3>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {data?.commandIntent.map((intent, i) => (
                   <div
                     key={i}
-                    className="flex gap-6 p-6 rounded-xl bg-white/[0.02] border border-white/5 group hover:border-brand-500/20 transition-all cursor-default"
+                    className="flex gap-4 p-var(--space-4) rounded-sm bg-white/[0.01] border border-white/5 group hover:border-brand-500/20 transition-all cursor-default"
                   >
-                    <div className="text-2xl font-black text-brand-500/20 italic opacity-50 group-hover:opacity-80 transition-opacity">
+                    <div className="text-lg font-black text-brand-500/10 tabular-nums opacity-50 group-hover:opacity-100 transition-opacity">
                       0{i + 1}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-black text-white uppercase italic tracking-tighter group-hover:text-brand-400 transition-colors">
+                      <p className="text-[11px] font-bold text-white/80 uppercase tracking-tight group-hover:text-white transition-colors">
                         {intent}
                       </p>
-                      <div className="mt-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                        <span className="text-[9px] font-bold text-white/30 uppercase tracking-widest">
-                          Công việc quan trọng
-                        </span>
-                        <ArrowRight size={12} className="text-brand-500/50" />
-                      </div>
                     </div>
                   </div>
                 ))}
@@ -156,36 +149,34 @@ export function MorningBriefing({
             </div>
 
             {/* Hoạt động gần đây */}
-            <div className="space-y-8">
-              <h3 className="text-[11px] font-black text-white/40 uppercase tracking-[0.4em] px-2 flex items-center gap-3">
-                <Brain size={14} className="text-brand-400" />
-                Nổi bật
+            <div className="space-y-var(--space-6)">
+              <h3 className="text-[9px] font-bold text-white/30 uppercase tracking-widest px-1 flex items-center gap-2">
+                <Brain size={12} className="text-brand-400" />
+                Key_Highlights
               </h3>
 
-              <div className="flex flex-col h-full bg-white/[0.02] rounded-[2.5rem] p-10 text-white relative overflow-hidden group border border-white/5 shadow-glass">
-                <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Zap size={100} strokeWidth={1} />
+              <div className="flex flex-col h-full bg-white/[0.01] rounded-md p-var(--space-8) text-white relative overflow-hidden group border border-white/5 shadow-inner">
+                <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 Transition-opacity">
+                  <Zap size={80} strokeWidth={1} />
                 </div>
 
-                <div className="relative z-10 space-y-6">
+                <div className="relative z-10 space-y-4">
                   {data?.highlights.map((h, i) => (
-                    <div key={i} className="flex gap-4 items-start">
-                      <div className="mt-1 w-4 h-4 rounded-full border border-white/20 flex items-center justify-center text-white/40">
-                        <CheckCircle2 size={10} />
+                    <div key={i} className="flex gap-3 items-start">
+                      <div className="mt-1 w-3 h-3 rounded-full border border-white/10 flex items-center justify-center text-white/20">
+                        <CheckCircle2 size={8} />
                       </div>
-                      <p className="text-[13px] font-medium text-white/80 leading-relaxed italic">
-                        {h}
-                      </p>
+                      <p className="text-[11px] font-medium text-white/60 leading-relaxed">{h}</p>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-auto pt-10 flex items-center justify-between relative z-10 opacity-30">
-                  <span className="text-[9px] font-black uppercase tracking-widest">
-                    Trạng thái hệ thống
+                <div className="mt-auto pt-8 flex items-center justify-between relative z-10 opacity-20">
+                  <span className="text-[8px] font-bold uppercase tracking-widest">
+                    System_Integrity
                   </span>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400">
-                    HOẠT ĐỘNG TỐT
+                  <span className="text-[8px] font-bold uppercase tracking-widest text-brand-400">
+                    Active_Sync
                   </span>
                 </div>
               </div>

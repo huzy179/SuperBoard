@@ -43,25 +43,25 @@ export function ChatShell({ channel }: ChatShellProps) {
         <header className="flex h-16 shrink-0 items-center justify-between px-8 bg-slate-950/80 backdrop-blur-3xl border-b border-white/5 sticky top-0 z-40">
           <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-brand-500/20 to-transparent" />
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div
-              className={`p-2 rounded-xl border ${channel.type === 'PUBLIC' ? 'bg-brand-500/10 border-brand-500/20 shadow-glow-brand/5' : 'bg-amber-500/10 border-amber-500/20 shadow-glow-amber/5'}`}
+              className={`p-1.5 rounded-sm border ${channel.type === 'PUBLIC' ? 'bg-brand-500/10 border-brand-500/20 shadow-inner' : 'bg-amber-500/10 border-amber-500/20 shadow-inner'}`}
             >
               {channel.type === 'PUBLIC' ? (
-                <Hash className="h-4 w-4 text-brand-400" />
+                <Hash className="h-3.5 w-3.5 text-brand-400" />
               ) : (
-                <Lock className="h-4 w-4 text-amber-400" />
+                <Lock className="h-3.5 w-3.5 text-amber-400" />
               )}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-sm font-black text-white uppercase tracking-wider">
+                <h1 className="text-[12px] font-black text-white uppercase tracking-tight">
                   {channel.name}
                 </h1>
-                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shadow-glow-emerald" />
+                <div className="h-1 w-1 rounded-full bg-emerald-500 animate-pulse shadow-glow-emerald" />
               </div>
               {channel.description && (
-                <p className="text-[10px] font-black text-white/20 uppercase tracking-widest truncate max-w-md">
+                <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest truncate max-w-md mt-0.5">
                   {channel.description}
                 </p>
               )}
@@ -69,41 +69,41 @@ export function ChatShell({ channel }: ChatShellProps) {
           </div>
 
           <div className="flex items-center gap-6">
-            <div className="flex -space-x-2">
+            <div className="flex -space-x-1.5">
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="h-7 w-7 rounded-full border-2 border-slate-950 bg-slate-800 flex items-center justify-center text-[10px] font-black text-white/40"
+                  className="h-6 w-6 rounded-full border border-slate-950 bg-slate-800 flex items-center justify-center text-[8px] font-bold text-white/30"
                 >
                   U{i}
                 </div>
               ))}
-              <div className="h-7 w-7 rounded-full border-2 border-slate-950 bg-brand-500/20 flex items-center justify-center text-[10px] font-black text-brand-400">
+              <div className="h-6 w-6 rounded-full border border-slate-950 bg-brand-500/10 flex items-center justify-center text-[8px] font-bold text-brand-400">
                 +9
               </div>
             </div>
 
             <div className="h-4 w-px bg-white/5" />
 
-            <div className="flex items-center gap-4 text-white/40">
+            <div className="flex items-center gap-3 text-white/20">
               <button
                 onClick={() => setShowTransmission(true)}
-                className="p-2 hover:text-emerald-400 transition-all group relative"
+                className="p-1.5 hover:text-emerald-400 transition-all group relative"
               >
-                <Phone size={18} />
-                <div className="absolute inset-0 bg-emerald-400/10 rounded-lg scale-0 group-hover:scale-100 transition-transform" />
+                <Phone size={14} />
+                <div className="absolute inset-0 bg-emerald-400/10 rounded-sm scale-0 group-hover:scale-100 transition-transform" />
               </button>
-              <button className="p-2 hover:text-white transition-all group relative">
-                <Search size={18} />
-                <div className="absolute inset-0 bg-brand-500/10 rounded-lg scale-0 group-hover:scale-100 transition-transform" />
+              <button className="p-1.5 hover:text-white transition-all group relative">
+                <Search size={14} />
+                <div className="absolute inset-0 bg-brand-500/10 rounded-sm scale-0 group-hover:scale-100 transition-transform" />
               </button>
-              <button className="p-2 hover:text-white transition-all group relative">
-                <Users size={18} />
-                <div className="absolute inset-0 bg-brand-500/10 rounded-lg scale-0 group-hover:scale-100 transition-transform" />
+              <button className="p-1.5 hover:text-white transition-all group relative">
+                <Users size={14} />
+                <div className="absolute inset-0 bg-brand-500/10 rounded-sm scale-0 group-hover:scale-100 transition-transform" />
               </button>
-              <button className="p-2 hover:text-white transition-all group relative">
-                <MoreVertical size={18} />
-                <div className="absolute inset-0 bg-brand-500/10 rounded-lg scale-0 group-hover:scale-100 transition-transform" />
+              <button className="p-1.5 hover:text-white transition-all group relative">
+                <MoreVertical size={14} />
+                <div className="absolute inset-0 bg-brand-500/10 rounded-sm scale-0 group-hover:scale-100 transition-transform" />
               </button>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { Injectable, OnModuleDestroy, OnModuleInit, Inject, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Worker, Job } from 'bullmq';
+import type { NotificationJobDTO } from '@superboard/shared';
 import { PrismaService } from '../prisma/prisma.service';
 import { ReportService } from '../modules/analytics/report.service';
 import { NeuralAgentService } from '../modules/automation/neural-agent.service';
@@ -74,6 +75,9 @@ export class WorkerService implements OnModuleInit, OnModuleDestroy {
       case 'GENERATE_MEMOIR':
         await this.handleGenerateMemoirJob(job.data);
         break;
+      case 'SEND_NOTIFICATION':
+        await this.handleSendNotificationJob(job.data as NotificationJobDTO);
+        break;
       default:
         console.warn(`[WorkerService] Unknown job type: ${job.name}`);
     }
@@ -111,5 +115,23 @@ export class WorkerService implements OnModuleInit, OnModuleDestroy {
 
     console.log(`[WorkerService] Generating dynamic Memoir for project ${projectId}...`);
     await this.reportService.generateProjectMemoir(projectId as string, 'executive');
+  }
+
+  private async handleSendNotificationJob(job: NotificationJobDTO): Promise<void> {
+    console.log(
+      `[WorkerService] Processing notification job ${job.id} [${job.type}] for recipient ${job.recipientId}`,
+      { correlationId: job.correlationId },
+    );
+
+    // Log the notification job for processing — actual delivery is handled by the
+    // Notification Service (apps/notification/) in the target architecture.
+    // For now, this worker acknowledges receipt and logs the typed job data.
+    console.log(`[WorkerService] Notification job ${job.id} acknowledged:`, {
+      type: job.type,
+      recipientId: job.recipientId,
+      templateId: job.templateId,
+      scheduledAt: job.scheduledAt,
+      correlationId: job.correlationId,
+    });
   }
 }

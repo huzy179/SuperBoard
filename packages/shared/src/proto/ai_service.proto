@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package ai;
+
+service AIService {
+  rpc SummarizeTask (SummarizeRequest) returns (SummarizeResponse);
+  rpc GetEmbedding (EmbeddingRequest) returns (EmbeddingResponse);
+  rpc ProcessText (ProcessTextRequest) returns (TextResponse);
+  rpc SummarizeChat (SummarizeChatRequest) returns (TextResponse);
+  rpc GenerateAutomationRule (GenerateRuleRequest) returns (TextResponse);
+  rpc LogSignal (SignalRequest) returns (SignalResponse);
+  rpc ArchitectProject (ArchitectRequest) returns (ArchitectResponse);
+  rpc GenerateTrainingDataset (DatasetRequest) returns (DatasetResponse);
+}
+
+message DatasetRequest {
+  string format = 1; // "llama3", "alpaca"
+  int32 limit = 2;
+}
+
+message DatasetResponse {
+  string dataset_jsonl = 1;
+}
+
+message ArchitectRequest {
+  string goal = 1;
+  string image_base64 = 2; // Optional multimodal seed
+}
+
+message ArchitectResponse {
+  string project_json = 1;
+}
+
+message SignalRequest {
+  string intent = 1;
+  string payload_json = 2;
+  string context_json = 3;
+}
+
+message SignalResponse {
+  bool success = 1;
+}
+
+message GenerateRuleRequest {
+  string prompt = 1;
+}
+
+message MessageData {
+  string author = 1;
+  string content = 2;
+  string created_at = 3;
+}
+
+message SummarizeChatRequest {
+  repeated MessageData messages = 1;
+}
+
+message ProcessTextRequest {
+  string text = 1;
+  string mode = 2; // "improve", "shorten", "summarize"
+}
+
+message TextResponse {
+  string result = 1;
+}
+
+message SummarizeRequest {
+  string task_id = 1;
+  string content = 2;
+}
+
+message SummarizeResponse {
+  string summary = 1;
+}
+
+message EmbeddingRequest {
+  string text = 1;
+}
+
+message EmbeddingResponse {
+  repeated float embedding = 1;
+}

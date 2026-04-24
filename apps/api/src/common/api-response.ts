@@ -1,11 +1,3 @@
-import type { ApiResponse } from '@superboard/shared';
-
-export function apiSuccess<T>(data: T): ApiResponse<T> {
-  return {
-    success: true,
-    data,
-    meta: {
-      timestamp: new Date().toISOString(),
-    },
-  };
-}
+// Re-export helpers from the shared package so existing imports continue to work
+export { apiSuccess, apiError } from '@superboard/shared';
+export type { ApiResponse } from '@superboard/shared';

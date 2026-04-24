@@ -4,6 +4,7 @@ import { NotificationService } from '../notification/notification.service';
 import { AiService } from '../ai/ai.service';
 import { logger } from '../../common/logger';
 import type { TaskEventType } from '@prisma/client';
+import type { CreateWorkflowRuleDTO, UpdateWorkflowRuleDTO } from '@superboard/shared';
 
 import { NeuralAgentService } from './neural-agent.service';
 
@@ -238,6 +239,63 @@ export class AutomationService {
     return template
       .replace(/{{taskId}}/g, String(event.taskId))
       .replace(/{{type}}/g, String(event.type));
+  }
+
+  async getRules(workspaceId: string, projectId?: string) {
+    return this.prisma.workflowRule.findMany({
+      where: {
+        workspaceId,
+        ...(projectId ? { projectId } : {}),
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async createRule(workspaceId: string, dto: CreateWorkflowRuleDTO) {
+    return this.prisma.workflowRule.create({
+      data: {
+        workspaceId,
+        projectId: dto.projectId || null,
+        name: dto.name,
+        description: dto.description || null,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        trigger: dto.trigger as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        actions: dto.actions as any,
+      },
+    });
+  }
+
+  async updateRule(id: string, dto: UpdateWorkflowRuleDTO) {
+    return this.prisma.workflowRule.update({
+      where: { id },
+      data: {
+        ...(dto.name !== undefined ? { name: dto.name } : {}),
+        ...(dto.description !== undefined ? { description: dto.description } : {}),
+        ...(dto.isActive !== undefined ? { isActive: dto.isActive } : {}),
+        ...(dto.trigger !== undefined
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            { trigger: dto.trigger as any }
+          : {}),
+        ...(dto.actions !== undefined
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            { actions: dto.actions as any }
+          : {}),
+      },
+    });
+  }
+
+  async deleteRule(id: string) {
+    return this.prisma.workflowRule.delete({ where: { id } });
+  }
+
+  async getHealth(workspaceId: string) {
+    const actions = await this.prisma.agentAction.findMany({
+      where: { workspaceId, agentName: 'AuditorAgent' },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+    return { actions };
   }
 
   async generateRuleFromPrompt(prompt: string): Promise<Record<string, unknown>> {

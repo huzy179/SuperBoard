@@ -1,4 +1,4 @@
-import type { ApiResponse } from '../types/common.types';
+import type { ApiResponse } from '../types/api-response';
 
 export interface WorkspaceItemDTO {
   id: string;

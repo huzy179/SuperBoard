@@ -1,5 +1,5 @@
 import type { User } from '../types/auth.types';
-import type { ApiResponse } from '../types/common.types';
+import type { ApiResponse } from '../types/api-response';
 
 export interface LoginRequestDTO {
   email: string;

@@ -1,5 +1,4 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { apiSuccess } from '../../common/api-response';
 import type { AuthUserDTO, CreateWorkflowRuleDTO, UpdateWorkflowRuleDTO } from '@superboard/shared';
@@ -13,7 +12,6 @@ import { ExecutiveService } from './executive.service';
 @Controller('v1/automation')
 export class AutomationController {
   constructor(
-    private prisma: PrismaService,
     private automationService: AutomationService,
     private neuralAgentService: NeuralAgentService,
     private singularityService: SingularityService,
@@ -53,12 +51,8 @@ export class AutomationController {
 
   @Get('health')
   async getHealth(@Query('workspaceId') workspaceId: string) {
-    const actions = await this.prisma.agentAction.findMany({
-      where: { workspaceId, agentName: 'AuditorAgent' },
-      orderBy: { createdAt: 'desc' },
-      take: 20,
-    });
-    return apiSuccess({ actions });
+    const data = await this.automationService.getHealth(workspaceId);
+    return apiSuccess(data);
   }
 
   @Post('heal')
@@ -80,13 +74,7 @@ export class AutomationController {
     @Query('workspaceId') workspaceId: string,
     @Query('projectId') projectId?: string,
   ) {
-    const rules = await this.prisma.workflowRule.findMany({
-      where: {
-        workspaceId,
-        ...(projectId ? { projectId } : {}),
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    const rules = await this.automationService.getRules(workspaceId, projectId);
     return apiSuccess(rules);
   }
 
@@ -96,18 +84,7 @@ export class AutomationController {
     @Query('workspaceId') workspaceId: string,
     @Body() dto: CreateWorkflowRuleDTO,
   ) {
-    const rule = await this.prisma.workflowRule.create({
-      data: {
-        workspaceId,
-        projectId: dto.projectId || null,
-        name: dto.name,
-        description: dto.description || null,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        trigger: dto.trigger as any,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        actions: dto.actions as any,
-      },
-    });
+    const rule = await this.automationService.createRule(workspaceId, dto);
     return apiSuccess(rule);
   }
 
@@ -117,28 +94,13 @@ export class AutomationController {
     @Param('id') id: string,
     @Body() dto: UpdateWorkflowRuleDTO,
   ) {
-    const rule = await this.prisma.workflowRule.update({
-      where: { id },
-      data: {
-        ...(dto.name !== undefined ? { name: dto.name } : {}),
-        ...(dto.description !== undefined ? { description: dto.description } : {}),
-        ...(dto.isActive !== undefined ? { isActive: dto.isActive } : {}),
-        ...(dto.trigger !== undefined
-          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            { trigger: dto.trigger as any }
-          : {}),
-        ...(dto.actions !== undefined
-          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            { actions: dto.actions as any }
-          : {}),
-      },
-    });
+    const rule = await this.automationService.updateRule(id, dto);
     return apiSuccess(rule);
   }
 
   @Delete('rules/:id')
   async deleteRule(@CurrentUser() user: AuthUserDTO, @Param('id') id: string) {
-    await this.prisma.workflowRule.delete({ where: { id } });
+    await this.automationService.deleteRule(id);
     return apiSuccess({ deleted: true });
   }
 }

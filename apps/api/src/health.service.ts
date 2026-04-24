@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { DependencyHealthDTO, HealthResponseDTO } from '@superboard/shared';
+import type { LegacyDependencyHealthDTO, HealthResponseDTO } from '@superboard/shared';
 import { logger } from './common/logger';
 import { QueueService } from './common/queue.service';
 import { RedisService } from './common/redis.service';
@@ -34,6 +34,7 @@ export class HealthService {
           queue,
         },
       },
+      error: null,
       meta: {
         timestamp: new Date().toISOString(),
       },
@@ -44,7 +45,7 @@ export class HealthService {
     return response;
   }
 
-  private async checkDb(): Promise<DependencyHealthDTO> {
+  private async checkDb(): Promise<LegacyDependencyHealthDTO> {
     try {
       await this.prismaService.isHealthy();
       return { status: 'up' };
@@ -53,7 +54,7 @@ export class HealthService {
     }
   }
 
-  private async checkRedis(): Promise<DependencyHealthDTO> {
+  private async checkRedis(): Promise<LegacyDependencyHealthDTO> {
     if (!this.redisService.isEnabled()) {
       return { status: 'up', details: { enabled: false } };
     }
@@ -66,7 +67,7 @@ export class HealthService {
     }
   }
 
-  private async checkQueue(): Promise<DependencyHealthDTO> {
+  private async checkQueue(): Promise<LegacyDependencyHealthDTO> {
     if (!this.queueService.isEnabled()) {
       return { status: 'up', details: { enabled: false } };
     }

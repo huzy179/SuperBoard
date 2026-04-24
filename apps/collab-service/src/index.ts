@@ -4,6 +4,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import pg from 'pg';
 import * as jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
+import { startHealthServer } from './health.js';
 
 dotenv.config();
 
@@ -11,8 +12,12 @@ const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
+const COLLAB_PORT = parseInt(process.env.COLLAB_PORT || '1234', 10);
+const COLLAB_HOST = process.env.COLLAB_HOST || '0.0.0.0';
+
 const server = Server.configure({
-  port: 1234,
+  port: COLLAB_PORT,
+  address: COLLAB_HOST,
 
   async onAuthenticate(data) {
     const { token } = data;
@@ -73,4 +78,7 @@ const server = Server.configure({
 });
 
 server.listen();
-console.log('Collaboration server started on port 1234');
+console.log(`Collaboration server started on ${COLLAB_HOST}:${COLLAB_PORT}`);
+
+// Start health check HTTP server alongside Hocuspocus
+startHealthServer();

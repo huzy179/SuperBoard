@@ -108,7 +108,7 @@ export async function apiRequest<TData>(
     throw new ApiClientError(errorMessage, errorStatus, errorCode, errorDetails);
   }
 
-  return payload.data;
+  return payload.data as TData;
 }
 
 export function apiGet<TData>(

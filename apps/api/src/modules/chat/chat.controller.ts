@@ -5,6 +5,7 @@ import { ChatService } from './chat.service';
 import { SendMessageDto, UpdateMessageDto, AddReactionDto } from './dto/chat.dto';
 import { ChatGateway } from './chat.gateway';
 import { BearerAuthGuard } from '../../common/guards/bearer-auth.guard';
+import { apiSuccess } from '../../common/api-response';
 
 @Controller('chat')
 @UseGuards(BearerAuthGuard)
@@ -16,17 +17,20 @@ export class ChatController {
 
   @Get('channels')
   async getChannels(@Query('workspaceId') workspaceId: string, @CurrentUser() user: AuthUserDTO) {
-    return this.chatService.getChannels(workspaceId, user.id);
+    const data = await this.chatService.getChannels(workspaceId, user.id);
+    return apiSuccess(data);
   }
 
   @Get('channels/:channelId/messages')
   async getMessages(@Param('channelId') channelId: string, @Query('cursor') cursor?: string) {
-    return this.chatService.getMessages(channelId, cursor);
+    const data = await this.chatService.getMessages(channelId, cursor);
+    return apiSuccess(data);
   }
 
   @Get('messages/:messageId/thread')
   async getThreadMessages(@Param('messageId') messageId: string) {
-    return this.chatService.getThreadMessages(messageId);
+    const data = await this.chatService.getThreadMessages(messageId);
+    return apiSuccess(data);
   }
 
   @Post('channels/:channelId/messages')
@@ -39,7 +43,7 @@ export class ChatController {
     const messageDTO = this.chatService.mapMessageToDTO(message);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.chatGateway.broadcastMessage(channelId, messageDTO as any);
-    return messageDTO;
+    return apiSuccess(messageDTO);
   }
 
   @Put('messages/:messageId')
@@ -52,14 +56,14 @@ export class ChatController {
     const messageDTO = this.chatService.mapMessageToDTO(message);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.chatGateway.broadcastUpdate(message.channelId, messageDTO as any);
-    return messageDTO;
+    return apiSuccess(messageDTO);
   }
 
   @Delete('messages/:messageId')
   async deleteMessage(@Param('messageId') messageId: string, @CurrentUser() user: AuthUserDTO) {
     const message = await this.chatService.deleteMessage(messageId, user.id);
     this.chatGateway.broadcastDelete(message.channelId, messageId);
-    return { success: true };
+    return apiSuccess({ deleted: true });
   }
 
   @Post('messages/:messageId/reactions')
@@ -75,12 +79,12 @@ export class ChatController {
       userId: user.id,
       emoji: dto.emoji,
     });
-    return { success: true };
+    return apiSuccess({ added: true });
   }
 
   @Post('channels/:channelId/join')
   async joinChannel(@Param('channelId') channelId: string, @CurrentUser() user: AuthUserDTO) {
     await this.chatService.joinChannel(channelId, user.id);
-    return { success: true };
+    return apiSuccess({ joined: true });
   }
 }

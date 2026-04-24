@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@nestjs/common';
 import { DocService } from './doc.service';
+import { apiSuccess } from '../../common/api-response';
 
 @Controller('docs')
 export class DocController {
@@ -12,17 +13,20 @@ export class DocController {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     @Body() data: { title: string; content?: any; parentDocId?: string },
   ) {
-    return this.docService.createDoc(workspaceId, req.user.id, data);
+    const doc = await this.docService.createDoc(workspaceId, req.user.id, data);
+    return apiSuccess(doc);
   }
 
   @Get()
   async getWorkspaceDocs(@Query('workspaceId') workspaceId: string) {
-    return this.docService.getWorkspaceDocs(workspaceId);
+    const docs = await this.docService.getWorkspaceDocs(workspaceId);
+    return apiSuccess(docs);
   }
 
   @Get(':docId')
   async getDocById(@Param('docId') docId: string) {
-    return this.docService.getDocById(docId);
+    const doc = await this.docService.getDocById(docId);
+    return apiSuccess(doc);
   }
 
   @Put(':docId')
@@ -31,22 +35,26 @@ export class DocController {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     @Body() data: { title?: string; content?: any; parentDocId?: string },
   ) {
-    return this.docService.updateDoc(docId, data);
+    const doc = await this.docService.updateDoc(docId, data);
+    return apiSuccess(doc);
   }
 
   @Delete(':docId')
   async deleteDoc(@Param('docId') docId: string) {
-    return this.docService.deleteDoc(docId);
+    await this.docService.deleteDoc(docId);
+    return apiSuccess({ deleted: true });
   }
 
   @Post(':docId/versions')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async createVersion(@Param('docId') docId: string, @Body() data: { content: any }) {
-    return this.docService.createVersion(docId, data.content);
+    const version = await this.docService.createVersion(docId, data.content);
+    return apiSuccess(version);
   }
 
   @Get(':docId/versions')
   async getDocVersions(@Param('docId') docId: string) {
-    return this.docService.getDocVersions(docId);
+    const versions = await this.docService.getDocVersions(docId);
+    return apiSuccess(versions);
   }
 }

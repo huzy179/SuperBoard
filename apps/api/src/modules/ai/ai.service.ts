@@ -3,6 +3,8 @@ import { ClientGrpc } from '@nestjs/microservices';
 import { firstValueFrom, Observable } from 'rxjs';
 import { RedisService } from '../../common/redis.service';
 import * as crypto from 'crypto';
+import { Metadata } from '@grpc/grpc-js';
+import { getRequestContext } from '../../common/request-context';
 
 interface SummarizeRequest {
   task_id: string;
@@ -14,29 +16,53 @@ interface SummarizeResponse {
 }
 
 interface AIService {
-  SummarizeTask(data: SummarizeRequest): Observable<SummarizeResponse>;
-  GetEmbedding(data: { text: string }): Observable<{ embedding: number[] }>;
-  SummarizeChat(data: {
-    messages: { author: string; content: string; created_at: string }[];
-  }): Observable<{ result: string }>;
-  GenerateAutomationRule(data: { prompt: string }): Observable<{ result: string }>;
-  SuggestLabels(data: {
-    title: string;
-    description: string;
-    existing_labels: string[];
-  }): Observable<{ labels: string[] }>;
-  SuggestPriority(data: { title: string; description: string }): Observable<{ priority: string }>;
-  ProcessText(data: { text: string; mode: string }): Observable<{ result: string }>;
-  LogSignal(data: {
-    intent: string;
-    payload_json: string;
-    context_json: string;
-  }): Observable<{ success: boolean }>;
-  ArchitectProject(data: { goal: string }): Observable<{ project_json: string }>;
-  GenerateTrainingDataset(data: {
-    format: string;
-    limit: number;
-  }): Observable<{ dataset_json: string }>;
+  SummarizeTask(data: SummarizeRequest, metadata?: Metadata): Observable<SummarizeResponse>;
+  GetEmbedding(data: { text: string }, metadata?: Metadata): Observable<{ embedding: number[] }>;
+  SummarizeChat(
+    data: {
+      messages: { author: string; content: string; created_at: string }[];
+    },
+    metadata?: Metadata,
+  ): Observable<{ result: string }>;
+  GenerateAutomationRule(
+    data: { prompt: string },
+    metadata?: Metadata,
+  ): Observable<{ result: string }>;
+  SuggestLabels(
+    data: {
+      title: string;
+      description: string;
+      existing_labels: string[];
+    },
+    metadata?: Metadata,
+  ): Observable<{ labels: string[] }>;
+  SuggestPriority(
+    data: { title: string; description: string },
+    metadata?: Metadata,
+  ): Observable<{ priority: string }>;
+  ProcessText(
+    data: { text: string; mode: string },
+    metadata?: Metadata,
+  ): Observable<{ result: string }>;
+  LogSignal(
+    data: {
+      intent: string;
+      payload_json: string;
+      context_json: string;
+    },
+    metadata?: Metadata,
+  ): Observable<{ success: boolean }>;
+  ArchitectProject(
+    data: { goal: string },
+    metadata?: Metadata,
+  ): Observable<{ project_json: string }>;
+  GenerateTrainingDataset(
+    data: {
+      format: string;
+      limit: number;
+    },
+    metadata?: Metadata,
+  ): Observable<{ dataset_json: string }>;
 }
 
 @Injectable()
@@ -53,6 +79,15 @@ export class AiService implements OnModuleInit {
     this.aiServiceClient = this.client.getService<AIService>('AIService');
   }
 
+  private buildGrpcMetadata(): Metadata {
+    const metadata = new Metadata();
+    const ctx = getRequestContext();
+    if (ctx?.correlationId) {
+      metadata.set('correlation-id', ctx.correlationId);
+    }
+    return metadata;
+  }
+
   private generateCacheKey(prefix: string, ...parts: string[]): string {
     const raw = parts.map((p) => p.trim()).join('|');
     const hash = crypto.createHash('sha256').update(raw).digest('hex');
@@ -67,7 +102,7 @@ export class AiService implements OnModuleInit {
     try {
       const content = `Title: ${title}\nDescription: ${description}`;
       const result = await firstValueFrom(
-        this.aiServiceClient.SummarizeTask({ task_id: taskId, content }),
+        this.aiServiceClient.SummarizeTask({ task_id: taskId, content }, this.buildGrpcMetadata()),
       );
 
       await this.redis.setJson(cacheKey, result.summary, 60 * 60 * 24 * 7); // 7 days TTL
@@ -84,7 +119,9 @@ export class AiService implements OnModuleInit {
     if (cached) return cached;
 
     try {
-      const result = await firstValueFrom(this.aiServiceClient.GetEmbedding({ text }));
+      const result = await firstValueFrom(
+        this.aiServiceClient.GetEmbedding({ text }, this.buildGrpcMetadata()),
+      );
       if (!result?.embedding) {
         throw new Error('Invalid embedding response');
       }
@@ -130,7 +167,9 @@ export class AiService implements OnModuleInit {
 
     try {
       if (!this.aiServiceClient) throw new Error('gRPC client not initialized');
-      const result = await firstValueFrom(this.aiServiceClient.ProcessText({ text, mode }));
+      const result = await firstValueFrom(
+        this.aiServiceClient.ProcessText({ text, mode }, this.buildGrpcMetadata()),
+      );
 
       // Cache for 24 hours for generalized text processing
       await this.redis.setJson(cacheKey, result.result, 60 * 60 * 24);
@@ -231,7 +270,9 @@ export class AiService implements OnModuleInit {
     messages: { author: string; content: string; created_at: string }[],
   ): Promise<string> {
     try {
-      const result = await firstValueFrom(this.aiServiceClient.SummarizeChat({ messages }));
+      const result = await firstValueFrom(
+        this.aiServiceClient.SummarizeChat({ messages }, this.buildGrpcMetadata()),
+      );
       return result.result;
     } catch (error) {
       console.error('AI Chat Summarization failed:', error);
@@ -241,7 +282,9 @@ export class AiService implements OnModuleInit {
 
   async generateAutomationRule(prompt: string): Promise<Record<string, unknown> | null> {
     try {
-      const result = await firstValueFrom(this.aiServiceClient.GenerateAutomationRule({ prompt }));
+      const result = await firstValueFrom(
+        this.aiServiceClient.GenerateAutomationRule({ prompt }, this.buildGrpcMetadata()),
+      );
       try {
         return JSON.parse(result.result) as Record<string, unknown>;
       } catch {
@@ -296,11 +339,14 @@ export class AiService implements OnModuleInit {
     try {
       const labels = existingLabels.map((l) => l.name);
       const result = await firstValueFrom(
-        this.aiServiceClient.SuggestLabels({
-          title,
-          description,
-          existing_labels: labels,
-        }),
+        this.aiServiceClient.SuggestLabels(
+          {
+            title,
+            description,
+            existing_labels: labels,
+          },
+          this.buildGrpcMetadata(),
+        ),
       );
       return result.labels;
     } catch (error) {
@@ -312,7 +358,7 @@ export class AiService implements OnModuleInit {
   async suggestPriority(title: string, description: string): Promise<string | null> {
     try {
       const result = await firstValueFrom(
-        this.aiServiceClient.SuggestPriority({ title, description }),
+        this.aiServiceClient.SuggestPriority({ title, description }, this.buildGrpcMetadata()),
       );
       return result.priority;
     } catch (error) {
@@ -343,7 +389,7 @@ export class AiService implements OnModuleInit {
   async generateTrainingDataset(format: string, limit: number): Promise<unknown[]> {
     try {
       const result = await firstValueFrom(
-        this.aiServiceClient.GenerateTrainingDataset({ format, limit }),
+        this.aiServiceClient.GenerateTrainingDataset({ format, limit }, this.buildGrpcMetadata()),
       );
       return JSON.parse(result.dataset_json) as unknown[];
     } catch (error) {
@@ -359,11 +405,14 @@ export class AiService implements OnModuleInit {
   ): Promise<boolean> {
     try {
       const result = await firstValueFrom(
-        this.aiServiceClient.LogSignal({
-          intent,
-          payload_json: JSON.stringify(payload),
-          context_json: JSON.stringify(context),
-        }),
+        this.aiServiceClient.LogSignal(
+          {
+            intent,
+            payload_json: JSON.stringify(payload),
+            context_json: JSON.stringify(context),
+          },
+          this.buildGrpcMetadata(),
+        ),
       );
       return result.success;
     } catch (error) {
@@ -374,7 +423,9 @@ export class AiService implements OnModuleInit {
 
   async architectProject(goal: string): Promise<Record<string, unknown>> {
     try {
-      const result = await firstValueFrom(this.aiServiceClient.ArchitectProject({ goal }));
+      const result = await firstValueFrom(
+        this.aiServiceClient.ArchitectProject({ goal }, this.buildGrpcMetadata()),
+      );
       return JSON.parse(result.project_json) as Record<string, unknown>;
     } catch (error) {
       this.logger.error('AI Architect failed', error);

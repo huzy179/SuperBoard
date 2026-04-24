@@ -1,0 +1,213 @@
+{
+  "reportVersion": "1",
+  "generatedAt": "2025-07-15T00:00:00.000Z",
+  "hotspots": [
+    {
+      "rank": 1,
+      "group": "mapper",
+      "files": ["src/modules/task/task.service.ts", "src/modules/project/project.service.ts"],
+      "duplicateLines": 58,
+      "impact": "high",
+      "consolidationDirection": "Extract task-to-DTO mapping into packages/shared/src/mappers/task.mapper.ts"
+    },
+    {
+      "rank": 2,
+      "group": "mapper",
+      "files": [
+        "src/modules/project/project.service.ts",
+        "src/modules/workspace/workspace.service.ts"
+      ],
+      "duplicateLines": 42,
+      "impact": "high",
+      "consolidationDirection": "Extract entity-to-DTO date serialization into packages/shared/src/mappers/base.mapper.ts"
+    },
+    {
+      "rank": 3,
+      "group": "error-handling",
+      "files": [
+        "src/modules/task/task.service.ts",
+        "src/modules/project/project.service.ts",
+        "src/modules/workspace/workspace.service.ts"
+      ],
+      "duplicateLines": 38,
+      "impact": "high",
+      "consolidationDirection": "Consolidate NotFoundException + BadRequestException guard patterns into packages/shared/src/errors/domain-guard.ts"
+    },
+    {
+      "rank": 4,
+      "group": "validation",
+      "files": ["src/modules/workspace/workspace.service.ts", "src/modules/task/task.service.ts"],
+      "duplicateLines": 35,
+      "impact": "high",
+      "consolidationDirection": "Extract membership/ownership verification into src/common/workspace-member.helper.ts (already partially done — complete consolidation)"
+    },
+    {
+      "rank": 5,
+      "group": "response",
+      "files": [
+        "src/modules/task/task.controller.ts",
+        "src/modules/project/project.controller.ts",
+        "src/modules/workspace/workspace.controller.ts",
+        "src/modules/auth/auth.controller.ts"
+      ],
+      "duplicateLines": 32,
+      "impact": "high",
+      "consolidationDirection": "Enforce single apiSuccess() wrapper from src/common/api-response.ts across all controllers; remove inline response shaping"
+    },
+    {
+      "rank": 6,
+      "group": "mapper",
+      "files": ["src/modules/task/task.service.ts", "src/modules/project/project.service.ts"],
+      "duplicateLines": 30,
+      "impact": "high",
+      "consolidationDirection": "Extract syncEmbedding pattern (getEmbedding → vectorStr → $executeRaw upsert) into src/common/embedding.helper.ts"
+    },
+    {
+      "rank": 7,
+      "group": "error-handling",
+      "files": [
+        "src/common/filters/http-exception.filter.ts",
+        "src/modules/auth/auth.service.ts",
+        "src/modules/workspace/workspace.service.ts"
+      ],
+      "duplicateLines": 28,
+      "impact": "high",
+      "consolidationDirection": "Replace raw ERR_{status} codes in HttpExceptionFilter with domain error codes from packages/shared/src/errors/error-codes.ts"
+    },
+    {
+      "rank": 8,
+      "group": "validation",
+      "files": [
+        "src/modules/task/task.service.ts",
+        "src/modules/project/project.service.ts",
+        "src/modules/workspace/workspace.service.ts"
+      ],
+      "duplicateLines": 26,
+      "impact": "medium",
+      "consolidationDirection": "Extract clearDashboardCache pattern into a shared CacheInvalidationService in src/common/"
+    },
+    {
+      "rank": 9,
+      "group": "response",
+      "files": [
+        "src/modules/notification/notification.service.ts",
+        "src/modules/task/task.service.ts",
+        "src/modules/project/project.service.ts"
+      ],
+      "duplicateLines": 24,
+      "impact": "medium",
+      "consolidationDirection": "Extract fire-and-forget notification pattern (.catch(err => logger.error)) into a NotificationDispatcher helper"
+    },
+    {
+      "rank": 10,
+      "group": "validation",
+      "files": ["src/modules/workspace/workspace.service.ts", "src/modules/task/task.service.ts"],
+      "duplicateLines": 22,
+      "impact": "medium",
+      "consolidationDirection": "Extract email normalization (trim + toLowerCase) and role validation into src/common/validators/user-input.validator.ts"
+    },
+    {
+      "rank": 11,
+      "group": "mapper",
+      "files": [
+        "src/modules/doc/doc.service.ts",
+        "src/modules/task/task.service.ts",
+        "src/modules/project/project.service.ts"
+      ],
+      "duplicateLines": 21,
+      "impact": "medium",
+      "consolidationDirection": "Extract aiService.logSignal telemetry calls into a DomainEventTelemetry decorator or helper in src/common/telemetry.helper.ts"
+    },
+    {
+      "rank": 12,
+      "group": "error-handling",
+      "files": [
+        "src/modules/workspace/workspace.service.ts",
+        "src/modules/task/task.service.ts",
+        "src/modules/project/project.service.ts"
+      ],
+      "duplicateLines": 20,
+      "impact": "medium",
+      "consolidationDirection": "Extract archive/restore guard pattern (check parent deletedAt before restoring child) into src/common/archive.helper.ts"
+    },
+    {
+      "rank": 13,
+      "group": "validation",
+      "files": ["src/modules/task/task.service.ts", "src/modules/project/project.service.ts"],
+      "duplicateLines": 18,
+      "impact": "medium",
+      "consolidationDirection": "Extract Prisma $transaction + aggregate max number pattern for auto-increment into src/common/prisma/sequence.helper.ts"
+    },
+    {
+      "rank": 14,
+      "group": "response",
+      "files": [
+        "src/modules/notification/notification.service.ts",
+        "src/modules/workspace/workspace.service.ts"
+      ],
+      "duplicateLines": 17,
+      "impact": "medium",
+      "consolidationDirection": "Extract baseUrl construction from process.env.NEXT_PUBLIC_APP_URL into src/config/env.ts as a typed config accessor"
+    },
+    {
+      "rank": 15,
+      "group": "error-handling",
+      "files": [
+        "src/modules/auth/auth.service.ts",
+        "src/common/guards/jwt-auth.guard.ts",
+        "src/common/guards/bearer-auth.guard.ts"
+      ],
+      "duplicateLines": 16,
+      "impact": "medium",
+      "consolidationDirection": "Consolidate JWT verify + user lookup + isActive check into a single AuthTokenValidator service in src/modules/auth/"
+    },
+    {
+      "rank": 16,
+      "group": "mapper",
+      "files": [
+        "src/modules/task/task.service.ts",
+        "src/modules/project/project.service.ts",
+        "src/modules/workspace/workspace.service.ts"
+      ],
+      "duplicateLines": 15,
+      "impact": "low",
+      "consolidationDirection": "Extract Prisma select shape for workspace/project/task list queries into typed const selectors in src/common/prisma/selectors.ts"
+    },
+    {
+      "rank": 17,
+      "group": "validation",
+      "files": ["src/modules/workspace/workspace.service.ts", "src/modules/task/task.service.ts"],
+      "duplicateLines": 14,
+      "impact": "low",
+      "consolidationDirection": "Extract tx.user.updateMany({ defaultWorkspaceId: null }) pattern into a UserDefaultWorkspaceHelper in src/modules/workspace/"
+    },
+    {
+      "rank": 18,
+      "group": "response",
+      "files": [
+        "src/modules/analytics/report.service.ts",
+        "src/modules/analytics/briefing.service.ts",
+        "src/modules/analytics/forecast.service.ts"
+      ],
+      "duplicateLines": 13,
+      "impact": "low",
+      "consolidationDirection": "Extract AI-backed analytics response shaping into a shared AnalyticsResponseBuilder in src/modules/analytics/analytics-response.builder.ts"
+    },
+    {
+      "rank": 19,
+      "group": "error-handling",
+      "files": ["src/modules/doc/doc.service.ts", "src/modules/task/task.service.ts"],
+      "duplicateLines": 12,
+      "impact": "low",
+      "consolidationDirection": "Extract try/catch embedding sync error logging into the shared embedding.helper.ts (see rank 6)"
+    },
+    {
+      "rank": 20,
+      "group": "validation",
+      "files": ["src/common/project-scope.helper.ts", "src/common/workspace-member.helper.ts"],
+      "duplicateLines": 11,
+      "impact": "low",
+      "consolidationDirection": "Merge findOrThrow + scope verification helpers into a single src/common/scope.helper.ts with generic entity lookup"
+    }
+  ]
+}

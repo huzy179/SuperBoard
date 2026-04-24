@@ -1,29 +1,22 @@
 import { Controller, Get, Param, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { ReportService } from './report.service';
-import type { ProjectReportResponseDTO } from '@superboard/shared';
+import { apiSuccess } from '../../common/api-response';
 
 @Controller('v1/projects')
 export class ReportController {
   constructor(private readonly reportService: ReportService) {}
 
   @Get(':projectId/reports')
-  async getProjectReport(@Param('projectId') projectId: string): Promise<ProjectReportResponseDTO> {
+  async getProjectReport(@Param('projectId') projectId: string) {
     const report = await this.reportService.getProjectReport(projectId);
-    return {
-      success: true,
-      data: report,
-      meta: { timestamp: new Date().toISOString() },
-    };
+    return apiSuccess(report);
   }
 
   @Get(':projectId/predictive-health')
   async getPredictiveHealth(@Param('projectId') projectId: string) {
     const data = await this.reportService.getPredictiveHealth(projectId);
-    return {
-      success: true,
-      data,
-    };
+    return apiSuccess(data);
   }
 
   @Get(':projectId/export')

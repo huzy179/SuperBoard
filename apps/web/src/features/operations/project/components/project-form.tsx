@@ -18,6 +18,7 @@ type ProjectFormValues = z.infer<typeof projectSchema>;
 
 type ProjectFormProps = {
   mode: 'create' | 'edit';
+
   initialValues?: Partial<ProjectFormValues>;
   isPending: boolean;
   onCancel: () => void;

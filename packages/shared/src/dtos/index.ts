@@ -1,6 +1,7 @@
 export * from './auth.dto';
 export * from './health.dto';
 export * from './notification.dto';
+export * from './notification-job.dto';
 export * from './project.dto';
 export * from './workspace.dto';
 export * from './workflow.dto';

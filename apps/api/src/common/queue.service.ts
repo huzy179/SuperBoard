@@ -1,6 +1,7 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Queue } from 'bullmq';
+import { getRequestContext } from './request-context';
 
 @Injectable()
 export class QueueService implements OnModuleInit, OnModuleDestroy {
@@ -82,7 +83,10 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
       return;
     }
 
-    await this.queue.add(name, data, opts);
+    const ctx = getRequestContext();
+    const jobData = ctx?.correlationId ? { ...data, correlationId: ctx.correlationId } : data;
+
+    await this.queue.add(name, jobData, opts);
   }
 
   async scheduleAutonomousJobs(): Promise<void> {

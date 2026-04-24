@@ -189,6 +189,29 @@ export class NeuralAgentService {
     }
   }
 
+  async getAgentLogs(workspaceId: string, projectId?: string) {
+    return this.prisma.agentAction.findMany({
+      where: {
+        workspaceId,
+        ...(projectId ? { projectId } : {}),
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+  }
+
+  async getSingularityStream(workspaceId: string) {
+    return this.prisma.agentAction.findMany({
+      where: {
+        workspaceId,
+        agentName: 'NeuralSingularity',
+        actionType: 'CONSCIOUSNESS_PULSE',
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+  }
+
   private async logAction(data: {
     workspaceId: string;
     projectId?: string;

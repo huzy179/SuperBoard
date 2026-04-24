@@ -11,3 +11,4 @@ coverage
 *.tsbuildinfo
 .eslintcache
 .stylelintcache
+apps/api/reports/dup/*.json

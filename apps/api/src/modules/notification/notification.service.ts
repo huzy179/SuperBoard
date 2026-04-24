@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import type { Prisma, NotificationPreference } from '@prisma/client';
+import type { NotificationJobDTO } from '@superboard/shared';
 import { PrismaService } from '../../prisma/prisma.service';
+import { QueueService } from '../../common/queue.service';
 import { EmailService } from './email.service';
 import { NotificationGateway } from './notification.gateway';
 import { AiService } from '../ai/ai.service';
@@ -10,6 +12,7 @@ import { logger } from '../../common/logger';
 export class NotificationService {
   constructor(
     private prisma: PrismaService,
+    private queueService: QueueService,
     private emailService: EmailService,
     private gateway: NotificationGateway,
     private aiService: AiService,
@@ -76,6 +79,14 @@ export class NotificationService {
     } catch {
       return { neuralPriority: 'AMBIENT', aiSummary: null };
     }
+  }
+
+  /**
+   * Enqueue a typed notification job via BullMQ.
+   * Uses NotificationJobDTO from @superboard/shared for type-safe inter-service contract.
+   */
+  async enqueueNotificationJob(job: NotificationJobDTO): Promise<void> {
+    await this.queueService.addJob('SEND_NOTIFICATION', job as unknown as Record<string, unknown>);
   }
 
   async markAsRead(notificationId: string, userId: string) {

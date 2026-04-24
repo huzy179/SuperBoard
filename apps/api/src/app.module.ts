@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
+import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { BearerAuthGuard } from './common/guards/bearer-auth.guard';
@@ -9,6 +10,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { HealthController } from './health.controller';
 import { validateEnv } from './config/env';
 import { HealthService } from './health.service';
+import { HealthModule } from './modules/health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { NotificationModule } from './modules/notification/notification.module';
@@ -44,6 +46,7 @@ import { WorkerModule } from './common/worker.module';
     }),
     CommonModule,
     WorkerModule,
+    HealthModule,
     AuthModule,
     ProjectModule,
     WorkspaceModule,
@@ -83,4 +86,8 @@ import { WorkerModule } from './common/worker.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+  }
+}

@@ -1,12 +1,16 @@
 import {
   ArgumentsHost,
+  BadRequestException,
   Catch,
   ExceptionFilter,
+  ForbiddenException,
   HttpException,
   HttpStatus,
   Inject,
+  InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import type { ApiResponse } from '@superboard/shared';
+import { apiError, ErrorCodes } from '@superboard/shared';
 import { logger } from '../logger';
 import { DiagnosisService } from '../../modules/knowledge/diagnosis.service';
 
@@ -54,26 +58,81 @@ export class HttpExceptionFilter implements ExceptionFilter {
       logger.warn({ status, message }, 'Client request error');
     }
 
-    const correlationId = request.headers['x-correlation-id'] || 'root';
+    const correlationId = String(request.headers['x-correlation-id'] || 'root');
 
-    const payload: ApiResponse<never> = {
-      success: false,
-      error: {
-        code: `ERR_${status}`,
-        message,
-      },
-      meta: {
-        timestamp: new Date().toISOString(),
-        correlationId: String(correlationId || 'root'),
-        trace:
-          process.env.NODE_ENV === 'development' && exception instanceof Error
-            ? exception.stack
-            : undefined,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any,
-    };
+    // Extract error code from exception response if available
+    const errorCode = this.extractErrorCode(exception, status);
+
+    // Extract optional details (e.g. validation errors array)
+    const details = this.extractDetails(exception);
+
+    const payload = apiError(errorCode, message, details, {
+      correlationId,
+      trace:
+        process.env.NODE_ENV === 'development' && exception instanceof Error
+          ? exception.stack
+          : undefined,
+    });
 
     response.status(status).json(payload);
+  }
+
+  private extractErrorCode(exception: unknown, status: number): string {
+    // Check for explicit code set on the exception response first
+    if (exception instanceof HttpException) {
+      const exceptionResponse = exception.getResponse();
+      if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+        const res = exceptionResponse as Record<string, unknown>;
+        if (typeof res['code'] === 'string' && res['code']) {
+          return res['code'];
+        }
+      }
+    }
+
+    // Map common NestJS exception classes to domain error codes
+    if (exception instanceof UnauthorizedException) {
+      return ErrorCodes.AUTH_PERMISSION_DENIED;
+    }
+    if (exception instanceof ForbiddenException) {
+      return ErrorCodes.AUTH_PERMISSION_DENIED;
+    }
+    if (exception instanceof BadRequestException) {
+      return ErrorCodes.VALIDATION_FAILED;
+    }
+    if (exception instanceof InternalServerErrorException) {
+      return ErrorCodes.INTERNAL_ERROR;
+    }
+
+    // Fall back to status-based mapping for other HttpExceptions
+    if (exception instanceof HttpException) {
+      const exceptionResponse = exception.getResponse();
+      if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+        const res = exceptionResponse as Record<string, unknown>;
+        if (typeof res['error'] === 'string' && res['error']) {
+          return res['error'].toUpperCase().replace(/\s+/g, '_');
+        }
+      }
+    }
+
+    if (status >= 500) {
+      return ErrorCodes.INTERNAL_ERROR;
+    }
+
+    return `ERR_${status}`;
+  }
+
+  private extractDetails(exception: unknown): unknown {
+    if (exception instanceof HttpException) {
+      const exceptionResponse = exception.getResponse();
+      if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+        const res = exceptionResponse as Record<string, unknown>;
+        // NestJS validation pipe puts errors in `message` array
+        if (Array.isArray(res['message'])) {
+          return res['message'];
+        }
+      }
+    }
+    return undefined;
   }
 
   private getHttpExceptionMessage(exception: HttpException): string {

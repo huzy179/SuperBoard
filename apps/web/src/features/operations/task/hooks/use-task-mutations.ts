@@ -1,5 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAppMutation } from '@/lib/hooks/use-app-mutation';
+import { notify } from '@/lib/api/notification-handler';
 import type {
   BulkTaskOperationRequestDTO,
   CreateTaskRequestDTO,
@@ -23,63 +24,61 @@ import {
 import { publishProjectDetailUpdated } from '@/lib/realtime/project-sync';
 
 export function useSummarizeTask() {
-  return useMutation({
+  return useAppMutation({
     mutationFn: (taskId: string) => summarizeProjectTask(taskId),
+    resource: 'Tóm tắt',
+    action: 'sync',
   });
 }
 
 export function useAiDecompose() {
-  return useMutation({
+  return useAppMutation({
     mutationFn: (taskId: string) => aiDecomposeTask(taskId),
+    resource: 'Phân rã task',
+    action: 'sync',
   });
 }
 
 export function useAiRefine() {
-  return useMutation({
+  return useAppMutation({
     mutationFn: (taskId: string) => aiRefineTask(taskId),
+    resource: 'Tối ưu task',
+    action: 'sync',
   });
 }
 
 export function useCreateTask(projectId: string) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useAppMutation({
     mutationFn: (payload: CreateTaskRequestDTO) => createProjectTask(projectId, payload),
+    resource: 'Task',
+    action: 'create',
+    invalidateKeys: [['projects', projectId]],
     onSuccess: () => {
-      toast.success('Tạo task thành công!');
-      void queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
       publishProjectDetailUpdated(projectId);
-    },
-    onError: () => {
-      toast.error('Không thể tạo task');
     },
   });
 }
 
 export function useUpdateTask(projectId: string) {
   const queryClient = useQueryClient();
-
-  return useMutation({
+  return useAppMutation({
     mutationFn: ({ taskId, data }: { taskId: string; data: UpdateTaskRequestDTO }) =>
       updateProjectTask(projectId, taskId, data),
+    resource: 'Task',
+    action: 'update',
+    invalidateKeys: [['projects', projectId]],
     onSuccess: (_data, variables) => {
-      toast.success('Cập nhật task thành công!');
-      void queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
       void queryClient.invalidateQueries({
         queryKey: ['projects', projectId, 'tasks', variables.taskId, 'history'],
       });
       publishProjectDetailUpdated(projectId);
-    },
-    onError: () => {
-      toast.error('Không thể cập nhật task');
     },
   });
 }
 
 export function useUpdateTaskStatus(projectId: string) {
   const queryClient = useQueryClient();
-
-  return useMutation({
+  return useAppMutation({
     mutationFn: ({
       taskId,
       status,
@@ -93,9 +92,10 @@ export function useUpdateTaskStatus(projectId: string) {
         status,
         ...(position !== undefined ? { position } : {}),
       }),
+    resource: 'Trạng thái',
+    action: 'update',
     onMutate: async ({ taskId, status, position }) => {
       await queryClient.cancelQueries({ queryKey: ['projects', projectId] });
-
       const previous = queryClient.getQueryData<ProjectDetailDTO>(['projects', projectId]);
 
       if (previous) {
@@ -112,21 +112,9 @@ export function useUpdateTaskStatus(projectId: string) {
           ),
         });
       }
-
       return { previous };
     },
-    onError: (error: Error, variables, context) => {
-      const errorMessage = error instanceof Error ? error.message : 'Không thể cập nhật trạng thái';
-      toast.error(errorMessage, {
-        action: {
-          label: 'Thử lại',
-          onClick: () => {
-            // Trigger same mutation again
-            queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
-          },
-        },
-      });
-
+    onError: (_error, _variables, context) => {
       if (context?.previous) {
         queryClient.setQueryData(['projects', projectId], context.previous);
       }
@@ -145,9 +133,10 @@ export function useUpdateTaskStatus(projectId: string) {
 
 export function useArchiveTask(projectId: string) {
   const queryClient = useQueryClient();
-
-  return useMutation({
+  return useAppMutation({
     mutationFn: (taskId: string) => archiveTask(taskId),
+    resource: 'Task',
+    action: 'archive',
     onMutate: async (taskId) => {
       await queryClient.cancelQueries({ queryKey: ['projects', projectId] });
       const previous = queryClient.getQueryData<ProjectDetailDTO>(['projects', projectId]);
@@ -158,18 +147,15 @@ export function useArchiveTask(projectId: string) {
           tasks: previous.tasks.filter((t) => t.id !== taskId),
         });
       }
-
       return { previous };
     },
-    onSuccess: () => {
-      toast.success('Đã lưu trữ task');
-      publishProjectDetailUpdated(projectId);
-    },
     onError: (_error, _variables, context) => {
-      toast.error('Không thể lưu trữ task');
       if (context?.previous) {
         queryClient.setQueryData(['projects', projectId], context.previous);
       }
+    },
+    onSuccess: () => {
+      publishProjectDetailUpdated(projectId);
     },
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
@@ -178,53 +164,46 @@ export function useArchiveTask(projectId: string) {
 }
 
 export function useRestoreTask(projectId: string) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useAppMutation({
     mutationFn: (taskId: string) => restoreTask(taskId),
+    resource: 'Task',
+    action: 'restore',
+    invalidateKeys: [['projects', projectId]],
     onSuccess: () => {
-      toast.success('Đã khôi phục task');
-      void queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
       publishProjectDetailUpdated(projectId);
-    },
-    onError: () => {
-      toast.error('Không thể khôi phục task');
     },
   });
 }
 
 export function useDeleteTask(projectId: string) {
   const queryClient = useQueryClient();
-
-  return useMutation({
+  return useAppMutation({
     mutationFn: (taskId: string) => deleteProjectTask(projectId, taskId),
+    resource: 'Task',
+    action: 'delete',
+    invalidateKeys: [['projects', projectId]],
     onSuccess: (_data, taskId) => {
-      void queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
       void queryClient.invalidateQueries({
         queryKey: ['projects', projectId, 'tasks', taskId, 'history'],
       });
       publishProjectDetailUpdated(projectId);
-    },
-    onError: () => {
-      toast.error('Không thể xoá task');
     },
   });
 }
 
 export function useBulkTaskOperation(projectId: string) {
   const queryClient = useQueryClient();
-
-  return useMutation({
+  return useAppMutation({
     mutationFn: (payload: BulkTaskOperationRequestDTO) =>
       bulkProjectTaskOperation(projectId, payload),
+    resource: 'Thao tác hàng loạt',
+    action: 'update',
     onMutate: async (payload) => {
       await queryClient.cancelQueries({ queryKey: ['projects', projectId] });
-
       const previous = queryClient.getQueryData<ProjectDetailDTO>(['projects', projectId]);
 
       if (previous) {
         const taskIds = new Set(payload.taskIds);
-
         if (payload.delete) {
           queryClient.setQueryData<ProjectDetailDTO>(['projects', projectId], {
             ...previous,
@@ -243,10 +222,7 @@ export function useBulkTaskOperation(projectId: string) {
           queryClient.setQueryData<ProjectDetailDTO>(['projects', projectId], {
             ...previous,
             tasks: previous.tasks.map((task) => {
-              if (!taskIds.has(task.id)) {
-                return task;
-              }
-
+              if (!taskIds.has(task.id)) return task;
               return {
                 ...task,
                 ...(hasStatusUpdate ? { status: payload.status } : {}),
@@ -271,18 +247,16 @@ export function useBulkTaskOperation(projectId: string) {
           });
         }
       }
-
       return { previous };
     },
     onError: (_error, _variables, context) => {
-      toast.error('Không thể thực hiện thao tác hàng loạt');
       if (context?.previous) {
         queryClient.setQueryData(['projects', projectId], context.previous);
       }
     },
     onSuccess: (_data, variables) => {
       const count = variables.taskIds.length;
-      toast.success(`Đã cập nhật ${count} task thành công!`);
+      notify.success('update', '', `Đã cập nhật ${count} task thành công!`);
       for (const taskId of variables.taskIds) {
         void queryClient.invalidateQueries({
           queryKey: ['projects', projectId, 'tasks', taskId, 'history'],

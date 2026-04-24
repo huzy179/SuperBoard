@@ -4,107 +4,54 @@ import type {
   InvitationDetailDTO,
   WorkspaceItemDTO,
 } from '@superboard/shared';
-import { apiGet, apiRequest, apiPost, apiDelete } from '@/lib/api-client';
+import { api, authApi } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 
-export async function getWorkspaces(): Promise<WorkspaceItemDTO[]> {
-  return apiGet<WorkspaceItemDTO[]>(API_ENDPOINTS.workspaces.list, { auth: true });
-}
+export const getWorkspaces = () => authApi.get<WorkspaceItemDTO[]>(API_ENDPOINTS.workspaces.list);
 
-export async function createWorkspace(data: {
-  name: string;
-  slug?: string;
-}): Promise<WorkspaceItemDTO> {
-  return apiPost<WorkspaceItemDTO>(API_ENDPOINTS.workspaces.list, data, { auth: true });
-}
+export const createWorkspace = (data: { name: string; slug?: string }) =>
+  authApi.post<WorkspaceItemDTO>(API_ENDPOINTS.workspaces.list, data);
 
-export async function getWorkspaceMembers(workspaceId: string): Promise<WorkspaceMemberItemDTO[]> {
-  return apiGet<WorkspaceMemberItemDTO[]>(API_ENDPOINTS.workspaces.members(workspaceId), {
-    auth: true,
-  });
-}
+export const getWorkspaceMembers = (workspaceId: string) =>
+  authApi.get<WorkspaceMemberItemDTO[]>(API_ENDPOINTS.workspaces.members(workspaceId));
 
-export async function updateMemberRole(
-  workspaceId: string,
-  memberId: string,
-  role: string,
-): Promise<void> {
-  await apiRequest(API_ENDPOINTS.workspaces.updateMember(workspaceId, memberId), {
-    auth: true,
-    method: 'PATCH',
-    body: { role },
-  });
-}
+export const updateMemberRole = (workspaceId: string, memberId: string, role: string) =>
+  authApi.patch(API_ENDPOINTS.workspaces.updateMember(workspaceId, memberId), { role });
 
-export async function getWorkspaceInvitations(
-  workspaceId: string,
-): Promise<WorkspaceInvitationItemDTO[]> {
-  return apiGet<WorkspaceInvitationItemDTO[]>(API_ENDPOINTS.workspaces.invitations(workspaceId), {
-    auth: true,
-  });
-}
+export const getWorkspaceInvitations = (workspaceId: string) =>
+  authApi.get<WorkspaceInvitationItemDTO[]>(API_ENDPOINTS.workspaces.invitations(workspaceId));
 
-export async function createWorkspaceInvitation(
+export const createWorkspaceInvitation = (
   workspaceId: string,
   input: { email: string; role: string; expiresInHours?: number },
-): Promise<{ token: string; email: string; role: string; expiresAt: string }> {
-  return apiPost<{ token: string; email: string; role: string; expiresAt: string }>(
+) =>
+  authApi.post<{ token: string; email: string; role: string; expiresAt: string }>(
     API_ENDPOINTS.workspaces.createInvitation(workspaceId),
     input,
-    { auth: true },
   );
-}
 
-export async function revokeWorkspaceInvitation(
-  workspaceId: string,
-  invitationId: string,
-): Promise<void> {
-  await apiDelete(API_ENDPOINTS.workspaces.revokeInvitation(workspaceId, invitationId), {
-    auth: true,
-  });
-}
+export const revokeWorkspaceInvitation = (workspaceId: string, invitationId: string) =>
+  authApi.delete(API_ENDPOINTS.workspaces.revokeInvitation(workspaceId, invitationId));
 
-export async function getInvitationByToken(token: string): Promise<InvitationDetailDTO> {
-  return apiGet<InvitationDetailDTO>(API_ENDPOINTS.workspaces.getInvitation(token), {
-    auth: false,
-  });
-}
+export const getInvitationByToken = (token: string) =>
+  api.get<InvitationDetailDTO>(API_ENDPOINTS.workspaces.getInvitation(token));
 
-export async function acceptWorkspaceInvitation(token: string): Promise<void> {
-  await apiPost(API_ENDPOINTS.workspaces.acceptInvitation(token), undefined, { auth: true });
-}
+export const acceptWorkspaceInvitation = (token: string) =>
+  authApi.post(API_ENDPOINTS.workspaces.acceptInvitation(token));
 
-export async function removeMemberFromWorkspace(
-  workspaceId: string,
-  memberId: string,
-): Promise<void> {
-  await apiDelete(API_ENDPOINTS.workspaces.removeMember(workspaceId, memberId), { auth: true });
-}
+export const removeMemberFromWorkspace = (workspaceId: string, memberId: string) =>
+  authApi.delete(API_ENDPOINTS.workspaces.removeMember(workspaceId, memberId));
 
-export async function leaveWorkspace(workspaceId: string): Promise<void> {
-  await apiDelete(API_ENDPOINTS.workspaces.leaveWorkspace(workspaceId), { auth: true });
-}
+export const leaveWorkspace = (workspaceId: string) =>
+  authApi.delete(API_ENDPOINTS.workspaces.leaveWorkspace(workspaceId));
 
-export async function transferWorkspaceOwnership(
-  workspaceId: string,
-  memberId: string,
-): Promise<void> {
-  await apiPost(API_ENDPOINTS.workspaces.transferOwnership(workspaceId, memberId), undefined, {
-    auth: true,
-  });
-}
+export const transferWorkspaceOwnership = (workspaceId: string, memberId: string) =>
+  authApi.post(API_ENDPOINTS.workspaces.transferOwnership(workspaceId, memberId));
 
-export async function getWorkspaceDetails(workspaceId: string): Promise<WorkspaceItemDTO> {
-  return apiGet<WorkspaceItemDTO>(API_ENDPOINTS.workspaces.detail(workspaceId), { auth: true });
-}
+export const getWorkspaceDetails = (workspaceId: string) =>
+  authApi.get<WorkspaceItemDTO>(API_ENDPOINTS.workspaces.detail(workspaceId));
 
-export async function updateWorkspaceDetails(
+export const updateWorkspaceDetails = (
   workspaceId: string,
   data: { name?: string; slug?: string },
-): Promise<WorkspaceItemDTO> {
-  return apiRequest<WorkspaceItemDTO>(API_ENDPOINTS.workspaces.update(workspaceId), {
-    auth: true,
-    method: 'PATCH',
-    body: data,
-  });
-}
+) => authApi.patch<WorkspaceItemDTO>(API_ENDPOINTS.workspaces.update(workspaceId), data);

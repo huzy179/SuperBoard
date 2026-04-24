@@ -40,6 +40,7 @@ import {
 import { useRelatedDocs } from '@/features/system/search/hooks/use-related-docs';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { FormField, FormTextArea } from '@/components/ui/form-controls';
 
 interface TaskEditSlideOverProps {
   editingTask: ProjectTaskItemDTO;
@@ -596,28 +597,23 @@ export function TaskEditSlideOver({
                 />
 
                 <div className="space-y-10">
-                  <div className="flex items-center gap-6 px-4">
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white/5" />
-                    <label className="text-[10px] font-black text-white/10 uppercase tracking-[0.5em]">
-                      Mô tả chi tiết
-                    </label>
-                    <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/5" />
-                  </div>
-                  <div className="relative group">
-                    <textarea
-                      value={editDescription}
-                      onChange={(e) => setEditDescription(e.target.value)}
-                      rows={12}
-                      className="w-full rounded-md border border-white/5 bg-white/[0.01] px-var(--space-6) py-var(--space-6) text-sm font-bold text-white/70 focus:outline-none focus:border-brand-500/20 focus:bg-white/[0.02] transition-all placeholder:text-white/5 shadow-inner elite-scrollbar leading-relaxed"
-                      placeholder="Mô tả chi tiết về công việc này..."
-                    />
-                    <div className="absolute bottom-6 right-6 flex items-center gap-2.5 opacity-20 group-hover:opacity-100 transition-opacity">
-                      <span className="text-[8px] font-black text-white uppercase tracking-[0.3em]">
-                        SECURE_SIGNAL
-                      </span>
-                      <ShieldCheck size={12} className="text-brand-500" />
+                  <FormField label="Mô tả chi tiết">
+                    <div className="relative group">
+                      <FormTextArea
+                        value={editDescription}
+                        onChange={(e) => setEditDescription(e.target.value)}
+                        rows={12}
+                        className="py-6 h-auto min-h-[15rem]"
+                        placeholder="Mô tả chi tiết về công việc này..."
+                      />
+                      <div className="absolute bottom-6 right-6 flex items-center gap-2.5 opacity-20 group-hover:opacity-100 transition-opacity">
+                        <span className="text-[8px] font-black text-white uppercase tracking-[0.3em]">
+                          SECURE_SIGNAL
+                        </span>
+                        <ShieldCheck size={12} className="text-brand-500" />
+                      </div>
                     </div>
-                  </div>
+                  </FormField>
                 </div>
 
                 <div className="grid grid-cols-1 gap-12 xl:grid-cols-2">

@@ -3,14 +3,14 @@ import type {
   CreateCommentRequestDTO,
   UpdateCommentRequestDTO,
 } from '@superboard/shared';
-import { apiGet, apiPost, apiRequest } from '@/lib/api-client';
+import { authApi } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 
-export async function getTaskComments(
+export const getTaskComments = (
   projectId: string,
   taskId: string,
   params?: { cursor?: string; limit?: number },
-): Promise<CommentItemDTO[]> {
+) => {
   const queryParams = new URLSearchParams();
   if (params?.cursor) queryParams.set('cursor', params.cursor);
   if (params?.limit) queryParams.set('limit', params.limit.toString());
@@ -18,47 +18,27 @@ export async function getTaskComments(
   const queryString = queryParams.toString();
   const url = `${API_ENDPOINTS.projects.listComments(projectId, taskId)}${queryString ? `?${queryString}` : ''}`;
 
-  return apiGet<CommentItemDTO[]>(url, {
-    auth: true,
-  });
-}
+  return authApi.get<CommentItemDTO[]>(url);
+};
 
-export async function createTaskComment(
+export const createTaskComment = (
   projectId: string,
   taskId: string,
   payload: CreateCommentRequestDTO,
-): Promise<CommentItemDTO> {
-  return apiPost<CommentItemDTO>(API_ENDPOINTS.projects.createComment(projectId, taskId), payload, {
-    auth: true,
-  });
-}
+) => authApi.post<CommentItemDTO>(API_ENDPOINTS.projects.createComment(projectId, taskId), payload);
 
-export async function updateTaskComment(
+export const updateTaskComment = (
   projectId: string,
   taskId: string,
   commentId: string,
   payload: UpdateCommentRequestDTO,
-): Promise<CommentItemDTO> {
-  return apiRequest<CommentItemDTO>(
+) =>
+  authApi.patch<CommentItemDTO>(
     API_ENDPOINTS.projects.updateComment(projectId, taskId, commentId),
-    {
-      auth: true,
-      method: 'PATCH',
-      body: payload,
-    },
+    payload,
   );
-}
 
-export async function deleteTaskComment(
-  projectId: string,
-  taskId: string,
-  commentId: string,
-): Promise<{ deleted: boolean }> {
-  return apiRequest<{ deleted: boolean }>(
+export const deleteTaskComment = (projectId: string, taskId: string, commentId: string) =>
+  authApi.delete<{ deleted: boolean }>(
     API_ENDPOINTS.projects.deleteComment(projectId, taskId, commentId),
-    {
-      auth: true,
-      method: 'DELETE',
-    },
   );
-}

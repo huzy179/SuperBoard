@@ -1,5 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { useAppMutation } from '@/lib/hooks/use-app-mutation';
+import { useQuery } from '@tanstack/react-query';
 import type { WorkspaceMemberItemDTO, WorkspaceInvitationItemDTO } from '@superboard/shared';
 import {
   getWorkspaceMembers,
@@ -26,17 +26,12 @@ export function useWorkspaceMembers(workspaceId: string | undefined) {
 }
 
 export function useUpdateMemberRole(workspaceId: string | undefined) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: ({ memberId, role }: { memberId: string; role: string }) =>
       updateMemberRole(workspaceId!, memberId, role),
-    onSuccess: () => {
-      toast.success('Cập nhật vai trò thành công');
-      void queryClient.invalidateQueries({ queryKey: ['workspace-members', workspaceId] });
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Lỗi khi cập nhật vai trò');
-    },
+    resource: 'Thành viên',
+    action: 'update',
+    invalidateKeys: [['workspace-members', workspaceId]],
   });
 }
 
@@ -49,31 +44,21 @@ export function useWorkspaceInvitations(workspaceId: string | undefined) {
 }
 
 export function useCreateInvitation(workspaceId: string | undefined) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: (input: { email: string; role: string; expiresInHours?: number }) =>
       createWorkspaceInvitation(workspaceId!, input),
-    onSuccess: () => {
-      toast.success('Gửi lời mời thành công');
-      void queryClient.invalidateQueries({ queryKey: ['workspace-invitations', workspaceId] });
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Lỗi khi gửi lời mời');
-    },
+    resource: 'Lời mời',
+    action: 'create',
+    invalidateKeys: [['workspace-invitations', workspaceId]],
   });
 }
 
 export function useRevokeInvitation(workspaceId: string | undefined) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: (invitationId: string) => revokeWorkspaceInvitation(workspaceId!, invitationId),
-    onSuccess: () => {
-      toast.success('Thu hồi lời mời thành công');
-      void queryClient.invalidateQueries({ queryKey: ['workspace-invitations', workspaceId] });
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Lỗi khi thu hồi lời mời');
-    },
+    resource: 'Lời mời',
+    action: 'archive',
+    invalidateKeys: [['workspace-invitations', workspaceId]],
   });
 }
 
@@ -86,59 +71,38 @@ export function useInvitationByToken(token: string | undefined) {
 }
 
 export function useAcceptInvitation() {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: (token: string) => acceptWorkspaceInvitation(token),
-    onSuccess: () => {
-      toast.success('Tham gia workspace thành công!');
-      void queryClient.invalidateQueries({ queryKey: ['workspace-members'] });
-      void queryClient.invalidateQueries({ queryKey: ['workspaces'] });
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Lỗi khi tham gia workspace');
-    },
+    resource: 'Workspace',
+    action: 'sync',
+    invalidateKeys: [['workspace-members'], ['workspaces']],
   });
 }
 
 export function useRemoveMember(workspaceId: string | undefined) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: (memberId: string) => removeMemberFromWorkspace(workspaceId!, memberId),
-    onSuccess: () => {
-      toast.success('Xóa thành viên thành công');
-      void queryClient.invalidateQueries({ queryKey: ['workspace-members', workspaceId] });
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Lỗi khi xóa thành viên');
-    },
+    resource: 'Thành viên',
+    action: 'delete',
+    invalidateKeys: [['workspace-members', workspaceId]],
   });
 }
 
 export function useLeaveWorkspace(workspaceId: string | undefined) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: () => leaveWorkspace(workspaceId!),
-    onSuccess: () => {
-      toast.success('Rời workspace thành công');
-      void queryClient.invalidateQueries({ queryKey: ['workspaces'] });
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Lỗi khi rời workspace');
-    },
+    resource: 'Workspace',
+    action: 'sync',
+    invalidateKeys: [['workspaces']],
   });
 }
 
 export function useTransferOwnership(workspaceId: string | undefined) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: (memberId: string) => transferWorkspaceOwnership(workspaceId!, memberId),
-    onSuccess: () => {
-      toast.success('Chuyển quyền chủ sở hữu thành công');
-      void queryClient.invalidateQueries({ queryKey: ['workspace-members', workspaceId] });
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Lỗi khi chuyển quyền');
-    },
+    resource: 'Quyền sở hữu',
+    action: 'update',
+    invalidateKeys: [['workspace-members', workspaceId]],
   });
 }
 
@@ -151,17 +115,11 @@ export function useWorkspace(workspaceId: string | undefined) {
 }
 
 export function useUpdateWorkspace(workspaceId: string | undefined) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: (data: { name?: string; slug?: string }) =>
       updateWorkspaceDetails(workspaceId!, data),
-    onSuccess: () => {
-      toast.success('Cập nhật thông tin workspace thành công');
-      void queryClient.invalidateQueries({ queryKey: ['workspace', workspaceId] });
-      void queryClient.invalidateQueries({ queryKey: ['workspaces'] });
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Lỗi khi cập nhật workspace');
-    },
+    resource: 'Workspace',
+    action: 'update',
+    invalidateKeys: [['workspace', workspaceId], ['workspaces']],
   });
 }

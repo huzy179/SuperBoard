@@ -1,5 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
+import { useAppMutation } from '@/lib/hooks/use-app-mutation';
 import {
   getProjectWorkflow,
   createProjectStatus,
@@ -27,23 +27,21 @@ export function useProjectWorkflow(projectId: string) {
 }
 
 export function useCreateProjectStatus(projectId: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: (payload: {
       key: string;
       name: string;
       category: WorkflowStatusCategory;
       position?: number;
     }) => createProjectStatus(projectId, payload),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: workflowQueryKey(projectId) });
-    },
+    resource: 'Trạng thái',
+    action: 'create',
+    invalidateKeys: [workflowQueryKey(projectId)],
   });
 }
 
 export function useUpdateProjectStatus(projectId: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: ({
       statusId,
       data,
@@ -51,35 +49,29 @@ export function useUpdateProjectStatus(projectId: string) {
       statusId: string;
       data: { name?: string; category?: WorkflowStatusCategory; position?: number };
     }) => updateProjectStatus(projectId, statusId, data),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: workflowQueryKey(projectId) });
-    },
+    resource: 'Trạng thái',
+    action: 'update',
+    invalidateKeys: [workflowQueryKey(projectId)],
   });
 }
 
 export function useDeleteProjectStatus(projectId: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: ({ statusId, data }: { statusId: string; data: { migrateToId: string } }) =>
       deleteProjectStatus(projectId, statusId, data),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: workflowQueryKey(projectId) });
-      toast.success('Xoá trạng thái thành công');
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Lỗi khi xoá trạng thái');
-    },
+    resource: 'Trạng thái',
+    action: 'delete',
+    invalidateKeys: [workflowQueryKey(projectId)],
   });
 }
 
 export function useUpdateProjectTransitions(projectId: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: (payload: { transitions: { fromStatusId: string; toStatusId: string }[] }) =>
       updateProjectTransitions(projectId, payload),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: workflowQueryKey(projectId) });
-    },
+    resource: 'Quy trình',
+    action: 'update',
+    invalidateKeys: [workflowQueryKey(projectId)],
   });
 }
 
@@ -96,23 +88,21 @@ export function useWorkspaceWorkflow(workspaceId: string) {
 }
 
 export function useCreateWorkspaceStatus(workspaceId: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: (payload: {
       key: string;
       name: string;
       category: WorkflowStatusCategory;
       position?: number;
     }) => createWorkspaceStatus(workspaceId, payload),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: workspaceWorkflowQueryKey(workspaceId) });
-    },
+    resource: 'Trạng thái workspace',
+    action: 'create',
+    invalidateKeys: [workspaceWorkflowQueryKey(workspaceId)],
   });
 }
 
 export function useUpdateWorkspaceStatus(workspaceId: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: ({
       statusId,
       data,
@@ -120,48 +110,38 @@ export function useUpdateWorkspaceStatus(workspaceId: string) {
       statusId: string;
       data: { name?: string; category?: WorkflowStatusCategory; position?: number };
     }) => updateWorkspaceStatus(workspaceId, statusId, data),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: workspaceWorkflowQueryKey(workspaceId) });
-    },
+    resource: 'Trạng thái workspace',
+    action: 'update',
+    invalidateKeys: [workspaceWorkflowQueryKey(workspaceId)],
   });
 }
 
 export function useDeleteWorkspaceStatus(workspaceId: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: ({ statusId, data }: { statusId: string; data?: DeleteStatusRequestDTO }) =>
       deleteWorkspaceStatus(workspaceId, statusId, data),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: workspaceWorkflowQueryKey(workspaceId) });
-      toast.success('Xoá trạng thái workspace thành công');
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Lỗi khi xoá trạng thái workspace');
-    },
+    resource: 'Trạng thái workspace',
+    action: 'delete',
+    invalidateKeys: [workspaceWorkflowQueryKey(workspaceId)],
   });
 }
 
 export function useUpdateWorkspaceTransitions(workspaceId: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: (payload: { transitions: { fromStatusId: string; toStatusId: string }[] }) =>
       updateWorkspaceTransitions(workspaceId, payload),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: workspaceWorkflowQueryKey(workspaceId) });
-    },
+    resource: 'Quy trình workspace',
+    action: 'update',
+    invalidateKeys: [workspaceWorkflowQueryKey(workspaceId)],
   });
 }
 
 export function useSyncWorkspaceWorkflow(workspaceId: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: () => syncWorkspaceWorkflow(workspaceId),
-    onSuccess: () => {
-      toast.success('Đã đồng bộ quy trình cho tất cả dự án trong workspace');
-      void queryClient.invalidateQueries({ queryKey: ['projects'] });
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Lỗi khi đồng bộ quy trình');
-    },
+    resource: 'Quy trình',
+    action: 'sync',
+    successMessage: 'Đã đồng bộ quy trình cho tất cả dự án trong workspace',
+    invalidateKeys: [['projects']],
   });
 }

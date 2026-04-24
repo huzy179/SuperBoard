@@ -1,27 +1,54 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
-import { Loader2, X } from 'lucide-react';
+import { z } from 'zod';
 import { useCreateWorkspace } from '@/features/system/workspace/hooks/use-workspace-mutations';
+import { useAppForm } from '@/lib/hooks/use-app-form';
+import { FormField, FormInput } from '@/components/ui/form-controls';
+
+const workspaceSchema = z.object({
+  name: z.string().min(1, 'Tên Workspace không được để trống'),
+  slug: z
+    .string()
+    .min(3, 'Slug phải có ít nhất 3 ký tự')
+    .regex(/^[a-z0-9-]+$/, 'Slug chỉ được chứa chữ thường, số và dấu gạch ngang')
+    .optional()
+    .or(z.literal('')),
+});
+
+type WorkspaceFormValues = z.infer<typeof workspaceSchema>;
 
 interface WorkspaceCreateModalProps {
   onClose: () => void;
   onSuccess?: (workspaceId: string) => void;
 }
 
+import { AppOverlay } from '@/components/ui/app-overlay';
+
+import { AppButton } from '@/components/ui/app-button';
+import { Globe } from 'lucide-react';
+
 export function WorkspaceCreateModal({ onClose, onSuccess }: WorkspaceCreateModalProps) {
-  const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
   const createMutation = useCreateWorkspace();
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
+  const form = useAppForm({
+    schema: workspaceSchema,
+    defaultValues: {
+      name: '',
+      slug: '',
+    },
+  });
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = form;
+
+  const onSubmit = async (values: WorkspaceFormValues) => {
     try {
       const result = await createMutation.mutateAsync({
-        name: name.trim(),
-        ...(slug.trim() ? { slug: slug.trim() } : {}),
+        name: values.name.trim(),
+        ...(values.slug?.trim() ? { slug: values.slug.trim() } : {}),
       });
       onSuccess?.(result.id);
       onClose();
@@ -31,86 +58,59 @@ export function WorkspaceCreateModal({ onClose, onSuccess }: WorkspaceCreateModa
   };
 
   return (
-    <div className="modal-overlay p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="ws-create-title"
-        className="modal-panel max-w-md"
-      >
-        {/* Header */}
-        <div className="modal-header">
-          <div>
-            <h2 id="ws-create-title" className="modal-title">
-              Tạo Workspace mới
-            </h2>
-            <p className="modal-subtitle">Không gian làm việc chung cho team của bạn.</p>
-          </div>
-          <button type="button" onClick={onClose} className="modal-close-btn">
-            <X size={18} />
-          </button>
+    <AppOverlay
+      isOpen={true}
+      onClose={onClose}
+      variant="modal"
+      maxWidth="xl"
+      title="Tạo Workspace mới"
+      subtitle="Không gian làm việc chung cho team của bạn."
+      footer={
+        <div className="flex gap-3">
+          <AppButton variant="ghost" onClick={onClose} className="flex-1">
+            Hủy bỏ
+          </AppButton>
+          <AppButton
+            form="ws-create-form"
+            type="submit"
+            variant="primary"
+            isLoading={createMutation.isPending}
+            leftIcon={<Globe size={14} />}
+            className="flex-[2]"
+            id="e2e-ws-submit-button"
+          >
+            Tạo Workspace
+          </AppButton>
         </div>
+      }
+    >
+      <form id="ws-create-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <FormField label="Tên Workspace" error={errors.name?.message} required>
+          <FormInput
+            {...register('name')}
+            placeholder="VD: TechViet Solutions"
+            autoFocus
+            error={!!errors.name}
+          />
+        </FormField>
 
-        {/* Body */}
-        <div className="modal-body">
-          <form id="ws-create-form" onSubmit={handleSubmit} className="space-y-5">
-            {/* Workspace name */}
-            <div>
-              <label htmlFor="ws-name-input" className="form-label">
-                Tên Workspace{' '}
-                <span className="text-rose-400 normal-case tracking-normal ml-0.5">*</span>
-              </label>
-              <input
-                id="ws-name-input"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="VD: TechViet Solutions"
-                className="form-input"
-                required
-                autoFocus
-              />
-            </div>
-
-            {/* Slug */}
-            <div>
-              <label htmlFor="ws-slug-input" className="form-label">
-                Workspace_Protocol_Slug (Optional)
-              </label>
-              <div className="flex items-center rounded-sm border border-white/10 bg-white/[0.01] overflow-hidden focus-within:border-brand-500/40 transition-all shadow-inner">
-                <span className="px-3 text-white/20 text-[10px] font-mono select-none border-r border-white/10">
-                  UPLINK://
-                </span>
-                <input
-                  id="ws-slug-input"
-                  type="text"
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                  placeholder="alpha-sector-01"
-                  className="flex-1 bg-transparent px-4 py-3 text-sm font-bold text-white placeholder:text-white/10 focus:outline-none"
-                />
-              </div>
-            </div>
-          </form>
-
-          {/* Footer */}
-          <div className="modal-footer">
-            <button type="button" onClick={onClose} className="btn-secondary flex-1">
-              Hủy
-            </button>
-            <button
-              type="submit"
-              form="ws-create-form"
-              id="e2e-ws-submit-button"
-              disabled={createMutation.isPending || !name.trim()}
-              className="btn-primary flex-[2]"
-            >
-              {createMutation.isPending ? <Loader2 className="btn-spinner" /> : null}
-              {createMutation.isPending ? 'Đang tạo...' : 'Tạo Workspace'}
-            </button>
+        <FormField label="Workspace_Protocol_Slug (Optional)" error={errors.slug?.message}>
+          <div className="flex items-center rounded-lg border border-white/10 bg-white/[0.01] overflow-hidden focus-within:border-brand-500/40 transition-all shadow-inner h-14">
+            <span className="px-4 text-white/20 text-[10px] font-mono select-none border-r border-white/10 h-full flex items-center bg-white/[0.02]">
+              UPLINK://
+            </span>
+            <input
+              {...register('slug')}
+              placeholder="alpha-sector-01"
+              className="flex-1 bg-transparent px-4 py-3 text-sm font-bold text-white placeholder:text-white/10 focus:outline-none"
+              onChange={(e) => {
+                const value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+                form.setValue('slug', value);
+              }}
+            />
           </div>
-        </div>
-      </div>
-    </div>
+        </FormField>
+      </form>
+    </AppOverlay>
   );
 }

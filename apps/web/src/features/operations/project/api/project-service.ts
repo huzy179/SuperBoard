@@ -4,48 +4,24 @@ import type {
   ProjectItemDTO,
   UpdateProjectRequestDTO,
 } from '@superboard/shared';
-import { apiGet, apiPost, apiRequest } from '@/lib/api-client';
+import { authApi } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 
-export async function getProjects(): Promise<ProjectItemDTO[]> {
-  return apiGet<ProjectItemDTO[]>(API_ENDPOINTS.projects.list, { auth: true });
-}
+export const getProjects = () => authApi.get<ProjectItemDTO[]>(API_ENDPOINTS.projects.list);
 
-export async function createProject(payload: CreateProjectRequestDTO): Promise<ProjectItemDTO> {
-  return apiPost<ProjectItemDTO>(API_ENDPOINTS.projects.create, payload, { auth: true });
-}
+export const createProject = (payload: CreateProjectRequestDTO) =>
+  authApi.post<ProjectItemDTO>(API_ENDPOINTS.projects.create, payload);
 
-export async function updateProject(
-  projectId: string,
-  payload: UpdateProjectRequestDTO,
-): Promise<ProjectItemDTO> {
-  return apiRequest<ProjectItemDTO>(API_ENDPOINTS.projects.update(projectId), {
-    auth: true,
-    method: 'PATCH',
-    body: payload,
-  });
-}
+export const updateProject = (projectId: string, payload: UpdateProjectRequestDTO) =>
+  authApi.patch<ProjectItemDTO>(API_ENDPOINTS.projects.update(projectId), payload);
 
-export async function archiveProject(projectId: string): Promise<void> {
-  return apiRequest<void>(API_ENDPOINTS.projects.delete(projectId), {
-    auth: true,
-    method: 'DELETE',
-  });
-}
+export const archiveProject = (projectId: string) =>
+  authApi.delete<void>(API_ENDPOINTS.projects.delete(projectId));
 
-export async function restoreProject(projectId: string): Promise<void> {
-  return apiRequest<void>(API_ENDPOINTS.projects.restore(projectId), {
-    auth: true,
-    method: 'PATCH',
-  });
-}
+export const restoreProject = (projectId: string) =>
+  authApi.patch<void>(API_ENDPOINTS.projects.restore(projectId));
 
-export async function getProjectDetail(
-  projectId: string,
-  showArchived = false,
-): Promise<ProjectDetailDTO> {
+export const getProjectDetail = (projectId: string, showArchived = false) => {
   const query = showArchived ? `?showArchived=true` : '';
-  return apiGet<ProjectDetailDTO>(`${API_ENDPOINTS.projects.detail(projectId)}${query}`, {
-    auth: true,
-  });
-}
+  return authApi.get<ProjectDetailDTO>(`${API_ENDPOINTS.projects.detail(projectId)}${query}`);
+};

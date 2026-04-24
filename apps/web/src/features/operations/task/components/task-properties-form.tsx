@@ -1,7 +1,8 @@
 'use client';
 
 import { Dispatch, SetStateAction, useMemo } from 'react';
-import { Activity, Flag, Calendar, User, Orbit, Target, ShieldCheck, Cpu } from 'lucide-react';
+import { Activity, Flag, Calendar, User, Orbit, Target, Cpu } from 'lucide-react';
+
 import type { ProjectTaskItemDTO, ProjectMemberDTO, TaskTypeDTO } from '@superboard/shared';
 import { LabelDots } from '@/features/operations/task/components/task-badges';
 import {
@@ -12,6 +13,7 @@ import {
 } from '@/lib/constants/task';
 import type { WorkflowStatusTemplateDTO } from '@superboard/shared';
 import { SmartAssigneeSuggestion } from '@/features/specialized/talent/components/smart-assignee-suggestion';
+import { FormField, FormInput, FormSelect, FormTextArea } from '@/components/ui/form-controls';
 
 interface TaskPropertiesFormProps {
   editTitle: string;
@@ -85,39 +87,35 @@ export function TaskPropertiesForm({
       .map((s) => ({ key: s.key, label: s.name }));
   }, [workflow, initialStatus]);
 
-  const inputClasses =
-    'mt-2 w-full rounded-sm border border-white/5 bg-white/[0.01] px-var(--space-4) py-var(--space-3) text-sm font-bold text-white/70 placeholder:text-white/5 focus:outline-none focus:border-brand-500/20 focus:bg-white/[0.02] transition-all duration-300 shadow-inner appearance-none backdrop-blur-xl tracking-tight';
-  const labelClasses =
-    'text-[10px] font-black text-white/10 uppercase tracking-[0.4em] flex items-center gap-3 mb-1.5 pl-2';
-
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-10 duration-700">
       <div className="space-y-3">
-        <label className="block group/title">
-          <span className={labelClasses}>
-            <Target size={12} className="text-brand-500 group-hover/title:animate-pulse" /> Mission
-            Designation
-          </span>
-          <textarea
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-            className={`${inputClasses} text-2xl font-black tracking-tight uppercase leading-none resize-none elite-scrollbar py-6 h-auto min-h-[5rem] border-white/10 bg-white/[0.02] shadow-luxe focus:border-brand-500/30`}
-            required
-            rows={1}
-            placeholder="INPUT_MISSION_DESIGNATOR..."
-          />
-        </label>
+        <FormField label="Mission Designation">
+          <div className="relative group/title">
+            <div className="absolute left-4 top-6 text-brand-500 group-hover/title:animate-pulse z-10 pointer-events-none">
+              <Target size={18} />
+            </div>
+            <FormTextArea
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              className="text-2xl font-black tracking-tight uppercase leading-none resize-none elite-scrollbar py-6 pl-12 min-h-[5rem] border-white/10 bg-white/[0.02] shadow-luxe focus:border-brand-500/30"
+              required
+              rows={1}
+              placeholder="INPUT_MISSION_DESIGNATOR..."
+            />
+          </div>
+        </FormField>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-12">
         <div className="space-y-4">
-          <span className={labelClasses}>
+          <label className="text-[10px] font-black text-white/10 uppercase tracking-[0.4em] flex items-center gap-3 mb-1.5 pl-2">
             <Orbit
               size={12}
               className="text-indigo-400 group-hover:rotate-180 transition-transform duration-1000"
             />{' '}
             Prototype Class
-          </span>
+          </label>
           <div className="flex flex-wrap gap-3 mt-4 px-1">
             {TASK_TYPE_OPTIONS.map((t) => (
               <button
@@ -142,19 +140,15 @@ export function TaskPropertiesForm({
         </div>
 
         <div className="grid grid-cols-2 gap-8">
-          <label className="block group/select">
-            <span className={labelClasses}>
-              <Activity
-                size={12}
-                className="text-emerald-500 group-hover/select:animate-spin-slow"
-              />{' '}
-              Sync State
-            </span>
+          <FormField label="Sync State">
             <div className="relative group/field">
-              <select
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500 group-hover/field:animate-spin-slow z-10 pointer-events-none">
+                <Activity size={14} />
+              </div>
+              <FormSelect
                 value={editStatus}
                 onChange={(e) => setEditStatus(e.target.value)}
-                className={inputClasses}
+                className="pl-12"
               >
                 {statusOptions.map((opt: { key: string; label: string }) => (
                   <option
@@ -165,22 +159,19 @@ export function TaskPropertiesForm({
                     {opt.label.toUpperCase()}
                   </option>
                 ))}
-              </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-white/10 group-hover/field:text-emerald-500 transition-colors">
-                <ChevronDown size={12} />
-              </div>
+              </FormSelect>
             </div>
-          </label>
-          <label className="block group/select">
-            <span className={labelClasses}>
-              <Flag size={12} className="text-rose-500 group-hover/select:animate-bounce" /> Vector
-              Urgency
-            </span>
+          </FormField>
+
+          <FormField label="Vector Urgency">
             <div className="relative group/field">
-              <select
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-rose-500 group-hover/field:animate-bounce z-10 pointer-events-none">
+                <Flag size={14} />
+              </div>
+              <FormSelect
                 value={editPriority}
                 onChange={(e) => setEditPriority(e.target.value as TaskPriority)}
-                className={inputClasses}
+                className="pl-12"
               >
                 {PRIORITY_OPTIONS.map((priority) => (
                   <option
@@ -191,69 +182,56 @@ export function TaskPropertiesForm({
                     {priority.label.toUpperCase()}
                   </option>
                 ))}
-              </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-white/10 group-hover/field:text-rose-500 transition-colors">
-                <ChevronDown size={12} />
-              </div>
+              </FormSelect>
             </div>
-          </label>
+          </FormField>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <label className="block group/input">
-          <span className={labelClasses}>
-            <Cpu size={12} className="text-brand-400 group-hover/input:animate-pulse" /> Neural
-            Complexity
-          </span>
+        <FormField label="Neural Complexity">
           <div className="relative group/field">
-            <input
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-400 group-hover/field:animate-pulse z-10 pointer-events-none">
+              <Cpu size={14} />
+            </div>
+            <FormInput
               type="number"
               min="0"
               max="100"
               value={editStoryPoints}
               onChange={(e) => setEditStoryPoints(e.target.value)}
               placeholder="—"
-              className={inputClasses}
+              className="pl-12"
             />
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[8px] font-black text-white/10 uppercase tracking-[0.3em] pointer-events-none group-hover/field:text-brand-500 transition-colors">
               CP_IDX
             </span>
           </div>
-        </label>
-        <label className="block group/input">
-          <span className={labelClasses}>
-            <Calendar
-              size={12}
-              className="text-blue-400 group-hover/input:scale-110 transition-transform"
-            />{' '}
-            Termination
-          </span>
+        </FormField>
+
+        <FormField label="Termination">
           <div className="relative group/field">
-            <input
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-400 group-hover/field:scale-110 transition-transform z-10 pointer-events-none">
+              <Calendar size={14} />
+            </div>
+            <FormInput
               type="date"
               value={editDueDate}
               onChange={(e) => setEditDueDate(e.target.value)}
-              className={`${inputClasses} [color-scheme:dark]`}
+              className="pl-12 [color-scheme:dark]"
             />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-white/10 group-hover/field:text-blue-500 transition-colors">
-              <ShieldCheck size={14} />
-            </div>
           </div>
-        </label>
-        <label className="block group/select">
-          <span className={labelClasses}>
-            <User
-              size={12}
-              className="text-orange-500 group-hover/select:translate-x-1 transition-transform"
-            />{' '}
-            Provisioned Op
-          </span>
+        </FormField>
+
+        <FormField label="Provisioned Op">
           <div className="relative group/field">
-            <select
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-500 group-hover/field:translate-x-1 transition-transform z-10 pointer-events-none">
+              <User size={14} />
+            </div>
+            <FormSelect
               value={editAssigneeId}
               onChange={(e) => setEditAssigneeId(e.target.value)}
-              className={inputClasses}
+              className="pl-12"
             >
               <option value="" className="bg-slate-950 font-black uppercase tracking-widest">
                 UNASSIGNED_OPERATOR
@@ -267,10 +245,7 @@ export function TaskPropertiesForm({
                   {m.fullName.toUpperCase()}
                 </option>
               ))}
-            </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-white/10 group-hover/field:text-orange-500 transition-colors">
-              <ChevronDown size={12} />
-            </div>
+            </FormSelect>
           </div>
           {taskId && workspaceId && (
             <div className="mt-6 animate-in fade-in duration-1000">
@@ -282,35 +257,19 @@ export function TaskPropertiesForm({
               />
             </div>
           )}
-        </label>
+        </FormField>
       </div>
 
       {labels && labels.length > 0 && (
         <div className="space-y-6 pt-12 border-t border-white/5 bg-white/[0.005] rounded-md p-var(--space-6) mt-4 border-dashed">
-          <span className={labelClasses}>Classifications Vectors</span>
+          <label className="text-[10px] font-black text-white/10 uppercase tracking-[0.4em] flex items-center gap-3 mb-1.5 pl-2">
+            Classifications Vectors
+          </label>
           <div className="flex flex-wrap gap-4 px-2">
             <LabelDots labels={labels} />
           </div>
         </div>
       )}
     </div>
-  );
-}
-
-function ChevronDown({ size, className }: { size: number; className?: string }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="m6 9 6 6 6-6" />
-    </svg>
   );
 }

@@ -1,12 +1,11 @@
 import type { AuthUserDTO, LoginDataDTO, LoginRequestDTO, MeDataDTO } from '@superboard/shared';
-import { apiGet, apiPost } from '@/lib/api-client';
+import { api, authApi } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 
-export async function login(payload: LoginRequestDTO): Promise<LoginDataDTO> {
-  return apiPost<LoginDataDTO>(API_ENDPOINTS.auth.login, payload, { auth: false });
-}
+export const login = (payload: LoginRequestDTO) =>
+  api.post<LoginDataDTO>(API_ENDPOINTS.auth.login, payload);
 
-export async function getCurrentUser(): Promise<AuthUserDTO> {
-  const data = await apiGet<MeDataDTO>(API_ENDPOINTS.auth.me, { auth: true });
+export const getCurrentUser = async (): Promise<AuthUserDTO> => {
+  const data = await authApi.get<MeDataDTO>(API_ENDPOINTS.auth.me);
   return data.user;
-}
+};

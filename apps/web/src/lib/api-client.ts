@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ApiResponse } from '@superboard/shared';
 import { getAccessToken } from '@/features/system/auth/utils/auth-storage';
 
@@ -26,12 +27,14 @@ function isJsonResponse(contentType: string | null): boolean {
 export class ApiClientError extends Error {
   status: number;
   code: string | undefined;
+  details: Record<string, any> | undefined;
 
-  constructor(message: string, status: number, code?: string) {
+  constructor(message: string, status: number, code?: string, details?: Record<string, any>) {
     super(message);
     this.name = 'ApiClientError';
     this.status = status;
     this.code = code;
+    this.details = details;
   }
 }
 
@@ -87,6 +90,7 @@ export async function apiRequest<TData>(
     const errorMessage = payload?.error?.message ?? 'Request failed';
     const errorStatus = response.status;
     const errorCode = payload?.error?.code;
+    const errorDetails = payload?.error?.details as Record<string, any> | undefined;
 
     // Handle Rate Limiting globally for better UX
     if (errorStatus === 429 && typeof window !== 'undefined') {
@@ -101,7 +105,7 @@ export async function apiRequest<TData>(
       }
     }
 
-    throw new ApiClientError(errorMessage, errorStatus, errorCode);
+    throw new ApiClientError(errorMessage, errorStatus, errorCode, errorDetails);
   }
 
   return payload.data;
@@ -141,3 +145,32 @@ export function apiPut<TData>(
 export function apiDelete<TData>(path: string, options: RequestInitOptions = {}): Promise<TData> {
   return apiRequest<TData>(path, { ...options, method: 'DELETE' });
 }
+
+/**
+ * Grouped API clients
+ */
+export const api = {
+  get: <T>(path: string, options?: Omit<RequestInitOptions, 'method' | 'body'>) =>
+    apiGet<T>(path, { ...options, auth: false }),
+  post: <T>(path: string, body?: unknown, options?: Omit<RequestInitOptions, 'method' | 'body'>) =>
+    apiPost<T>(path, body, { ...options, auth: false }),
+  patch: <T>(path: string, body?: unknown, options?: Omit<RequestInitOptions, 'method' | 'body'>) =>
+    apiPatch<T>(path, body, { ...options, auth: false }),
+  put: <T>(path: string, body?: unknown, options?: Omit<RequestInitOptions, 'method' | 'body'>) =>
+    apiPut<T>(path, body, { ...options, auth: false }),
+  delete: <T>(path: string, options?: RequestInitOptions) =>
+    apiDelete<T>(path, { ...options, auth: false }),
+};
+
+export const authApi = {
+  get: <T>(path: string, options?: Omit<RequestInitOptions, 'method' | 'body'>) =>
+    apiGet<T>(path, { ...options, auth: true }),
+  post: <T>(path: string, body?: unknown, options?: Omit<RequestInitOptions, 'method' | 'body'>) =>
+    apiPost<T>(path, body, { ...options, auth: true }),
+  patch: <T>(path: string, body?: unknown, options?: Omit<RequestInitOptions, 'method' | 'body'>) =>
+    apiPatch<T>(path, body, { ...options, auth: true }),
+  put: <T>(path: string, body?: unknown, options?: Omit<RequestInitOptions, 'method' | 'body'>) =>
+    apiPut<T>(path, body, { ...options, auth: true }),
+  delete: <T>(path: string, options?: RequestInitOptions) =>
+    apiDelete<T>(path, { ...options, auth: true }),
+};

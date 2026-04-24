@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAppMutation } from '@/lib/hooks/use-app-mutation';
 import type { CreateProjectRequestDTO, UpdateProjectRequestDTO } from '@superboard/shared';
 import {
   createProject,
@@ -9,45 +9,49 @@ import {
 import { publishProjectsListUpdated } from '@/lib/realtime/project-sync';
 
 export function useCreateProject() {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: (data: CreateProjectRequestDTO) => createProject(data),
+    resource: 'Dự án',
+    action: 'create',
+    invalidateKeys: [['projects']],
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['projects'] });
       publishProjectsListUpdated();
     },
   });
 }
 
 export function useUpdateProject() {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateProjectRequestDTO }) =>
       updateProject(id, data),
+    resource: 'Dự án',
+    action: 'update',
+    invalidateKeys: [['projects']],
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['projects'] });
       publishProjectsListUpdated();
     },
   });
 }
 
 export function useArchiveProject() {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: (id: string) => archiveProject(id),
+    resource: 'Dự án',
+    action: 'archive',
+    invalidateKeys: [['projects']],
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['projects'] });
       publishProjectsListUpdated();
     },
   });
 }
 
 export function useRestoreProject() {
-  const queryClient = useQueryClient();
-  return useMutation({
+  return useAppMutation({
     mutationFn: (id: string) => restoreProject(id),
+    resource: 'Dự án',
+    action: 'restore',
+    invalidateKeys: [['projects']],
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['projects'] });
       publishProjectsListUpdated();
     },
   });

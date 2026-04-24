@@ -30,29 +30,11 @@ export function JiraDashboard() {
     clearAllRememberedContexts,
     showCreatePanel,
     setShowCreatePanel,
-    projectName,
-    setProjectName,
-    projectDescription,
-    setProjectDescription,
-    projectIcon,
-    setProjectIcon,
-    projectColor,
-    setProjectColor,
-    createError,
     handleCreateProject,
     createProjectPending,
     editingProject,
     openEditProject,
     closeEditProject,
-    editName,
-    setEditName,
-    editDescription,
-    setEditDescription,
-    editIcon,
-    setEditIcon,
-    editColor,
-    setEditColor,
-    editError,
     handleUpdateProject,
     updateProjectPending,
     archiveError,
@@ -178,16 +160,7 @@ export function JiraDashboard() {
           <div className="animate-in fade-in slide-in-from-top-6 duration-500">
             <ProjectForm
               mode="create"
-              name={projectName}
-              description={projectDescription}
-              icon={projectIcon}
-              color={projectColor}
-              error={createError}
               isPending={createProjectPending}
-              onNameChange={setProjectName}
-              onDescriptionChange={setProjectDescription}
-              onIconChange={setProjectIcon}
-              onColorChange={setProjectColor}
               onCancel={() => setShowCreatePanel(false)}
               onSubmit={handleCreateProject}
             />
@@ -198,16 +171,13 @@ export function JiraDashboard() {
           <div className="animate-in fade-in zoom-in-95 duration-500">
             <ProjectForm
               mode="edit"
-              name={editName}
-              description={editDescription}
-              icon={editIcon}
-              color={editColor}
-              error={null}
+              initialValues={{
+                name: editingProject.name,
+                description: editingProject.description ?? '',
+                icon: editingProject.icon ?? '📌',
+                color: editingProject.color ?? '#2563eb',
+              }}
               isPending={updateProjectPending}
-              onNameChange={setEditName}
-              onDescriptionChange={setEditDescription}
-              onIconChange={setEditIcon}
-              onColorChange={setEditColor}
               onCancel={closeEditProject}
               onSubmit={handleUpdateProject}
             />
@@ -215,7 +185,7 @@ export function JiraDashboard() {
         )}
 
         {/* Error Handling */}
-        {(editError || archiveError) && (
+        {archiveError && (
           <div
             role="alert"
             className="p-6 rounded-xl border border-rose-500/20 bg-rose-500/5 backdrop-blur-3xl animate-in shake duration-500"
@@ -223,7 +193,7 @@ export function JiraDashboard() {
             <div className="flex items-center gap-4 text-rose-400">
               <Zap size={20} />
               <span className="text-[10px] font-black uppercase tracking-widest">
-                Initialization Error: {editError || archiveError}
+                Initialization Error: {archiveError}
               </span>
             </div>
           </div>

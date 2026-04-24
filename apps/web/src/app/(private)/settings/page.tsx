@@ -381,9 +381,9 @@ export default function SettingsPage() {
                     await deleteWorkspaceStatus.mutateAsync({ statusId });
                   }
                 }}
-                onSaveTransitions={(transitions) =>
-                  updateWorkspaceTransitions.mutateAsync({ transitions })
-                }
+                onSaveTransitions={async (transitions) => {
+                  await updateWorkspaceTransitions.mutateAsync({ transitions });
+                }}
                 isPending={
                   createWorkspaceStatus.isPending ||
                   updateWorkspaceStatus.isPending ||

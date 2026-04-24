@@ -8,130 +8,60 @@ import type {
   UpdateTaskStatusRequestDTO,
   WorkflowStatusDTO,
 } from '@superboard/shared';
-import { apiGet, apiPost, apiRequest } from '@/lib/api-client';
+import { authApi } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 
-export async function createProjectTask(
-  projectId: string,
-  payload: CreateTaskRequestDTO,
-): Promise<ProjectTaskItemDTO> {
-  return apiPost<ProjectTaskItemDTO>(API_ENDPOINTS.projects.createTask(projectId), payload, {
-    auth: true,
-  });
-}
+export const createProjectTask = (projectId: string, payload: CreateTaskRequestDTO) =>
+  authApi.post<ProjectTaskItemDTO>(API_ENDPOINTS.projects.createTask(projectId), payload);
 
-export async function updateProjectTaskStatus(
+export const updateProjectTaskStatus = (
   projectId: string,
   taskId: string,
   payload: UpdateTaskStatusRequestDTO,
-): Promise<ProjectTaskItemDTO> {
-  return apiRequest<ProjectTaskItemDTO>(
+) =>
+  authApi.patch<ProjectTaskItemDTO>(
     API_ENDPOINTS.projects.updateTaskStatus(projectId, taskId),
-    {
-      auth: true,
-      method: 'PATCH',
-      body: payload,
-    },
+    payload,
   );
-}
 
-export async function updateProjectTask(
+export const updateProjectTask = (
   projectId: string,
   taskId: string,
   payload: UpdateTaskRequestDTO,
-): Promise<ProjectTaskItemDTO> {
-  return apiRequest<ProjectTaskItemDTO>(API_ENDPOINTS.projects.updateTask(projectId, taskId), {
-    auth: true,
-    method: 'PATCH',
-    body: payload,
-  });
-}
+) =>
+  authApi.patch<ProjectTaskItemDTO>(API_ENDPOINTS.projects.updateTask(projectId, taskId), payload);
 
-export async function bulkProjectTaskOperation(
-  projectId: string,
-  payload: BulkTaskOperationRequestDTO,
-): Promise<BulkTaskOperationResultDTO> {
-  return apiRequest<BulkTaskOperationResultDTO>(API_ENDPOINTS.projects.bulkTask(projectId), {
-    auth: true,
-    method: 'PATCH',
-    body: payload,
-  });
-}
+export const bulkProjectTaskOperation = (projectId: string, payload: BulkTaskOperationRequestDTO) =>
+  authApi.patch<BulkTaskOperationResultDTO>(API_ENDPOINTS.projects.bulkTask(projectId), payload);
 
-export async function deleteProjectTask(projectId: string, taskId: string): Promise<void> {
-  return apiRequest<void>(API_ENDPOINTS.projects.deleteTask(projectId, taskId), {
-    auth: true,
-    method: 'DELETE',
-  });
-}
+export const deleteProjectTask = (projectId: string, taskId: string) =>
+  authApi.delete<void>(API_ENDPOINTS.projects.deleteTask(projectId, taskId));
 
-export async function getTaskHistory(
-  projectId: string,
-  taskId: string,
-): Promise<TaskHistoryItemDTO[]> {
-  return apiGet<TaskHistoryItemDTO[]>(API_ENDPOINTS.projects.taskHistory(projectId, taskId), {
-    auth: true,
-  });
-}
+export const getTaskHistory = (projectId: string, taskId: string) =>
+  authApi.get<TaskHistoryItemDTO[]>(API_ENDPOINTS.projects.taskHistory(projectId, taskId));
 
-export async function archiveTask(taskId: string): Promise<void> {
-  return apiRequest<void>(API_ENDPOINTS.projects.archiveTask(taskId), {
-    auth: true,
-    method: 'PATCH',
-  });
-}
+export const archiveTask = (taskId: string) =>
+  authApi.patch<void>(API_ENDPOINTS.projects.archiveTask(taskId));
 
-export async function restoreTask(taskId: string): Promise<void> {
-  return apiRequest<void>(API_ENDPOINTS.projects.restoreTask(taskId), {
-    auth: true,
-    method: 'PATCH',
-  });
-}
+export const restoreTask = (taskId: string) =>
+  authApi.patch<void>(API_ENDPOINTS.projects.restoreTask(taskId));
 
-export async function getProjectStatuses(projectId: string): Promise<WorkflowStatusDTO[]> {
-  return apiGet<WorkflowStatusDTO[]>(API_ENDPOINTS.workflow.projectStatuses(projectId), {
-    auth: true,
-  });
-}
+export const getProjectStatuses = (projectId: string) =>
+  authApi.get<WorkflowStatusDTO[]>(API_ENDPOINTS.workflow.projectStatuses(projectId));
 
-export async function summarizeProjectTask(taskId: string): Promise<{ summary: string }> {
-  return apiPost<{ summary: string }>(
-    API_ENDPOINTS.projects.summarizeTask(taskId),
-    {},
-    {
-      auth: true,
-    },
-  );
-}
+export const summarizeProjectTask = (taskId: string) =>
+  authApi.post<{ summary: string }>(API_ENDPOINTS.projects.summarizeTask(taskId));
 
-export async function aiDecomposeTask(taskId: string): Promise<{ subtasks: string[] }> {
-  return apiPost<{ subtasks: string[] }>(
-    API_ENDPOINTS.projects.aiDecompose(taskId),
-    {},
-    {
-      auth: true,
-    },
-  );
-}
+export const aiDecomposeTask = (taskId: string) =>
+  authApi.post<{ subtasks: string[] }>(API_ENDPOINTS.projects.aiDecompose(taskId));
 
-export async function aiRefineTask(
-  taskId: string,
-): Promise<{ description: string; storyPoints: number | null }> {
-  return apiPost<{ description: string; storyPoints: number | null }>(
+export const aiRefineTask = (taskId: string) =>
+  authApi.post<{ description: string; storyPoints: number | null }>(
     API_ENDPOINTS.projects.aiRefine(taskId),
-    {},
-    {
-      auth: true,
-    },
   );
-}
 
-export async function getTaskIntelligence(taskId: string): Promise<{
-  suggestions: { labels: string[]; priority: string | null };
-  duplicates: { id: string; title: string; score: number }[];
-}> {
-  return apiGet<{
+export const getTaskIntelligence = (taskId: string) =>
+  authApi.get<{
     suggestions: { labels: string[]; priority: string | null };
     duplicates: { id: string; title: string; score: number }[];
-  }>(API_ENDPOINTS.projects.aiIntelligence(taskId), { auth: true });
-}
+  }>(API_ENDPOINTS.projects.aiIntelligence(taskId));

@@ -1,97 +1,67 @@
 # Kiến Trúc Hệ Thống SuperBoard 🏗️
 
-Tài liệu này mô tả chi tiết cách SuperBoard được xây dựng, các công nghệ sử dụng và cách các thành phần phối hợp với nhau. Mục tiêu là giúp bạn hiểu nhanh cấu trúc để có thể bắt đầu phát triển hoặc học tập.
+Tài liệu này cung cấp cái nhìn sâu sắc về cách SuperBoard được thiết kế và vận hành. Đây là một hệ thống **Modern Monorepo** với kiến trúc phân tầng rõ rệt, đảm bảo tính mở rộng và dễ bảo trì.
 
 ---
 
-## 1. Tổng Quan Kiến Trúc (High-Level)
+## 1. Mô Hình Monorepo (Turborepo) 🚀
 
-SuperBoard được xây dựng theo mô hình **Monorepo** (một kho chứa nhiều ứng dụng). Chúng ta sử dụng **Turborepo** để quản lý việc chạy và build các ứng dụng này một cách hiệu quả.
+SuperBoard không phải là một project đơn lẻ, mà là một hệ sinh thái các ứng dụng phối hợp với nhau. Chúng ta sử dụng **Turborepo** để:
 
-Hệ thống bao gồm các thành phần chính:
-
-- **Frontend (Web)**: Giao diện người dùng hiện đại, tương tác mượt mà.
-- **Backend (API)**: Trung tâm xử lý logic nghiệp vụ và dữ liệu.
-- **Microservices**: Các dịch vụ nhỏ chuyên biệt (Automation, AI, Collaboration).
-- **Shared Packages**: Các thư viện dùng chung cho toàn bộ dự án.
+- **Tối ưu hóa Build & Test:** Chỉ chạy lại những phần có thay đổi.
+- **Quản lý Dependencies:** Đồng bộ hóa phiên bản thư viện trên toàn bộ các app.
+- **Chia sẻ mã nguồn:** Tái sử dụng logic nghiệp vụ và kiểu dữ liệu dễ dàng qua thư mục `packages/`.
 
 ---
 
-## 2. Công Nghệ Sử Dụng (Tech Stack)
+## 2. Chi Tiết Các Thành Phần (Apps & Services) 📂
 
-### Core
+### 🏛️ Backend Ecosystem (NestJS & Python)
 
-- **Quản lý Monorepo**: [Turborepo](https://turbo.build/)
-- **Ngôn ngữ**: TypeScript (Đảm bảo an toàn kiểu dữ liệu)
+- **API chính (`apps/api`):** Trái tim của hệ thống. Xử lý Auth, Workspace, Project, Task. Sử dụng **Prisma** làm ORM để tương tác với PostgreSQL.
+- **Automation Service (`apps/automation`):** Chuyên trách các "Rules" tự động. Tách biệt khỏi API chính để không ảnh hưởng đến hiệu năng khi xử lý logic phức tạp.
+- **Notification Service (`apps/notification`):** Quản lý luồng gửi Email và thông báo In-app thông qua hàng đợi **BullMQ**.
+- **Collaboration Service (`apps/collab-service`):** Dịch vụ đặc thù cho việc soạn thảo đồng thời (Notion-style), sử dụng **Hocuspocus** và thuật toán **Yjs (CRDT)**.
+- **Real-time Engine (`apps/collaboration`):** Xử lý kết nối Socket.io, đồng bộ hóa trạng thái tức thì giữa các người dùng.
+- **AI Service (`apps/ai-service`):** Microservice Python (FastAPI) cung cấp khả năng tìm kiếm ngữ nghĩa và tóm tắt thông tin qua LLMs.
 
-### Backend (Dịch vụ chính)
+### 🎨 Frontend (Next.js App Router)
 
-- **Framework**: [NestJS](https://nestjs.com/) (Kiến trúc modular, dễ mở rộng)
-- **ORM**: [Prisma](https://www.prisma.io/) (Làm việc với Database một cách hiện đại)
-- **Database**: PostgreSQL
-- **Hàng đợi (Queue)**: [BullMQ](https://docs.bullmq.io/) + Redis (Xử lý các tác vụ chạy ngầm như gửi email, automation)
-
-### Frontend
-
-- **Framework**: [Next.js](https://nextjs.org/) (App Router)
-- **Styling**: Vanilla CSS & TailwindCSS
-- **Quản lý dữ liệu**: [TanStack Query (React Query)](https://tanstack.com/query/latest) - Giúp đồng bộ dữ liệu server và client cực nhanh.
-
-### AI & Services khác
-
-- **AI Service**: Python ([FastAPI](https://fastapi.tiangolo.com/)) - Xử lý các tính năng thông minh như tìm kiếm ngữ nghĩa, tóm tắt task.
-- **Real-time**: WebSockets (Cho phép chat và cập nhật dữ liệu tức thì).
+- **Kiến trúc Feature-based:** Mã nguồn trong `apps/web` được tổ chức theo tính năng (Features) thay vì loại file, giúp quản lý code dễ dàng khi dự án phình to.
+- **Data Layer:** Sử dụng **TanStack Query** làm lớp đệm dữ liệu giữa UI và Server, hỗ trợ Cache và Optimistic Updates mạnh mẽ.
 
 ---
 
-## 3. Cấu Trúc Thư Mục 📂
+## 3. Các Nguyên Tắc Kiến Trúc Cốt Lõi 🛠️
 
-```text
-.
-├── apps/                   # Các ứng dụng chính
-│   ├── api/                # Backend chính (NestJS)
-│   ├── web/                # Frontend chính (Next.js)
-│   ├── ai-service/         # Dịch vụ AI (Python/FastAPI)
-│   ├── automation/         # Xử lý tự động hóa (NestJS + BullMQ)
-│   ├── collaboration/      # Tính năng cộng tác thời gian thực
-│   └── notification/       # Dịch vụ gửi thông báo (Email, Push)
-├── packages/               # Các thư viện dùng chung
-│   ├── shared/             # Định nghĩa dữ liệu (DTOs) và Types dùng cho cả Web & API
-│   └── config-ts/          # Cấu hình TypeScript dùng chung
-├── docker/                 # Cấu hình hạ tầng (Database, Redis, MailHog)
-└── scripts/                # Các script hỗ trợ setup và bảo trì dự án
-```
+### A. Quy tắc Ranh giới (Boundary Rules)
 
----
+- **Shared Contracts:** Mọi giao tiếp dữ liệu giữa Web và API đều phải thông qua các DTO được định nghĩa trong `packages/shared`. Điều này đảm bảo "Type-safety" tuyệt đối.
+- **Domain Decoupling:** Các module (như Task, Chat, Auth) được thiết kế để ít phụ thuộc trực tiếp vào nhau nhất có thể, thường giao tiếp qua Sự kiện (Events).
 
-## 4. Các Nguyên Tắc Thiết Kế (Key Patterns)
+### B. Kiến Trúc Đa Tầng (Layered Architecture) o API
 
-### Kiến Trúc Đa Tầng (Layered Architecture) o API
+1. **Controller Layer:** Chỉ tiếp nhận Request, Validate dữ liệu sơ bộ và gọi Service.
+2. **Business Logic Layer (Service):** Nơi thực hiện các quy tắc nghiệp vụ, kiểm tra quyền hạn.
+3. **Data Access Layer (Prisma):** Tương tác với Database.
 
-Mọi logic trong `apps/api` thường đi qua 3 tầng:
+### C. Cơ Chế Xử Lý Bất Đồng Bộ (Background Processing)
 
-1. **Controller**: Tiếp nhận yêu cầu từ người dùng (HTTP Request).
-2. **Service**: Xử lý logic nghiệp vụ chính (Ví dụ: kiểm tra quyền, tính toán dữ liệu).
-3. **Prisma/Repository**: Tương tác trực tiếp với Database.
-
-### Shared DTOs (Data Transfer Objects)
-
-Chúng ta định nghĩa kiểu dữ liệu trong `packages/shared`. Điều này giúp đảm bảo khi Backend thay đổi cấu trúc dữ liệu, Frontend sẽ nhận được thông báo lỗi ngay lập tức, tránh được các lỗi "vặt".
-
-### Optimistic UI
-
-Ở phía Frontend, khi bạn thực hiện một hành động (như chuyển trạng thái task), giao diện sẽ cập nhật **ngay lập tức** trước khi server phản hồi. Nếu có lỗi, hệ thống sẽ tự động quay lại trạng thái cũ (rollback). Điều này tạo cảm giác ứng dụng cực kỳ nhanh.
+Để đảm bảo API luôn phản hồi dưới 100ms, các tác vụ nặng (như gửi Email, đánh chỉ mục tìm kiếm) luôn được đẩy vào **Redis Queue (BullMQ)** để xử lý sau.
 
 ---
 
-## 5. Luồng Dữ Liệu Ví Dụ
+## 4. Luồng Vận Hành Thực Tế 🔄
 
-1. Người dùng nhấn "Hoàn thành Task" trên giao diện **Web**.
-2. **Web** gửi yêu cầu đến **API** đồng thời cập nhật giao diện ngay lập tức (Optimistic UI).
-3. **API** kiểm tra quyền hạn, lưu vào Database qua **Prisma**.
-4. **API** đẩy một sự kiện vào **Redis (BullMQ)**.
-5. **Automation Service** nhận sự kiện, tự động gửi thông báo qua **Notification Service**.
+1. **Thao tác người dùng:** Người dùng nhấn "Hoàn thành Task".
+2. **Optimistic Update:** Frontend hiển thị Task đã hoàn thành ngay lập tức.
+3. **API Processing:** API nhận yêu cầu, cập nhật Database qua Prisma Transaction.
+4. **Event Dispatch:** API đẩy sự kiện `task.completed` vào Redis.
+5. **Background Workers:**
+   - `Automation Service` kiểm tra xem có cần chuyển task tiếp theo hay không.
+   - `Notification Service` gửi mail cho Project Manager.
+   - `Search Service` cập nhật lại chỉ mục tìm kiếm.
 
 ---
 
-_Tài liệu này nhằm giúp bạn có cái nhìn tổng quát. Để đi sâu vào từng phần, hãy đọc README trong từng thư mục con._
+_Tài liệu này được thiết kế để bạn có thể nắm bắt nhanh "linh hồn" của dự án. Để bắt đầu code, hãy đọc thêm file `README.md` trong từng thư mục app._

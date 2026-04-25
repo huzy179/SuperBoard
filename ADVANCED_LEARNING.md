@@ -1,78 +1,120 @@
-# Lộ Trình Học Tập Nâng Cao Cùng SuperBoard 🚀
+# Lộ Trình Học Tập & Phát Triển Tính Năng Nâng Cao 🚀
 
-Chào mừng bạn đến với phần thú vị nhất! SuperBoard không chỉ là một ứng dụng quản lý công việc, mà là một "phòng thí nghiệm" để bạn thực hành các kỹ thuật lập trình hiện đại.
-
-Dưới đây là các chủ đề bạn có thể đào sâu để nâng cấp kỹ năng từ một lập trình viên cơ bản lên chuyên nghiệp (Production-grade).
+Tài liệu này tổng hợp các tính năng nâng cao bạn có thể học và tự thực hiện trong dự án SuperBoard. Mục tiêu là nâng cấp dự án từ một bản clone Jira cơ bản lên một nền tảng quy mô Production-grade.
 
 ---
 
-## 🛑 Giai Đoạn 1: Làm Chủ Nền Tảng
+## 1. Quản Trị Workspace & Quyền Truy Cập Nâng Cao 🔐
 
-### 1. Monorepo với Turborepo
+Việc quản lý quyền hạn không chỉ dừng lại ở việc đăng nhập, mà còn là kiểm soát sâu các hành động:
 
-- **Mục tiêu**: Hiểu cách quản lý nhiều project trong một repo.
-- **Thực hành**: Thử tạo một package mới trong thư mục `packages/` và sử dụng nó trong cả `apps/api` và `apps/web`.
-- **Câu hỏi**: Tại sao dùng Monorepo lại giúp team phát triển nhanh hơn?
-
-### 2. Type Safety Tuyệt Đối
-
-- **Mục tiêu**: Không bao giờ dùng `any` trong TypeScript.
-- **Thực hành**: Sử dụng thư viện Validation (như Zod hoặc Class-validator) để đảm bảo dữ liệu từ người dùng luôn đúng cấu trúc trước khi xử lý.
-
----
-
-## 🔥 Giai Đoạn 2: Nâng Cao Hiệu Năng & Trải Nghiệm
-
-### 3. Real-time Collaboration (Cộng tác tức thời)
-
-- **Mục tiêu**: Hiểu về WebSockets và SSE.
-- **Thực hành**: Cài đặt tính năng "Typing Indicator" (hiển thị ai đang gõ comment) hoặc thông báo nhảy lên ngay lập tức khi có người giao task cho bạn.
-
-### 4. Caching & Background Jobs
-
-- **Mục tiêu**: Làm ứng dụng nhanh hơn bằng cách đẩy các tác vụ nặng ra sau.
-- **Thực hành**:
-  - Dùng **Redis** để lưu các kết quả tính toán phức tạp (như báo cáo tiến độ dự án).
-  - Dùng **BullMQ** để xử lý gửi Email hàng loạt mà không làm nghẽn API chính.
-
-### 5. Search Thông Minh (Semantic Search)
-
-- **Mục tiêu**: Tìm kiếm không chỉ theo từ khóa mà theo ý nghĩa.
-- **Thực hành**: Tìm hiểu cách đưa dữ liệu task vào một **Vector Database** và dùng AI để tìm kiếm. (Xem module `apps/ai-service`).
+- **Quản trị đa vai trò (Multi-role governance):**
+  - Triển khai cơ chế chuyển nhượng chủ sở hữu (Transfer Owner) cho workspace.
+  - Cho phép cấu hình chính sách vai trò (Policy roles) tùy chỉnh cho từng workspace (RBAC + Custom roles).
+- **Vòng đời thành viên (Member lifecycle):**
+  - Hệ thống mời qua Email với Token có thời hạn.
+  - Quản lý các trạng thái: Đang chờ (Pending), Đã chấp nhận (Accepted), Đã hủy (Revoked).
+  - Hệ thống Nhật ký kiểm soát (Audit log) cho mọi hành động thêm/xóa/đổi quyền thành viên.
+  - Luồng rời khỏi workspace (Leave workspace) với các quy tắc bảo vệ chủ sở hữu.
+- **Kiến trúc bảo vệ phạm vi (Scope guard architecture):**
+  - Tách biệt các Helper kiểm tra quyền theo module (Workspace, Project, Task).
+  - Xây dựng ma trận kiểm thử (Test matrix) cho các vai trò: Owner, Admin, Member, Viewer.
 
 ---
 
-## 🛡️ Giai Đoạn 3: Hệ Thống Chuyên Nghiệp
+## 2. Công Cụ Quy Trình Dự Án (Project Workflow Engine) ⚙️
 
-### 6. RBAC & Security (Phân quyền & Bảo mật)
+Biến các task tĩnh thành một quy trình làm việc linh hoạt:
 
-- **Mục tiêu**: Quản lý quyền truy cập phức tạp.
-- **Thực hành**: Thiết kế hệ thống phân quyền sao cho: `Viewer` chỉ được xem, `Member` được tạo task, và `Admin` được mời người khác vào Workspace.
-
-### 7. Observability (Khả năng quan sát)
-
-- **Mục tiêu**: Biết chuyện gì đang xảy ra khi hệ thống gặp lỗi.
-- **Thực hành**:
-  - Cài đặt Logging tập trung (ví dụ: dùng Pino).
-  - Gắn `Correlation ID` vào mỗi request để theo dõi luồng đi của dữ liệu qua nhiều service.
-
----
-
-## 🛠️ Bài Tập Gợi Ý (Challenge dành cho bạn)
-
-1. **Dễ**: Thêm tính năng "Soft Delete" cho Task (Khi xóa không mất hẳn trong DB mà chỉ đánh dấu đã xóa).
-2. **Trung bình**: Cài đặt tính năng `@mention` trong comment và gửi thông báo cho người được nhắc đến.
-3. **Khó**: Xây dựng tính năng "Activity Timeline" (nhật ký thay đổi) cho từng Task bằng cách sử dụng **Event Sourcing** đơn giản.
+- **Mẫu quy trình (Workflow template):**
+  - Cho phép tạo bộ chuyển đổi trạng thái (Status transition) riêng cho từng workspace.
+  - Cơ chế sao chép mẫu (Clone template) khi tạo dự án mới.
+- **Chuyển đổi dựa trên quy tắc (Rule-based transition):**
+  - Ngăn chặn chuyển trạng thái nếu không thỏa mãn điều kiện (Ví dụ: Chỉ Admin mới được đóng task, hoặc task phải có người thực hiện mới được chuyển sang In Progress).
+- **Lịch sử sự kiện (Event sourcing nhẹ):**
+  - Lưu trữ `TaskEvent` đầy đủ cho mọi thay đổi (Trạng thái, Người thực hiện, Bình luận).
+  - Sử dụng dữ liệu này để tái tạo lại dòng thời gian (Timeline) của công việc.
 
 ---
 
-## 📚 Tài liệu tham khảo nên đọc
+## 3. Bình Luận & Cộng Tác Thời Gian Thực 💬
 
-- [NestJS Documentation](https://docs.nestjs.com/)
-- [Next.js App Router Guide](https://nextjs.org/docs)
-- [Prisma Best Practices](https://www.prisma.io/docs/guides)
-- [Twelve-Factor App](https://12factor.net/vi/) (Nguyên tắc xây dựng ứng dụng hiện đại)
+Mang lại trải nghiệm mượt mà như các ứng dụng chat hiện đại:
+
+- **Bình luận thời gian thực (Real-time comments):**
+  - Sử dụng WebSocket hoặc SSE để đẩy bình luận mới ngay lập tức.
+  - Hiển thị thông báo khi có người đang gõ (Typing indicator) và Optimistic UI.
+- **Hệ thống nhắc tên (Mention system):**
+  - Phân tích cú pháp `@username` trong nội dung và gửi thông báo cho người được nhắc đến.
+  - Liên kết trực tiếp (Deep-link) đến đúng task và bình luận đó.
+- **Soạn thảo phong phú & Kiểm duyệt:**
+  - Hỗ trợ Markdown và cơ chế làm sạch dữ liệu (Sanitize XSS).
+  - Chính sách chỉnh sửa/xóa bình luận với cơ chế Xóa mềm (Soft-delete).
 
 ---
 
-_Hãy nhớ: Cách học tốt nhất là bắt tay vào code. Chúc bạn có những trải nghiệm thú vị với SuperBoard!_
+## 4. Chiến Lược Hiệu Năng & Dữ Liệu ⚡
+
+Đảm bảo ứng dụng chạy nhanh ngay cả khi dữ liệu lớn:
+
+- **Tối ưu hóa truy vấn (Query optimization):**
+  - Triển khai Phân trang theo con trỏ (Cursor pagination) cho danh sách task và bình luận.
+  - Xây dựng bộ chỉ mục (Index) thông minh dựa trên hành vi truy vấn thực tế.
+- **Chiến lược Caching:**
+  - Sử dụng Redis để lưu trữ các chỉ số Dashboard thường xuyên truy cập.
+  - Cơ chế tự động làm mới cache (Invalidation) dựa trên sự kiện.
+- **Ranh giới API (API Boundary):**
+  - Kiểm tra dữ liệu đầu vào (DTO validation) chặt chẽ bằng Zod.
+  - Chuẩn hóa cấu trúc phản hồi (Response envelope) và bản đồ mã lỗi (Error code map).
+
+---
+
+## 5. Tìm Kiếm & Nâng Cấp AI 🤖
+
+Tận dụng sức mạnh của trí tuệ nhân tạo:
+
+- **Tìm kiếm ngữ nghĩa (Semantic search):**
+  - Đánh chỉ mục Task và Bình luận vào Vector Store (Sử dụng pgvector).
+  - Kết hợp tìm kiếm theo từ khóa truyền thống và tìm kiếm theo ý nghĩa.
+- **Trợ lý AI (AI Assistant):**
+  - Tự động tóm tắt tiến độ theo Dự án hoặc Sprint.
+  - Gợi ý hành động tiếp theo từ dữ liệu các task quá hạn.
+- **An toàn cho AI:**
+  - Thiết lập ranh giới cho Prompt (Guardrails).
+  - Hệ thống lưu nhật ký và vòng lặp phản hồi để cải thiện chất lượng AI.
+
+---
+
+## 6. Độ Tin Cậy, Bảo Mật & Khả Năng Quan Sát 🛡️
+
+Xây dựng nền tảng vững chắc cho việc vận hành:
+
+- **Thắt chặt bảo mật (Security hardening):**
+  - Giới hạn tần suất gọi API (Rate limit) cho các endpoint nhạy cảm.
+  - Kiểm tra quyền hai lớp ở tầng Service.
+- **Độ tin cậy (Reliability):**
+  - Áp dụng Outbox Pattern để đảm bảo thông báo/sự kiện không bị mất khi hệ thống lỗi.
+  - Chính sách thử lại (Retry policy) và Idempotency key cho các hành động quan trọng.
+- **Khả năng quan sát (Observability):**
+  - Log có cấu trúc gắn liền với `requestId`.
+  - Theo dõi các chỉ số quan trọng (Latency p95, Error rate, Throughput).
+
+---
+
+## 🛠️ Danh Sách Bài Tập Thực Hành (Challenges)
+
+Hãy thử sức với các bài tập dưới đây theo thứ tự độ khó tăng dần:
+
+1. ✅ **Chuyển nhượng Workspace**: Viết endpoint và test matrix cho việc đổi Owner.
+2. ✅ **Mời thành viên**: Tạo hệ thống mời qua link/email có thời hạn.
+3. ✅ **Stream Bình luận**: Bật kết nối thời gian thực cho một task cụ thể.
+4. ✅ **Phân trang nâng cao**: Thay đổi Limit/Offset sang Cursor pagination cho Comments.
+5. ✅ **Workflow Template**: Xây dựng bộ quản lý quy trình trạng thái tổng quát.
+6. ✅ **Hệ thống Mention**: Hoàn thiện tính năng `@mention` và gửi thông báo.
+7. ✅ **Báo cáo & Xuất dữ liệu**: Tính toán chỉ số sức khỏe dự án và xuất file JSON/CSV.
+8. ✅ **AI Semantic Search**: Tích hợp Vector Search để tìm kiếm task thông minh.
+9. 🚀 **Thử thách tiếp theo**: Triển khai Collaborative Real-time Editing (Soạn thảo đồng thời) cho phần Tài liệu (Docs).
+
+---
+
+_Hành trình phát triển SuperBoard là cách tốt nhất để bạn làm chủ các công nghệ Fullstack hiện đại. Hãy bắt đầu từ những module bạn yêu thích nhất!_

@@ -1,9 +1,26 @@
 import assert from 'node:assert/strict';
 import { NotFoundException } from '@nestjs/common';
 import { describe, it } from 'node:test';
-import { ProjectService } from '../../src/modules/project/project.service';
+import { TaskService } from '../../src/modules/task/task.service';
 
 type PrismaMock = Record<string, unknown>;
+
+// Minimal no-op mocks for unused dependencies
+const noopNotificationService = { createNotification: async () => undefined };
+const noopWorkflowService = {
+  validateTransition: async () => undefined,
+  cloneWorkspaceTemplateToProject: async () => undefined,
+};
+const noopAiService = {
+  getEmbedding: async () => [],
+  logSignal: async () => true,
+};
+const noopRedisService = {
+  del: async () => undefined,
+  getJson: async () => null,
+  setJson: async () => undefined,
+};
+const noopAutomationService = { handleTaskEvent: async () => undefined };
 
 describe('ProjectService', () => {
   it('createTaskForProject persists provided workflow status key', async () => {
@@ -32,6 +49,10 @@ describe('ProjectService', () => {
             assigneeId: null,
             assignee: null,
             labels: [],
+            attachments: [],
+            projectId: 'project-1',
+            parentTaskId: null,
+            deletedAt: null,
             createdAt: new Date(),
             updatedAt: new Date(),
           };
@@ -45,7 +66,14 @@ describe('ProjectService', () => {
       },
     } satisfies PrismaMock;
 
-    const service = new ProjectService(prisma as never, {} as never);
+    const service = new TaskService(
+      prisma as never,
+      noopAiService as never,
+      noopNotificationService as never,
+      noopWorkflowService as never,
+      noopRedisService as never,
+      noopAutomationService as never,
+    );
 
     const result = await service.createTaskForProject({
       projectId: 'project-1',
@@ -68,7 +96,8 @@ describe('ProjectService', () => {
         findFirst: async () => ({ id: 'project-1' }),
       },
       task: {
-        findFirst: async () => null,
+        findFirst: async () => ({ id: 'task-1' }),
+        findUnique: async () => null,
         update: async () => {
           updateCalled = true;
           return {
@@ -77,8 +106,18 @@ describe('ProjectService', () => {
             description: null,
             status: 'in_review',
             priority: 'medium',
+            type: 'task',
+            number: 7,
+            storyPoints: null,
+            position: '7000',
             dueDate: null,
             assigneeId: null,
+            assignee: null,
+            labels: [],
+            attachments: [],
+            projectId: 'project-1',
+            parentTaskId: null,
+            deletedAt: null,
             createdAt: new Date(),
             updatedAt: new Date(),
           };
@@ -86,7 +125,14 @@ describe('ProjectService', () => {
       },
     } satisfies PrismaMock;
 
-    const service = new ProjectService(prisma as never, {} as never);
+    const service = new TaskService(
+      prisma as never,
+      noopAiService as never,
+      noopNotificationService as never,
+      noopWorkflowService as never,
+      noopRedisService as never,
+      noopAutomationService as never,
+    );
 
     await assert.rejects(
       () =>
@@ -120,7 +166,16 @@ describe('ProjectService', () => {
       },
     } satisfies PrismaMock;
 
-    const service = new ProjectService(prisma as never, {} as never);
+    // Import ProjectService for this test since it's a project-level operation
+    const { ProjectService } = await import('../../src/modules/project/project.service');
+    const service = new ProjectService(
+      prisma as never,
+      noopNotificationService as never,
+      noopWorkflowService as never,
+      noopAiService as never,
+      noopRedisService as never,
+      noopAutomationService as never,
+    );
 
     await service.archiveProjectForWorkspace({
       projectId: 'project-1',
@@ -149,13 +204,20 @@ describe('ProjectService', () => {
             actorId: 'user-1',
             createdAt: now,
             payload: { from: 'todo', to: 'in_progress' },
-            actor: { fullName: 'Nguyễn Văn A' },
+            actor: { fullName: 'Nguyễn Văn A', avatarColor: null },
           },
         ],
       },
     } satisfies PrismaMock;
 
-    const service = new ProjectService(prisma as never, {} as never);
+    const service = new TaskService(
+      prisma as never,
+      noopAiService as never,
+      noopNotificationService as never,
+      noopWorkflowService as never,
+      noopRedisService as never,
+      noopAutomationService as never,
+    );
 
     const history = await service.getTaskHistoryForProject({
       projectId: 'project-1',

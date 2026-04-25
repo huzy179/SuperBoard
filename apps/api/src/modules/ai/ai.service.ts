@@ -5,6 +5,9 @@ import { RedisService } from '../../common/redis.service';
 import * as crypto from 'crypto';
 import { Metadata } from '@grpc/grpc-js';
 import { getRequestContext } from '../../common/request-context';
+import { AI_CLIENT_CONFIG } from './ai-client.config';
+import { withRetry } from './ai-retry.util';
+import { getAiFallback } from './ai-fallback.handler';
 
 interface SummarizeRequest {
   task_id: string;
@@ -15,18 +18,32 @@ interface SummarizeResponse {
   summary: string;
 }
 
+interface GrpcCallOptions {
+  deadline?: Date;
+}
+
 interface AIService {
-  SummarizeTask(data: SummarizeRequest, metadata?: Metadata): Observable<SummarizeResponse>;
-  GetEmbedding(data: { text: string }, metadata?: Metadata): Observable<{ embedding: number[] }>;
+  SummarizeTask(
+    data: SummarizeRequest,
+    metadata?: Metadata,
+    options?: GrpcCallOptions,
+  ): Observable<SummarizeResponse>;
+  GetEmbedding(
+    data: { text: string },
+    metadata?: Metadata,
+    options?: GrpcCallOptions,
+  ): Observable<{ embedding: number[] }>;
   SummarizeChat(
     data: {
       messages: { author: string; content: string; created_at: string }[];
     },
     metadata?: Metadata,
+    options?: GrpcCallOptions,
   ): Observable<{ result: string }>;
   GenerateAutomationRule(
     data: { prompt: string },
     metadata?: Metadata,
+    options?: GrpcCallOptions,
   ): Observable<{ result: string }>;
   SuggestLabels(
     data: {
@@ -35,14 +52,17 @@ interface AIService {
       existing_labels: string[];
     },
     metadata?: Metadata,
+    options?: GrpcCallOptions,
   ): Observable<{ labels: string[] }>;
   SuggestPriority(
     data: { title: string; description: string },
     metadata?: Metadata,
+    options?: GrpcCallOptions,
   ): Observable<{ priority: string }>;
   ProcessText(
     data: { text: string; mode: string },
     metadata?: Metadata,
+    options?: GrpcCallOptions,
   ): Observable<{ result: string }>;
   LogSignal(
     data: {
@@ -51,10 +71,12 @@ interface AIService {
       context_json: string;
     },
     metadata?: Metadata,
+    options?: GrpcCallOptions,
   ): Observable<{ success: boolean }>;
   ArchitectProject(
     data: { goal: string },
     metadata?: Metadata,
+    options?: GrpcCallOptions,
   ): Observable<{ project_json: string }>;
   GenerateTrainingDataset(
     data: {
@@ -62,6 +84,7 @@ interface AIService {
       limit: number;
     },
     metadata?: Metadata,
+    options?: GrpcCallOptions,
   ): Observable<{ dataset_json: string }>;
 }
 
@@ -88,6 +111,10 @@ export class AiService implements OnModuleInit {
     return metadata;
   }
 
+  private buildDeadline(): Date {
+    return new Date(Date.now() + AI_CLIENT_CONFIG.timeout);
+  }
+
   private generateCacheKey(prefix: string, ...parts: string[]): string {
     const raw = parts.map((p) => p.trim()).join('|');
     const hash = crypto.createHash('sha256').update(raw).digest('hex');
@@ -101,15 +128,22 @@ export class AiService implements OnModuleInit {
 
     try {
       const content = `Title: ${title}\nDescription: ${description}`;
-      const result = await firstValueFrom(
-        this.aiServiceClient.SummarizeTask({ task_id: taskId, content }, this.buildGrpcMetadata()),
+      const result = await withRetry(() =>
+        firstValueFrom(
+          this.aiServiceClient.SummarizeTask(
+            { task_id: taskId, content },
+            this.buildGrpcMetadata(),
+            { deadline: this.buildDeadline() },
+          ),
+        ),
       );
 
       await this.redis.setJson(cacheKey, result.summary, 60 * 60 * 24 * 7); // 7 days TTL
       return result.summary;
     } catch (error) {
       this.logger.error('AI Summarization failed', error);
-      return 'Không thể tạo bản tóm tắt lúc này.';
+      const fallback = getAiFallback('summarize');
+      return fallback.summary ?? 'Không thể tạo bản tóm tắt lúc này.';
     }
   }
 
@@ -119,8 +153,12 @@ export class AiService implements OnModuleInit {
     if (cached) return cached;
 
     try {
-      const result = await firstValueFrom(
-        this.aiServiceClient.GetEmbedding({ text }, this.buildGrpcMetadata()),
+      const result = await withRetry(() =>
+        firstValueFrom(
+          this.aiServiceClient.GetEmbedding({ text }, this.buildGrpcMetadata(), {
+            deadline: this.buildDeadline(),
+          }),
+        ),
       );
       if (!result?.embedding) {
         throw new Error('Invalid embedding response');
@@ -129,8 +167,8 @@ export class AiService implements OnModuleInit {
       await this.redis.setJson(cacheKey, result.embedding); // Deterministic, no TTL needed
       return result.embedding;
     } catch (error) {
-      this.logger.error('AI Embedding failed', error);
-      throw error; // Rethrow because this is critical for search/sync
+      this.logger.error('AI Embedding failed — returning fallback empty embedding', error);
+      return getAiFallback('embeddings').embedding;
     }
   }
 
@@ -167,8 +205,12 @@ export class AiService implements OnModuleInit {
 
     try {
       if (!this.aiServiceClient) throw new Error('gRPC client not initialized');
-      const result = await firstValueFrom(
-        this.aiServiceClient.ProcessText({ text, mode }, this.buildGrpcMetadata()),
+      const result = await withRetry(() =>
+        firstValueFrom(
+          this.aiServiceClient.ProcessText({ text, mode }, this.buildGrpcMetadata(), {
+            deadline: this.buildDeadline(),
+          }),
+        ),
       );
 
       // Cache for 24 hours for generalized text processing
@@ -271,7 +313,9 @@ export class AiService implements OnModuleInit {
   ): Promise<string> {
     try {
       const result = await firstValueFrom(
-        this.aiServiceClient.SummarizeChat({ messages }, this.buildGrpcMetadata()),
+        this.aiServiceClient.SummarizeChat({ messages }, this.buildGrpcMetadata(), {
+          deadline: this.buildDeadline(),
+        }),
       );
       return result.result;
     } catch (error) {
@@ -283,7 +327,9 @@ export class AiService implements OnModuleInit {
   async generateAutomationRule(prompt: string): Promise<Record<string, unknown> | null> {
     try {
       const result = await firstValueFrom(
-        this.aiServiceClient.GenerateAutomationRule({ prompt }, this.buildGrpcMetadata()),
+        this.aiServiceClient.GenerateAutomationRule({ prompt }, this.buildGrpcMetadata(), {
+          deadline: this.buildDeadline(),
+        }),
       );
       try {
         return JSON.parse(result.result) as Record<string, unknown>;
@@ -338,27 +384,34 @@ export class AiService implements OnModuleInit {
   ): Promise<string[]> {
     try {
       const labels = existingLabels.map((l) => l.name);
-      const result = await firstValueFrom(
-        this.aiServiceClient.SuggestLabels(
-          {
-            title,
-            description,
-            existing_labels: labels,
-          },
-          this.buildGrpcMetadata(),
+      const result = await withRetry(() =>
+        firstValueFrom(
+          this.aiServiceClient.SuggestLabels(
+            {
+              title,
+              description,
+              existing_labels: labels,
+            },
+            this.buildGrpcMetadata(),
+            { deadline: this.buildDeadline() },
+          ),
         ),
       );
       return result.labels;
     } catch (error) {
       this.logger.error('Label suggestion failed', error);
-      return [];
+      return getAiFallback('suggestLabels').labels;
     }
   }
 
   async suggestPriority(title: string, description: string): Promise<string | null> {
     try {
-      const result = await firstValueFrom(
-        this.aiServiceClient.SuggestPriority({ title, description }, this.buildGrpcMetadata()),
+      const result = await withRetry(() =>
+        firstValueFrom(
+          this.aiServiceClient.SuggestPriority({ title, description }, this.buildGrpcMetadata(), {
+            deadline: this.buildDeadline(),
+          }),
+        ),
       );
       return result.priority;
     } catch (error) {
@@ -389,7 +442,9 @@ export class AiService implements OnModuleInit {
   async generateTrainingDataset(format: string, limit: number): Promise<unknown[]> {
     try {
       const result = await firstValueFrom(
-        this.aiServiceClient.GenerateTrainingDataset({ format, limit }, this.buildGrpcMetadata()),
+        this.aiServiceClient.GenerateTrainingDataset({ format, limit }, this.buildGrpcMetadata(), {
+          deadline: this.buildDeadline(),
+        }),
       );
       return JSON.parse(result.dataset_json) as unknown[];
     } catch (error) {
@@ -412,6 +467,7 @@ export class AiService implements OnModuleInit {
             context_json: JSON.stringify(context),
           },
           this.buildGrpcMetadata(),
+          { deadline: this.buildDeadline() },
         ),
       );
       return result.success;
@@ -424,7 +480,9 @@ export class AiService implements OnModuleInit {
   async architectProject(goal: string): Promise<Record<string, unknown>> {
     try {
       const result = await firstValueFrom(
-        this.aiServiceClient.ArchitectProject({ goal }, this.buildGrpcMetadata()),
+        this.aiServiceClient.ArchitectProject({ goal }, this.buildGrpcMetadata(), {
+          deadline: this.buildDeadline(),
+        }),
       );
       return JSON.parse(result.project_json) as Record<string, unknown>;
     } catch (error) {

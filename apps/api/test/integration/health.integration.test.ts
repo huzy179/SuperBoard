@@ -27,14 +27,14 @@ function makeMockResponse() {
 
 const mockConfigService = { get: () => '1.0.0' };
 
-const healthyPrisma = { $queryRaw: async () => [{ '?column?': 1 }] };
+const healthyHealthService = { checkDatabase: async () => undefined };
 const healthyRedis = { ping: async () => 'PONG' };
 const healthyQueue = { isHealthy: async () => true };
 
-function buildController(overrides: { prisma?: object; redis?: object; queue?: object }) {
+function buildController(overrides: { healthService?: object; redis?: object; queue?: object }) {
   return new HealthCheckController(
     mockConfigService as never,
-    (overrides.prisma ?? healthyPrisma) as never,
+    (overrides.healthService ?? healthyHealthService) as never,
     (overrides.redis ?? healthyRedis) as never,
     (overrides.queue ?? healthyQueue) as never,
   );
@@ -74,8 +74,8 @@ describe('HealthCheckController integration', () => {
 
     it('returns 503 when database is not connected', async () => {
       const controller = buildController({
-        prisma: {
-          $queryRaw: async () => {
+        healthService: {
+          checkDatabase: async () => {
             throw new Error('Connection refused');
           },
         },

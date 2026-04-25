@@ -77,7 +77,22 @@ describe('Workflow Status Policy', () => {
         },
       } satisfies Record<string, any>;
 
-      const service = new ProjectService(prisma as any, {} as any, workflowService as any);
+      const noopRedisService = {
+        del: async () => undefined,
+        getJson: async () => null,
+        setJson: async () => undefined,
+      };
+      const noopAiService = { getEmbedding: async () => [], logSignal: async () => true };
+      const noopAutomationService = { handleTaskEvent: async () => undefined };
+
+      const service = new ProjectService(
+        prisma as any,
+        {} as any,
+        workflowService as any,
+        noopAiService as any,
+        noopRedisService as any,
+        noopAutomationService as any,
+      );
 
       await service.createProject('w1', { name: 'New Project' });
       assert.strictEqual(cloneCalled, true);

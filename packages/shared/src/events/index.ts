@@ -5,13 +5,6 @@ export * from './project.events';
 export * from './message.events';
 export * from './user.events';
 
-export * from './base.event';
-export * from './task.events';
-export * from './doc.events';
-export * from './project.events';
-export * from './message.events';
-export * from './user.events';
-
 import type { Doc, Message, Task } from '../types';
 
 export type WebSocketEventMap = {

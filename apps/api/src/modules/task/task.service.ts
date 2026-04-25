@@ -12,6 +12,7 @@ import { NotificationService } from '../notification/notification.service';
 import { WorkflowService } from '../workflow/workflow.service';
 import { RedisService } from '../../common/redis.service';
 import { AutomationService } from '../automation/automation.service';
+import { EventBusService } from '../../common/event-bus/event-bus.service';
 import { Prisma, TaskPriority, TaskType } from '@prisma/client';
 import { logger } from '../../common/logger';
 import {
@@ -20,6 +21,11 @@ import {
   ProjectTaskItemDTO,
   BulkTaskOperationResultDTO,
   TaskHistoryItemDTO,
+  TASK_CREATED,
+  TASK_UPDATED,
+  TASK_STATUS_CHANGED,
+  TASK_EVENT_VERSION,
+  TASK_EVENT_PRODUCER,
 } from '@superboard/shared';
 
 @Injectable()
@@ -31,6 +37,7 @@ export class TaskService {
     private workflowService: WorkflowService,
     private redisService: RedisService,
     private automationService: AutomationService,
+    private eventBus: EventBusService,
   ) {}
 
   private readonly taskSelect = {
@@ -273,6 +280,29 @@ export class TaskService {
       },
     );
 
+    // Emit domain event
+    void this.eventBus
+      .publish({
+        eventId: crypto.randomUUID(),
+        eventType: TASK_CREATED,
+        eventVersion: TASK_EVENT_VERSION,
+        producer: TASK_EVENT_PRODUCER,
+        correlationId: '',
+        idempotencyKey: `task-${TASK_CREATED}-${task.id}-${Date.now()}`,
+        occurredAt: new Date().toISOString(),
+        payload: {
+          taskId: task.id,
+          title: task.title,
+          projectId: task.projectId,
+          workspaceId: input.workspaceId,
+          assigneeId: task.assigneeId ?? undefined,
+          creatorId: input.actorId ?? '',
+          priority: task.priority,
+          labels: task.labels?.map((l) => l.label.id),
+        },
+      })
+      .catch((err: unknown) => logger.error({ err }, 'Failed to emit task.created event'));
+
     return this.toTaskDTO(task);
   }
 
@@ -487,6 +517,55 @@ export class TaskService {
 
     await this.clearDashboardCache(input.workspaceId);
 
+    // Emit task.updated domain event
+    if (changedFields.length > 0) {
+      const changes: Record<string, unknown> = {};
+      for (const field of changedFields) {
+        changes[field] = (input.data as Record<string, unknown>)[field];
+      }
+      void this.eventBus
+        .publish({
+          eventId: crypto.randomUUID(),
+          eventType: TASK_UPDATED,
+          eventVersion: TASK_EVENT_VERSION,
+          producer: TASK_EVENT_PRODUCER,
+          correlationId: '',
+          idempotencyKey: `task-${TASK_UPDATED}-${input.taskId}-${Date.now()}`,
+          occurredAt: new Date().toISOString(),
+          payload: {
+            taskId: input.taskId,
+            projectId: task.projectId,
+            workspaceId: input.workspaceId,
+            updatedBy: input.actorId ?? '',
+            changes,
+          },
+        })
+        .catch((err: unknown) => logger.error({ err }, 'Failed to emit task.updated event'));
+    }
+
+    // Emit task.status_changed domain event if status changed
+    if (input.data.status !== undefined && input.data.status !== existingTask.status) {
+      void this.eventBus
+        .publish({
+          eventId: crypto.randomUUID(),
+          eventType: TASK_STATUS_CHANGED,
+          eventVersion: TASK_EVENT_VERSION,
+          producer: TASK_EVENT_PRODUCER,
+          correlationId: '',
+          idempotencyKey: `task-${TASK_STATUS_CHANGED}-${input.taskId}-${Date.now()}`,
+          occurredAt: new Date().toISOString(),
+          payload: {
+            taskId: input.taskId,
+            projectId: task.projectId,
+            workspaceId: input.workspaceId,
+            oldStatus: existingTask.status,
+            newStatus: input.data.status,
+            changedBy: input.actorId ?? '',
+          },
+        })
+        .catch((err: unknown) => logger.error({ err }, 'Failed to emit task.status_changed event'));
+    }
+
     return this.toTaskDTO(task);
   }
 
@@ -554,6 +633,29 @@ export class TaskService {
     }
 
     await this.clearDashboardCache(input.workspaceId);
+
+    // Emit task.status_changed domain event
+    if (existingTask.status !== input.status) {
+      void this.eventBus
+        .publish({
+          eventId: crypto.randomUUID(),
+          eventType: TASK_STATUS_CHANGED,
+          eventVersion: TASK_EVENT_VERSION,
+          producer: TASK_EVENT_PRODUCER,
+          correlationId: '',
+          idempotencyKey: `task-${TASK_STATUS_CHANGED}-${input.taskId}-${Date.now()}`,
+          occurredAt: new Date().toISOString(),
+          payload: {
+            taskId: input.taskId,
+            projectId: input.projectId,
+            workspaceId: input.workspaceId,
+            oldStatus: existingTask.status,
+            newStatus: input.status,
+            changedBy: input.actorId ?? '',
+          },
+        })
+        .catch((err: unknown) => logger.error({ err }, 'Failed to emit task.status_changed event'));
+    }
 
     return this.toTaskDTO(task);
   }

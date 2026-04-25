@@ -1,3 +1,15 @@
+import type { DomainEvent } from './base.event';
+
+// Event type constants
+export const TASK_CREATED = 'task.created' as const;
+export const TASK_UPDATED = 'task.updated' as const;
+export const TASK_STATUS_CHANGED = 'task.status_changed' as const;
+
+// Event version & producer
+export const TASK_EVENT_VERSION = '1.0' as const;
+export const TASK_EVENT_PRODUCER = 'core-api' as const;
+
+// Payload types
 export interface TaskCreatedPayload {
   taskId: string;
   title: string;
@@ -25,3 +37,8 @@ export interface TaskStatusChangedPayload {
   newStatus: string;
   changedBy: string;
 }
+
+// Typed event interfaces
+export type TaskCreatedEvent = DomainEvent<TaskCreatedPayload>;
+export type TaskUpdatedEvent = DomainEvent<TaskUpdatedPayload>;
+export type TaskStatusChangedEvent = DomainEvent<TaskStatusChangedPayload>;

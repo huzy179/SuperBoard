@@ -4,7 +4,6 @@ import type { NotificationJobDTO } from '@superboard/shared';
 import { PrismaService } from '../../prisma/prisma.service';
 import { QueueService } from '../../common/queue.service';
 import { NotificationGateway } from './notification.gateway';
-import { AiService } from '../ai/ai.service';
 
 @Injectable()
 export class NotificationService {
@@ -12,7 +11,6 @@ export class NotificationService {
     private prisma: PrismaService,
     private queueService: QueueService,
     private gateway: NotificationGateway,
-    private aiService: AiService,
   ) {}
 
   async getNotifications(userId: string, workspaceId: string) {
@@ -49,40 +47,46 @@ export class NotificationService {
     };
   }
 
-  private async analyzeStrategicWeight(
-    type: string,
-    payload: Record<string, unknown>,
-  ): Promise<{ neuralPriority: string; aiSummary: string | null }> {
-    try {
-      const context = `Notification Type: ${type}\nPayload: ${JSON.stringify(payload)}`;
-      const result = await this.aiService.processText(context, 'notification_prioritizer');
-
-      try {
-        const parsed = JSON.parse(result);
-        return {
-          neuralPriority: parsed.priority || 'AMBIENT',
-          aiSummary: parsed.summary || null,
-        };
-      } catch {
-        if (type.includes('mention') || (payload.priority === 'high' && type.includes('delayed'))) {
-          return {
-            neuralPriority: 'STRATEGIC',
-            aiSummary: 'Critical signal detected in Mission Sector.',
-          };
-        }
-        return { neuralPriority: 'AMBIENT', aiSummary: null };
-      }
-    } catch {
-      return { neuralPriority: 'AMBIENT', aiSummary: null };
-    }
-  }
-
   /**
    * Enqueue a typed notification job via BullMQ.
    * Core API enqueues and returns immediately — no delivery logic here.
    */
   async enqueueNotificationJob(job: NotificationJobDTO): Promise<void> {
     await this.queueService.addJob('SEND_NOTIFICATION', job as unknown as Record<string, unknown>);
+  }
+
+  /**
+   * Persist an in-app notification to DB and emit real-time push.
+   * Called by the Notification Service worker via internal endpoint.
+   */
+  async persistInAppNotification(input: {
+    id: string;
+    userId: string;
+    workspaceId: string;
+    type: string;
+    payload: Record<string, unknown>;
+  }) {
+    const notification = await this.prisma.notification.create({
+      data: {
+        userId: input.userId,
+        workspaceId: input.workspaceId,
+        type: input.type,
+        payload: input.payload as Prisma.InputJsonValue,
+        neuralPriority: 'AMBIENT',
+        aiSummary: null,
+      },
+    });
+
+    void this.gateway.emitNotification(input.userId, {
+      id: notification.id,
+      type: notification.type,
+      payload: notification.payload,
+      neuralPriority: notification.neuralPriority,
+      aiSummary: notification.aiSummary,
+      createdAt: notification.createdAt.toISOString(),
+    });
+
+    return notification;
   }
 
   async markAsRead(notificationId: string, userId: string) {
@@ -106,34 +110,25 @@ export class NotificationService {
     payload: Record<string, unknown>;
     correlationId?: string;
   }) {
-    const { neuralPriority, aiSummary } = await this.analyzeStrategicWeight(
-      input.type,
-      input.payload,
-    );
-
-    const notification = await this.prisma.notification.create({
-      data: {
-        userId: input.userId,
-        workspaceId: input.workspaceId,
-        type: input.type,
-        payload: input.payload as Prisma.InputJsonValue,
-        neuralPriority,
-        aiSummary,
-      },
-    });
-
-    // Emit real-time notification (immediate, not delivery)
-    void this.gateway.emitNotification(input.userId, {
-      id: notification.id,
-      type: notification.type,
-      payload: notification.payload,
-      neuralPriority: notification.neuralPriority,
-      aiSummary: notification.aiSummary,
-      createdAt: notification.createdAt.toISOString(),
-    });
-
-    // Enqueue email notification job — fire-and-forget, Core API returns immediately
+    // Enqueue in-app notification job — fire-and-forget, Core API returns immediately.
+    // The Notification Service worker handles DB write and real-time push.
     const { newId } = await import('@superboard/shared');
+    void this.enqueueNotificationJob({
+      id: newId(),
+      correlationId: input.correlationId ?? '',
+      type: 'in-app',
+      recipientId: input.userId,
+      payload: {
+        title: input.type,
+        metadata: {
+          ...input.payload,
+          workspaceId: input.workspaceId,
+        },
+      },
+      createdAt: new Date().toISOString(),
+    });
+
+    // Enqueue email notification job — fire-and-forget
     void this.enqueueNotificationJob({
       id: newId(),
       correlationId: input.correlationId ?? '',

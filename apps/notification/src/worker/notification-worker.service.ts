@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Worker, Job, Queue } from 'bullmq';
 import type { NotificationJobDTO } from '@superboard/shared';
 import Redis from 'ioredis';
+import axios from 'axios';
 import { NotificationMetricsService } from '../metrics/notification-metrics.service';
 
 const QUEUE_NAME = 'notifications';
@@ -17,6 +18,8 @@ export class NotificationWorkerService implements OnModuleInit, OnModuleDestroy 
   private redisClient: Redis | null = null;
   private maxAttempts: number = 5;
   private backlogInterval: NodeJS.Timeout | null = null;
+  private coreApiUrl: string = 'http://localhost:4000';
+  private internalSecret: string = '';
 
   constructor(
     private config: ConfigService,
@@ -26,6 +29,8 @@ export class NotificationWorkerService implements OnModuleInit, OnModuleDestroy 
   async onModuleInit(): Promise<void> {
     const redisUrl = this.config.get<string>('REDIS_URL') ?? 'redis://localhost:6379';
     this.maxAttempts = parseInt(this.config.get<string>('NOTIF_RETRY_MAX') ?? '5', 10);
+    this.coreApiUrl = this.config.get<string>('CORE_API_URL') ?? 'http://localhost:4000';
+    this.internalSecret = this.config.get<string>('INTERNAL_API_SECRET') ?? '';
     this.redisClient = new Redis(redisUrl, { maxRetriesPerRequest: null });
 
     const parsed = new URL(redisUrl);
@@ -133,6 +138,23 @@ export class NotificationWorkerService implements OnModuleInit, OnModuleDestroy 
       jobId: job.id,
       correlationId: job.correlationId,
     });
+
+    // Call Core API internal endpoint to persist the in-app notification to DB
+    const workspaceId = (job.payload.metadata as Record<string, unknown>)?.workspaceId as string;
+    await axios.post(
+      `${this.coreApiUrl}/internal/notifications/in-app`,
+      {
+        id: job.id,
+        userId: job.recipientId,
+        workspaceId: workspaceId ?? '',
+        type: job.payload.title ?? 'notification',
+        payload: job.payload.metadata ?? {},
+      },
+      {
+        headers: { 'x-internal-secret': this.internalSecret },
+        timeout: 5000,
+      },
+    );
   }
 
   private async processEmail(job: NotificationJobDTO): Promise<void> {

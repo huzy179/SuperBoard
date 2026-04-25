@@ -327,7 +327,7 @@ Tech stack: NestJS v11, Prisma v7, PostgreSQL, Redis/BullMQ, gRPC, FastAPI, Dock
     - Expose qua `/metrics` endpoint hoặc BullMQ dashboard
     - _Requirements: 10.6_
 
-- [ ] 6. Checkpoint C — Đảm bảo Epic C hoàn chỉnh
+- [x] 6. Checkpoint C — Đảm bảo Epic C hoàn chỉnh
   - Kiểm tra AI Service calls có timeout, retry, circuit breaker hoạt động
   - Kiểm tra Collaboration Service chạy độc lập, Core API không còn WebSocket gateway
   - Kiểm tra Notification Service enqueue/process flow hoạt động
@@ -337,8 +337,8 @@ Tech stack: NestJS v11, Prisma v7, PostgreSQL, Redis/BullMQ, gRPC, FastAPI, Dock
 <!-- EPIC D — Event-Driven Architecture (Pha 5)                  -->
 <!-- ============================================================ -->
 
-- [ ] 7. Epic D — Event-Driven Architecture (Pha 5)
-  - [ ] 7.1 Tạo Event Taxonomy v1 trong Contract Package
+- [-] 7. Epic D — Event-Driven Architecture (Pha 5)
+  - [x] 7.1 Tạo Event Taxonomy v1 trong Contract Package
     - Đảm bảo `packages/shared/src/events/base.event.ts` có `DomainEvent<T>` interface với fields: `eventId` (ULID), `eventType`, `eventVersion`, `producer`, `correlationId`, `idempotencyKey`, `occurredAt` (ISO8601), `payload`
     - Hoàn thiện tất cả event payload types trong `packages/shared/src/events/`:
       - `task.events.ts`: `task.created`, `task.updated`, `task.status_changed`
@@ -350,19 +350,19 @@ Tech stack: NestJS v11, Prisma v7, PostgreSQL, Redis/BullMQ, gRPC, FastAPI, Dock
     - Cập nhật `packages/shared/CHANGELOG.md` với Event Taxonomy v1 entry
     - _Requirements: 11.1, 11.2, 11.3_
 
-  - [ ] 7.2 Viết property test cho Domain Event Schema Conformance
+  - [x] 7.2 Viết property test cho Domain Event Schema Conformance
     - **Property 11: Domain Event Schema Conformance**
     - Với mọi domain event được emit bởi Core API, event object phải conform với `DomainEvent` base schema: có non-empty `eventId`, `eventType`, `eventVersion`, `producer`, `correlationId`, `idempotencyKey`, `occurredAt`, và `payload` fields.
     - **Validates: Requirements 11.1, 11.2**
 
-  - [ ] 7.3 Tạo EventBus service trong Core API
+  - [x] 7.3 Tạo EventBus service trong Core API
     - Tạo `apps/api/src/common/event-bus/event-bus.service.ts`
     - Implement `publish(event: DomainEvent)` method dùng BullMQ hoặc Redis pub/sub
     - Implement retry policy cho event publishing: transient failures không dẫn đến lost events
     - Khi publish fail sau tất cả retries: log failure với `correlationId` và event payload
     - _Requirements: 12.3, 12.5_
 
-  - [ ] 7.4 Implement domain event producers trong Task domain
+  - [x] 7.4 Implement domain event producers trong Task domain
     - Cập nhật `TaskService` để emit events sau state changes:
       - `task.created` sau khi tạo task thành công
       - `task.updated` sau khi update task
@@ -371,18 +371,18 @@ Tech stack: NestJS v11, Prisma v7, PostgreSQL, Redis/BullMQ, gRPC, FastAPI, Dock
     - Đảm bảo không emit duplicate events trong cùng transaction boundary
     - _Requirements: 12.1, 12.2, 12.4_
 
-  - [ ] 7.5 Implement domain event producers trong Document và Project domains
+  - [x] 7.5 Implement domain event producers trong Document và Project domains
     - Cập nhật Document service để emit `doc.updated`, `doc.version_created`
     - Cập nhật Project service để emit `project.updated`
     - Áp dụng cùng idempotency key pattern
     - _Requirements: 12.1, 12.2, 12.4_
 
-  - [ ] 7.6 Viết property test cho No Duplicate Events Per Transaction
+  - [x] 7.6 Viết property test cho No Duplicate Events Per Transaction
     - **Property 12: No Duplicate Events Per Transaction**
     - Với mọi single state-change operation (ví dụ: một task status update), Core API phải emit đúng một domain event với unique `idempotencyKey`. Replay cùng operation với cùng transaction context không được produce event thứ hai với cùng idempotency key.
     - **Validates: Requirements 12.4**
 
-  - [ ] 7.7 Implement AI Service event consumer
+  - [-] 7.7 Implement AI Service event consumer
     - Tạo event consumer trong `apps/ai-service/` để subscribe tới Event Bus
     - Consume events: `task.created`, `task.updated`, `doc.updated`
     - Trigger enrichment actions (summarize, score, suggest) async — không cần synchronous call từ Core API
@@ -390,30 +390,30 @@ Tech stack: NestJS v11, Prisma v7, PostgreSQL, Redis/BullMQ, gRPC, FastAPI, Dock
     - Sau khi hết retries → move event tới DLQ
     - _Requirements: 13.1, 13.3_
 
-  - [ ] 7.8 Implement Notification Service event consumer
+  - [~] 7.8 Implement Notification Service event consumer
     - Tạo event consumer trong Notification Service để subscribe tới Event Bus
     - Consume tất cả events trong Event Taxonomy catalog
     - Map event → notification job và enqueue vào BullMQ
     - Implement retry và DLQ handling
     - _Requirements: 13.2, 13.3_
 
-  - [ ] 7.9 Viết property test cho Failed Events Route to DLQ After Max Retries
+  - [~] 7.9 Viết property test cho Failed Events Route to DLQ After Max Retries
     - **Property 13: Failed Events Route to DLQ After Max Retries**
     - Với mọi domain event mà consumer (AI hoặc Notification) consistently fail processing, sau khi hết configured maximum retry attempts, event phải xuất hiện trong Dead-Letter Queue — không bao giờ bị silently dropped.
     - **Validates: Requirements 13.3**
 
-  - [ ] 7.10 Expose consumer metrics cho AI và Notification consumers
+  - [~] 7.10 Expose consumer metrics cho AI và Notification consumers
     - Emit metrics cho mỗi consumer: events processed, success rate, DLQ depth
     - _Requirements: 13.4_
 
-  - [ ] 7.11 Scaffold Search Service và Automation Service (Pha 6 foundation)
+  - [~] 7.11 Scaffold Search Service và Automation Service (Pha 6 foundation)
     - Tạo `apps/search/` NestJS app với event consumer subscribing tới Event Bus
     - Consumer nhận domain events và update search index (mock implementation)
     - Tạo `apps/automation/` NestJS app với event consumer cho automation rules (mock implementation)
     - Đảm bảo Core API không chứa search indexing hoặc automation rule execution logic
     - _Requirements: 17.1, 17.2, 17.4_
 
-  - [ ] 7.12 Viết property test cho Core API Resilience khi downstream unavailable
+  - [~] 7.12 Viết property test cho Core API Resilience khi downstream unavailable
     - **Property 14: Core API Resilience When Downstream Services Are Unavailable**
     - Với mọi Core API request không cần Search hoặc Automation Service data, khi Search Service hoặc Automation Service unavailable, Core API phải trả successful response — không bao giờ propagate downstream unavailability thành Core API failure.
     - **Validates: Requirements 17.3**

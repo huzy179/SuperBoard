@@ -8,6 +8,8 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationService } from '../notification/notification.service';
 import { WorkflowService } from '../workflow/workflow.service';
 import { AutomationService } from '../automation/automation.service';
+import { EventBusService } from '../../common/event-bus/event-bus.service';
+import { PROJECT_UPDATED, PROJECT_EVENT_VERSION, PROJECT_EVENT_PRODUCER } from '@superboard/shared';
 import type {
   CreateProjectRequestDTO,
   DashboardStatsDTO,
@@ -28,6 +30,7 @@ export class ProjectService {
     private aiService: AiService,
     private redisService: RedisService,
     private automationService: AutomationService,
+    private eventBus: EventBusService,
   ) {}
 
   async getProjectsByWorkspace(
@@ -255,6 +258,25 @@ export class ProjectService {
     if (input.data.name !== undefined || input.data.description !== undefined) {
       void this.syncProjectEmbedding(project.id, project.name, project.description || '');
     }
+
+    // Emit project.updated domain event
+    void this.eventBus
+      .publish({
+        eventId: crypto.randomUUID(),
+        eventType: PROJECT_UPDATED,
+        eventVersion: PROJECT_EVENT_VERSION,
+        producer: PROJECT_EVENT_PRODUCER,
+        correlationId: '',
+        idempotencyKey: `project-${PROJECT_UPDATED}-${project.id}-${Date.now()}`,
+        occurredAt: new Date().toISOString(),
+        payload: {
+          projectId: project.id,
+          workspaceId: input.workspaceId,
+          updatedBy: '',
+          changes: input.data as Record<string, unknown>,
+        },
+      })
+      .catch((err: unknown) => logger.error({ err }, 'Failed to emit project.updated event'));
 
     return result;
   }

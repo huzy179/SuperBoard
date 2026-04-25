@@ -32,6 +32,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 import { CommonModule } from './common/common.module';
 import { WorkerModule } from './common/worker.module';
+import { EventBusModule } from './common/event-bus/event-bus.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { WorkerModule } from './common/worker.module';
     }),
     CommonModule,
     WorkerModule,
+    EventBusModule,
     HealthModule,
     AuthModule,
     ProjectModule,

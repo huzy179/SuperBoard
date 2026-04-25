@@ -2,6 +2,13 @@ import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/commo
 import { PrismaService } from '../../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
 import { logger } from '../../common/logger';
+import { EventBusService } from '../../common/event-bus/event-bus.service';
+import {
+  DOC_UPDATED,
+  DOC_VERSION_CREATED,
+  DOC_EVENT_VERSION,
+  DOC_EVENT_PRODUCER,
+} from '@superboard/shared';
 
 @Injectable()
 export class DocService {
@@ -9,6 +16,7 @@ export class DocService {
     private prisma: PrismaService,
     @Inject(forwardRef(() => AiService))
     private aiService: AiService,
+    private eventBus: EventBusService,
   ) {}
 
   async createDoc(
@@ -127,6 +135,31 @@ export class DocService {
       },
     );
 
+    // Emit doc.updated domain event
+    void this.eventBus
+      .publish({
+        eventId: crypto.randomUUID(),
+        eventType: DOC_UPDATED,
+        eventVersion: DOC_EVENT_VERSION,
+        producer: DOC_EVENT_PRODUCER,
+        correlationId: '',
+        idempotencyKey: `doc-${DOC_UPDATED}-${doc.id}-${Date.now()}`,
+        occurredAt: new Date().toISOString(),
+        payload: {
+          docId: doc.id,
+          projectId: '',
+          workspaceId: doc.workspaceId,
+          updatedBy: '',
+          changeType:
+            data.content !== undefined
+              ? 'content'
+              : data.title !== undefined
+                ? 'title'
+                : 'metadata',
+        },
+      })
+      .catch((err: unknown) => logger.error({ err }, 'Failed to emit doc.updated event'));
+
     return doc;
   }
 
@@ -139,13 +172,35 @@ export class DocService {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async createVersion(docId: string, content: any) {
-    return this.prisma.docVersion.create({
+    const version = await this.prisma.docVersion.create({
       data: {
         docId,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         content: content as any,
       },
     });
+
+    // Emit doc.version_created domain event
+    void this.eventBus
+      .publish({
+        eventId: crypto.randomUUID(),
+        eventType: DOC_VERSION_CREATED,
+        eventVersion: DOC_EVENT_VERSION,
+        producer: DOC_EVENT_PRODUCER,
+        correlationId: '',
+        idempotencyKey: `doc-${DOC_VERSION_CREATED}-${docId}-${Date.now()}`,
+        occurredAt: new Date().toISOString(),
+        payload: {
+          docId,
+          versionId: version.id,
+          projectId: '',
+          workspaceId: '',
+          createdBy: '',
+        },
+      })
+      .catch((err: unknown) => logger.error({ err }, 'Failed to emit doc.version_created event'));
+
+    return version;
   }
 
   async getDocVersions(docId: string) {

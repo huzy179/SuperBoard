@@ -56,10 +56,15 @@ npm run dev
 
 Dự án sử dụng **Turborepo** để quản lý các ứng dụng:
 
-- `/apps/web`: Frontend Next.js.
-- `/apps/api`: Backend chính NestJS.
-- `/apps/ai-service`: Dịch vụ AI (Python/FastAPI).
-- `/packages/shared`: Code và định nghĩa dữ liệu dùng chung.
+- [`/apps/web`](./apps/web): Frontend chính (Next.js).
+- [`/apps/api`](./apps/api): Backend cốt lõi (NestJS).
+- [`/apps/automation`](./apps/automation): Xử lý tự động hóa (BullMQ).
+- [`/apps/collaboration`](./apps/collaboration): Kết nối thời gian thực (Socket.io).
+- [`/apps/collab-service`](./apps/collab-service): Soạn thảo cộng tác (Yjs).
+- [`/apps/notification`](./apps/notification): Dịch vụ thông báo (Email, Push).
+- [`/apps/search`](./apps/search): Dịch vụ tìm kiếm dữ liệu.
+- [`/apps/ai-service`](./apps/ai-service): Dịch vụ trí tuệ nhân tạo (FastAPI).
+- [`/packages/shared`](./packages/shared): Định nghĩa dữ liệu và code dùng chung.
 
 ---
 

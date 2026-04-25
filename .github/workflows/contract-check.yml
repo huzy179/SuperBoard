@@ -1,0 +1,40 @@
+name: Contract Integration Gate
+
+on:
+  pull_request:
+    branches: ['**']
+    paths:
+      - 'packages/shared/src/events/**'
+      - 'packages/shared/src/dtos/**'
+
+concurrency:
+  group: contract-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  contract-integration:
+    name: Contract Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Core API integration tests
+        run: npx turbo test:integration --filter=@superboard/api
+
+      - name: Run Notification Service integration tests
+        run: npx turbo test:integration --filter=@superboard/notification
+
+      - name: Run AI Service integration tests
+        run: npx turbo test:integration --filter=@superboard/ai-service

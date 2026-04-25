@@ -29,7 +29,9 @@
     "db:fresh": "npm --workspace @superboard/api run db:fresh",
     "db:reset": "node scripts/db-reset.mjs",
     "db:studio": "npm --workspace @superboard/api run db:studio",
-    "commit": "cz"
+    "commit": "cz",
+    "tech-debt:report": "tsx scripts/tech-debt-report.ts",
+    "tech-debt:report:dry": "tsx scripts/tech-debt-report.ts --dry-run"
   },
   "config": {
     "commitizen": {

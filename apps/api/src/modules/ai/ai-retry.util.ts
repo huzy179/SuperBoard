@@ -4,10 +4,10 @@ export interface RetryOptions {
   maxAttempts: number;
   initialDelayMs: number;
   backoffMultiplier: number;
-  retryableErrors: number[];
+  retryableErrors: readonly number[];
 }
 
-function isRetryableError(error: unknown, retryableErrors: number[]): boolean {
+function isRetryableError(error: unknown, retryableErrors: readonly number[]): boolean {
   if (error && typeof error === 'object' && 'code' in error) {
     return retryableErrors.includes((error as { code: number }).code);
   }

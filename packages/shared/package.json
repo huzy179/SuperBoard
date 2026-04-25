@@ -8,7 +8,7 @@
     "build": "tsc -p tsconfig.json",
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit",
-    "test": "node --test --import tsx src/__tests__/exports.spec.ts src/__tests__/contract-exports.test.ts"
+    "test": "node --test --import tsx src/__tests__/exports.spec.ts src/__tests__/contract-exports.test.ts src/__tests__/contract-breaking.spec.ts"
   },
   "devDependencies": {
     "@superboard/config-ts": "0.1.0"

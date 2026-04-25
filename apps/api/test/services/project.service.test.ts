@@ -21,6 +21,7 @@ const noopRedisService = {
   setJson: async () => undefined,
 };
 const noopAutomationService = { handleTaskEvent: async () => undefined };
+const noopEventBusService = { publish: async () => undefined };
 
 describe('ProjectService', () => {
   it('createTaskForProject persists provided workflow status key', async () => {
@@ -73,6 +74,7 @@ describe('ProjectService', () => {
       noopWorkflowService as never,
       noopRedisService as never,
       noopAutomationService as never,
+      noopEventBusService as never,
     );
 
     const result = await service.createTaskForProject({
@@ -132,6 +134,7 @@ describe('ProjectService', () => {
       noopWorkflowService as never,
       noopRedisService as never,
       noopAutomationService as never,
+      noopEventBusService as never,
     );
 
     await assert.rejects(
@@ -175,6 +178,7 @@ describe('ProjectService', () => {
       noopAiService as never,
       noopRedisService as never,
       noopAutomationService as never,
+      noopEventBusService as never,
     );
 
     await service.archiveProjectForWorkspace({
@@ -217,6 +221,7 @@ describe('ProjectService', () => {
       noopWorkflowService as never,
       noopRedisService as never,
       noopAutomationService as never,
+      noopEventBusService as never,
     );
 
     const history = await service.getTaskHistoryForProject({

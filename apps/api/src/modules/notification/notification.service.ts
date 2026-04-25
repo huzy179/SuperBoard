@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import type { NotificationJobDTO } from '@superboard/shared';
+import { ulid } from '@superboard/shared';
 import { PrismaService } from '../../prisma/prisma.service';
 import { QueueService } from '../../common/queue.service';
 import { NotificationGateway } from './notification.gateway';
@@ -112,9 +113,8 @@ export class NotificationService {
   }) {
     // Enqueue in-app notification job — fire-and-forget, Core API returns immediately.
     // The Notification Service worker handles DB write and real-time push.
-    const { newId } = await import('@superboard/shared');
     void this.enqueueNotificationJob({
-      id: newId(),
+      id: ulid(),
       correlationId: input.correlationId ?? '',
       type: 'in-app',
       recipientId: input.userId,
@@ -130,7 +130,7 @@ export class NotificationService {
 
     // Enqueue email notification job — fire-and-forget
     void this.enqueueNotificationJob({
-      id: newId(),
+      id: ulid(),
       correlationId: input.correlationId ?? '',
       type: 'email',
       recipientId: input.userId,
@@ -171,9 +171,8 @@ export class NotificationService {
     token: string;
   }) {
     // Enqueue email job — fire-and-forget
-    const { newId } = await import('@superboard/shared');
     void this.enqueueNotificationJob({
-      id: newId(),
+      id: ulid(),
       correlationId: '',
       type: 'email',
       recipientId: input.email,

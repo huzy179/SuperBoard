@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "../../.venv/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    "dev": "../../.venv/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload",
+    "test:integration": "python -m pytest tests/ -m integration -v"
   }
 }

@@ -1,0 +1,169 @@
+{
+  "statistics": {
+    "detectionDate": "2026-04-25T16:58:05.759Z",
+    "formats": {
+      "typescript": {
+        "sources": {
+          "/Users/maitranhuy/SuperBoard/apps/notification/src/worker/notification-worker.service.ts": {
+            "lines": 181,
+            "tokens": 1907,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 6,
+            "duplicatedTokens": 73,
+            "percentage": 3.31,
+            "percentageTokens": 3.83,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/notification/src/worker/notification-worker.module.ts": {
+            "lines": 9,
+            "tokens": 89,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/notification/src/worker/event-consumer.service.ts": {
+            "lines": 276,
+            "tokens": 2345,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 6,
+            "duplicatedTokens": 73,
+            "percentage": 2.17,
+            "percentageTokens": 3.11,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/notification/src/metrics/notification-metrics.service.ts": {
+            "lines": 85,
+            "tokens": 689,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/notification/src/metrics/metrics.module.ts": {
+            "lines": 9,
+            "tokens": 82,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/notification/src/metrics/metrics.controller.ts": {
+            "lines": 10,
+            "tokens": 93,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/notification/src/main.ts": {
+            "lines": 11,
+            "tokens": 118,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/notification/src/app.module.ts": {
+            "lines": 15,
+            "tokens": 120,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 596,
+          "tokens": 5443,
+          "sources": 8,
+          "clones": 1,
+          "duplicatedLines": 6,
+          "duplicatedTokens": 73,
+          "percentage": 1.01,
+          "percentageTokens": 1.34,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    },
+    "total": {
+      "lines": 596,
+      "tokens": 5443,
+      "sources": 8,
+      "clones": 1,
+      "duplicatedLines": 6,
+      "duplicatedTokens": 73,
+      "percentage": 1.01,
+      "percentageTokens": 1.34,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    }
+  },
+  "duplicates": [
+    {
+      "format": "typescript",
+      "lines": 7,
+      "fragment": "metrics: NotificationMetricsService,\n  ) {}\n\n  async onModuleInit(): Promise<void> {\n    const redisUrl = this.config.get<string>('REDIS_URL') ?? 'redis://localhost:6379';\n    this.maxAttempts = parseInt(\n      this.config.get<string>('EVENT_CONSUMER_MAX_RETRIES'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/notification/src/worker/event-consumer.service.ts",
+        "start": 45,
+        "end": 51,
+        "startLoc": {
+          "line": 45,
+          "column": 2,
+          "position": 331
+        },
+        "endLoc": {
+          "line": 51,
+          "column": 29,
+          "position": 404
+        }
+      },
+      "secondFile": {
+        "name": "apps/notification/src/worker/notification-worker.service.ts",
+        "start": 26,
+        "end": 31,
+        "startLoc": {
+          "line": 26,
+          "column": 2,
+          "position": 302
+        },
+        "endLoc": {
+          "line": 31,
+          "column": 18,
+          "position": 373
+        }
+      }
+    }
+  ]
+}

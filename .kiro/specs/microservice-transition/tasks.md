@@ -337,7 +337,7 @@ Tech stack: NestJS v11, Prisma v7, PostgreSQL, Redis/BullMQ, gRPC, FastAPI, Dock
 <!-- EPIC D — Event-Driven Architecture (Pha 5)                  -->
 <!-- ============================================================ -->
 
-- [-] 7. Epic D — Event-Driven Architecture (Pha 5)
+- [x] 7. Epic D — Event-Driven Architecture (Pha 5)
   - [x] 7.1 Tạo Event Taxonomy v1 trong Contract Package
     - Đảm bảo `packages/shared/src/events/base.event.ts` có `DomainEvent<T>` interface với fields: `eventId` (ULID), `eventType`, `eventVersion`, `producer`, `correlationId`, `idempotencyKey`, `occurredAt` (ISO8601), `payload`
     - Hoàn thiện tất cả event payload types trong `packages/shared/src/events/`:
@@ -382,7 +382,7 @@ Tech stack: NestJS v11, Prisma v7, PostgreSQL, Redis/BullMQ, gRPC, FastAPI, Dock
     - Với mọi single state-change operation (ví dụ: một task status update), Core API phải emit đúng một domain event với unique `idempotencyKey`. Replay cùng operation với cùng transaction context không được produce event thứ hai với cùng idempotency key.
     - **Validates: Requirements 12.4**
 
-  - [-] 7.7 Implement AI Service event consumer
+  - [x] 7.7 Implement AI Service event consumer
     - Tạo event consumer trong `apps/ai-service/` để subscribe tới Event Bus
     - Consume events: `task.created`, `task.updated`, `doc.updated`
     - Trigger enrichment actions (summarize, score, suggest) async — không cần synchronous call từ Core API
@@ -390,35 +390,35 @@ Tech stack: NestJS v11, Prisma v7, PostgreSQL, Redis/BullMQ, gRPC, FastAPI, Dock
     - Sau khi hết retries → move event tới DLQ
     - _Requirements: 13.1, 13.3_
 
-  - [~] 7.8 Implement Notification Service event consumer
+  - [x] 7.8 Implement Notification Service event consumer
     - Tạo event consumer trong Notification Service để subscribe tới Event Bus
     - Consume tất cả events trong Event Taxonomy catalog
     - Map event → notification job và enqueue vào BullMQ
     - Implement retry và DLQ handling
     - _Requirements: 13.2, 13.3_
 
-  - [~] 7.9 Viết property test cho Failed Events Route to DLQ After Max Retries
+  - [x] 7.9 Viết property test cho Failed Events Route to DLQ After Max Retries
     - **Property 13: Failed Events Route to DLQ After Max Retries**
     - Với mọi domain event mà consumer (AI hoặc Notification) consistently fail processing, sau khi hết configured maximum retry attempts, event phải xuất hiện trong Dead-Letter Queue — không bao giờ bị silently dropped.
     - **Validates: Requirements 13.3**
 
-  - [~] 7.10 Expose consumer metrics cho AI và Notification consumers
+  - [x] 7.10 Expose consumer metrics cho AI và Notification consumers
     - Emit metrics cho mỗi consumer: events processed, success rate, DLQ depth
     - _Requirements: 13.4_
 
-  - [~] 7.11 Scaffold Search Service và Automation Service (Pha 6 foundation)
+  - [x] 7.11 Scaffold Search Service và Automation Service (Pha 6 foundation)
     - Tạo `apps/search/` NestJS app với event consumer subscribing tới Event Bus
     - Consumer nhận domain events và update search index (mock implementation)
     - Tạo `apps/automation/` NestJS app với event consumer cho automation rules (mock implementation)
     - Đảm bảo Core API không chứa search indexing hoặc automation rule execution logic
     - _Requirements: 17.1, 17.2, 17.4_
 
-  - [~] 7.12 Viết property test cho Core API Resilience khi downstream unavailable
+  - [x] 7.12 Viết property test cho Core API Resilience khi downstream unavailable
     - **Property 14: Core API Resilience When Downstream Services Are Unavailable**
     - Với mọi Core API request không cần Search hoặc Automation Service data, khi Search Service hoặc Automation Service unavailable, Core API phải trả successful response — không bao giờ propagate downstream unavailability thành Core API failure.
     - **Validates: Requirements 17.3**
 
-- [ ] 8. Checkpoint D — Đảm bảo Epic D hoàn chỉnh
+- [x] 8. Checkpoint D — Đảm bảo Epic D hoàn chỉnh
   - Kiểm tra events được emit từ Task, Document, Project domains
   - Kiểm tra AI Service và Notification Service consume events từ Event Bus
   - Kiểm tra DLQ nhận events sau khi hết retries
@@ -428,44 +428,44 @@ Tech stack: NestJS v11, Prisma v7, PostgreSQL, Redis/BullMQ, gRPC, FastAPI, Dock
 <!-- EPIC E — Quality Gates (Liên tục)                           -->
 <!-- ============================================================ -->
 
-- [ ] 9. Epic E — Quality Gates (Liên tục)
-  - [ ] 9.1 Tạo GitHub Actions PR quality gate workflow
+- [x] 9. Epic E — Quality Gates (Liên tục)
+  - [x] 9.1 Tạo GitHub Actions PR quality gate workflow
     - Tạo `.github/workflows/pr-check.yml`
     - Jobs: `lint`, `typecheck`, `test` — chỉ chạy cho affected apps (`turbo --filter=[HEAD^1]`)
     - Timeout: 10 phút cho toàn bộ workflow
     - _Requirements: 14.1, 14.4_
 
-  - [ ] 9.2 Cấu hình branch protection rules
+  - [x] 9.2 Cấu hình branch protection rules
     - Require status checks: `lint`, `typecheck`, `test` phải pass trước khi merge
     - Block merge khi bất kỳ check nào fail
     - Tạo file `docs/branch-protection-setup.md` hướng dẫn cấu hình
     - _Requirements: 14.3_
 
-  - [ ] 9.3 Viết unit test template cho module changes
+  - [x] 9.3 Viết unit test template cho module changes
     - Tạo test template/example để đảm bảo mỗi module bị thay đổi có ít nhất 1 unit test
     - _Requirements: 14.2_
 
-  - [ ] 9.4 Tạo contract integration gate workflow
+  - [x] 9.4 Tạo contract integration gate workflow
     - Tạo `.github/workflows/contract-check.yml`
     - Trigger khi PR thay đổi files trong `packages/shared/src/events/` hoặc `packages/shared/src/dtos/`
     - Chạy integration tests cho tất cả dependent services: `turbo test:integration --filter=@superboard/api`, `--filter=@superboard/notification`, `--filter=@superboard/ai-service`
     - Fail và block merge nếu bất kỳ integration test nào fail
     - _Requirements: 15.1, 15.2_
 
-  - [ ] 9.5 Viết 3 contract-breaking change test cases bắt buộc
+  - [x] 9.5 Viết 3 contract-breaking change test cases bắt buộc
     - Test case 1: Missing required field trong event payload → consumer reject (schema validation fail)
     - Test case 2: Type mismatch trong DTO field → API validation fail (class-validator reject)
     - Test case 3: Removed field từ contract → dependent service test fail (TypeScript compile error hoặc runtime assertion)
     - Đặt tests trong `packages/shared/src/__tests__/contract-breaking.spec.ts`
     - _Requirements: 15.3_
 
-  - [ ] 9.6 Tạo weekly tech debt review template và automation
+  - [x] 9.6 Tạo weekly tech debt review template và automation
     - Tạo `docs/tech-debt/template.md` với sections: duplicate code ratio, flaky test count, queue failure rate, lint/type error count per app
     - Tạo script `scripts/tech-debt-report.ts` để tự động collect metrics từ jscpd, CI history, BullMQ stats
     - Output: `docs/tech-debt/YYYY-WW.md` với current metrics + updated backlog priorities
     - _Requirements: 16.1, 16.2, 16.3_
 
-- [ ] 10. Final Checkpoint — Đảm bảo toàn bộ workflow hoàn chỉnh
+- [x] 10. Final Checkpoint — Đảm bảo toàn bộ workflow hoàn chỉnh
   - Chạy `turbo lint && turbo typecheck && turbo test` — tất cả pass
   - Kiểm tra GitHub Actions workflows tồn tại và cấu hình đúng
   - Kiểm tra contract integration gate trigger đúng khi `packages/shared` thay đổi

@@ -1,0 +1,4889 @@
+{
+  "statistics": {
+    "detectionDate": "2026-04-25T16:58:07.535Z",
+    "formats": {
+      "javascript": {
+        "sources": {
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/jira/projects/[projectId]/settings/workflow/page.tsx": {
+            "lines": 39,
+            "tokens": 310,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/jira/projects/[projectId]/reports/page.tsx": {
+            "lines": 484,
+            "tokens": 3535,
+            "sources": 1,
+            "clones": 4,
+            "duplicatedLines": 84,
+            "duplicatedTokens": 538,
+            "percentage": 17.36,
+            "percentageTokens": 15.22,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/jira/projects/[projectId]/automation/page.tsx": {
+            "lines": 100,
+            "tokens": 778,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/jira/projects/[projectId]/page.tsx": {
+            "lines": 401,
+            "tokens": 2846,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 39,
+            "duplicatedTokens": 232,
+            "percentage": 9.73,
+            "percentageTokens": 8.15,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/docs/[docId]/versions/page.tsx": {
+            "lines": 103,
+            "tokens": 855,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/workspace/components/WorkspaceSwitcher.tsx": {
+            "lines": 72,
+            "tokens": 596,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/workspace/components/WorkspaceMemberSettings.tsx": {
+            "lines": 199,
+            "tokens": 1723,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/workspace/components/WorkspaceCreateModal.tsx": {
+            "lines": 35,
+            "tokens": 257,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/workspace/components/InviteMemberModal.tsx": {
+            "lines": 119,
+            "tokens": 983,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/user/components/AvatarUpload.tsx": {
+            "lines": 53,
+            "tokens": 405,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/search/components/knowledge-map.tsx": {
+            "lines": 54,
+            "tokens": 417,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/search/components/SearchModal.tsx": {
+            "lines": 190,
+            "tokens": 1370,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/search/components/CommandPalette.tsx": {
+            "lines": 321,
+            "tokens": 2767,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/notifications/components/notification-bell.tsx": {
+            "lines": 131,
+            "tokens": 1125,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/talent/components/smart-assignee-suggestion.tsx": {
+            "lines": 89,
+            "tokens": 698,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/workspace-health.tsx": {
+            "lines": 129,
+            "tokens": 1063,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/connect-hub.tsx": {
+            "lines": 98,
+            "tokens": 735,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/automation-slide-over.tsx": {
+            "lines": 142,
+            "tokens": 1092,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/agent-activity-log.tsx": {
+            "lines": 112,
+            "tokens": 965,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/TheVoid.tsx": {
+            "lines": 134,
+            "tokens": 1290,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/SymbiosisConsole.tsx": {
+            "lines": 97,
+            "tokens": 768,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/ExecutiveDirective.tsx": {
+            "lines": 96,
+            "tokens": 765,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/CreateRuleModal.tsx": {
+            "lines": 89,
+            "tokens": 677,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/AutomationList.tsx": {
+            "lines": 98,
+            "tokens": 671,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/AIAutomationDialog.tsx": {
+            "lines": 216,
+            "tokens": 1717,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/workflow/components/WorkflowEditor.tsx": {
+            "lines": 233,
+            "tokens": 1727,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-subtask-manager.tsx": {
+            "lines": 179,
+            "tokens": 1363,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-properties-form.tsx": {
+            "lines": 173,
+            "tokens": 1260,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-list-view.tsx": {
+            "lines": 116,
+            "tokens": 961,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-filter-bar.tsx": {
+            "lines": 179,
+            "tokens": 1303,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-edit-slide-over.tsx": {
+            "lines": 599,
+            "tokens": 4358,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 13,
+            "duplicatedTokens": 77,
+            "percentage": 2.17,
+            "percentageTokens": 1.77,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-create-form.tsx": {
+            "lines": 130,
+            "tokens": 1159,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-comment-section.tsx": {
+            "lines": 312,
+            "tokens": 2500,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-calendar-view.tsx": {
+            "lines": 379,
+            "tokens": 3055,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-bulk-action-bar.tsx": {
+            "lines": 226,
+            "tokens": 1605,
+            "sources": 1,
+            "clones": 4,
+            "duplicatedLines": 96,
+            "duplicatedTokens": 798,
+            "percentage": 42.48,
+            "percentageTokens": 49.72,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-board-view.tsx": {
+            "lines": 224,
+            "tokens": 1812,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-badges.tsx": {
+            "lines": 70,
+            "tokens": 612,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-attachment-manager.tsx": {
+            "lines": 66,
+            "tokens": 500,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/reports/components/executive-briefing-card.tsx": {
+            "lines": 115,
+            "tokens": 957,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/context/ProjectDetailContext.tsx": {
+            "lines": 0,
+            "tokens": 3,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/twin-pulse-visualizer.tsx": {
+            "lines": 95,
+            "tokens": 793,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/quick-search-dialog.tsx": {
+            "lines": 176,
+            "tokens": 1255,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/project-form.tsx": {
+            "lines": 120,
+            "tokens": 895,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/project-digital-twin.tsx": {
+            "lines": 195,
+            "tokens": 1473,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/project-detail-header.tsx": {
+            "lines": 287,
+            "tokens": 2260,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/project-cards-grid.tsx": {
+            "lines": 23,
+            "tokens": 147,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/project-card.tsx": {
+            "lines": 134,
+            "tokens": 1051,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/StrategicSandbox.tsx": {
+            "lines": 128,
+            "tokens": 1060,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/ProjectViewManager.tsx": {
+            "lines": 60,
+            "tokens": 342,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/ProjectSkeleton.tsx": {
+            "lines": 10,
+            "tokens": 94,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/ProjectOverlayManager.tsx": {
+            "lines": 131,
+            "tokens": 957,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 26,
+            "duplicatedTokens": 155,
+            "percentage": 19.85,
+            "percentageTokens": 16.2,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/MissionTimeline.tsx": {
+            "lines": 208,
+            "tokens": 1578,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/MissionCommandBriefing.tsx": {
+            "lines": 314,
+            "tokens": 2437,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/MissionArchitectTerminal.tsx": {
+            "lines": 217,
+            "tokens": 1649,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/dashboard/components/stat-card.tsx": {
+            "lines": 18,
+            "tokens": 136,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/dashboard/components/distribution-chart.tsx": {
+            "lines": 72,
+            "tokens": 505,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/dashboard/components/dashboard-skeleton.tsx": {
+            "lines": 0,
+            "tokens": 3,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/dashboard/components/NeuralBriefing.tsx": {
+            "lines": 106,
+            "tokens": 956,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/knowledge/components/knowledge-graph-view.tsx": {
+            "lines": 90,
+            "tokens": 847,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/knowledge/components/VectorAtlas.tsx": {
+            "lines": 193,
+            "tokens": 1636,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/knowledge/components/ConflictResolver.tsx": {
+            "lines": 101,
+            "tokens": 927,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/executive/components/morning-briefing.tsx": {
+            "lines": 138,
+            "tokens": 999,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/executive/components/memoir-gallery.tsx": {
+            "lines": 124,
+            "tokens": 960,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/ai/components/project-copilot.tsx": {
+            "lines": 113,
+            "tokens": 919,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/ai/components/neural-workspace-digest.tsx": {
+            "lines": 87,
+            "tokens": 767,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/ai/components/ai-planner-modal.tsx": {
+            "lines": 174,
+            "tokens": 1477,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/integrations/jira/components/JiraDashboard.tsx": {
+            "lines": 214,
+            "tokens": 1615,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 22,
+            "duplicatedTokens": 156,
+            "percentage": 10.28,
+            "percentageTokens": 9.66,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/qa/components/test-generator-modal.tsx": {
+            "lines": 87,
+            "tokens": 717,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/qa/components/neural-qa-dashboard.tsx": {
+            "lines": 152,
+            "tokens": 1250,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/docs/components/TaskNodeEmbed.tsx": {
+            "lines": 52,
+            "tokens": 415,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/docs/components/RichTextEditor.tsx": {
+            "lines": 434,
+            "tokens": 3611,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/docs/components/DocVersionSidebar.tsx": {
+            "lines": 83,
+            "tokens": 659,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/docs/components/DocTOC.tsx": {
+            "lines": 24,
+            "tokens": 193,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/docs/components/DocPropertyBar.tsx": {
+            "lines": 92,
+            "tokens": 628,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/ThreadPanel.tsx": {
+            "lines": 123,
+            "tokens": 1007,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/MessageToTaskDialog.tsx": {
+            "lines": 91,
+            "tokens": 730,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/MessageList.tsx": {
+            "lines": 186,
+            "tokens": 1439,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/MessageInput.tsx": {
+            "lines": 49,
+            "tokens": 332,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/EmojiReactionPicker.tsx": {
+            "lines": 13,
+            "tokens": 131,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/DirectTransmissionHub.tsx": {
+            "lines": 155,
+            "tokens": 1236,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/ChatShell.tsx": {
+            "lines": 107,
+            "tokens": 867,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/ChannelSidebar.tsx": {
+            "lines": 67,
+            "tokens": 536,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(public)/share/[docId]/page.tsx": {
+            "lines": 118,
+            "tokens": 1049,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(public)/invite/[token]/page.tsx": {
+            "lines": 67,
+            "tokens": 552,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(public)/invitation/[token]/page.tsx": {
+            "lines": 96,
+            "tokens": 742,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/docs/divergence/page.tsx": {
+            "lines": 3,
+            "tokens": 29,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/docs/[docId]/page.tsx": {
+            "lines": 209,
+            "tokens": 1536,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/chat/[channelId]/page.tsx": {
+            "lines": 27,
+            "tokens": 188,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/automation/symbiosis/page.tsx": {
+            "lines": 0,
+            "tokens": 3,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/ui/states/section-states.tsx": {
+            "lines": 37,
+            "tokens": 276,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/ui/states/full-page-states.tsx": {
+            "lines": 39,
+            "tokens": 285,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(public)/login/page.tsx": {
+            "lines": 75,
+            "tokens": 552,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/settings/page.tsx": {
+            "lines": 359,
+            "tokens": 2947,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/docs/page.tsx": {
+            "lines": 118,
+            "tokens": 905,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/docs/layout.tsx": {
+            "lines": 140,
+            "tokens": 1134,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/dashboard/page.tsx": {
+            "lines": 180,
+            "tokens": 1425,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/chat/page.tsx": {
+            "lines": 0,
+            "tokens": 3,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/chat/layout.tsx": {
+            "lines": 124,
+            "tokens": 1031,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/ui/state-view.tsx": {
+            "lines": 58,
+            "tokens": 467,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/ui/form-controls.tsx": {
+            "lines": 62,
+            "tokens": 497,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/ui/app-overlay.tsx": {
+            "lines": 40,
+            "tokens": 388,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/ui/app-button.tsx": {
+            "lines": 14,
+            "tokens": 87,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/providers/query-provider.tsx": {
+            "lines": 3,
+            "tokens": 30,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/layout/private-shell.tsx": {
+            "lines": 275,
+            "tokens": 2184,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/layout/app-brand.tsx": {
+            "lines": 5,
+            "tokens": 45,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/layout/SingularityPulse.tsx": {
+            "lines": 125,
+            "tokens": 1000,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/guards/private-route-guard.tsx": {
+            "lines": 2,
+            "tokens": 28,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/layout.tsx": {
+            "lines": 3,
+            "tokens": 21,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/layout.tsx": {
+            "lines": 0,
+            "tokens": 15,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/global-error.tsx": {
+            "lines": 2,
+            "tokens": 20,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/error.tsx": {
+            "lines": 2,
+            "tokens": 20,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 14028,
+          "tokens": 110531,
+          "sources": 111,
+          "clones": 7,
+          "duplicatedLines": 140,
+          "duplicatedTokens": 978,
+          "percentage": 1,
+          "percentageTokens": 0.88,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "tsx": {
+        "sources": {
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/jira/projects/[projectId]/settings/workflow/page.tsx": {
+            "lines": 103,
+            "tokens": 813,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/jira/projects/[projectId]/reports/page.tsx": {
+            "lines": 575,
+            "tokens": 4167,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/jira/projects/[projectId]/automation/page.tsx": {
+            "lines": 142,
+            "tokens": 1182,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/jira/projects/[projectId]/page.tsx": {
+            "lines": 457,
+            "tokens": 3349,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/docs/[docId]/versions/page.tsx": {
+            "lines": 155,
+            "tokens": 1384,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/workspace/components/WorkspaceSwitcher.tsx": {
+            "lines": 99,
+            "tokens": 855,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/workspace/components/WorkspaceMemberSettings.tsx": {
+            "lines": 288,
+            "tokens": 2657,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/workspace/components/WorkspaceCreateModal.tsx": {
+            "lines": 115,
+            "tokens": 895,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/workspace/components/InviteMemberModal.tsx": {
+            "lines": 197,
+            "tokens": 1737,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/user/components/AvatarUpload.tsx": {
+            "lines": 102,
+            "tokens": 827,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/search/components/knowledge-map.tsx": {
+            "lines": 119,
+            "tokens": 1044,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/search/components/SearchModal.tsx": {
+            "lines": 302,
+            "tokens": 2547,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/search/components/CommandPalette.tsx": {
+            "lines": 442,
+            "tokens": 3849,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/notifications/components/notification-bell.tsx": {
+            "lines": 172,
+            "tokens": 1420,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/talent/components/smart-assignee-suggestion.tsx": {
+            "lines": 146,
+            "tokens": 1170,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/workspace-health.tsx": {
+            "lines": 224,
+            "tokens": 1824,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/connect-hub.tsx": {
+            "lines": 188,
+            "tokens": 1472,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/automation-slide-over.tsx": {
+            "lines": 277,
+            "tokens": 2216,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/agent-activity-log.tsx": {
+            "lines": 178,
+            "tokens": 1466,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/TheVoid.tsx": {
+            "lines": 205,
+            "tokens": 1945,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/SymbiosisConsole.tsx": {
+            "lines": 191,
+            "tokens": 1578,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 10,
+            "duplicatedTokens": 82,
+            "percentage": 5.24,
+            "percentageTokens": 5.2,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/ExecutiveDirective.tsx": {
+            "lines": 180,
+            "tokens": 1500,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/CreateRuleModal.tsx": {
+            "lines": 147,
+            "tokens": 1214,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 5,
+            "duplicatedTokens": 85,
+            "percentage": 3.4,
+            "percentageTokens": 7,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/AutomationList.tsx": {
+            "lines": 174,
+            "tokens": 1441,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/specialized/automation/components/AIAutomationDialog.tsx": {
+            "lines": 313,
+            "tokens": 2552,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 5,
+            "duplicatedTokens": 85,
+            "percentage": 1.6,
+            "percentageTokens": 3.33,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/workflow/components/WorkflowEditor.tsx": {
+            "lines": 391,
+            "tokens": 3206,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-subtask-manager.tsx": {
+            "lines": 236,
+            "tokens": 1780,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-properties-form.tsx": {
+            "lines": 274,
+            "tokens": 2236,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 24,
+            "duplicatedTokens": 288,
+            "percentage": 8.76,
+            "percentageTokens": 12.88,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-list-view.tsx": {
+            "lines": 236,
+            "tokens": 1976,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 10,
+            "duplicatedTokens": 131,
+            "percentage": 4.24,
+            "percentageTokens": 6.63,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-filter-bar.tsx": {
+            "lines": 244,
+            "tokens": 1741,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-edit-slide-over.tsx": {
+            "lines": 801,
+            "tokens": 5953,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 40,
+            "duplicatedTokens": 260,
+            "percentage": 4.99,
+            "percentageTokens": 4.37,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-create-form.tsx": {
+            "lines": 259,
+            "tokens": 2274,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-comment-section.tsx": {
+            "lines": 457,
+            "tokens": 3798,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-calendar-view.tsx": {
+            "lines": 467,
+            "tokens": 3632,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 13,
+            "duplicatedTokens": 102,
+            "percentage": 2.78,
+            "percentageTokens": 2.81,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-bulk-action-bar.tsx": {
+            "lines": 338,
+            "tokens": 2462,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-board-view.tsx": {
+            "lines": 427,
+            "tokens": 3479,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-badges.tsx": {
+            "lines": 104,
+            "tokens": 871,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/task-attachment-manager.tsx": {
+            "lines": 177,
+            "tokens": 1431,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/reports/components/executive-briefing-card.tsx": {
+            "lines": 185,
+            "tokens": 1469,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/context/ProjectDetailContext.tsx": {
+            "lines": 165,
+            "tokens": 1455,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/twin-pulse-visualizer.tsx": {
+            "lines": 142,
+            "tokens": 1204,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/quick-search-dialog.tsx": {
+            "lines": 311,
+            "tokens": 2475,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/project-form.tsx": {
+            "lines": 198,
+            "tokens": 1522,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/project-digital-twin.tsx": {
+            "lines": 299,
+            "tokens": 2310,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/project-detail-header.tsx": {
+            "lines": 361,
+            "tokens": 2818,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/project-cards-grid.tsx": {
+            "lines": 80,
+            "tokens": 608,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/project-card.tsx": {
+            "lines": 218,
+            "tokens": 1692,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/StrategicSandbox.tsx": {
+            "lines": 201,
+            "tokens": 1697,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/ProjectViewManager.tsx": {
+            "lines": 162,
+            "tokens": 1175,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/ProjectSkeleton.tsx": {
+            "lines": 54,
+            "tokens": 431,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/ProjectOverlayManager.tsx": {
+            "lines": 271,
+            "tokens": 2011,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 26,
+            "duplicatedTokens": 103,
+            "percentage": 9.59,
+            "percentageTokens": 5.12,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/MissionTimeline.tsx": {
+            "lines": 289,
+            "tokens": 2310,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/MissionCommandBriefing.tsx": {
+            "lines": 409,
+            "tokens": 3254,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/MissionArchitectTerminal.tsx": {
+            "lines": 376,
+            "tokens": 2978,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/dashboard/components/stat-card.tsx": {
+            "lines": 72,
+            "tokens": 488,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/dashboard/components/distribution-chart.tsx": {
+            "lines": 120,
+            "tokens": 820,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/dashboard/components/dashboard-skeleton.tsx": {
+            "lines": 23,
+            "tokens": 211,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/dashboard/components/adaptive-widget.tsx": {
+            "lines": 43,
+            "tokens": 349,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/dashboard/components/NeuralBriefing.tsx": {
+            "lines": 181,
+            "tokens": 1578,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/knowledge/components/knowledge-graph-view.tsx": {
+            "lines": 253,
+            "tokens": 2442,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/knowledge/components/VectorAtlas.tsx": {
+            "lines": 300,
+            "tokens": 2655,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/knowledge/components/ConflictResolver.tsx": {
+            "lines": 192,
+            "tokens": 1642,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 10,
+            "duplicatedTokens": 82,
+            "percentage": 5.21,
+            "percentageTokens": 4.99,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/executive/components/morning-briefing.tsx": {
+            "lines": 199,
+            "tokens": 1439,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/executive/components/memoir-gallery.tsx": {
+            "lines": 195,
+            "tokens": 1591,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/ai/components/project-copilot.tsx": {
+            "lines": 226,
+            "tokens": 1896,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/ai/components/neural-workspace-digest.tsx": {
+            "lines": 166,
+            "tokens": 1388,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/intelligence/ai/components/ai-planner-modal.tsx": {
+            "lines": 266,
+            "tokens": 2322,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/integrations/jira/components/JiraDashboard.tsx": {
+            "lines": 299,
+            "tokens": 2160,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/qa/components/test-generator-modal.tsx": {
+            "lines": 151,
+            "tokens": 1309,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/qa/components/neural-qa-dashboard.tsx": {
+            "lines": 241,
+            "tokens": 1936,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/docs/components/TaskNodeEmbed.tsx": {
+            "lines": 80,
+            "tokens": 708,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/docs/components/RichTextEditor.tsx": {
+            "lines": 679,
+            "tokens": 5837,
+            "sources": 1,
+            "clones": 4,
+            "duplicatedLines": 34,
+            "duplicatedTokens": 298,
+            "percentage": 5.01,
+            "percentageTokens": 5.11,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/docs/components/DocVersionSidebar.tsx": {
+            "lines": 118,
+            "tokens": 988,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/docs/components/DocTOC.tsx": {
+            "lines": 120,
+            "tokens": 982,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/docs/components/DocPropertyBar.tsx": {
+            "lines": 116,
+            "tokens": 814,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/ThreadPanel.tsx": {
+            "lines": 166,
+            "tokens": 1413,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/MessageToTaskDialog.tsx": {
+            "lines": 173,
+            "tokens": 1428,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/MessageList.tsx": {
+            "lines": 280,
+            "tokens": 2256,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/MessageInput.tsx": {
+            "lines": 141,
+            "tokens": 1133,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/EmojiReactionPicker.tsx": {
+            "lines": 41,
+            "tokens": 334,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/DirectTransmissionHub.tsx": {
+            "lines": 185,
+            "tokens": 1541,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/ChatShell.tsx": {
+            "lines": 161,
+            "tokens": 1399,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/components/ChannelSidebar.tsx": {
+            "lines": 140,
+            "tokens": 1161,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(public)/share/[docId]/page.tsx": {
+            "lines": 164,
+            "tokens": 1429,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(public)/invite/[token]/page.tsx": {
+            "lines": 147,
+            "tokens": 1304,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(public)/invitation/[token]/page.tsx": {
+            "lines": 145,
+            "tokens": 1179,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/docs/divergence/page.tsx": {
+            "lines": 24,
+            "tokens": 185,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/docs/atlas/page.tsx": {
+            "lines": 69,
+            "tokens": 522,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/docs/[docId]/page.tsx": {
+            "lines": 288,
+            "tokens": 2140,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/chat/[channelId]/page.tsx": {
+            "lines": 48,
+            "tokens": 404,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/automation/symbiosis/page.tsx": {
+            "lines": 22,
+            "tokens": 162,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/ui/states/section-states.tsx": {
+            "lines": 68,
+            "tokens": 484,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/ui/states/full-page-states.tsx": {
+            "lines": 96,
+            "tokens": 717,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(public)/login/page.tsx": {
+            "lines": 158,
+            "tokens": 1272,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/settings/page.tsx": {
+            "lines": 419,
+            "tokens": 3324,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/jira/page.tsx": {
+            "lines": 4,
+            "tokens": 35,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/docs/page.tsx": {
+            "lines": 154,
+            "tokens": 1283,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/docs/layout.tsx": {
+            "lines": 204,
+            "tokens": 1735,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/dashboard/page.tsx": {
+            "lines": 341,
+            "tokens": 2915,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/chat/page.tsx": {
+            "lines": 52,
+            "tokens": 545,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/chat/layout.tsx": {
+            "lines": 155,
+            "tokens": 1346,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/ui/state-view.tsx": {
+            "lines": 95,
+            "tokens": 720,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/ui/form-controls.tsx": {
+            "lines": 86,
+            "tokens": 649,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/ui/app-overlay.tsx": {
+            "lines": 106,
+            "tokens": 856,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/ui/app-button.tsx": {
+            "lines": 81,
+            "tokens": 544,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/providers/query-provider.tsx": {
+            "lines": 38,
+            "tokens": 293,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/layout/public-shell.tsx": {
+            "lines": 44,
+            "tokens": 375,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/layout/private-shell.tsx": {
+            "lines": 316,
+            "tokens": 2517,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/layout/app-brand.tsx": {
+            "lines": 27,
+            "tokens": 212,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/layout/SingularityPulse.tsx": {
+            "lines": 204,
+            "tokens": 1818,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 13,
+            "duplicatedTokens": 102,
+            "percentage": 6.37,
+            "percentageTokens": 5.61,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/components/guards/private-route-guard.tsx": {
+            "lines": 37,
+            "tokens": 313,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(public)/layout.tsx": {
+            "lines": 5,
+            "tokens": 70,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/(private)/layout.tsx": {
+            "lines": 28,
+            "tokens": 215,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/page.tsx": {
+            "lines": 5,
+            "tokens": 48,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/not-found.tsx": {
+            "lines": 24,
+            "tokens": 208,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/loading.tsx": {
+            "lines": 4,
+            "tokens": 41,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/layout.tsx": {
+            "lines": 48,
+            "tokens": 358,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/global-error.tsx": {
+            "lines": 22,
+            "tokens": 160,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/error.tsx": {
+            "lines": 18,
+            "tokens": 128,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 22696,
+          "tokens": 184078,
+          "sources": 119,
+          "clones": 8,
+          "duplicatedLines": 95,
+          "duplicatedTokens": 809,
+          "percentage": 0.42,
+          "percentageTokens": 0.44,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "typescript": {
+        "sources": {
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/utils/__tests__/task-view.test.ts": {
+            "lines": 313,
+            "tokens": 3274,
+            "sources": 1,
+            "clones": 8,
+            "duplicatedLines": 94,
+            "duplicatedTokens": 934,
+            "percentage": 30.03,
+            "percentageTokens": 28.53,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/workspace/hooks/use-workspaces.ts": {
+            "lines": 9,
+            "tokens": 85,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/workspace/hooks/use-workspace.ts": {
+            "lines": 124,
+            "tokens": 1131,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/workspace/hooks/use-workspace-mutations.ts": {
+            "lines": 10,
+            "tokens": 107,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/workspace/api/workspace-service.ts": {
+            "lines": 56,
+            "tokens": 710,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/user/hooks/user-profile.ts": {
+            "lines": 44,
+            "tokens": 450,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/user/api/upload-service.ts": {
+            "lines": 22,
+            "tokens": 215,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/search/hooks/use-search.ts": {
+            "lines": 16,
+            "tokens": 182,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/search/hooks/use-search-status.ts": {
+            "lines": 16,
+            "tokens": 201,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/search/hooks/use-related-docs.ts": {
+            "lines": 18,
+            "tokens": 233,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/notifications/hooks/use-notifications.ts": {
+            "lines": 34,
+            "tokens": 283,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/notifications/hooks/notification-preferences.ts": {
+            "lines": 35,
+            "tokens": 325,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/notifications/hooks/index.ts": {
+            "lines": 4,
+            "tokens": 21,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/notifications/api/notification-service.ts": {
+            "lines": 11,
+            "tokens": 130,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/auth/utils/auth-storage.ts": {
+            "lines": 15,
+            "tokens": 151,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/auth/hooks/use-redirect-authenticated.ts": {
+            "lines": 30,
+            "tokens": 241,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/auth/hooks/use-auth-session.ts": {
+            "lines": 46,
+            "tokens": 433,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/auth/api/auth-service.ts": {
+            "lines": 10,
+            "tokens": 147,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/workflow/hooks/use-workflow.ts": {
+            "lines": 146,
+            "tokens": 1260,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/workflow/api/workflow-service.ts": {
+            "lines": 71,
+            "tokens": 642,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/utils/task-view.ts": {
+            "lines": 161,
+            "tokens": 1808,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/hooks/use-task-selection.ts": {
+            "lines": 105,
+            "tokens": 1010,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/hooks/use-task-mutations.ts": {
+            "lines": 279,
+            "tokens": 2671,
+            "sources": 1,
+            "clones": 6,
+            "duplicatedLines": 52,
+            "duplicatedTokens": 534,
+            "percentage": 18.64,
+            "percentageTokens": 19.99,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/hooks/use-task-edit-panel.ts": {
+            "lines": 320,
+            "tokens": 2739,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/hooks/use-task-drag-drop.ts": {
+            "lines": 194,
+            "tokens": 1720,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/hooks/use-task-comments.ts": {
+            "lines": 160,
+            "tokens": 1560,
+            "sources": 1,
+            "clones": 3,
+            "duplicatedLines": 55,
+            "duplicatedTokens": 432,
+            "percentage": 34.38,
+            "percentageTokens": 27.69,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/hooks/use-task-bulk-actions.ts": {
+            "lines": 360,
+            "tokens": 2737,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/hooks/use-task-attachments.ts": {
+            "lines": 32,
+            "tokens": 316,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/hooks/index.ts": {
+            "lines": 6,
+            "tokens": 61,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/components/index.ts": {
+            "lines": 11,
+            "tokens": 106,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/api/task-service.ts": {
+            "lines": 66,
+            "tokens": 739,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/task/api/comment-service.ts": {
+            "lines": 43,
+            "tokens": 435,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/reports/hooks/use-report.ts": {
+            "lines": 9,
+            "tokens": 91,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/reports/api/report-service.ts": {
+            "lines": 17,
+            "tokens": 209,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/utils/project-detail-calendar.ts": {
+            "lines": 29,
+            "tokens": 400,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/hooks/use-projects.ts": {
+            "lines": 70,
+            "tokens": 609,
+            "sources": 1,
+            "clones": 3,
+            "duplicatedLines": 80,
+            "duplicatedTokens": 600,
+            "percentage": 114.29,
+            "percentageTokens": 98.52,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/hooks/use-project-url-state.ts": {
+            "lines": 294,
+            "tokens": 2389,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/hooks/use-project-mutations.ts": {
+            "lines": 57,
+            "tokens": 453,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/hooks/use-project-header-actions.ts": {
+            "lines": 36,
+            "tokens": 329,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/hooks/use-project-favorites.ts": {
+            "lines": 64,
+            "tokens": 563,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/hooks/use-project-detail.ts": {
+            "lines": 108,
+            "tokens": 955,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 45,
+            "duplicatedTokens": 348,
+            "percentage": 41.67,
+            "percentageTokens": 36.44,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/hooks/use-project-crud-form.ts": {
+            "lines": 68,
+            "tokens": 469,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/hooks/use-project-context-memory.ts": {
+            "lines": 136,
+            "tokens": 1127,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/hooks/use-project-calendar.ts": {
+            "lines": 51,
+            "tokens": 509,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/hooks/use-predictive-health.ts": {
+            "lines": 29,
+            "tokens": 220,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/hooks/project-mutation-core.ts": {
+            "lines": 5,
+            "tokens": 25,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/hooks/project-core.ts": {
+            "lines": 3,
+            "tokens": 50,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/hooks/index.ts": {
+            "lines": 9,
+            "tokens": 88,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/components/index.ts": {
+            "lines": 13,
+            "tokens": 124,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/api/project-service.ts": {
+            "lines": 26,
+            "tokens": 317,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/dashboard/hooks/use-dashboard.ts": {
+            "lines": 9,
+            "tokens": 83,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/dashboard/api/dashboard-service.ts": {
+            "lines": 41,
+            "tokens": 469,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/board/hooks/index.ts": {
+            "lines": 13,
+            "tokens": 124,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/board/components/index.ts": {
+            "lines": 26,
+            "tokens": 225,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/board/api/index.ts": {
+            "lines": 3,
+            "tokens": 34,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/integrations/jira/utils/jira-helpers.ts": {
+            "lines": 61,
+            "tokens": 651,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/integrations/jira/stores/jira-project-ui-store.ts": {
+            "lines": 91,
+            "tokens": 1024,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/integrations/jira/hooks/use-jira-projects-page.ts": {
+            "lines": 119,
+            "tokens": 728,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/integrations/jira/components/JiraTaskExtension.ts": {
+            "lines": 77,
+            "tokens": 473,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/docs/hooks/use-doc.ts": {
+            "lines": 115,
+            "tokens": 1127,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/docs/api/doc-service.ts": {
+            "lines": 59,
+            "tokens": 729,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/hooks/use-chat.ts": {
+            "lines": 130,
+            "tokens": 1277,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/collaboration/chat/api/chat-service.ts": {
+            "lines": 54,
+            "tokens": 682,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/system/workspace/index.ts": {
+            "lines": 4,
+            "tokens": 43,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/project/index.ts": {
+            "lines": 12,
+            "tokens": 115,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/features/operations/board/index.ts": {
+            "lines": 3,
+            "tokens": 34,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/lib/realtime/project-sync.ts": {
+            "lines": 189,
+            "tokens": 1284,
+            "sources": 1,
+            "clones": 4,
+            "duplicatedLines": 44,
+            "duplicatedTokens": 404,
+            "percentage": 23.28,
+            "percentageTokens": 31.46,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/lib/realtime/project-socket.ts": {
+            "lines": 247,
+            "tokens": 2050,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/lib/realtime/chat-socket.ts": {
+            "lines": 97,
+            "tokens": 1019,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/lib/mocks/dashboard-stats.mock.ts": {
+            "lines": 89,
+            "tokens": 768,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/lib/hooks/use-app-mutation.ts": {
+            "lines": 88,
+            "tokens": 650,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/lib/hooks/use-app-form.ts": {
+            "lines": 50,
+            "tokens": 400,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/lib/constants/task.ts": {
+            "lines": 102,
+            "tokens": 991,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/lib/api/notification-handler.ts": {
+            "lines": 64,
+            "tokens": 542,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/lib/api/error-map.ts": {
+            "lines": 33,
+            "tokens": 181,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/lib/api/endpoints.ts": {
+            "lines": 102,
+            "tokens": 1492,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/lib/utils.ts": {
+            "lines": 38,
+            "tokens": 294,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/lib/navigation.ts": {
+            "lines": 33,
+            "tokens": 358,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/lib/format-date.ts": {
+            "lines": 28,
+            "tokens": 308,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/lib/api-client.ts": {
+            "lines": 175,
+            "tokens": 2073,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/hooks/use-keyboard-shortcuts.ts": {
+            "lines": 53,
+            "tokens": 529,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/hooks/use-debounce.ts": {
+            "lines": 16,
+            "tokens": 148,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 6012,
+          "tokens": 55955,
+          "sources": 82,
+          "clones": 13,
+          "duplicatedLines": 185,
+          "duplicatedTokens": 1626,
+          "percentage": 3.08,
+          "percentageTokens": 2.91,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "css": {
+        "sources": {
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/theme.css": {
+            "lines": 95,
+            "tokens": 870,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/globals.css": {
+            "lines": 351,
+            "tokens": 1857,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 446,
+          "tokens": 2727,
+          "sources": 2,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "markdown": {
+        "sources": {
+          "/Users/maitranhuy/SuperBoard/apps/web/src/app/ARCHITECTURE.md": {
+            "lines": 33,
+            "tokens": 304,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 33,
+          "tokens": 304,
+          "sources": 1,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    },
+    "total": {
+      "lines": 43215,
+      "tokens": 353595,
+      "sources": 315,
+      "clones": 28,
+      "duplicatedLines": 420,
+      "duplicatedTokens": 3413,
+      "percentage": 0.97,
+      "percentageTokens": 0.97,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    }
+  },
+  "duplicates": [
+    {
+      "format": "javascript",
+      "lines": 24,
+      "fragment": "}>\n                <CartesianGrid\n                  strokeDasharray=\"3 3\"\n                  vertical={false}\n                  stroke=\"rgba(255,255,255,0.03)\"\n                />\n                <XAxis\n                  dataKey=\"date\"\n                  axisLine={false}\n                  tickLine={false}\n                  tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontWeight: 900 }}\n                  dy={10}\n                />\n                <YAxis\n                  axisLine={false}\n                  tickLine={false}\n                  tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontWeight: 900 }}\n                />\n                <Tooltip\n                  contentStyle={{\n                    backgroundColor: 'rgba(15, 23, 42, 0.95)',\n                    borderRadius: '24px',\n                    border: '1px solid rgba(255,255,255,0.1)',\n                    backdropFilter",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/app/(private)/jira/projects/[projectId]/reports/page.tsx",
+        "start": 335,
+        "end": 358,
+        "startLoc": {
+          "line": 335,
+          "column": 15,
+          "position": 2525
+        },
+        "endLoc": {
+          "line": 358,
+          "column": 35,
+          "position": 2667
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/app/(private)/jira/projects/[projectId]/reports/page.tsx",
+        "start": 257,
+        "end": 286,
+        "startLoc": {
+          "line": 257,
+          "column": 9,
+          "position": 2009
+        },
+        "endLoc": {
+          "line": 286,
+          "column": 30,
+          "position": 2237
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 20,
+      "fragment": "}>\n                <CartesianGrid\n                  strokeDasharray=\"3 3\"\n                  vertical={false}\n                  stroke=\"rgba(255,255,255,0.03)\"\n                />\n                <XAxis\n                  dataKey=\"label\"\n                  axisLine={false}\n                  tickLine={false}\n                  tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontWeight: 900 }}\n                  dy={10}\n                />\n                <YAxis\n                  axisLine={false}\n                  tickLine={false}\n                  tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontWeight: 900 }}\n                />\n                <Tooltip\n                  cursor={{ fill",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/app/(private)/jira/projects/[projectId]/reports/page.tsx",
+        "start": 395,
+        "end": 414,
+        "startLoc": {
+          "line": 395,
+          "column": 9,
+          "position": 2902
+        },
+        "endLoc": {
+          "line": 414,
+          "column": 6,
+          "position": 3029
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/app/(private)/jira/projects/[projectId]/reports/page.tsx",
+        "start": 257,
+        "end": 283,
+        "startLoc": {
+          "line": 257,
+          "column": 9,
+          "position": 2009
+        },
+        "endLoc": {
+          "line": 283,
+          "column": 36,
+          "position": 2222
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 10,
+      "fragment": ",\n      assigneeId: '',\n      statuses: new Set(),\n      priorities: new Set(),\n      types: new Set(),\n      sortBy: '',\n      sortDir: 'asc',\n    });\n    assert.equal(result.length, 1);\n    assert.equal(result[0]!.id, 't2'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/task/utils/__tests__/task-view.test.ts",
+        "start": 87,
+        "end": 96,
+        "startLoc": {
+          "line": 87,
+          "column": 5,
+          "position": 767
+        },
+        "endLoc": {
+          "line": 96,
+          "column": 5,
+          "position": 856
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/utils/__tests__/task-view.test.ts",
+        "start": 72,
+        "end": 81,
+        "startLoc": {
+          "line": 72,
+          "column": 8,
+          "position": 589
+        },
+        "endLoc": {
+          "line": 81,
+          "column": 5,
+          "position": 678
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 12,
+      "fragment": ",\n      statuses: new Set(),\n      priorities: new Set(),\n      types: new Set(),\n      sortBy: '',\n      sortDir: 'asc',\n    });\n    assert.equal(result.length, 1);\n    assert.equal(result[0]!.id, 't1');\n  });\n\n  it('filters by status'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/task/utils/__tests__/task-view.test.ts",
+        "start": 106,
+        "end": 117,
+        "startLoc": {
+          "line": 106,
+          "column": 9,
+          "position": 958
+        },
+        "endLoc": {
+          "line": 117,
+          "column": 20,
+          "position": 1053
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/utils/__tests__/task-view.test.ts",
+        "start": 73,
+        "end": 84,
+        "startLoc": {
+          "line": 73,
+          "column": 3,
+          "position": 596
+        },
+        "endLoc": {
+          "line": 84,
+          "column": 40,
+          "position": 691
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 13,
+      "fragment": ", () => {\n    const tasks = [\n      makeTask({ id: 't1', dueDate: '2026-03-15T00:00:00Z' }),\n      makeTask({ id: 't2', dueDate: '2026-03-01T00:00:00Z' }),\n    ];\n    const result = filterAndSortProjectTasks(tasks, {\n      query: '',\n      assigneeId: '',\n      statuses: new Set(),\n      priorities: new Set(),\n      types: new Set(),\n      sortBy: 'dueDate',\n      sortDir: 'desc'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/task/utils/__tests__/task-view.test.ts",
+        "start": 168,
+        "end": 180,
+        "startLoc": {
+          "line": 168,
+          "column": 30,
+          "position": 1615
+        },
+        "endLoc": {
+          "line": 180,
+          "column": 7,
+          "position": 1749
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/utils/__tests__/task-view.test.ts",
+        "start": 150,
+        "end": 162,
+        "startLoc": {
+          "line": 150,
+          "column": 29,
+          "position": 1427
+        },
+        "endLoc": {
+          "line": 162,
+          "column": 6,
+          "position": 1561
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 16,
+      "fragment": "}),\n      makeTask({ id: 't2', dueDate: '2026-03-01T00:00:00Z' }),\n    ];\n    const result = filterAndSortProjectTasks(tasks, {\n      query: '',\n      assigneeId: '',\n      statuses: new Set(),\n      priorities: new Set(),\n      types: new Set(),\n      sortBy: 'dueDate',\n      sortDir: 'asc',\n    });\n    assert.equal(result[0]!.id, 't2');\n    assert.equal(result[1]!.id, 't1');\n  });\n}",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/task/utils/__tests__/task-view.test.ts",
+        "start": 187,
+        "end": 202,
+        "startLoc": {
+          "line": 187,
+          "column": 2,
+          "position": 1819
+        },
+        "endLoc": {
+          "line": 202,
+          "column": 2,
+          "position": 1968
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/utils/__tests__/task-view.test.ts",
+        "start": 152,
+        "end": 168,
+        "startLoc": {
+          "line": 152,
+          "column": 2,
+          "position": 1461
+        },
+        "endLoc": {
+          "line": 168,
+          "column": 3,
+          "position": 1612
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 6,
+      "fragment": "= useMutation({\n    mutationFn: (data: Record<string, unknown>) =>\n      apiPost(`/automation/rules?workspaceId=${workspaceId}`, data, { auth: true }),\n    onSuccess: () => {\n      void queryClient.invalidateQueries({ queryKey: ['automation-rules'] });\n      toast.success('Giao thức đã kích hoạt'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/specialized/automation/components/AIAutomationDialog.tsx",
+        "start": 47,
+        "end": 52,
+        "startLoc": {
+          "line": 47,
+          "column": 2,
+          "position": 420
+        },
+        "endLoc": {
+          "line": 52,
+          "column": 25,
+          "position": 505
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/specialized/automation/components/CreateRuleModal.tsx",
+        "start": 19,
+        "end": 24,
+        "startLoc": {
+          "line": 19,
+          "column": 2,
+          "position": 213
+        },
+        "endLoc": {
+          "line": 24,
+          "column": 28,
+          "position": 298
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 8,
+      "fragment": ") => {\n      await queryClient.cancelQueries({ queryKey: ['projects', projectId] });\n      const previous = queryClient.getQueryData<ProjectDetailDTO>(['projects', projectId]);\n\n      if (previous) {\n        queryClient.setQueryData<ProjectDetailDTO>(['projects', projectId], {\n          ...previous,\n          tasks: previous.tasks.filter",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/task/hooks/use-task-mutations.ts",
+        "start": 140,
+        "end": 147,
+        "startLoc": {
+          "line": 140,
+          "column": 7,
+          "position": 1188
+        },
+        "endLoc": {
+          "line": 147,
+          "column": 7,
+          "position": 1281
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/hooks/use-task-mutations.ts",
+        "start": 97,
+        "end": 104,
+        "startLoc": {
+          "line": 97,
+          "column": 2,
+          "position": 766
+        },
+        "endLoc": {
+          "line": 104,
+          "column": 4,
+          "position": 859
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 11,
+      "fragment": "),\n        });\n      }\n      return { previous };\n    },\n    onError: (_error, _variables, context) => {\n      if (context?.previous) {\n        queryClient.setQueryData(['projects', projectId], context.previous);\n      }\n    },\n    onSuccess: ()",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/task/hooks/use-task-mutations.ts",
+        "start": 147,
+        "end": 157,
+        "startLoc": {
+          "line": 147,
+          "column": 7,
+          "position": 1296
+        },
+        "endLoc": {
+          "line": 157,
+          "column": 2,
+          "position": 1382
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/hooks/use-task-mutations.ts",
+        "start": 112,
+        "end": 122,
+        "startLoc": {
+          "line": 112,
+          "column": 11,
+          "position": 924
+        },
+        "endLoc": {
+          "line": 122,
+          "column": 6,
+          "position": 1010
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 10,
+      "fragment": "}\n      return { previous };\n    },\n    onError: (_error, _variables, context) => {\n      if (context?.previous) {\n        queryClient.setQueryData(['projects', projectId], context.previous);\n      }\n    },\n    onSuccess: (_data, variables) => {\n      const",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/task/hooks/use-task-mutations.ts",
+        "start": 249,
+        "end": 258,
+        "startLoc": {
+          "line": 249,
+          "column": 7,
+          "position": 2338
+        },
+        "endLoc": {
+          "line": 258,
+          "column": 6,
+          "position": 2426
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/hooks/use-task-mutations.ts",
+        "start": 114,
+        "end": 123,
+        "startLoc": {
+          "line": 114,
+          "column": 7,
+          "position": 933
+        },
+        "endLoc": {
+          "line": 123,
+          "column": 5,
+          "position": 1021
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 11,
+      "fragment": ");\n    if (!currentStatusObj) return workflow.statuses.map((s) => ({ key: s.key, label: s.name }));\n\n    const allowedToStatusIds = new Set(\n      workflow.transitions\n        .filter((t) => t.fromStatusId === currentStatusObj.id)\n        .map((t) => t.toStatusId),\n    );\n\n    return workflow.statuses\n      .filter((s) => s.key === currentStatus",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/task/components/task-list-view.tsx",
+        "start": 57,
+        "end": 67,
+        "startLoc": {
+          "line": 57,
+          "column": 14,
+          "position": 484
+        },
+        "endLoc": {
+          "line": 67,
+          "column": 14,
+          "position": 615
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/components/task-properties-form.tsx",
+        "start": 76,
+        "end": 86,
+        "startLoc": {
+          "line": 76,
+          "column": 14,
+          "position": 692
+        },
+        "endLoc": {
+          "line": 86,
+          "column": 14,
+          "position": 823
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 14,
+      "fragment": "}\n                  editType={editType}\n                  setEditType={setEditType}\n                  editStatus={editStatus}\n                  setEditStatus={setEditStatus}\n                  editPriority={editPriority}\n                  setEditPriority={setEditPriority}\n                  editStoryPoints={editStoryPoints}\n                  setEditStoryPoints={setEditStoryPoints}\n                  editDueDate={editDueDate}\n                  setEditDueDate={setEditDueDate}\n                  editAssigneeId={editAssigneeId}\n                  setEditAssigneeId={setEditAssigneeId}\n                  members={members",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/task/components/task-edit-slide-over.tsx",
+        "start": 578,
+        "end": 591,
+        "startLoc": {
+          "line": 578,
+          "column": 13,
+          "position": 4390
+        },
+        "endLoc": {
+          "line": 591,
+          "column": 8,
+          "position": 4467
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/app/(private)/jira/projects/[projectId]/page.tsx",
+        "start": 423,
+        "end": 436,
+        "startLoc": {
+          "line": 423,
+          "column": 19,
+          "position": 3145
+        },
+        "endLoc": {
+          "line": 436,
+          "column": 20,
+          "position": 3222
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 15,
+      "fragment": ": (val: string) => void;\n  editType: TaskTypeDTO;\n  setEditType: Dispatch<SetStateAction<TaskTypeDTO>>;\n  editStatus: ProjectTaskItemDTO['status'];\n  setEditStatus: (val: ProjectTaskItemDTO['status']) => void;\n  editPriority: TaskPriority;\n  setEditPriority: (val: TaskPriority) => void;\n  editStoryPoints: string;\n  setEditStoryPoints: (val: string) => void;\n  editDueDate: string;\n  setEditDueDate: (val: string) => void;\n  editAssigneeId: string;\n  setEditAssigneeId: (val: string) => void;\n\n  // Subtasks",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/task/components/task-edit-slide-over.tsx",
+        "start": 57,
+        "end": 71,
+        "startLoc": {
+          "line": 57,
+          "column": 19,
+          "position": 408
+        },
+        "endLoc": {
+          "line": 71,
+          "column": 12,
+          "position": 565
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/components/task-properties-form.tsx",
+        "start": 20,
+        "end": 33,
+        "startLoc": {
+          "line": 20,
+          "column": 13,
+          "position": 184
+        },
+        "endLoc": {
+          "line": 33,
+          "column": 8,
+          "position": 340
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 24,
+      "fragment": "}\n              >\n                <Flag\n                  size={16}\n                  className={isPriorityPending ? 'animate-pulse text-indigo-500' : ''}\n                />\n                <span className=\"text-[10px] font-black uppercase tracking-[0.3em] italic\">\n                  RANK\n                </span>\n              </button>\n\n              <AnimatePresence>\n                {activeMenu === 'priority' && (\n                  <motion.div\n                    initial={{ opacity: 0, scale: 0.95, y: -20 }}\n                    animate={{ opacity: 1, scale: 1, y: -12 }}\n                    exit={{ opacity: 0, scale: 0.95, y: -10 }}\n                    className=\"absolute bottom-full left-0 mb-6 rounded-[2.5rem] border border-white/10 bg-slate-950/90 p-3 w-64 backdrop-blur-3xl shadow-luxe z-50 overflow-hidden\"\n                  >\n                    <div className=\"absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent\" />\n                    <div className=\"space-y-1.5 p-1\">\n                      {PRIORITY_OPTIONS.map((p) => (\n                        <button\n                          key={p",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/task/components/task-bulk-action-bar.tsx",
+        "start": 168,
+        "end": 191,
+        "startLoc": {
+          "line": 168,
+          "column": 2,
+          "position": 1284
+        },
+        "endLoc": {
+          "line": 191,
+          "column": 2,
+          "position": 1485
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/components/task-bulk-action-bar.tsx",
+        "start": 113,
+        "end": 135,
+        "startLoc": {
+          "line": 113,
+          "column": 3,
+          "position": 870
+        },
+        "endLoc": {
+          "line": 135,
+          "column": 3,
+          "position": 1062
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 26,
+      "fragment": "\n                    ? 'bg-white border-white text-slate-950 shadow-luxe scale-105'\n                    : 'bg-white/[0.02] border-white/5 text-white/40 hover:text-white hover:bg-white/5'\n                }`}\n              >\n                <User\n                  size={16}\n                  className={isAssignPending ? 'animate-pulse text-emerald-500' : ''}\n                />\n                <span className=\"text-[10px] font-black uppercase tracking-[0.3em] italic\">\n                  OPERATOR\n                </span>\n              </button>\n\n              <AnimatePresence>\n                {activeMenu === 'assignee' && (\n                  <motion.div\n                    initial={{ opacity: 0, scale: 0.95, y: -20 }}\n                    animate={{ opacity: 1, scale: 1, y: -12 }}\n                    exit={{ opacity: 0, scale: 0.95, y: -10 }}\n                    className=\"absolute bottom-full left-0 mb-6 rounded-[2.5rem] border border-white/10 bg-slate-950/90 p-3 w-80 backdrop-blur-3xl shadow-luxe z-50 overflow-hidden\"\n                  >\n                    <div className=\"absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent\" />\n                    <div className=\"space-y-1.5 p-1\">\n                      <button\n                        onClick={(",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/task/components/task-bulk-action-bar.tsx",
+        "start": 222,
+        "end": 247,
+        "startLoc": {
+          "line": 222,
+          "column": 11,
+          "position": 1688
+        },
+        "endLoc": {
+          "line": 247,
+          "column": 2,
+          "position": 1886
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/components/task-bulk-action-bar.tsx",
+        "start": 165,
+        "end": 135,
+        "startLoc": {
+          "line": 165,
+          "column": 11,
+          "position": 1273
+        },
+        "endLoc": {
+          "line": 135,
+          "column": 3,
+          "position": 1062
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 36,
+      "fragment": "});\n    };\n\n    const scheduleInvalidate = () => {\n      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {\n        hasPendingInvalidateRef.current = true;\n        return;\n      }\n\n      if (invalidateTimerRef.current) {\n        clearTimeout(invalidateTimerRef.current);\n      }\n\n      invalidateTimerRef.current = setTimeout(() => {\n        invalidateTimerRef.current = null;\n        hasPendingInvalidateRef.current = false;\n        runInvalidate();\n      }, 120);\n    };\n\n    const handleVisibilityChange = () => {\n      if (\n        typeof document !== 'undefined' &&\n        document.visibilityState === 'visible' &&\n        hasPendingInvalidateRef.current\n      ) {\n        hasPendingInvalidateRef.current = false;\n        if (invalidateTimerRef.current) {\n          clearTimeout(invalidateTimerRef.current);\n          invalidateTimerRef.current = null;\n        }\n        runInvalidate();\n      }\n    };\n\n    const unsubscribe",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/project/hooks/use-projects.ts",
+        "start": 14,
+        "end": 49,
+        "startLoc": {
+          "line": 14,
+          "column": 2,
+          "position": 175
+        },
+        "endLoc": {
+          "line": 49,
+          "column": 12,
+          "position": 431
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/hooks/use-task-comments.ts",
+        "start": 38,
+        "end": 73,
+        "startLoc": {
+          "line": 38,
+          "column": 2,
+          "position": 398
+        },
+        "endLoc": {
+          "line": 73,
+          "column": 16,
+          "position": 654
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 11,
+      "fragment": "();\n      if (typeof document !== 'undefined') {\n        document.removeEventListener('visibilitychange', handleVisibilityChange);\n      }\n      if (invalidateTimerRef.current) {\n        clearTimeout(invalidateTimerRef.current);\n        invalidateTimerRef.current = null;\n      }\n      hasPendingInvalidateRef.current = false;\n    };\n  }, [queryClient",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/project/hooks/use-projects.ts",
+        "start": 55,
+        "end": 65,
+        "startLoc": {
+          "line": 55,
+          "column": 12,
+          "position": 484
+        },
+        "endLoc": {
+          "line": 65,
+          "column": 12,
+          "position": 570
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/hooks/use-task-comments.ts",
+        "start": 86,
+        "end": 96,
+        "startLoc": {
+          "line": 86,
+          "column": 18,
+          "position": 772
+        },
+        "endLoc": {
+          "line": 96,
+          "column": 10,
+          "position": 858
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 36,
+      "fragment": "] });\n    };\n\n    const scheduleInvalidate = () => {\n      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {\n        hasPendingInvalidateRef.current = true;\n        return;\n      }\n\n      if (invalidateTimerRef.current) {\n        clearTimeout(invalidateTimerRef.current);\n      }\n\n      invalidateTimerRef.current = setTimeout(() => {\n        invalidateTimerRef.current = null;\n        hasPendingInvalidateRef.current = false;\n        runInvalidate();\n      }, 120);\n    };\n\n    const handleVisibilityChange = () => {\n      if (\n        typeof document !== 'undefined' &&\n        document.visibilityState === 'visible' &&\n        hasPendingInvalidateRef.current\n      ) {\n        hasPendingInvalidateRef.current = false;\n        if (invalidateTimerRef.current) {\n          clearTimeout(invalidateTimerRef.current);\n          invalidateTimerRef.current = null;\n        }\n        runInvalidate();\n      }\n    };\n\n    const unsubscribeBroadcast",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/project/hooks/use-project-detail.ts",
+        "start": 22,
+        "end": 57,
+        "startLoc": {
+          "line": 22,
+          "column": 2,
+          "position": 231
+        },
+        "endLoc": {
+          "line": 57,
+          "column": 21,
+          "position": 489
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/project/hooks/use-projects.ts",
+        "start": 14,
+        "end": 73,
+        "startLoc": {
+          "line": 14,
+          "column": 11,
+          "position": 173
+        },
+        "endLoc": {
+          "line": 73,
+          "column": 16,
+          "position": 654
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 11,
+      "fragment": "();\n      if (typeof document !== 'undefined') {\n        document.removeEventListener('visibilitychange', handleVisibilityChange);\n      }\n      if (invalidateTimerRef.current) {\n        clearTimeout(invalidateTimerRef.current);\n        invalidateTimerRef.current = null;\n      }\n      hasPendingInvalidateRef.current = false;\n    };\n  }, [projectId, queryClient]",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/project/hooks/use-project-detail.ts",
+        "start": 92,
+        "end": 102,
+        "startLoc": {
+          "line": 92,
+          "column": 23,
+          "position": 799
+        },
+        "endLoc": {
+          "line": 102,
+          "column": 2,
+          "position": 889
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/hooks/use-task-comments.ts",
+        "start": 86,
+        "end": 96,
+        "startLoc": {
+          "line": 86,
+          "column": 18,
+          "position": 772
+        },
+        "endLoc": {
+          "line": 96,
+          "column": 2,
+          "position": 862
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 27,
+      "fragment": "}\n                editTitle={editTitle}\n                setEditTitle={setEditTitle}\n                editDescription={editDescription}\n                setEditDescription={setEditDescription}\n                editType={editType}\n                setEditType={setEditType}\n                editStatus={editStatus}\n                setEditStatus={setEditStatus}\n                editPriority={editPriority}\n                setEditPriority={setEditPriority}\n                editStoryPoints={editStoryPoints}\n                setEditStoryPoints={setEditStoryPoints}\n                editDueDate={editDueDate}\n                setEditDueDate={setEditDueDate}\n                editAssigneeId={editAssigneeId}\n                setEditAssigneeId={setEditAssigneeId}\n                editingTaskSubtasks={editingTaskSubtasks}\n                subtaskTitle={subtaskTitle}\n                setSubtaskTitle={setSubtaskTitle}\n                subtaskError={subtaskError}\n                subtaskPendingTaskId={subtaskPendingTaskId}\n                handleCreateSubtask={handleCreateSubtask}\n                handleToggleSubtaskDone={handleToggleSubtaskDone}\n                handleDeleteSubtask={handleDeleteSubtask}\n                editingParentTask={editingParentTask}\n                onClose={onCloseEdit",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/project/components/ProjectOverlayManager.tsx",
+        "start": 150,
+        "end": 176,
+        "startLoc": {
+          "line": 150,
+          "column": 8,
+          "position": 1184
+        },
+        "endLoc": {
+          "line": 176,
+          "column": 12,
+          "position": 1339
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/app/(private)/jira/projects/[projectId]/page.tsx",
+        "start": 419,
+        "end": 445,
+        "startLoc": {
+          "line": 419,
+          "column": 15,
+          "position": 3121
+        },
+        "endLoc": {
+          "line": 445,
+          "column": 17,
+          "position": 3276
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 27,
+      "fragment": ",\n  editTitle,\n  setEditTitle,\n  editDescription,\n  setEditDescription,\n  editType,\n  setEditType,\n  editStatus,\n  setEditStatus,\n  editPriority,\n  setEditPriority,\n  editStoryPoints,\n  setEditStoryPoints,\n  editDueDate,\n  setEditDueDate,\n  editAssigneeId,\n  setEditAssigneeId,\n  editingTaskSubtasks,\n  subtaskTitle,\n  setSubtaskTitle,\n  subtaskError,\n  subtaskPendingTaskId,\n  handleCreateSubtask,\n  handleToggleSubtaskDone,\n  handleDeleteSubtask,\n  editingParentTask,\n  handleUpdateTask",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/operations/project/components/ProjectOverlayManager.tsx",
+        "start": 84,
+        "end": 110,
+        "startLoc": {
+          "line": 84,
+          "column": 11,
+          "position": 762
+        },
+        "endLoc": {
+          "line": 110,
+          "column": 17,
+          "position": 865
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/components/task-edit-slide-over.tsx",
+        "start": 106,
+        "end": 132,
+        "startLoc": {
+          "line": 106,
+          "column": 8,
+          "position": 889
+        },
+        "endLoc": {
+          "line": 132,
+          "column": 8,
+          "position": 992
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 11,
+      "fragment": "() {\n  return (\n    <div className=\"space-y-12 py-10 px-6 animate-pulse\">\n      <div className=\"h-12 w-64 bg-white/5 rounded-lg\" />\n      <div className=\"grid grid-cols-1 lg:grid-cols-2 gap-8\">\n        <div className=\"h-96 bg-white/5 rounded-[3.5rem]\" />\n        <div className=\"h-96 bg-white/5 rounded-[3.5rem]\" />\n      </div>\n    </div>\n  );\n}",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/intelligence/knowledge/components/ConflictResolver.tsx",
+        "start": 183,
+        "end": 193,
+        "startLoc": {
+          "line": 183,
+          "column": 17,
+          "position": 1560
+        },
+        "endLoc": {
+          "line": 193,
+          "column": 2,
+          "position": 1642
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/specialized/automation/components/SymbiosisConsole.tsx",
+        "start": 182,
+        "end": 192,
+        "startLoc": {
+          "line": 182,
+          "column": 16,
+          "position": 1496
+        },
+        "endLoc": {
+          "line": 192,
+          "column": 2,
+          "position": 1578
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 12,
+      "fragment": "}\n                    onOpenCreate={() => setShowCreatePanel(true)}\n                    onOpenEdit={openEditProject}\n                    onArchive={(projectId) => {\n                      void handleArchiveProject(projectId);\n                    }}\n                    isArchivingProject={isArchivingProject}\n                    onToggleFavorite={toggleFavoriteProject}\n                    isFavorite={isFavoriteProject}\n                    getProjectOpenHref={getProjectOpenHref}\n                    onClearRememberedContext={clearProjectRememberedContext}\n                    hasRememberedContext={hasRememberedContext}",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/integrations/jira/components/JiraDashboard.tsx",
+        "start": 278,
+        "end": 289,
+        "startLoc": {
+          "line": 278,
+          "column": 23,
+          "position": 2039
+        },
+        "endLoc": {
+          "line": 289,
+          "column": 2,
+          "position": 2117
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/integrations/jira/components/JiraDashboard.tsx",
+        "start": 248,
+        "end": 259,
+        "startLoc": {
+          "line": 248,
+          "column": 21,
+          "position": 1813
+        },
+        "endLoc": {
+          "line": 259,
+          "column": 2,
+          "position": 1891
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 9,
+      "fragment": "onClick={() => {\n              editor\n                .chain()\n                .focus()\n                .deleteRange({\n                  from: editor.state.selection.from - 1,\n                  to: editor.state.selection.from,\n                })\n                .toggleHeading({ level: 2",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/collaboration/docs/components/RichTextEditor.tsx",
+        "start": 309,
+        "end": 317,
+        "startLoc": {
+          "line": 309,
+          "column": 13,
+          "position": 2797
+        },
+        "endLoc": {
+          "line": 317,
+          "column": 2,
+          "position": 2871
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/collaboration/docs/components/RichTextEditor.tsx",
+        "start": 292,
+        "end": 300,
+        "startLoc": {
+          "line": 292,
+          "column": 13,
+          "position": 2640
+        },
+        "endLoc": {
+          "line": 300,
+          "column": 2,
+          "position": 2714
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 10,
+      "fragment": "onClick={() => {\n              editor\n                .chain()\n                .focus()\n                .deleteRange({\n                  from: editor.state.selection.from - 1,\n                  to: editor.state.selection.from,\n                })\n                .run();\n              handleTemplateInject('rfc'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/features/collaboration/docs/components/RichTextEditor.tsx",
+        "start": 379,
+        "end": 388,
+        "startLoc": {
+          "line": 379,
+          "column": 13,
+          "position": 3405
+        },
+        "endLoc": {
+          "line": 388,
+          "column": 6,
+          "position": 3480
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/collaboration/docs/components/RichTextEditor.tsx",
+        "start": 363,
+        "end": 372,
+        "startLoc": {
+          "line": 363,
+          "column": 13,
+          "position": 3281
+        },
+        "endLoc": {
+          "line": 372,
+          "column": 11,
+          "position": 3356
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 11,
+      "fragment": "): () => void {\n  const channel = getBroadcastChannel();\n\n  if (!channel) {\n    return () => {};\n  }\n\n  const handler = (message: MessageEvent<ProjectSyncEvent>) => {\n    const event = message.data;\n\n    if (event.type !== 'projects-list-updated'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/lib/realtime/project-sync.ts",
+        "start": 114,
+        "end": 124,
+        "startLoc": {
+          "line": 114,
+          "column": 5,
+          "position": 753
+        },
+        "endLoc": {
+          "line": 124,
+          "column": 24,
+          "position": 848
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/lib/realtime/project-sync.ts",
+        "start": 71,
+        "end": 82,
+        "startLoc": {
+          "line": 71,
+          "column": 1,
+          "position": 460
+        },
+        "endLoc": {
+          "line": 82,
+          "column": 25,
+          "position": 557
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 13,
+      "fragment": ": () => void,\n): () => void {\n  const channel = getBroadcastChannel();\n\n  if (!channel) {\n    return () => {};\n  }\n\n  const handler = (message: MessageEvent<ProjectSyncEvent>) => {\n    const event = message.data;\n\n    if (\n      event.type !== 'task-comments-updated'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/lib/realtime/project-sync.ts",
+        "start": 162,
+        "end": 174,
+        "startLoc": {
+          "line": 162,
+          "column": 18,
+          "position": 1079
+        },
+        "endLoc": {
+          "line": 174,
+          "column": 24,
+          "position": 1186
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/lib/realtime/project-sync.ts",
+        "start": 70,
+        "end": 82,
+        "startLoc": {
+          "line": 70,
+          "column": 17,
+          "position": 450
+        },
+        "endLoc": {
+          "line": 82,
+          "column": 25,
+          "position": 557
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 14,
+      "fragment": "({ size, className }: { size: number; className?: string }) {\n  return (\n    <svg\n      width={size}\n      height={size}\n      viewBox=\"0 0 24 24\"\n      fill=\"none\"\n      stroke=\"currentColor\"\n      strokeWidth=\"2\"\n      strokeLinecap=\"round\"\n      strokeLinejoin=\"round\"\n      className={className}\n    >\n      <path d=\"M12 2a3 3 0 0 0-3 3v7",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/src/components/layout/SingularityPulse.tsx",
+        "start": 183,
+        "end": 196,
+        "startLoc": {
+          "line": 183,
+          "column": 13,
+          "position": 1630
+        },
+        "endLoc": {
+          "line": 196,
+          "column": 22,
+          "position": 1732
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/src/features/operations/task/components/task-calendar-view.tsx",
+        "start": 90,
+        "end": 103,
+        "startLoc": {
+          "line": 90,
+          "column": 9,
+          "position": 631
+        },
+        "endLoc": {
+          "line": 103,
+          "column": 26,
+          "position": 733
+        }
+      }
+    }
+  ]
+}

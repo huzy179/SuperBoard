@@ -1,10 +1,33 @@
+import asyncio
 import os
 import socket
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from datetime import datetime, timezone
 
-app = FastAPI(title="SuperBoard AI Service")
+from event_consumer import EventConsumer
+
+_event_consumer: EventConsumer | None = None
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Start the event consumer as a background task on startup."""
+    global _event_consumer
+    _event_consumer = EventConsumer()
+    consumer_task = asyncio.create_task(_event_consumer.start())
+    yield
+    if _event_consumer:
+        await _event_consumer.stop()
+    consumer_task.cancel()
+    try:
+        await consumer_task
+    except asyncio.CancelledError:
+        pass
+
+
+app = FastAPI(title="SuperBoard AI Service", lifespan=lifespan)
 
 # Ensure telemetry data directory exists
 os.makedirs("data", exist_ok=True)

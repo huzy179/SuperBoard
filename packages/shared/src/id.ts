@@ -2,6 +2,8 @@ import { decodeTime, isValid, monotonicFactory, ulid } from 'ulid';
 
 const monotonicUlid = monotonicFactory();
 
+export { ulid };
+
 export function createUlid(): string {
   return ulid();
 }

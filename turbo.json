@@ -20,6 +20,9 @@
     },
     "test": {
       "cache": false
+    },
+    "test:integration": {
+      "cache": false
     }
   }
 }

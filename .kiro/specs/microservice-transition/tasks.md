@@ -187,7 +187,7 @@ Tech stack: NestJS v11, Prisma v7, PostgreSQL, Redis/BullMQ, gRPC, FastAPI, Dock
 <!-- EPIC C — Tách Runtime Services (Pha 2–4)                    -->
 <!-- ============================================================ -->
 
-- [-] 5. Epic C — Tách Runtime Services (Pha 2–4)
+- [x] 5. Epic C — Tách Runtime Services (Pha 2–4)
   - [x] 5.1 Tạo AI Client config với timeout, retry, circuit breaker
     - Tạo `apps/api/src/modules/ai/ai-client.config.ts` với `AI_CLIENT_CONFIG` object
     - Config timeout từ env `AI_GRPC_TIMEOUT_MS` (default 10000ms)
@@ -259,70 +259,70 @@ Tech stack: NestJS v11, Prisma v7, PostgreSQL, Redis/BullMQ, gRPC, FastAPI, Dock
     - Load tất cả config từ environment variables
     - _Requirements: 9.1, 5.7_
 
-  - [-] 5.12 Implement WebSocket gateway trong Collaboration Service
+  - [x] 5.12 Implement WebSocket gateway trong Collaboration Service
     - Tạo `CollaborationGateway` với Socket.IO
     - Implement channels: `project:{projectId}`, `doc:{docId}`, `chat:{channelId}`
     - Implement events: join/leave channel, typing indicator, presence update, document sync
     - Dùng Redis pub/sub (ioredis adapter) để fan-out events tới connected clients
     - _Requirements: 9.1, 9.4_
 
-  - [~] 5.13 Implement JWT auth handshake cho Collaboration Service
+  - [x] 5.13 Implement JWT auth handshake cho Collaboration Service
     - Khi WebSocket client connect, Collaboration Service gọi `POST /api/v1/auth/verify-token` trên Core API
     - Nếu token invalid → reject connection
     - Nếu valid → accept connection với `{ userId, workspaceId }` context
     - _Requirements: 9.3_
 
-  - [~] 5.14 Implement presence SLA ≤ 500ms trong Collaboration Service
+  - [x] 5.14 Implement presence SLA ≤ 500ms trong Collaboration Service
     - Khi user join/leave project channel → update presence state trong Redis (TTL-based)
     - Broadcast presence change tới tất cả subscribers của channel trong vòng 500ms
     - _Requirements: 9.5_
 
-  - [~] 5.15 Remove WebSocket gateway khỏi Core API
+  - [x] 5.15 Remove WebSocket gateway khỏi Core API
     - Xóa hoặc disable WebSocket gateway code trong `apps/api/src/`
     - Đảm bảo Core API không còn xử lý WebSocket connections
     - _Requirements: 9.2_
 
-  - [~] 5.16 Viết integration tests cho Collaboration Service
+  - [x] 5.16 Viết integration tests cho Collaboration Service
     - Test join/leave channel
     - Test typing indicator broadcast
     - Test presence update
     - Test document sync event delivery
     - _Requirements: 9.6_
 
-  - [~] 5.17 Implement Notification Service async worker
+  - [x] 5.17 Implement Notification Service async worker
     - Tạo `apps/notification/` NestJS app (hoặc standalone worker) với BullMQ processor
     - Implement processors cho 4 channels: `in-app`, `email`, `digest`, `reminder`
     - Queue name: `"notifications"`
     - Load config từ environment variables
     - _Requirements: 10.2_
 
-  - [~] 5.18 Implement retry với exponential backoff và DLQ cho Notification Service
+  - [x] 5.18 Implement retry với exponential backoff và DLQ cho Notification Service
     - Cấu hình BullMQ job retry: exponential backoff, max attempts từ env `NOTIF_RETRY_MAX` (default 5)
     - Sau khi hết retry → move job tới DLQ queue `"notifications:failed"`
     - _Requirements: 10.3_
 
-  - [~] 5.19 Implement Idempotency Key cho Notification jobs
+  - [x] 5.19 Implement Idempotency Key cho Notification jobs
     - Mỗi notification job có `id` field (ULID) làm idempotency key
     - Trước khi process job: check Redis SET NX với key `notif:processed:{id}`
     - Nếu key đã tồn tại → skip (đã xử lý), không gửi lại
     - _Requirements: 10.4_
 
-  - [~] 5.20 Viết property test cho Notification idempotency
+  - [x] 5.20 Viết property test cho Notification idempotency
     - **Property 10: Notification Idempotency**
     - Với mọi notification job được replay với cùng idempotency key (simulate retry/duplicate delivery), notification phải được deliver đúng một lần — không zero lần, không nhiều hơn một lần.
     - **Validates: Requirements 10.4**
 
-  - [~] 5.21 Cập nhật Core API để chỉ enqueue notification jobs
+  - [x] 5.21 Cập nhật Core API để chỉ enqueue notification jobs
     - Thay thế tất cả notification delivery logic trong `apps/api/src/` bằng BullMQ enqueue call
     - Core API enqueue job và return ngay — không wait delivery confirmation
     - _Requirements: 10.1, 10.5_
 
-  - [~] 5.22 Viết property test cho Notification enqueue is non-blocking
+  - [x] 5.22 Viết property test cho Notification enqueue is non-blocking
     - **Property 9: Notification Enqueue is Non-Blocking**
     - Với mọi Core API action trigger notification, Core API response time không được correlated với notification worker processing time. Core API phải return ngay sau khi enqueue job.
     - **Validates: Requirements 10.1**
 
-  - [~] 5.23 Expose metrics cho Notification Service
+  - [x] 5.23 Expose metrics cho Notification Service
     - Emit metrics: queue backlog size, job success rate, failed job count per notification channel
     - Expose qua `/metrics` endpoint hoặc BullMQ dashboard
     - _Requirements: 10.6_

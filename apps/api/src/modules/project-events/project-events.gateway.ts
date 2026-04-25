@@ -1,76 +1,14 @@
-import {
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+// WebSocket gateway disabled — collaboration moved to apps/collaboration/
+import { Injectable } from '@nestjs/common';
 import { logger } from '../../common/logger';
 
-const toProjectRoom = (projectId: string) => `project:${projectId}`;
-const toTaskRoom = (projectId: string, taskId: string) => `project:${projectId}:task:${taskId}`;
-
-@WebSocketGateway({
-  cors: {
-    origin: '*',
-  },
-  namespace: 'projects',
-})
-export class ProjectEventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer()
-  server!: Server;
-
-  handleConnection(client: Socket) {
-    const projectId = client.handshake.query.projectId as string;
-    if (projectId) {
-      void client.join(toProjectRoom(projectId));
-      this.emitProjectPresence(projectId);
-      logger.info({ clientId: client.id, projectId }, 'Client connected to project');
-    }
-  }
-
-  handleDisconnect(client: Socket) {
-    const projectId = client.handshake.query.projectId as string;
-    if (projectId) {
-      this.emitProjectPresence(projectId);
-      logger.info({ clientId: client.id, projectId }, 'Client disconnected from project');
-    }
-  }
-
-  @SubscribeMessage('project:join')
-  handleProjectJoin(client: Socket, payload: { projectId: string }) {
-    if (!payload.projectId) return;
-    void client.join(toProjectRoom(payload.projectId));
-    this.emitProjectPresence(payload.projectId);
-  }
-
-  @SubscribeMessage('project:leave')
-  handleProjectLeave(client: Socket, payload: { projectId: string }) {
-    if (!payload.projectId) return;
-    void client.leave(toProjectRoom(payload.projectId));
-    this.emitProjectPresence(payload.projectId);
-  }
-
-  @SubscribeMessage('task:join')
-  handleTaskJoin(client: Socket, payload: { projectId: string; taskId: string }) {
-    if (!payload.projectId || !payload.taskId) return;
-    void client.join(toTaskRoom(payload.projectId, payload.taskId));
-    this.emitTaskPresence(payload.projectId, payload.taskId);
-  }
-
-  @SubscribeMessage('task:leave')
-  handleTaskLeave(client: Socket, payload: { projectId: string; taskId: string }) {
-    if (!payload.projectId || !payload.taskId) return;
-    void client.leave(toTaskRoom(payload.projectId, payload.taskId));
-    this.emitTaskPresence(payload.projectId, payload.taskId);
-  }
-
+@Injectable()
+export class ProjectEventsGateway {
   emitProjectUpdated(projectId: string) {
-    this.server.to(toProjectRoom(projectId)).emit('project:updated', {
-      projectId,
-      at: Date.now(),
-    });
+    logger.warn(
+      { projectId },
+      'ProjectEventsGateway.emitProjectUpdated: WebSocket disabled, skipping emit',
+    );
   }
 
   emitProjectTaskPatched(payload: {
@@ -80,14 +18,10 @@ export class ProjectEventsGateway implements OnGatewayConnection, OnGatewayDisco
     position?: string | null;
     updatedAt: string;
   }) {
-    this.server.to(toProjectRoom(payload.projectId)).emit('project:task-patched', {
-      projectId: payload.projectId,
-      taskId: payload.taskId,
-      status: payload.status,
-      position: payload.position ?? null,
-      updatedAt: payload.updatedAt,
-      at: Date.now(),
-    });
+    logger.warn(
+      { projectId: payload.projectId, taskId: payload.taskId },
+      'ProjectEventsGateway.emitProjectTaskPatched: WebSocket disabled, skipping emit',
+    );
   }
 
   emitTaskUpdated(payload: {
@@ -96,14 +30,10 @@ export class ProjectEventsGateway implements OnGatewayConnection, OnGatewayDisco
     aiContext?: string | null;
     updatedAt: string;
   }) {
-    this.server.to(toProjectRoom(payload.projectId)).emit('task:updated', {
-      projectId: payload.projectId,
-      taskId: payload.taskId,
-      aiContext: payload.aiContext || null,
-      aiMetadata: payload.aiContext ? { processedAt: new Date().toISOString() } : null,
-      updatedAt: payload.updatedAt,
-      at: Date.now(),
-    });
+    logger.warn(
+      { projectId: payload.projectId, taskId: payload.taskId },
+      'ProjectEventsGateway.emitTaskUpdated: WebSocket disabled, skipping emit',
+    );
   }
 
   emitCommentAdded(payload: {
@@ -114,10 +44,10 @@ export class ProjectEventsGateway implements OnGatewayConnection, OnGatewayDisco
     content: string;
     createdAt: string;
   }) {
-    this.server.to(toTaskRoom(payload.projectId, payload.taskId)).emit('comment:added', {
-      ...payload,
-      at: Date.now(),
-    });
+    logger.warn(
+      { projectId: payload.projectId, taskId: payload.taskId, commentId: payload.commentId },
+      'ProjectEventsGateway.emitCommentAdded: WebSocket disabled, skipping emit',
+    );
   }
 
   emitCommentUpdated(payload: {
@@ -127,39 +57,16 @@ export class ProjectEventsGateway implements OnGatewayConnection, OnGatewayDisco
     content: string;
     updatedAt: string;
   }) {
-    this.server.to(toTaskRoom(payload.projectId, payload.taskId)).emit('comment:updated', {
-      ...payload,
-      at: Date.now(),
-    });
+    logger.warn(
+      { projectId: payload.projectId, taskId: payload.taskId, commentId: payload.commentId },
+      'ProjectEventsGateway.emitCommentUpdated: WebSocket disabled, skipping emit',
+    );
   }
 
   emitCommentDeleted(payload: { projectId: string; taskId: string; commentId: string }) {
-    this.server.to(toTaskRoom(payload.projectId, payload.taskId)).emit('comment:deleted', {
-      ...payload,
-      at: Date.now(),
-    });
-  }
-
-  private emitProjectPresence(projectId: string) {
-    const room = this.server.sockets.adapter.rooms.get(toProjectRoom(projectId));
-    const viewerCount = room?.size ?? 0;
-
-    this.server.to(toProjectRoom(projectId)).emit('project:presence', {
-      projectId,
-      viewerCount,
-      at: Date.now(),
-    });
-  }
-
-  private emitTaskPresence(projectId: string, taskId: string) {
-    const room = this.server.sockets.adapter.rooms.get(toTaskRoom(projectId, taskId));
-    const viewerCount = room?.size ?? 0;
-
-    this.server.to(toTaskRoom(projectId, taskId)).emit('task:presence', {
-      projectId,
-      taskId,
-      viewerCount,
-      at: Date.now(),
-    });
+    logger.warn(
+      { projectId: payload.projectId, taskId: payload.taskId, commentId: payload.commentId },
+      'ProjectEventsGateway.emitCommentDeleted: WebSocket disabled, skipping emit',
+    );
   }
 }

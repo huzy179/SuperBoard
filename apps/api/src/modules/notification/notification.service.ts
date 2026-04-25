@@ -1,19 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import type { Prisma, NotificationPreference } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import type { NotificationJobDTO } from '@superboard/shared';
 import { PrismaService } from '../../prisma/prisma.service';
 import { QueueService } from '../../common/queue.service';
-import { EmailService } from './email.service';
 import { NotificationGateway } from './notification.gateway';
 import { AiService } from '../ai/ai.service';
-import { logger } from '../../common/logger';
 
 @Injectable()
 export class NotificationService {
   constructor(
     private prisma: PrismaService,
     private queueService: QueueService,
-    private emailService: EmailService,
     private gateway: NotificationGateway,
     private aiService: AiService,
   ) {}
@@ -67,7 +64,6 @@ export class NotificationService {
           aiSummary: parsed.summary || null,
         };
       } catch {
-        // High-confidence heuristic fallback
         if (type.includes('mention') || (payload.priority === 'high' && type.includes('delayed'))) {
           return {
             neuralPriority: 'STRATEGIC',
@@ -83,7 +79,7 @@ export class NotificationService {
 
   /**
    * Enqueue a typed notification job via BullMQ.
-   * Uses NotificationJobDTO from @superboard/shared for type-safe inter-service contract.
+   * Core API enqueues and returns immediately — no delivery logic here.
    */
   async enqueueNotificationJob(job: NotificationJobDTO): Promise<void> {
     await this.queueService.addJob('SEND_NOTIFICATION', job as unknown as Record<string, unknown>);
@@ -108,6 +104,7 @@ export class NotificationService {
     workspaceId: string;
     type: string;
     payload: Record<string, unknown>;
+    correlationId?: string;
   }) {
     const { neuralPriority, aiSummary } = await this.analyzeStrategicWeight(
       input.type,
@@ -125,7 +122,7 @@ export class NotificationService {
       },
     });
 
-    // Emit real-time notification
+    // Emit real-time notification (immediate, not delivery)
     void this.gateway.emitNotification(input.userId, {
       id: notification.id,
       type: notification.type,
@@ -135,15 +132,19 @@ export class NotificationService {
       createdAt: notification.createdAt.toISOString(),
     });
 
-    // Handle Email Notifications
-    try {
-      const preferences = await this.getUserPreferences(input.userId);
-      if (preferences.emailEnabled) {
-        await this.handleEmailTrigger(input, preferences);
-      }
-    } catch (error) {
-      logger.error({ error, userId: input.userId }, 'Failed to process email notification');
-    }
+    // Enqueue email notification job — fire-and-forget, Core API returns immediately
+    const { newId } = await import('@superboard/shared');
+    void this.enqueueNotificationJob({
+      id: newId(),
+      correlationId: input.correlationId ?? '',
+      type: 'email',
+      recipientId: input.userId,
+      payload: {
+        title: input.type,
+        metadata: input.payload,
+      },
+      createdAt: new Date().toISOString(),
+    });
   }
 
   async getUserPreferences(userId: string) {
@@ -168,73 +169,24 @@ export class NotificationService {
     });
   }
 
-  private async handleEmailTrigger(
-    input: { userId: string; type: string; payload: Record<string, unknown> },
-    preferences: NotificationPreference,
-  ) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: input.userId },
-      select: { email: true, fullName: true },
-    });
-
-    if (!user) return;
-
-    if (input.type === 'task_assigned' && preferences.taskAssignedEmail) {
-      const payload = input.payload as Record<string, unknown>;
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-      const taskUrl = `${baseUrl}/projects/${payload.projectId}/tasks/${payload.taskId}`;
-
-      await this.emailService.sendTaskAssignedEmail(
-        user.email,
-        user.fullName,
-        payload.taskTitle as string,
-        taskUrl,
-      );
-    }
-
-    if (input.type === 'workspace_invite' && preferences.workspaceInviteEmail) {
-      const payload = input.payload as Record<string, unknown>;
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-      const inviteUrl = `${baseUrl}/invitation/${payload.token}`;
-
-      await this.emailService.sendWorkspaceInviteEmail(
-        user.email,
-        payload.inviterName as string,
-        payload.workspaceName as string,
-        inviteUrl,
-      );
-    }
-
-    if (input.type === 'comment_mention' && preferences.commentMentionEmail) {
-      const payload = input.payload as Record<string, unknown>;
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-      const taskUrl = `${baseUrl}/projects/${payload.projectId}/tasks/${payload.taskId}`;
-
-      await this.emailService.sendCommentMentionEmail(
-        user.email,
-        user.fullName,
-        payload.authorName as string,
-        payload.taskTitle as string,
-        payload.commentPreview as string,
-        taskUrl,
-      );
-    }
-  }
-
   async sendWorkspaceInvitation(input: {
     email: string;
     inviterName: string;
     workspaceName: string;
     token: string;
   }) {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const inviteUrl = `${baseUrl}/invitation/${input.token}`;
-
-    await this.emailService.sendWorkspaceInviteEmail(
-      input.email,
-      input.inviterName,
-      input.workspaceName,
-      inviteUrl,
-    );
+    // Enqueue email job — fire-and-forget
+    const { newId } = await import('@superboard/shared');
+    void this.enqueueNotificationJob({
+      id: newId(),
+      correlationId: '',
+      type: 'email',
+      recipientId: input.email,
+      payload: {
+        title: 'workspace_invite',
+        metadata: input as unknown as Record<string, unknown>,
+      },
+      createdAt: new Date().toISOString(),
+    });
   }
 }

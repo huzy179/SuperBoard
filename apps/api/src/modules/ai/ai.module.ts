@@ -3,6 +3,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { AiController } from './ai.controller';
 import { AiService } from './ai.service';
+import { AiMetricsService } from './ai-metrics.service';
 import { TaskModule } from '../task/task.module';
 import { ChatModule } from '../chat/chat.module';
 import { ProjectModule } from '../project/project.module';
@@ -29,7 +30,7 @@ import { AnalyticsModule } from '../analytics/analytics.module';
     ]),
   ],
   controllers: [AiController],
-  providers: [AiService],
-  exports: [AiService],
+  providers: [AiService, AiMetricsService],
+  exports: [AiService, AiMetricsService],
 })
 export class AiModule {}

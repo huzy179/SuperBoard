@@ -1,0 +1,35 @@
+{
+  "name": "@superboard/collaboration",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npx nest start --watch",
+    "build": "npx nest build",
+    "start": "node dist/main.js",
+    "test": "node --test --import tsx",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.16",
+    "@nestjs/config": "^4.0.3",
+    "@nestjs/core": "^11.1.16",
+    "@nestjs/platform-socket.io": "^11.1.16",
+    "@nestjs/websockets": "^11.1.16",
+    "@socket.io/redis-adapter": "^8.3.0",
+    "@superboard/shared": "0.1.0",
+    "axios": "^1.8.1",
+    "ioredis": "^5.6.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/schematics": "^11.0.0",
+    "@nestjs/testing": "^11.0.0",
+    "@superboard/config-ts": "0.1.0",
+    "@types/node": "^25.5.0",
+    "tsx": "^4.20.6"
+  }
+}

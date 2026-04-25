@@ -8,7 +8,8 @@ import { getRequestContext } from '../../common/request-context';
 import { AI_CLIENT_CONFIG } from './ai-client.config';
 import { withRetry } from './ai-retry.util';
 import { getAiFallback } from './ai-fallback.handler';
-import { CircuitBreaker } from './ai-circuit-breaker';
+import { CircuitBreaker, CircuitOpenError } from './ai-circuit-breaker';
+import { AiMetricsService } from './ai-metrics.service';
 
 interface SummarizeRequest {
   task_id: string;
@@ -98,6 +99,7 @@ export class AiService implements OnModuleInit {
   constructor(
     @Inject('AI_PACKAGE') private client: ClientGrpc,
     private redis: RedisService,
+    private metrics: AiMetricsService,
   ) {}
 
   onModuleInit() {
@@ -123,6 +125,29 @@ export class AiService implements OnModuleInit {
     return `ai:${prefix}:${hash}`;
   }
 
+  private async executeWithMetrics<T>(method: string, fn: () => Promise<T>): Promise<T> {
+    const start = Date.now();
+    try {
+      const result = await this.circuitBreaker.execute(() => withRetry(fn));
+      const duration = Date.now() - start;
+      this.metrics.recordDuration(method, duration);
+      this.metrics.recordRequest(method, 'success');
+      this.metrics.updateCircuitBreakerState(this.circuitBreaker.getState());
+      return result;
+    } catch (error) {
+      if (error instanceof CircuitOpenError) {
+        this.metrics.recordRequest(method, 'circuit_open');
+        this.metrics.updateCircuitBreakerState(this.circuitBreaker.getState());
+        throw error;
+      }
+      const duration = Date.now() - start;
+      this.metrics.recordDuration(method, duration);
+      this.metrics.recordRequest(method, 'error');
+      this.metrics.updateCircuitBreakerState(this.circuitBreaker.getState());
+      throw error;
+    }
+  }
+
   async summarizeTask(taskId: string, title: string, description: string): Promise<string> {
     const cacheKey = this.generateCacheKey('summary', title, description);
     const cached = await this.redis.getJson<string>(cacheKey);
@@ -130,14 +155,12 @@ export class AiService implements OnModuleInit {
 
     try {
       const content = `Title: ${title}\nDescription: ${description}`;
-      const result = await this.circuitBreaker.execute(() =>
-        withRetry(() =>
-          firstValueFrom(
-            this.aiServiceClient.SummarizeTask(
-              { task_id: taskId, content },
-              this.buildGrpcMetadata(),
-              { deadline: this.buildDeadline() },
-            ),
+      const result = await this.executeWithMetrics('SummarizeTask', () =>
+        firstValueFrom(
+          this.aiServiceClient.SummarizeTask(
+            { task_id: taskId, content },
+            this.buildGrpcMetadata(),
+            { deadline: this.buildDeadline() },
           ),
         ),
       );
@@ -147,6 +170,7 @@ export class AiService implements OnModuleInit {
     } catch (error) {
       this.logger.error('AI Summarization failed', error);
       const fallback = getAiFallback('summarize');
+      this.metrics.recordRequest('SummarizeTask', 'fallback');
       return fallback.summary ?? 'Không thể tạo bản tóm tắt lúc này.';
     }
   }
@@ -157,13 +181,11 @@ export class AiService implements OnModuleInit {
     if (cached) return cached;
 
     try {
-      const result = await this.circuitBreaker.execute(() =>
-        withRetry(() =>
-          firstValueFrom(
-            this.aiServiceClient.GetEmbedding({ text }, this.buildGrpcMetadata(), {
-              deadline: this.buildDeadline(),
-            }),
-          ),
+      const result = await this.executeWithMetrics('GetEmbedding', () =>
+        firstValueFrom(
+          this.aiServiceClient.GetEmbedding({ text }, this.buildGrpcMetadata(), {
+            deadline: this.buildDeadline(),
+          }),
         ),
       );
       if (!result?.embedding) {
@@ -174,6 +196,7 @@ export class AiService implements OnModuleInit {
       return result.embedding;
     } catch (error) {
       this.logger.error('AI Embedding failed — returning fallback empty embedding', error);
+      this.metrics.recordRequest('GetEmbedding', 'fallback');
       return getAiFallback('embeddings').embedding;
     }
   }
@@ -211,13 +234,11 @@ export class AiService implements OnModuleInit {
 
     try {
       if (!this.aiServiceClient) throw new Error('gRPC client not initialized');
-      const result = await this.circuitBreaker.execute(() =>
-        withRetry(() =>
-          firstValueFrom(
-            this.aiServiceClient.ProcessText({ text, mode }, this.buildGrpcMetadata(), {
-              deadline: this.buildDeadline(),
-            }),
-          ),
+      const result = await this.executeWithMetrics('ProcessText', () =>
+        firstValueFrom(
+          this.aiServiceClient.ProcessText({ text, mode }, this.buildGrpcMetadata(), {
+            deadline: this.buildDeadline(),
+          }),
         ),
       );
 
@@ -229,6 +250,7 @@ export class AiService implements OnModuleInit {
         { mode },
         `AI gRPC failed, using Local Intelligence fallback. Error: ${error instanceof Error ? error.message : String(error)}`,
       );
+      this.metrics.recordRequest('ProcessText', 'fallback');
 
       const fallbacks: Record<string, (t: string) => string> = {
         summarize: (t) =>
@@ -392,42 +414,40 @@ export class AiService implements OnModuleInit {
   ): Promise<string[]> {
     try {
       const labels = existingLabels.map((l) => l.name);
-      const result = await this.circuitBreaker.execute(() =>
-        withRetry(() =>
-          firstValueFrom(
-            this.aiServiceClient.SuggestLabels(
-              {
-                title,
-                description,
-                existing_labels: labels,
-              },
-              this.buildGrpcMetadata(),
-              { deadline: this.buildDeadline() },
-            ),
+      const result = await this.executeWithMetrics('SuggestLabels', () =>
+        firstValueFrom(
+          this.aiServiceClient.SuggestLabels(
+            {
+              title,
+              description,
+              existing_labels: labels,
+            },
+            this.buildGrpcMetadata(),
+            { deadline: this.buildDeadline() },
           ),
         ),
       );
       return result.labels;
     } catch (error) {
       this.logger.error('Label suggestion failed', error);
+      this.metrics.recordRequest('SuggestLabels', 'fallback');
       return getAiFallback('suggestLabels').labels;
     }
   }
 
   async suggestPriority(title: string, description: string): Promise<string | null> {
     try {
-      const result = await this.circuitBreaker.execute(() =>
-        withRetry(() =>
-          firstValueFrom(
-            this.aiServiceClient.SuggestPriority({ title, description }, this.buildGrpcMetadata(), {
-              deadline: this.buildDeadline(),
-            }),
-          ),
+      const result = await this.executeWithMetrics('SuggestPriority', () =>
+        firstValueFrom(
+          this.aiServiceClient.SuggestPriority({ title, description }, this.buildGrpcMetadata(), {
+            deadline: this.buildDeadline(),
+          }),
         ),
       );
       return result.priority;
     } catch (error) {
       this.logger.error('Priority suggestion failed', error);
+      this.metrics.recordRequest('SuggestPriority', 'fallback');
       return null;
     }
   }

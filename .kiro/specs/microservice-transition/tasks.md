@@ -244,7 +244,7 @@ Tech stack: NestJS v11, Prisma v7, PostgreSQL, Redis/BullMQ, gRPC, FastAPI, Dock
     - Với mọi sequence consecutive AI Service failures đạt configured threshold, subsequent AI calls phải fail fast (circuit open) mà không tạo gRPC call mới tới AI Service, cho đến khi circuit chuyển sang half-open.
     - **Validates: Requirements 8.4**
 
-  - [-] 5.10 Implement telemetry metrics cho AI Service calls
+  - [x] 5.10 Implement telemetry metrics cho AI Service calls
     - Tích hợp Prometheus metrics (dùng `prom-client`)
     - Emit `ai_grpc_requests_total{method, status}`
     - Emit `ai_grpc_duration_seconds{method, quantile}` — p50, p95, p99
@@ -252,14 +252,14 @@ Tech stack: NestJS v11, Prisma v7, PostgreSQL, Redis/BullMQ, gRPC, FastAPI, Dock
     - Expose `/metrics` endpoint trên Core API
     - _Requirements: 8.5, 8.6_
 
-  - [~] 5.11 Tạo Collaboration Service app (`apps/collaboration/`)
+  - [x] 5.11 Tạo Collaboration Service app (`apps/collaboration/`)
     - Scaffold NestJS app tại `apps/collaboration/` với Socket.IO adapter
     - Cấu hình Turborepo để build `apps/collaboration/` độc lập
     - Tạo `apps/collaboration/Dockerfile`
     - Load tất cả config từ environment variables
     - _Requirements: 9.1, 5.7_
 
-  - [~] 5.12 Implement WebSocket gateway trong Collaboration Service
+  - [-] 5.12 Implement WebSocket gateway trong Collaboration Service
     - Tạo `CollaborationGateway` với Socket.IO
     - Implement channels: `project:{projectId}`, `doc:{docId}`, `chat:{channelId}`
     - Implement events: join/leave channel, typing indicator, presence update, document sync

@@ -1,22 +1,67 @@
-# SuperBoard
+# SuperBoard 🚀
 
-Chào mừng bạn đến với repo của SuperBoard - Một ứng dụng quản lý công việc Jira-style hiện đại.
+Chào mừng bạn đến với **SuperBoard** - Một nền tảng quản lý công việc hiện đại phong cách Jira, được thiết kế tối ưu cho mục đích **học tập** và **mở rộng hệ thống**.
 
-## 🚀 Tài liệu Dự án
+Dự án này là minh chứng cho việc áp dụng các kiến trúc phần mềm tiên tiến vào một sản phẩm thực tế, giúp bạn làm chủ từ Frontend, Backend cho đến các dịch vụ AI thông minh.
 
-Để hiểu rõ hơn về dự án và bắt đầu phát triển, vui lòng xem các tài liệu sau:
+---
 
-- **[Hướng dẫn Dự án (Project Guide)](docs/PROJECT_GUIDE.md)**: Tổng quan về tính năng, mục tiêu và lộ trình học tập.
-- **[Kiến trúc & Kỹ thuật (Architecture)](docs/ARCHITECTURE.md)**: Chi tiết về Tech Stack, cấu trúc thư mục và các quy ước code.
-- **[Nhật ký Công việc (Worklog)](worklog/worklog.md)**: Theo dõi tiến độ phát triển và các task đang thực hiện.
+## 📖 Tài Liệu Quan Trọng
 
-## 🛠 Bắt đầu Nhanh
+Để hiểu rõ và bắt đầu với dự án, vui lòng đọc các tài liệu hướng dẫn sau (đã được chuẩn hóa tiếng Việt):
 
-1.  **Cài đặt**: `npm install`
-2.  **Cơ sở hạ tầng**: `docker-compose up -d`
-3.  **Chạy Backend**: `npm run dev --workspace @superboard/api`
-4.  **Chạy Frontend**: `npm run dev --workspace @superboard/web`
+- 🏗️ **[Kiến Trúc Hệ Thống (ARCHITECT.md)](./ARCHITECT.md)**: Giải thích chi tiết về Tech Stack, cấu trúc thư mục và cách hệ thống vận hành.
+- 🚀 **[Lộ Trình Học Tập Nâng Cao (ADVANCED_LEARNING.md)](./ADVANCED_LEARNING.md)**: Các chủ đề và bài tập thực hành để nâng cao kỹ năng lập trình.
+- 🛠️ **[Nhật Ký Phát Triển (Worklog)](./worklog/worklog.md)**: Theo dõi các cập nhật và thay đổi mới nhất của dự án.
+
+---
+
+## 🛠️ Tính Năng Nổi Bật
+
+- **Quản lý Workspace & Project**: Phân quyền và tổ chức công việc chuyên nghiệp.
+- **Bảng Công Việc (Jira-style)**: Giao diện kéo thả, quản lý task linh hoạt.
+- **Hệ Thống Tự Động Hóa (Automation)**: Tự động xử lý các tác vụ lặp đi lặp lại.
+- **Tích Hợp AI**: Tìm kiếm ngữ nghĩa và hỗ trợ quản lý task thông minh.
+- **Thông Báo Thời Gian Thực**: Cập nhật tức thì qua WebSockets và Email.
+
+---
+
+## 🚀 Bắt Đầu Nhanh
+
+### 1. Yêu cầu hệ thống
+
+- Node.js >= 20.11
+- Docker & Docker Compose
+
+### 2. Cài đặt & Khởi chạy
+
+```bash
+# Cài đặt dependencies
+npm install
+
+# Khởi chạy hạ tầng (Database, Redis, MailHog)
+npm run dev:infra
+
+# Khởi tạo Database
+npm run db:migrate
+npm run db:seed
+
+# Chạy toàn bộ ứng dụng (API, Web, AI Services)
+npm run dev
+```
+
+---
+
+## 🏗️ Cấu Trúc Monorepo
+
+Dự án sử dụng **Turborepo** để quản lý các ứng dụng:
+
+- `/apps/web`: Frontend Next.js.
+- `/apps/api`: Backend chính NestJS.
+- `/apps/ai-service`: Dịch vụ AI (Python/FastAPI).
+- `/packages/shared`: Code và định nghĩa dữ liệu dùng chung.
 
 ---
 
 _SuperBoard - Code for learning, built for scale._
+_Duy trì và phát triển bởi cộng đồng học tập công nghệ._

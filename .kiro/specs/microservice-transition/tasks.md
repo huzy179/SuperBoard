@@ -227,24 +227,24 @@ Tech stack: NestJS v11, Prisma v7, PostgreSQL, Redis/BullMQ, gRPC, FastAPI, Dock
     - Không throw unhandled exception hoặc trả 500
     - _Requirements: 8.3_
 
-  - [-] 5.7 Viết property test cho AI Service fallback on exhausted retries
+  - [x] 5.7 Viết property test cho AI Service fallback on exhausted retries
     - **Property 7: AI Service Fallback on Exhausted Retries**
     - Với mọi AI use case (summarize, briefing, suggestLabels, embeddings), khi AI Service unavailable sau khi hết retries, Core API phải trả predefined fallback response — không bao giờ là unhandled exception hoặc 500 error.
     - **Validates: Requirements 8.3**
 
-  - [~] 5.8 Implement Circuit Breaker cho AI Service calls
+  - [x] 5.8 Implement Circuit Breaker cho AI Service calls
     - Implement circuit breaker pattern (dùng `opossum` hoặc custom implementation)
     - Circuit opens sau `failureThreshold` consecutive failures
     - Khi circuit open: fail fast, không gọi gRPC mới
     - Sau `timeout` ms: chuyển sang half-open state để thử lại
     - _Requirements: 8.4_
 
-  - [~] 5.9 Viết property test cho Circuit Breaker opens after threshold
+  - [x] 5.9 Viết property test cho Circuit Breaker opens after threshold
     - **Property 8: Circuit Breaker Opens After Threshold**
     - Với mọi sequence consecutive AI Service failures đạt configured threshold, subsequent AI calls phải fail fast (circuit open) mà không tạo gRPC call mới tới AI Service, cho đến khi circuit chuyển sang half-open.
     - **Validates: Requirements 8.4**
 
-  - [~] 5.10 Implement telemetry metrics cho AI Service calls
+  - [-] 5.10 Implement telemetry metrics cho AI Service calls
     - Tích hợp Prometheus metrics (dùng `prom-client`)
     - Emit `ai_grpc_requests_total{method, status}`
     - Emit `ai_grpc_duration_seconds{method, quantile}` — p50, p95, p99

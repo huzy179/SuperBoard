@@ -8,6 +8,7 @@ import { getRequestContext } from '../../common/request-context';
 import { AI_CLIENT_CONFIG } from './ai-client.config';
 import { withRetry } from './ai-retry.util';
 import { getAiFallback } from './ai-fallback.handler';
+import { CircuitBreaker } from './ai-circuit-breaker';
 
 interface SummarizeRequest {
   task_id: string;
@@ -92,6 +93,7 @@ interface AIService {
 export class AiService implements OnModuleInit {
   private readonly logger = new Logger(AiService.name);
   private aiServiceClient!: AIService;
+  private readonly circuitBreaker = new CircuitBreaker();
 
   constructor(
     @Inject('AI_PACKAGE') private client: ClientGrpc,
@@ -128,12 +130,14 @@ export class AiService implements OnModuleInit {
 
     try {
       const content = `Title: ${title}\nDescription: ${description}`;
-      const result = await withRetry(() =>
-        firstValueFrom(
-          this.aiServiceClient.SummarizeTask(
-            { task_id: taskId, content },
-            this.buildGrpcMetadata(),
-            { deadline: this.buildDeadline() },
+      const result = await this.circuitBreaker.execute(() =>
+        withRetry(() =>
+          firstValueFrom(
+            this.aiServiceClient.SummarizeTask(
+              { task_id: taskId, content },
+              this.buildGrpcMetadata(),
+              { deadline: this.buildDeadline() },
+            ),
           ),
         ),
       );
@@ -153,11 +157,13 @@ export class AiService implements OnModuleInit {
     if (cached) return cached;
 
     try {
-      const result = await withRetry(() =>
-        firstValueFrom(
-          this.aiServiceClient.GetEmbedding({ text }, this.buildGrpcMetadata(), {
-            deadline: this.buildDeadline(),
-          }),
+      const result = await this.circuitBreaker.execute(() =>
+        withRetry(() =>
+          firstValueFrom(
+            this.aiServiceClient.GetEmbedding({ text }, this.buildGrpcMetadata(), {
+              deadline: this.buildDeadline(),
+            }),
+          ),
         ),
       );
       if (!result?.embedding) {
@@ -205,11 +211,13 @@ export class AiService implements OnModuleInit {
 
     try {
       if (!this.aiServiceClient) throw new Error('gRPC client not initialized');
-      const result = await withRetry(() =>
-        firstValueFrom(
-          this.aiServiceClient.ProcessText({ text, mode }, this.buildGrpcMetadata(), {
-            deadline: this.buildDeadline(),
-          }),
+      const result = await this.circuitBreaker.execute(() =>
+        withRetry(() =>
+          firstValueFrom(
+            this.aiServiceClient.ProcessText({ text, mode }, this.buildGrpcMetadata(), {
+              deadline: this.buildDeadline(),
+            }),
+          ),
         ),
       );
 
@@ -384,16 +392,18 @@ export class AiService implements OnModuleInit {
   ): Promise<string[]> {
     try {
       const labels = existingLabels.map((l) => l.name);
-      const result = await withRetry(() =>
-        firstValueFrom(
-          this.aiServiceClient.SuggestLabels(
-            {
-              title,
-              description,
-              existing_labels: labels,
-            },
-            this.buildGrpcMetadata(),
-            { deadline: this.buildDeadline() },
+      const result = await this.circuitBreaker.execute(() =>
+        withRetry(() =>
+          firstValueFrom(
+            this.aiServiceClient.SuggestLabels(
+              {
+                title,
+                description,
+                existing_labels: labels,
+              },
+              this.buildGrpcMetadata(),
+              { deadline: this.buildDeadline() },
+            ),
           ),
         ),
       );
@@ -406,11 +416,13 @@ export class AiService implements OnModuleInit {
 
   async suggestPriority(title: string, description: string): Promise<string | null> {
     try {
-      const result = await withRetry(() =>
-        firstValueFrom(
-          this.aiServiceClient.SuggestPriority({ title, description }, this.buildGrpcMetadata(), {
-            deadline: this.buildDeadline(),
-          }),
+      const result = await this.circuitBreaker.execute(() =>
+        withRetry(() =>
+          firstValueFrom(
+            this.aiServiceClient.SuggestPriority({ title, description }, this.buildGrpcMetadata(), {
+              deadline: this.buildDeadline(),
+            }),
+          ),
         ),
       );
       return result.priority;

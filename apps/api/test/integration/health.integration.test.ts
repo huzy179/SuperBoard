@@ -30,13 +30,24 @@ const mockConfigService = { get: () => '1.0.0' };
 const healthyHealthService = { checkDatabase: async () => undefined };
 const healthyRedis = { ping: async () => 'PONG' };
 const healthyQueue = { isHealthy: async () => true };
+const healthyRabbitMQ = {
+  isHealthy: async () => ({
+    rabbitmq: { status: 'up', enabled: false, message: 'RabbitMQ is disabled' },
+  }),
+};
 
-function buildController(overrides: { healthService?: object; redis?: object; queue?: object }) {
+function buildController(overrides: {
+  healthService?: object;
+  redis?: object;
+  queue?: object;
+  rabbitMQ?: object;
+}) {
   return new HealthCheckController(
     mockConfigService as never,
     (overrides.healthService ?? healthyHealthService) as never,
     (overrides.redis ?? healthyRedis) as never,
     (overrides.queue ?? healthyQueue) as never,
+    (overrides.rabbitMQ ?? healthyRabbitMQ) as never,
   );
 }
 

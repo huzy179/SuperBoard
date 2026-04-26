@@ -15,8 +15,9 @@ export class RabbitMQHealthIndicator extends HealthIndicator {
   async isHealthy(key: string): Promise<HealthIndicatorResult> {
     const isRabbitMQEnabled = this.configService.get('ENABLE_RABBITMQ_EVENT_BUS') === 'true';
 
+    // If RabbitMQ is not enabled, consider it healthy (not required)
     if (!isRabbitMQEnabled) {
-      return this.getStatus(key, true, { enabled: false });
+      return this.getStatus(key, true, { enabled: false, message: 'RabbitMQ is disabled' });
     }
 
     try {

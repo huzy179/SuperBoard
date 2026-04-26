@@ -12,6 +12,9 @@ export class NotificationMetricsService {
   readonly eventsFailedTotal: Counter<string>;
   readonly eventDlqDepth: Gauge<string>;
 
+  // RabbitMQ consume metrics (Requirements: 9.3)
+  readonly rabbitmqConsumeTotal: Counter<string>;
+
   constructor() {
     register.removeSingleMetric('notification_jobs_total');
     register.removeSingleMetric('notification_jobs_failed_total');
@@ -19,6 +22,7 @@ export class NotificationMetricsService {
     register.removeSingleMetric('notification_events_processed_total');
     register.removeSingleMetric('notification_events_failed_total');
     register.removeSingleMetric('notification_event_dlq_depth');
+    register.removeSingleMetric('rabbitmq_consume_total');
 
     this.jobsTotal = new Counter({
       name: 'notification_jobs_total',
@@ -53,6 +57,12 @@ export class NotificationMetricsService {
       name: 'notification_event_dlq_depth',
       help: 'Current number of events in the domain-events DLQ',
     });
+
+    this.rabbitmqConsumeTotal = new Counter({
+      name: 'rabbitmq_consume_total',
+      help: 'Total RabbitMQ events consumed by service',
+      labelNames: ['service', 'event_type', 'status'],
+    });
   }
 
   recordSuccess(type: string): void {
@@ -71,12 +81,33 @@ export class NotificationMetricsService {
   /** Record a successfully processed domain event. */
   recordEventProcessed(eventType: string): void {
     this.eventsProcessedTotal.inc({ event_type: eventType, status: 'success' });
+    // Also record RabbitMQ consume metric
+    this.rabbitmqConsumeTotal.inc({
+      service: 'notification',
+      event_type: eventType,
+      status: 'success',
+    });
   }
 
   /** Record a domain event that exhausted retries and was routed to DLQ. */
   recordEventDlq(eventType: string): void {
     this.eventsProcessedTotal.inc({ event_type: eventType, status: 'dlq' });
     this.eventsFailedTotal.inc({ event_type: eventType });
+    // Also record RabbitMQ consume metric
+    this.rabbitmqConsumeTotal.inc({
+      service: 'notification',
+      event_type: eventType,
+      status: 'dlq',
+    });
+  }
+
+  /** Record a failed RabbitMQ event processing. */
+  recordRabbitmqEventFailure(eventType: string): void {
+    this.rabbitmqConsumeTotal.inc({
+      service: 'notification',
+      event_type: eventType,
+      status: 'failure',
+    });
   }
 
   /** Set the current DLQ depth for domain events. */

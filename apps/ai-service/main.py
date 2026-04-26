@@ -6,20 +6,20 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from datetime import datetime, timezone
 
-from event_consumer import EventConsumer
+from amqp_consumer import AMQPEventConsumer
 
-_event_consumer: EventConsumer | None = None
+_amqp_consumer: AMQPEventConsumer | None = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Start the event consumer as a background task on startup."""
-    global _event_consumer
-    _event_consumer = EventConsumer()
-    consumer_task = asyncio.create_task(_event_consumer.start())
+    """Start the AMQP event consumer as a background task on startup."""
+    global _amqp_consumer
+    _amqp_consumer = AMQPEventConsumer()
+    consumer_task = asyncio.create_task(_amqp_consumer.start())
     yield
-    if _event_consumer:
-        await _event_consumer.stop()
+    if _amqp_consumer:
+        await _amqp_consumer.stop()
     consumer_task.cancel()
     try:
         await consumer_task

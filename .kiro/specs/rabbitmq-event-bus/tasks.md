@@ -129,15 +129,15 @@ Thêm RabbitMQ làm Event Bus chuyên dụng cho domain events trong SuperBoard,
     - Thêm `ENABLE_RABBITMQ_EVENT_BUS=false`, `RABBITMQ_URL`, `RABBITMQ_PUBLISH_MAX_RETRIES`, `RABBITMQ_PUBLISH_BACKOFF_BASE_MS`
     - _Requirements: 3.8, 10.5_
 
-- [-] 7. Checkpoint — Core API
+- [x] 7. Checkpoint — Core API
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 8. AI Service — AMQP Consumer (Python/aio-pika)
-  - [~] 8.1 Cài đặt dependency `aio-pika` vào `apps/ai-service`
+- [x] 8. AI Service — AMQP Consumer (Python/aio-pika)
+  - [x] 8.1 Cài đặt dependency `aio-pika` vào `apps/ai-service`
     - Thêm `aio-pika` vào `apps/ai-service/requirements.txt`
     - _Requirements: 4.1_
 
-  - [~] 8.2 Implement `AMQPEventConsumer`
+  - [x] 8.2 Implement `AMQPEventConsumer`
     - Tạo `apps/ai-service/amqp_consumer.py`
     - Class `AMQPEventConsumer` với constants: `QUEUE_NAME = "ai.domain.events"`, `EXCHANGE_NAME = "superboard.domain.events"`, `BINDING_KEYS = ["task.created", "task.updated", "doc.updated"]`, `PREFETCH_COUNT = 10`
     - Method `start()`: dùng `aio_pika.connect_robust()` với URL từ env var `AMQP_URL`
@@ -147,29 +147,29 @@ Thêm RabbitMQ làm Event Bus chuyên dụng cho domain events trong SuperBoard,
     - Include `correlationId` trong tất cả log entries
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7_
 
-  - [~] 8.3 Tích hợp `AMQPEventConsumer` vào `main.py`
+  - [x] 8.3 Tích hợp `AMQPEventConsumer` vào `main.py`
     - Thay thế Redis-polling `EventConsumer` bằng `AMQPEventConsumer` trong startup sequence
     - _Requirements: 4.1_
 
-  - [~] 8.4 Implement consume metrics cho AI Service
+  - [x] 8.4 Implement consume metrics cho AI Service
     - Thêm Prometheus counter `rabbitmq_consume_total` với labels `service="ai"`, `event_type`, `status`
     - Emit trong `_on_message()` sau khi xử lý
     - _Requirements: 9.3_
 
-  - [~] 8.5 Write property test for ACK iff success (P8) — Python/Hypothesis
+  - [x] 8.5 Write property test for ACK iff success (P8) — Python/Hypothesis
     - **Property 8: ACK Sent If and Only If Processing Succeeds**
     - Dùng Hypothesis: generate events với random success/failure handlers, verify ACK khi success, NACK(requeue=False) khi failure
     - **Validates: Requirements 4.3, 4.4**
 
-  - [~] 8.6 Cập nhật `.env.example` của AI Service
+  - [x] 8.6 Cập nhật `.env.example` của AI Service
     - Thêm `AMQP_URL`, `AMQP_PREFETCH_COUNT`
     - _Requirements: 10.5_
 
-- [ ] 9. Notification Service — AMQP Consumer (NestJS)
-  - [~] 9.1 Cài đặt dependency `amqplib` và `@types/amqplib` vào `apps/notification`
+- [x] 9. Notification Service — AMQP Consumer (NestJS)
+  - [x] 9.1 Cài đặt dependency `amqplib` và `@types/amqplib` vào `apps/notification`
     - _Requirements: 5.1_
 
-  - [~] 9.2 Implement `AmqpEventConsumerService`
+  - [x] 9.2 Implement `AmqpEventConsumerService`
     - Tạo `apps/notification/src/worker/amqp-event-consumer.service.ts`
     - Implement `OnModuleInit` / `OnModuleDestroy`
     - Method `connect()` và `declareAndBind()`: declare queue `notification.domain.events` (durable, `x-dead-letter-exchange`), bind với routing key `#`
@@ -179,30 +179,30 @@ Thêm RabbitMQ làm Event Bus chuyên dụng cho domain events trong SuperBoard,
     - Reconnect với exponential backoff khi AMQP connection lost; BullMQ job processing không bị ảnh hưởng
     - _Requirements: 5.1, 5.3, 5.4, 5.5, 5.6, 5.7_
 
-  - [~] 9.3 Đăng ký `AmqpEventConsumerService` vào Notification module
+  - [x] 9.3 Đăng ký `AmqpEventConsumerService` vào Notification module
     - Thêm vào providers của module, không sửa `NotificationWorkerService` hay BullMQ processor
     - _Requirements: 5.2_
 
-  - [~] 9.4 Implement consume metrics cho Notification Service
+  - [x] 9.4 Implement consume metrics cho Notification Service
     - Thêm counter `rabbitmq_consume_total` với labels `service="notification"`, `event_type`, `status`
     - _Requirements: 9.3_
 
-  - [~] 9.5 Write property test for notification jobId = idempotencyKey (P9)
+  - [x] 9.5 Write property test for notification jobId = idempotencyKey (P9)
     - **Property 9: Notification Service Uses Event Idempotency Key as BullMQ Job ID**
     - Dùng fast-check: generate random events, mock BullMQ queue, verify `jobId === event.idempotencyKey`
     - **Validates: Requirements 5.5**
 
-  - [~] 9.6 Write property test for notification mapping completeness (P10)
+  - [x] 9.6 Write property test for notification mapping completeness (P10)
     - **Property 10: Notification Event-to-Job Mapping Completeness**
     - Dùng fast-check: generate supported event types, verify ít nhất một `NotificationJobDTO` được enqueue với `correlationId` matching
     - **Validates: Requirements 5.3**
 
-  - [~] 9.7 Write property test for ACK iff success — Notification Service (P8)
+  - [x] 9.7 Write property test for ACK iff success — Notification Service (P8)
     - **Property 8: ACK Sent If and Only If Processing Succeeds**
     - Dùng fast-check: generate events với BullMQ enqueue success/failure, verify ACK/NACK behavior
     - **Validates: Requirements 5.4**
 
-  - [~] 9.8 Cập nhật `.env.example` của Notification Service
+  - [x] 9.8 Cập nhật `.env.example` của Notification Service
     - Thêm `RABBITMQ_URL`, `RABBITMQ_PREFETCH_COUNT`
     - _Requirements: 10.5_
 

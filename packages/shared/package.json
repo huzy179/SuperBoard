@@ -8,10 +8,11 @@
     "build": "tsc -p tsconfig.json",
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit",
-    "test": "node --test --import tsx src/__tests__/exports.spec.ts src/__tests__/contract-exports.test.ts src/__tests__/contract-breaking.spec.ts"
+    "test": "node --test --import tsx src/__tests__/exports.spec.ts src/__tests__/contract-exports.test.ts src/__tests__/contract-breaking.spec.ts src/__tests__/rabbitmq-routing-key-format.test.ts src/__tests__/rabbitmq-queue-naming.test.ts"
   },
   "devDependencies": {
-    "@superboard/config-ts": "0.1.0"
+    "@superboard/config-ts": "0.1.0",
+    "fast-check": "^3.23.2"
   },
   "dependencies": {
     "ulid": "^3.0.1",

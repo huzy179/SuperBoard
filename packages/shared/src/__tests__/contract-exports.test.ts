@@ -9,7 +9,15 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 // Runtime value imports
-import { ErrorCodes, apiSuccess, apiError } from '../index.js';
+import {
+  ErrorCodes,
+  apiSuccess,
+  apiError,
+  RABBITMQ_EXCHANGES,
+  RABBITMQ_QUEUES,
+  RABBITMQ_DLQ_NAMES,
+  VALID_ROUTING_KEYS,
+} from '../index.js';
 
 // Type-only imports (verified via TypeScript compilation)
 import type {
@@ -26,6 +34,9 @@ import type {
   UserMemberJoinedPayload,
   // Base event interface
   DomainEvent,
+  // RabbitMQ event interface
+  RabbitMQDomainEvent,
+  ValidRoutingKey,
   // DTO types
   NotificationJobDTO,
   HealthDataDTO,
@@ -79,6 +90,39 @@ describe('Contract Package Exports', () => {
       assert.equal(result.error.code, 'NOT_FOUND');
       assert.equal(result.error.message, 'Resource not found');
       assert.ok(result.meta.timestamp);
+    });
+
+    it('RABBITMQ_EXCHANGES is an object with expected keys', () => {
+      assert.ok(RABBITMQ_EXCHANGES !== undefined, 'RABBITMQ_EXCHANGES should be defined');
+      assert.equal(typeof RABBITMQ_EXCHANGES, 'object', 'RABBITMQ_EXCHANGES should be an object');
+      assert.equal(RABBITMQ_EXCHANGES.DOMAIN_EVENTS, 'superboard.domain.events');
+      assert.equal(RABBITMQ_EXCHANGES.DEAD_LETTER, 'superboard.domain.events.dlx');
+    });
+
+    it('RABBITMQ_QUEUES is an object with expected service queues', () => {
+      assert.ok(RABBITMQ_QUEUES !== undefined, 'RABBITMQ_QUEUES should be defined');
+      assert.equal(typeof RABBITMQ_QUEUES, 'object', 'RABBITMQ_QUEUES should be an object');
+      assert.equal(RABBITMQ_QUEUES.AI, 'ai.domain.events');
+      assert.equal(RABBITMQ_QUEUES.NOTIFICATION, 'notification.domain.events');
+      assert.equal(RABBITMQ_QUEUES.SEARCH, 'search.domain.events');
+      assert.equal(RABBITMQ_QUEUES.AUTOMATION, 'automation.domain.events');
+    });
+
+    it('RABBITMQ_DLQ_NAMES is an object with expected DLQ names', () => {
+      assert.ok(RABBITMQ_DLQ_NAMES !== undefined, 'RABBITMQ_DLQ_NAMES should be defined');
+      assert.equal(typeof RABBITMQ_DLQ_NAMES, 'object', 'RABBITMQ_DLQ_NAMES should be an object');
+      assert.equal(RABBITMQ_DLQ_NAMES.AI, 'ai.domain.events.dlq');
+      assert.equal(RABBITMQ_DLQ_NAMES.NOTIFICATION, 'notification.domain.events.dlq');
+      assert.equal(RABBITMQ_DLQ_NAMES.SEARCH, 'search.domain.events.dlq');
+      assert.equal(RABBITMQ_DLQ_NAMES.AUTOMATION, 'automation.domain.events.dlq');
+    });
+
+    it('VALID_ROUTING_KEYS is an array with 12 routing keys', () => {
+      assert.ok(VALID_ROUTING_KEYS !== undefined, 'VALID_ROUTING_KEYS should be defined');
+      assert.ok(Array.isArray(VALID_ROUTING_KEYS), 'VALID_ROUTING_KEYS should be an array');
+      assert.equal(VALID_ROUTING_KEYS.length, 12, 'VALID_ROUTING_KEYS should have 12 items');
+      assert.ok(VALID_ROUTING_KEYS.includes('task.created'));
+      assert.ok(VALID_ROUTING_KEYS.includes('user.member_joined'));
     });
   });
 
@@ -192,6 +236,30 @@ describe('Contract Package Exports', () => {
 
       assert.ok(_event);
       assert.ok(true, 'DomainEvent type compiled successfully');
+    });
+
+    it('RabbitMQDomainEvent interface is usable as a TypeScript type', () => {
+      const _rabbitMQEvent: RabbitMQDomainEvent<{ id: string }> = {
+        eventId: 'e1',
+        eventType: 'task.created',
+        eventVersion: '1.0',
+        producer: 'core-api',
+        correlationId: 'corr1',
+        idempotencyKey: 'idem1',
+        occurredAt: new Date().toISOString(),
+        payload: { id: 'p1' },
+        routingKey: 'task.created',
+        exchange: 'superboard.domain.events',
+      };
+
+      assert.ok(_rabbitMQEvent);
+      assert.ok(true, 'RabbitMQDomainEvent type compiled successfully');
+    });
+
+    it('ValidRoutingKey type is usable as a TypeScript type', () => {
+      const _routingKey: ValidRoutingKey = 'task.created';
+      assert.ok(_routingKey);
+      assert.ok(true, 'ValidRoutingKey type compiled successfully');
     });
 
     it('DTO types are usable as TypeScript types', () => {

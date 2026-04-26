@@ -4,6 +4,7 @@ export * from './doc.events';
 export * from './project.events';
 export * from './message.events';
 export * from './user.events';
+export * from './rabbitmq.event';
 
 import type { Doc, Message, Task } from '../types';
 

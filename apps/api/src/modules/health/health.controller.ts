@@ -6,6 +6,7 @@ import { Public } from '../../common/decorators/public.decorator';
 import { HealthService } from './health.service';
 import { RedisService } from '../../common/redis.service';
 import { QueueService } from '../../common/queue.service';
+import { RabbitMQHealthIndicator } from './rabbitmq.health';
 
 @Controller()
 export class HealthCheckController {
@@ -16,6 +17,7 @@ export class HealthCheckController {
     private readonly healthService: HealthService,
     private readonly redisService: RedisService,
     private readonly queueService: QueueService,
+    private readonly rabbitMQHealthIndicator: RabbitMQHealthIndicator,
   ) {}
 
   @Public()
@@ -33,13 +35,14 @@ export class HealthCheckController {
   @Public()
   @Get('ready')
   async readiness(@Res() res: Response): Promise<void> {
-    const [postgres, redis, queue] = await Promise.all([
+    const [postgres, redis, queue, rabbitmq] = await Promise.all([
       this.checkPostgres(),
       this.checkRedis(),
       this.checkQueue(),
+      this.checkRabbitMQ(),
     ]);
 
-    const dependencies: DependencyHealthDTO[] = [postgres, redis, queue];
+    const dependencies: DependencyHealthDTO[] = [postgres, redis, queue, rabbitmq];
     const allHealthy = dependencies.every((d) => d.status === 'healthy');
 
     const body: HealthDataDTO = {
@@ -103,6 +106,28 @@ export class HealthCheckController {
     } catch (error) {
       return {
         name: 'bullmq',
+        status: 'unhealthy',
+        latencyMs: Date.now() - start,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  private async checkRabbitMQ(): Promise<DependencyHealthDTO> {
+    const start = Date.now();
+    try {
+      const result = await this.rabbitMQHealthIndicator.isHealthy('rabbitmq');
+      const isHealthy = result.rabbitmq.status === 'up';
+
+      return {
+        name: 'rabbitmq',
+        status: isHealthy ? 'healthy' : 'unhealthy',
+        latencyMs: Date.now() - start,
+        error: !isHealthy ? result.rabbitmq.error : undefined,
+      };
+    } catch (error) {
+      return {
+        name: 'rabbitmq',
         status: 'unhealthy',
         latencyMs: Date.now() - start,
         error: error instanceof Error ? error.message : 'Unknown error',

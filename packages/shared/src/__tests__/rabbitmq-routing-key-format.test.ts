@@ -46,7 +46,7 @@ describe('RabbitMQ Routing Key Format (P15)', () => {
         const [domain] = routingKey.split('.');
         const domainPattern = /^[a-z]+$/;
         assert.ok(
-          domainPattern.test(domain),
+          domain && domainPattern.test(domain),
           `Domain part "${domain}" should contain only lowercase letters`,
         );
       }),
@@ -60,7 +60,7 @@ describe('RabbitMQ Routing Key Format (P15)', () => {
         const [, action] = routingKey.split('.');
         const actionPattern = /^[a-z_]+$/;
         assert.ok(
-          actionPattern.test(action),
+          action && actionPattern.test(action),
           `Action part "${action}" should contain only lowercase letters and underscores`,
         );
       }),

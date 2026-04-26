@@ -41,6 +41,26 @@ services:
     networks:
       - superboard
 
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: superboard-rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+      RABBITMQ_DEFAULT_VHOST: superboard
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - superboard
+
   # ===== Application Services (Default) =====
   api:
     build:
@@ -204,6 +224,7 @@ volumes:
   minio_data:
   elasticsearch_data:
   grafana_data:
+  rabbitmq_data:
 
 networks:
   superboard:

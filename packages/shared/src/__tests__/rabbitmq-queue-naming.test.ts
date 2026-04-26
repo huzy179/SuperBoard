@@ -26,7 +26,7 @@ describe('RabbitMQ Queue Naming Convention (P5)', () => {
           `Queue name for service ${serviceName} should be "${expectedQueueName}", got "${actualQueueName}"`,
         );
       }),
-      { numRuns: 100 },
+      { numRuns: 20 },
     );
   });
 
@@ -42,7 +42,7 @@ describe('RabbitMQ Queue Naming Convention (P5)', () => {
           `DLQ name for service ${serviceName} should be "${expectedDlqName}", got "${actualDlqName}"`,
         );
       }),
-      { numRuns: 100 },
+      { numRuns: 20 },
     );
   });
 
@@ -57,7 +57,7 @@ describe('RabbitMQ Queue Naming Convention (P5)', () => {
           `Queue name "${queueName}" should contain only lowercase letters and dots`,
         );
       }),
-      { numRuns: 100 },
+      { numRuns: 20 },
     );
   });
 

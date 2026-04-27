@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import type { ProjectDetailDTO } from '@superboard/shared';
 import { getProjectDetail } from '@/features/operations/project/api/project-service';
 import { subscribeProjectDetailUpdated } from '@/lib/realtime/project-sync';
@@ -7,57 +7,43 @@ import {
   subscribeProjectSocketUpdated,
   subscribeProjectTaskPatched,
 } from '@/lib/realtime/project-socket';
+import { useAppQuery } from '@/lib/hooks/use-app-query';
+import { useDeferredQueryInvalidation } from '@/lib/hooks/use-deferred-query-invalidation';
+import { queryKeys } from '@/lib/query-keys';
 
 export function useProjectDetail(projectId: string, showArchived = false) {
   const queryClient = useQueryClient();
-  const invalidateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hasPendingInvalidateRef = useRef(false);
+  const detailQueryKey = useMemo(
+    () => queryKeys.projects.detail(projectId, showArchived),
+    [projectId, showArchived],
+  );
+
+  const subscribeToProjectUpdates = useCallback(
+    (scheduleInvalidate: () => void) => {
+      const unsubscribeBroadcast = subscribeProjectDetailUpdated(projectId, scheduleInvalidate);
+      const unsubscribeSocket = subscribeProjectSocketUpdated(projectId, scheduleInvalidate);
+
+      return () => {
+        unsubscribeBroadcast();
+        unsubscribeSocket();
+      };
+    },
+    [projectId],
+  );
+
+  useDeferredQueryInvalidation({
+    queryKey: detailQueryKey,
+    subscribe: subscribeToProjectUpdates,
+    enabled: !!projectId,
+  });
 
   useEffect(() => {
     if (!projectId) {
       return;
     }
 
-    const runInvalidate = () => {
-      void queryClient.invalidateQueries({ queryKey: ['projects', projectId, { showArchived }] });
-    };
-
-    const scheduleInvalidate = () => {
-      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
-        hasPendingInvalidateRef.current = true;
-        return;
-      }
-
-      if (invalidateTimerRef.current) {
-        clearTimeout(invalidateTimerRef.current);
-      }
-
-      invalidateTimerRef.current = setTimeout(() => {
-        invalidateTimerRef.current = null;
-        hasPendingInvalidateRef.current = false;
-        runInvalidate();
-      }, 120);
-    };
-
-    const handleVisibilityChange = () => {
-      if (
-        typeof document !== 'undefined' &&
-        document.visibilityState === 'visible' &&
-        hasPendingInvalidateRef.current
-      ) {
-        hasPendingInvalidateRef.current = false;
-        if (invalidateTimerRef.current) {
-          clearTimeout(invalidateTimerRef.current);
-          invalidateTimerRef.current = null;
-        }
-        runInvalidate();
-      }
-    };
-
-    const unsubscribeBroadcast = subscribeProjectDetailUpdated(projectId, scheduleInvalidate);
-    const unsubscribeSocket = subscribeProjectSocketUpdated(projectId, scheduleInvalidate);
     const unsubscribeTaskPatched = subscribeProjectTaskPatched(projectId, (payload) => {
-      queryClient.setQueryData<ProjectDetailDTO>(['projects', projectId], (current) => {
+      queryClient.setQueryData<ProjectDetailDTO>(detailQueryKey, (current) => {
         if (!current) {
           return current;
         }
@@ -82,28 +68,15 @@ export function useProjectDetail(projectId: string, showArchived = false) {
       });
     });
 
-    if (typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-    }
-
     return () => {
-      unsubscribeBroadcast();
-      unsubscribeSocket();
       unsubscribeTaskPatched();
-      if (typeof document !== 'undefined') {
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-      }
-      if (invalidateTimerRef.current) {
-        clearTimeout(invalidateTimerRef.current);
-        invalidateTimerRef.current = null;
-      }
-      hasPendingInvalidateRef.current = false;
     };
-  }, [projectId, queryClient]);
+  }, [detailQueryKey, projectId, queryClient]);
 
-  return useQuery<ProjectDetailDTO>({
-    queryKey: ['projects', projectId, { showArchived }],
+  return useAppQuery<ProjectDetailDTO>({
+    queryKey: detailQueryKey,
     queryFn: () => getProjectDetail(projectId, showArchived),
     enabled: !!projectId,
+    errorMessage: 'Không thể tải chi tiết dự án',
   });
 }

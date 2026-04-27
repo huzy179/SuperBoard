@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Sparkles, UserPlus, Check, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 import { getInitials } from '@/lib/utils';
+import { getTaskAssigneeSuggestions } from '../api/talent-service';
 
 interface Suggestion {
   id: string;
@@ -33,11 +34,8 @@ export function SmartAssigneeSuggestion({
     const fetchSuggestions = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(
-          `/api/v1/talent/tasks/${taskId}/suggestions?workspaceId=${workspaceId}`,
-        );
-        const data = await res.json();
-        setSuggestions(data.data.suggestions);
+        const data = await getTaskAssigneeSuggestions(taskId, workspaceId);
+        setSuggestions(data.suggestions);
       } catch {
         toast.error('Lỗi khi gợi ý nhân sự');
       } finally {

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Terminal, ShieldAlert, TrendingUp, Cpu, Eye, Zap, Activity } from 'lucide-react';
 import { StrategicSandbox } from './StrategicSandbox';
 import { ExecutiveDirective } from '@/features/specialized/automation/components/ExecutiveDirective';
+import { getProjectBriefing, getProjectForecast } from '../api/project-service';
 
 interface BriefingData {
   missionName: string;
@@ -47,16 +48,12 @@ export function MissionCommandBriefing({
 
   useEffect(() => {
     if (isOpen) {
-      fetch(`/api/v1/projects/${projectId}/briefing`)
-        .then((res) => res.json())
-        .then((res) => {
-          setData(res.data);
-          startBriefing(res.data.sitrep);
-        });
+      getProjectBriefing(projectId).then((data) => {
+        setData(data);
+        startBriefing(data.sitrep);
+      });
 
-      fetch(`/api/v1/projects/${projectId}/forecast`)
-        .then((res) => res.json())
-        .then((res) => setForecast(res.data));
+      getProjectForecast(projectId).then((data) => setForecast(data));
     } else {
       setDisplayText('');
       setData(null);

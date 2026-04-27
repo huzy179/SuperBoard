@@ -22,6 +22,55 @@ export const restoreProject = (projectId: string) =>
   authApi.patch<void>(API_ENDPOINTS.projects.restore(projectId));
 
 export const getProjectDetail = (projectId: string, showArchived = false) => {
-  const query = showArchived ? `?showArchived=true` : '';
-  return authApi.get<ProjectDetailDTO>(`${API_ENDPOINTS.projects.detail(projectId)}${query}`);
+  return authApi.get<ProjectDetailDTO>(API_ENDPOINTS.projects.detail(projectId), {
+    params: { showArchived: showArchived || undefined },
+  });
 };
+
+export type ProjectChronologyPulse = {
+  id: string;
+  date: string;
+  intensity: number;
+  narrative: string;
+  events: {
+    id: string;
+    type: string;
+    title: string;
+    actor: string;
+    time: string;
+  }[];
+};
+
+export type ProjectCommandBriefing = {
+  missionName: string;
+  sitrep: string;
+  metrics: {
+    velocity: number;
+    collisions: number;
+    pulses: number;
+  };
+  latestIntensity: number;
+};
+
+export type ProjectForecast = {
+  prediction: string;
+  confidence: number;
+  metrics: {
+    completionDays: number;
+    driftIndex: number;
+    stability: number;
+  };
+  trajectory: 'POSITIVE' | 'NEUTRAL' | 'CRITICAL';
+};
+
+export const getProjectChronology = (projectId: string) =>
+  authApi.get<ProjectChronologyPulse[]>(API_ENDPOINTS.projects.chronology(projectId));
+
+export const getProjectBriefing = (projectId: string) =>
+  authApi.get<ProjectCommandBriefing>(API_ENDPOINTS.projects.briefing(projectId));
+
+export const getProjectForecast = (projectId: string) =>
+  authApi.get<ProjectForecast>(API_ENDPOINTS.projects.forecast(projectId));
+
+export const simulateProject = (projectId: string, payload: Record<string, unknown>) =>
+  authApi.post<ProjectForecast>(API_ENDPOINTS.projects.simulate(projectId), payload);

@@ -12,6 +12,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { getWorkspaceDigest } from '../api/ai-service';
 
 interface NeuralWorkspaceDigestProps {
   workspaceId: string;
@@ -27,9 +28,8 @@ export function NeuralWorkspaceDigest({ workspaceId }: NeuralWorkspaceDigestProp
     else setIsRefreshing(true);
 
     try {
-      const res = await fetch(`/api/v1/ai/workspace/${workspaceId}/digest`);
-      const data = await res.json();
-      setDigest(data.data.digest);
+      const data = await getWorkspaceDigest(workspaceId);
+      setDigest(data.digest);
     } catch {
       toast.error('Không thể đồng bộ AI');
     } finally {

@@ -1,4 +1,5 @@
 import { io, type Socket } from 'socket.io-client';
+import { getApiBaseUrl } from '@/lib/api-client';
 
 const socketsByProjectId = new Map<string, Socket>();
 
@@ -7,17 +8,12 @@ function resolveSocketUrl(): string {
     return '';
   }
 
-  const envApiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (envApiUrl) {
-    try {
-      const parsed = new URL(envApiUrl, window.location.origin);
-      return parsed.origin;
-    } catch {
-      return window.location.origin;
-    }
+  try {
+    const parsed = new URL(getApiBaseUrl(), window.location.origin);
+    return parsed.origin;
+  } catch {
+    return window.location.origin;
   }
-
-  return window.location.origin;
 }
 
 function getProjectSocket(projectId: string): Socket | null {

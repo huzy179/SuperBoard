@@ -1,71 +1,21 @@
-import { useEffect, useRef } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ProjectItemDTO } from '@superboard/shared';
 import { getProjects } from '@/features/operations/project/api/project-service';
 import { subscribeProjectsListUpdated } from '@/lib/realtime/project-sync';
+import { useAppQuery } from '@/lib/hooks/use-app-query';
+import { useDeferredQueryInvalidation } from '@/lib/hooks/use-deferred-query-invalidation';
+import { queryKeys } from '@/lib/query-keys';
+
+const projectsQueryKey = queryKeys.projects.lists();
 
 export function useProjects() {
-  const queryClient = useQueryClient();
-  const invalidateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hasPendingInvalidateRef = useRef(false);
+  useDeferredQueryInvalidation({
+    queryKey: projectsQueryKey,
+    subscribe: subscribeProjectsListUpdated,
+  });
 
-  useEffect(() => {
-    const runInvalidate = () => {
-      void queryClient.invalidateQueries({ queryKey: ['projects'] });
-    };
-
-    const scheduleInvalidate = () => {
-      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
-        hasPendingInvalidateRef.current = true;
-        return;
-      }
-
-      if (invalidateTimerRef.current) {
-        clearTimeout(invalidateTimerRef.current);
-      }
-
-      invalidateTimerRef.current = setTimeout(() => {
-        invalidateTimerRef.current = null;
-        hasPendingInvalidateRef.current = false;
-        runInvalidate();
-      }, 120);
-    };
-
-    const handleVisibilityChange = () => {
-      if (
-        typeof document !== 'undefined' &&
-        document.visibilityState === 'visible' &&
-        hasPendingInvalidateRef.current
-      ) {
-        hasPendingInvalidateRef.current = false;
-        if (invalidateTimerRef.current) {
-          clearTimeout(invalidateTimerRef.current);
-          invalidateTimerRef.current = null;
-        }
-        runInvalidate();
-      }
-    };
-
-    const unsubscribe = subscribeProjectsListUpdated(scheduleInvalidate);
-    if (typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-    }
-
-    return () => {
-      unsubscribe();
-      if (typeof document !== 'undefined') {
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-      }
-      if (invalidateTimerRef.current) {
-        clearTimeout(invalidateTimerRef.current);
-        invalidateTimerRef.current = null;
-      }
-      hasPendingInvalidateRef.current = false;
-    };
-  }, [queryClient]);
-
-  return useQuery<ProjectItemDTO[]>({
-    queryKey: ['projects'],
+  return useAppQuery<ProjectItemDTO[]>({
+    queryKey: projectsQueryKey,
     queryFn: getProjects,
+    errorMessage: 'Không thể tải danh sách dự án',
   });
 }

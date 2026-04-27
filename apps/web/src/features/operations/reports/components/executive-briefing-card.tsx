@@ -12,6 +12,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { getExecutiveProjectBriefing } from '@/features/intelligence/executive/api/executive-service';
 
 interface ExecutiveData {
   healthScore: number;
@@ -33,9 +34,7 @@ export function ExecutiveBriefingCard({ projectId }: ExecutiveBriefingCardProps)
   const fetchBriefing = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/v1/executive/projects/${projectId}/briefing`);
-      const body = await res.json();
-      setData(body.data);
+      setData(await getExecutiveProjectBriefing(projectId));
     } catch {
       toast.error('Không thể tải Strategic Briefing');
     } finally {

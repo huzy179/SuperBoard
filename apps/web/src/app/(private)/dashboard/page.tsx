@@ -21,6 +21,7 @@ import type { DashboardStatsDTO } from '@superboard/shared';
 import { StatCard } from '@/features/operations/dashboard/components/stat-card';
 import { DonutDistributionChart } from '@/features/operations/dashboard/components/distribution-chart';
 import { DashboardSkeleton } from '@/features/operations/dashboard/components/dashboard-skeleton';
+import { getAdaptiveLayout } from '@/features/intelligence/executive/api/executive-service';
 
 const CHART_COLOR_CLASSES = [
   'text-brand-500',
@@ -109,9 +110,8 @@ export default function DashboardPage() {
   const [adaptiveLayout, setAdaptiveLayout] = useState<DashboardModule[]>(DEFAULT_DASHBOARD_LAYOUT);
 
   useEffect(() => {
-    fetch('/api/v1/executive/adaptive-layout')
-      .then((res) => res.json())
-      .then((body) => setAdaptiveLayout(parseAdaptiveLayout(body?.data)))
+    getAdaptiveLayout()
+      .then((data) => setAdaptiveLayout(parseAdaptiveLayout(data)))
       .catch(() => {});
   }, []);
 

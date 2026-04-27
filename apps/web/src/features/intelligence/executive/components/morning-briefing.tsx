@@ -13,6 +13,7 @@ import {
   Wind,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { getDailyBriefing } from '../api/executive-service';
 
 interface BriefingData {
   pulse: string;
@@ -37,9 +38,7 @@ export function MorningBriefing({
   const fetchBriefing = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/v1/executive/daily-briefing?workspaceId=${workspaceId}`);
-      const body = await res.json();
-      if (res.ok) setData(body.data);
+      setData(await getDailyBriefing(workspaceId));
     } catch {
       toast.error('Không thể tải báo cáo buổi sáng');
     } finally {

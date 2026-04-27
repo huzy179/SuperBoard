@@ -14,6 +14,10 @@ import {
 import { TwinPulseVisualizer } from './twin-pulse-visualizer';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import {
+  getExecutiveProjectBriefing,
+  simulateExecutiveProject,
+} from '@/features/intelligence/executive/api/executive-service';
 
 interface ForecastData {
   projectId: string;
@@ -47,12 +51,9 @@ export function ProjectDigitalTwin({ projectId }: { projectId: string }) {
   const fetchBaseline = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/v1/executive/projects/${projectId}/briefing`);
-      const body = await res.json();
-      if (res.ok) {
-        setBaselineData(body.data);
-        setSimulatedForecast(body.data.forecast);
-      }
+      const data = await getExecutiveProjectBriefing(projectId);
+      setBaselineData(data);
+      setSimulatedForecast(data.forecast);
     } catch {
       toast.error('Failed to initialize Digital Twin');
     } finally {
@@ -63,16 +64,11 @@ export function ProjectDigitalTwin({ projectId }: { projectId: string }) {
   const handleSimulate = async () => {
     setIsSimulating(true);
     try {
-      const res = await fetch(`/api/v1/executive/projects/${projectId}/simulate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ velocityBoost: velocityBoost / 100 }),
+      const body = await simulateExecutiveProject(projectId, {
+        velocityBoost: velocityBoost / 100,
       });
-      const body = await res.json();
-      if (res.ok) {
-        setSimulatedForecast(body.data.forecast);
-        toast.success('Simulation updated');
-      }
+      setSimulatedForecast(body.forecast);
+      toast.success('Simulation updated');
     } catch {
       toast.error('Simulation failed');
     } finally {

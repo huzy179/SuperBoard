@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Network, BrainCircuit, Zap, ChevronRight, Database, Layers, Activity } from 'lucide-react';
+import { getKnowledgeAtlas, getKnowledgeDiagnosis } from '../api/knowledge-service';
 
 interface AtlasNode {
   id: string;
@@ -28,13 +29,10 @@ export function VectorAtlas() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/v1/knowledge/atlas').then((res) => res.json()),
-      fetch('/api/v1/knowledge/diagnosis').then((res) => res.json()),
-    ])
-      .then(([atlasRes, diagRes]) => {
-        setData(atlasRes.data);
-        setDiagnosis(diagRes.data);
+    Promise.all([getKnowledgeAtlas(), getKnowledgeDiagnosis()])
+      .then(([atlas, diag]) => {
+        setData(atlas);
+        setDiagnosis(diag);
         setIsLoading(false);
       })
       .catch(() => setIsLoading(false));

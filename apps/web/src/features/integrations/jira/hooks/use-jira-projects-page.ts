@@ -19,7 +19,7 @@ export function useJiraProjectsPage() {
     isLoading: projectsLoading,
     isError,
     error: projectsQueryError,
-    refetch,
+    refetch: reloadProjectQuery,
   } = useProjects();
   const projectsError = isError ? (projectsQueryError?.message ?? 'Không tải được dự án') : null;
 
@@ -80,7 +80,7 @@ export function useJiraProjectsPage() {
   );
 
   function reloadProjects() {
-    void refetch();
+    void reloadProjectQuery();
   }
 
   return {

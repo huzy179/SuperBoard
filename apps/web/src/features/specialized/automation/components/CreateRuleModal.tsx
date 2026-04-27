@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { X, Sparkles, Plus, AlertCircle } from 'lucide-react';
-import { apiPost } from '@/lib/api-client';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { useCreateAutomationRule } from '../hooks/use-automation-rules';
 
 interface CreateRuleModalProps {
   workspaceId: string;
@@ -11,25 +9,25 @@ interface CreateRuleModalProps {
 }
 
 export function CreateRuleModal({ workspaceId, projectId, onClose }: CreateRuleModalProps) {
-  const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const [triggerType, setTriggerType] = useState('TASK_CREATED');
   const [actionMessage, setActionMessage] = useState('Task {{taskId}} notification!');
 
-  const createMutation = useMutation({
-    mutationFn: (data: Record<string, unknown>) =>
-      apiPost(`/automation/rules?workspaceId=${workspaceId}`, data, { auth: true }),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
-      toast.success('Đã tạo quy tắc thành công');
-      onClose();
-    },
-  });
+  const createMutation = useCreateAutomationRule(workspaceId, projectId);
+  const handleSuccess = () => {
+    onClose();
+  };
+
+  const createRule = (payload: Record<string, unknown>) =>
+    createMutation.mutate(payload, {
+      onSuccess: handleSuccess,
+    });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createMutation.mutate({
+    createRule({
       name,
+      workspaceId,
       projectId,
       trigger: { type: triggerType },
       actions: [

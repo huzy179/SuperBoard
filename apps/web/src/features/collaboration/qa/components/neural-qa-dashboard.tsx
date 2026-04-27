@@ -14,6 +14,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { diagnoseManualIssue } from '../api/qa-service';
 
 interface ErrorEvent {
   id: string;
@@ -50,20 +51,13 @@ export function NeuralQaDashboard() {
   const handleDiagnose = async (error: ErrorEvent) => {
     setIsDiagnosing(error.id);
     try {
-      const res = await fetch('/api/v1/qa/diagnose/manual', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: error.message,
-          stack: error.stack || 'No stack trace available',
-          url: error.url,
-        }),
+      const body = await diagnoseManualIssue({
+        message: error.message,
+        stack: error.stack || 'No stack trace available',
+        url: error.url,
       });
-      const body = await res.json();
-      if (res.ok) {
-        toast.success('Diagnosis Complete: A Troubleshooting Doc has been created.');
-        setSelectedError({ ...error, message: body.data.diagnosis });
-      }
+      toast.success('Diagnosis Complete: A Troubleshooting Doc has been created.');
+      setSelectedError({ ...error, message: body.diagnosis });
     } catch {
       toast.error('Diagnosis failed');
     } finally {

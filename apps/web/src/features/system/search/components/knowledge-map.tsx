@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { X, Activity, BookOpen, RefreshCw, Sparkles, Zap } from 'lucide-react';
 import { KnowledgeGraphView } from '@/features/intelligence/knowledge/components/knowledge-graph-view';
 import { toast } from 'sonner';
+import { generateKnowledgeDiary } from '@/features/intelligence/knowledge/api/knowledge-service';
 
 interface KnowledgeMapProps {
   projectId: string;
@@ -17,13 +18,8 @@ export function KnowledgeMap({ projectId, onClose, onSelectNode }: KnowledgeMapP
   const handleGenerateDiary = async () => {
     setIsGeneratingDiary(true);
     try {
-      const res = await fetch(`/api/v1/knowledge/diary/${projectId}`, { method: 'POST' });
-      const body = await res.json();
-      if (res.ok) {
-        toast.success('Đã tạo nhật ký tuần thành công');
-      } else {
-        throw new Error(body.message);
-      }
+      await generateKnowledgeDiary(projectId);
+      toast.success('Đã tạo nhật ký tuần thành công');
     } catch (err: unknown) {
       toast.error('Tạo thất bại: ' + (err instanceof Error ? err.message : 'Lỗi không xác định'));
     } finally {

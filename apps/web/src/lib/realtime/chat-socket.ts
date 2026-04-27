@@ -1,6 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import { getAccessToken } from '@/features/system/auth/utils/auth-storage';
 import type { Message } from '@superboard/shared';
+import { getApiBaseUrl } from '@/lib/api-client';
 
 export type ChatSocketEvents = {
   'message:new': (message: Message) => void;
@@ -23,7 +24,7 @@ class ChatSocketManager {
     if (this.socket?.connected) return;
 
     const token = getAccessToken();
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    const baseUrl = getApiBaseUrl();
 
     this.socket = io(`${baseUrl}/chat`, {
       auth: { token },

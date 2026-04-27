@@ -12,6 +12,7 @@ import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { AssigneeAvatar } from '@/features/operations/task/components/task-badges';
 import { WorkspaceSwitcher } from '@/features/system/workspace/components/WorkspaceSwitcher';
 import { SingularityPulse } from './SingularityPulse';
+import { getNavigationFocus } from '@/features/intelligence/executive/api/executive-service';
 import {
   MessageSquare,
   FileText,
@@ -51,9 +52,8 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
   const [navFocus, setNavFocus] = useState<Record<string, unknown>[]>([]);
 
   useEffect(() => {
-    fetch('/api/v1/executive/navigation-focus')
-      .then((res) => res.json())
-      .then((body) => setNavFocus(body.data?.highlights ?? []))
+    getNavigationFocus()
+      .then((data) => setNavFocus(data.highlights ?? []))
       .catch(() => {});
   }, []);
 

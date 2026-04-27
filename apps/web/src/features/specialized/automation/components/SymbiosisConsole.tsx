@@ -11,6 +11,7 @@ import {
   AlertTriangle,
   Fingerprint,
 } from 'lucide-react';
+import { approveAutomationProposal, getAutomationProposals } from '../api/automation-service';
 
 interface Proposal {
   id: string;
@@ -30,17 +31,15 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
   const [isApproving, setIsApproving] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`/api/v1/automation/proposals?workspaceId=${workspaceId}`)
-      .then((res) => res.json())
-      .then((res) => {
-        setProposals(res.data);
-        setIsLoading(false);
-      });
+    getAutomationProposals(workspaceId).then((data) => {
+      setProposals(data as Proposal[]);
+      setIsLoading(false);
+    });
   }, [workspaceId]);
 
   const handleApprove = async (id: string) => {
     setIsApproving(id);
-    await fetch(`/api/v1/automation/proposals/${id}/approve`, { method: 'POST' });
+    await approveAutomationProposal(id);
     setProposals((prev) =>
       prev.map((p) =>
         p.id === id ? { ...p, metadata: { ...p.metadata, status: 'APPROVED' } } : p,

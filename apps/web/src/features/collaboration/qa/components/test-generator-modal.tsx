@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Zap, X, Code, Play, Copy, CheckCircle2, RefreshCw, Sparkles, Command } from 'lucide-react';
 import { toast } from 'sonner';
+import { generateTestSpec } from '../api/qa-service';
 
 interface TestGeneratorModalProps {
   onClose: () => void;
@@ -18,16 +19,9 @@ export function TestGeneratorModal({ onClose }: TestGeneratorModalProps) {
     if (!prompt.trim()) return;
     setIsGenerating(true);
     try {
-      const res = await fetch('/api/v1/qa/generate-spec', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
-      });
-      const body = await res.json();
-      if (res.ok) {
-        setGeneratedCode(body.data.spec);
-        toast.success('Neural Test Spec Generated Successfully');
-      }
+      const body = await generateTestSpec(prompt);
+      setGeneratedCode(body.spec);
+      toast.success('Neural Test Spec Generated Successfully');
     } catch {
       toast.error('Test generation failed');
     } finally {

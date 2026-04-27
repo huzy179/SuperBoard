@@ -14,6 +14,13 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import type { WorkflowRuleDTO } from '@superboard/shared';
+import {
+  createAutomationRule,
+  deleteAutomationRule,
+  generateAutomationRule,
+  getAutomationRules,
+  updateAutomationRule,
+} from '../api/automation-service';
 
 interface AutomationSlideOverProps {
   workspaceId: string;
@@ -34,11 +41,7 @@ export function AutomationSlideOver({ workspaceId, projectId, onClose }: Automat
   const fetchRules = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(
-        `/api/v1/automation?workspaceId=${workspaceId}${projectId ? `&projectId=${projectId}` : ''}`,
-      );
-      const data = await res.json();
-      setRules(data.data || []);
+      setRules(await getAutomationRules(workspaceId, projectId));
     } catch (err) {
       console.error('Failed to fetch rules', err);
     } finally {
@@ -50,30 +53,16 @@ export function AutomationSlideOver({ workspaceId, projectId, onClose }: Automat
     if (!prompt.trim()) return;
     setIsGenerating(true);
     try {
-      // Logic would call POST /api/v1/automation/generate in real impl
-      // For demo, we simulate the AI response
-      const res = await fetch('/api/v1/automation/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
-      });
-      const generated = await res.json();
+      const generated = await generateAutomationRule(prompt);
 
-      // Persist the generated rule
-      const saveRes = await fetch('/api/v1/automation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...generated.data,
-          workspaceId,
-          projectId,
-        }),
+      await createAutomationRule({
+        ...(generated as Record<string, unknown>),
+        workspaceId,
+        projectId,
       });
 
-      if (saveRes.ok) {
-        setPrompt('');
-        fetchRules();
-      }
+      setPrompt('');
+      fetchRules();
     } catch (err) {
       console.error('Generation failed', err);
     } finally {
@@ -83,11 +72,7 @@ export function AutomationSlideOver({ workspaceId, projectId, onClose }: Automat
 
   const toggleRule = async (ruleId: string, current: boolean) => {
     try {
-      await fetch(`/api/v1/automation/${ruleId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isActive: !current }),
-      });
+      await updateAutomationRule(ruleId, { isActive: !current });
       fetchRules();
     } catch (err) {
       console.error('Toggle failed', err);
@@ -96,7 +81,7 @@ export function AutomationSlideOver({ workspaceId, projectId, onClose }: Automat
 
   const deleteRule = async (ruleId: string) => {
     try {
-      await fetch(`/api/v1/automation/${ruleId}`, { method: 'DELETE' });
+      await deleteAutomationRule(ruleId);
       fetchRules();
     } catch (err) {
       console.error('Delete failed', err);

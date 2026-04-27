@@ -10,3 +10,4 @@ export * from './task-list-view';
 export * from './task-calendar-view';
 export * from './task-filter-bar';
 export * from './task-bulk-action-bar';
+export * from './task-bulk-action-menu';

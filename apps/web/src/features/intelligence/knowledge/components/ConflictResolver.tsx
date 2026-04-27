@@ -12,20 +12,7 @@ import {
   FileText,
   Briefcase,
 } from 'lucide-react';
-
-interface CollisionNode {
-  id: string;
-  type: 'task' | 'doc';
-  title: string;
-  projectName: string;
-}
-
-interface StrategicCollision {
-  id: string;
-  intensity: number;
-  protocol: string;
-  nodes: CollisionNode[];
-}
+import { getKnowledgeDivergence, type StrategicCollision } from '../api/knowledge-service';
 
 export function ConflictResolver() {
   const [collisions, setCollisions] = useState<StrategicCollision[]>([]);
@@ -33,10 +20,9 @@ export function ConflictResolver() {
   const [resolvedIds, setResolvedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    fetch('/api/v1/knowledge/diagnosis/divergence')
-      .then((res) => res.json())
-      .then((res) => {
-        setCollisions(res.data);
+    getKnowledgeDivergence()
+      .then((data) => {
+        setCollisions(data);
         setIsLoading(false);
       })
       .catch(() => setIsLoading(false));
@@ -162,7 +148,7 @@ export function ConflictResolver() {
   );
 }
 
-function CollisionNodeCard({ node }: { node: CollisionNode }) {
+function CollisionNodeCard({ node }: { node: StrategicCollision['nodes'][number] }) {
   return (
     <div className="flex-1 p-5 bg-white/[0.03] border border-white/5 rounded-xl space-y-3 hover:bg-white/[0.06] transition-all">
       <div className="flex items-center gap-3">

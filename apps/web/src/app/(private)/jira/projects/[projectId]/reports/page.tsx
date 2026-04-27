@@ -4,6 +4,14 @@ import { useParams } from 'next/navigation';
 import { useProjectReport } from '@/features/operations/reports/hooks/use-report';
 import { reportService } from '@/features/operations/reports/api/report-service';
 import {
+  ReportChartShell,
+  REPORT_AXIS_TICK,
+  REPORT_GRID_PROPS,
+  REPORT_LEGEND_STYLE,
+  REPORT_TOOLTIP_ITEM_STYLE,
+  REPORT_TOOLTIP_STYLE,
+} from '@/features/operations/reports/components/report-chart-shell';
+import {
   DownloadIcon,
   BarChart3Icon,
   TrendingUpIcon,
@@ -249,7 +257,7 @@ export default function ProjectReportsPage() {
         {/* Neural Visualizations Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* Burndown Matrix */}
-          <ChartShell
+          <ReportChartShell
             title="Burndown Trajectory"
             description="Tracking daily Story Point depletion matrix (14D Window)"
           >
@@ -261,49 +269,20 @@ export default function ProjectReportsPage() {
                     <stop offset="100%" stopColor="#6366f1" />
                   </linearGradient>
                 </defs>
-                <CartesianGrid
-                  strokeDasharray="6 6"
-                  vertical={false}
-                  stroke="rgba(255,255,255,0.03)"
-                />
+                <CartesianGrid strokeDasharray="6 6" {...REPORT_GRID_PROPS} />
                 <XAxis
                   dataKey="date"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontWeight: 900 }}
+                  tick={REPORT_AXIS_TICK}
                   dy={10}
                 />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontWeight: 900 }}
-                />
+                <YAxis axisLine={false} tickLine={false} tick={REPORT_AXIS_TICK} />
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                    borderRadius: '24px',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.5)',
-                    backdropFilter: 'blur(16px)',
-                    padding: '16px',
-                  }}
-                  itemStyle={{
-                    fontSize: '10px',
-                    fontWeight: 900,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.1em',
-                  }}
+                  contentStyle={REPORT_TOOLTIP_STYLE}
+                  itemStyle={REPORT_TOOLTIP_ITEM_STYLE}
                 />
-                <Legend
-                  iconType="circle"
-                  wrapperStyle={{
-                    fontSize: '9px',
-                    fontWeight: 900,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.2em',
-                    paddingTop: '30px',
-                  }}
-                />
+                <Legend iconType="circle" wrapperStyle={REPORT_LEGEND_STYLE} />
                 <Line
                   type="monotone"
                   dataKey="remainingPoints"
@@ -324,50 +303,26 @@ export default function ProjectReportsPage() {
                 />
               </LineChart>
             </ResponsiveContainer>
-          </ChartShell>
+          </ReportChartShell>
 
           {/* Cumulative Flow Field */}
-          <ChartShell
+          <ReportChartShell
             title="Cumulative Flow Field (CFD)"
             description="Temporal work-state distribution and bottleneck detection"
           >
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={report.cumulativeFlow}>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="rgba(255,255,255,0.03)"
-                />
+                <CartesianGrid strokeDasharray="3 3" {...REPORT_GRID_PROPS} />
                 <XAxis
                   dataKey="date"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontWeight: 900 }}
+                  tick={REPORT_AXIS_TICK}
                   dy={10}
                 />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontWeight: 900 }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                    borderRadius: '24px',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    backdropFilter: 'blur(16px)',
-                  }}
-                />
-                <Legend
-                  iconType="square"
-                  wrapperStyle={{
-                    fontSize: '9px',
-                    fontWeight: 900,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.2em',
-                    paddingTop: '30px',
-                  }}
-                />
+                <YAxis axisLine={false} tickLine={false} tick={REPORT_AXIS_TICK} />
+                <Tooltip contentStyle={REPORT_TOOLTIP_STYLE} />
+                <Legend iconType="square" wrapperStyle={REPORT_LEGEND_STYLE} />
                 {Object.keys(report.cumulativeFlow[0] || {})
                   .filter((k) => k !== 'date')
                   .map((status) => (
@@ -384,40 +339,27 @@ export default function ProjectReportsPage() {
                   ))}
               </AreaChart>
             </ResponsiveContainer>
-          </ChartShell>
+          </ReportChartShell>
 
           {/* Team Velocity Matrix */}
-          <ChartShell
+          <ReportChartShell
             title="Team Flow Velocity"
             description="Monthly throughput across core operational cycles"
           >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={report.velocity}>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="rgba(255,255,255,0.03)"
-                />
+                <CartesianGrid strokeDasharray="3 3" {...REPORT_GRID_PROPS} />
                 <XAxis
                   dataKey="label"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontWeight: 900 }}
+                  tick={REPORT_AXIS_TICK}
                   dy={10}
                 />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontWeight: 900 }}
-                />
+                <YAxis axisLine={false} tickLine={false} tick={REPORT_AXIS_TICK} />
                 <Tooltip
                   cursor={{ fill: 'rgba(255,255,255,0.02)' }}
-                  contentStyle={{
-                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                    borderRadius: '24px',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    backdropFilter: 'blur(16px)',
-                  }}
+                  contentStyle={REPORT_TOOLTIP_STYLE}
                 />
                 <Bar dataKey="points" name="Throughput" radius={[12, 12, 0, 0]}>
                   {report.velocity.map((entry, index) => (
@@ -430,10 +372,10 @@ export default function ProjectReportsPage() {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-          </ChartShell>
+          </ReportChartShell>
 
           {/* Neural Distribution Matrix */}
-          <ChartShell
+          <ReportChartShell
             title="Current State Matrix"
             description="Process step distribution and resource allocation"
           >
@@ -476,7 +418,7 @@ export default function ProjectReportsPage() {
                 );
               })}
             </div>
-          </ChartShell>
+          </ReportChartShell>
         </div>
       </div>
     </div>
@@ -547,30 +489,6 @@ function HealthCard({
           {label}
         </div>
       </div>
-    </div>
-  );
-}
-
-function ChartShell({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col bg-white/5 p-10 rounded-[3.5rem] border border-white/5 shadow-glass backdrop-blur-3xl group hover:border-white/10 transition-all min-h-[500px]">
-      <div className="mb-10 space-y-2">
-        <h3 className="text-xl font-black text-white tracking-tight uppercase leading-none">
-          {title}
-        </h3>
-        <p className="text-[10px] font-bold text-white/20 tracking-wider uppercase leading-none">
-          {description}
-        </p>
-      </div>
-      <div className="flex-1 min-h-[300px]">{children}</div>
     </div>
   );
 }

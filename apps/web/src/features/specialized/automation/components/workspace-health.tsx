@@ -12,16 +12,7 @@ import {
   GitMerge,
 } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface HealthAction {
-  id: string;
-  agentName: string;
-  actionType: string;
-  targetId: string;
-  reason: string;
-  createdAt: string;
-  metadata?: Record<string, unknown>;
-}
+import { getAutomationHealth, healWorkspace, type HealthAction } from '../api/automation-service';
 
 export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
   const [actions, setActions] = useState<HealthAction[]>([]);
@@ -33,11 +24,8 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
 
   const fetchHealth = async () => {
     try {
-      const res = await fetch(`/api/v1/automation/health?workspaceId=${workspaceId}`);
-      const body = await res.json();
-      if (res.ok) {
-        setActions(body.data.actions);
-      }
+      const body = await getAutomationHealth(workspaceId);
+      setActions(body.actions);
     } catch {
       toast.error('Failed to sync Workspace Health');
     }
@@ -46,14 +34,9 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
   const handleHeal = async () => {
     setIsHealing(true);
     try {
-      const res = await fetch(`/api/v1/automation/heal?workspaceId=${workspaceId}`, {
-        method: 'POST',
-      });
-      const body = await res.json();
-      if (res.ok) {
-        toast.success(`Healing complete: ${body.data.archived} items archived.`);
-        fetchHealth();
-      }
+      const body = await healWorkspace(workspaceId);
+      toast.success(`Healing complete: ${body.archived} items archived.`);
+      fetchHealth();
     } catch {
       toast.error('Healing cycle failed');
     } finally {

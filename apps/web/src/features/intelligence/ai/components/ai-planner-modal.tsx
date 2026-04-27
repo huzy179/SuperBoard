@@ -3,12 +3,8 @@
 import { useState } from 'react';
 import { X, Sparkles, Plus, Check, Zap, Target, Layers, ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface SuggestedTask {
-  title: string;
-  priority: 'high' | 'medium' | 'low';
-  storyPoints: number;
-}
+import { generateProjectPlan, type AiSuggestedTask } from '../api/ai-service';
+import { createProjectTask } from '@/features/operations/task/api/task-service';
 
 interface AiPlannerModalProps {
   projectId: string;
@@ -25,21 +21,16 @@ export function AiPlannerModal({
 }: AiPlannerModalProps) {
   const [goal, setGoal] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [proposedPlan, setProposedPlan] = useState<SuggestedTask[] | null>(null);
+  const [proposedPlan, setProposedPlan] = useState<AiSuggestedTask[] | null>(null);
   const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
 
   const handleGenerate = async () => {
     if (!goal.trim()) return;
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/v1/projects/${projectId}/plan`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ goal }),
-      });
-      const data = await res.json();
-      setProposedPlan(data.data.suggestedTasks);
-      setSelectedTasks(new Set(data.data.suggestedTasks.map((_: unknown, i: number) => i)));
+      const data = await generateProjectPlan(projectId, goal);
+      setProposedPlan(data.suggestedTasks);
+      setSelectedTasks(new Set(data.suggestedTasks.map((_: unknown, i: number) => i)));
     } catch {
       toast.error('Không thể tạo kế hoạch AI');
     } finally {
@@ -55,17 +46,16 @@ export function AiPlannerModal({
 
       if (tasksToCreate.length === 0) return;
 
-      // Execute multi-task creation via the bulk API
-      await fetch(`/api/v1/projects/${projectId}/tasks`, {
-        method: 'POST', // Note: For real impl, we'd add a bulk endpoint or loop
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: tasksToCreate[0]?.title || 'New Task',
-          description: `AI Planned: ${goal}`,
-          priority: tasksToCreate[0]?.priority || 'medium',
-          storyPoints: tasksToCreate[0]?.storyPoints || 1,
-        }),
-      });
+      await Promise.all(
+        tasksToCreate.map((task) =>
+          createProjectTask(projectId, {
+            title: task.title || 'New Task',
+            description: `AI Planned: ${goal}`,
+            priority: task.priority || 'medium',
+            storyPoints: task.storyPoints || 1,
+          }),
+        ),
+      );
 
       toast.success('Kế hoạch đã được khởi tạo thành công');
       onPlanExecuted();

@@ -37,7 +37,7 @@ export default function DocDetailPage() {
     localContent,
     setLocalContent,
     isSaving,
-    refetch,
+    refetch: reloadDoc,
   } = useDoc(params.docId);
 
   const summarizeMutation = useSummarizeDoc();
@@ -75,7 +75,7 @@ export default function DocDetailPage() {
             {error?.message || 'Access denied to the specific intelligence node.'}
           </p>
           <button
-            onClick={() => refetch()}
+            onClick={() => reloadDoc()}
             className="px-8 py-4 bg-brand-500 text-white rounded-xl font-black uppercase text-[10px] tracking-widest shadow-glow-brand/20 active:scale-95 transition-all"
           >
             Retry_Initialization

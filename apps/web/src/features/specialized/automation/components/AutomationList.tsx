@@ -1,9 +1,10 @@
 import React from 'react';
 import { Sparkles, Power, Zap, Activity, Cpu, Trash } from 'lucide-react';
-import { apiGet, apiPut, apiDelete } from '@/lib/api-client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import type { WorkflowRuleDTO } from '@superboard/shared';
+import {
+  useAutomationRules,
+  useDeleteAutomationRule,
+  useToggleAutomationRule,
+} from '../hooks/use-automation-rules';
 
 interface AutomationListProps {
   workspaceId: string;
@@ -11,32 +12,9 @@ interface AutomationListProps {
 }
 
 export function AutomationList({ workspaceId, projectId }: AutomationListProps) {
-  const queryClient = useQueryClient();
-
-  const { data: rules, isLoading } = useQuery<WorkflowRuleDTO[]>({
-    queryKey: ['automation-rules', workspaceId, projectId],
-    queryFn: () => {
-      const url = `/automation/rules?workspaceId=${workspaceId}${projectId ? `&projectId=${projectId}` : ''}`;
-      return apiGet<WorkflowRuleDTO[]>(url, { auth: true });
-    },
-  });
-
-  const toggleMutation = useMutation({
-    mutationFn: (rule: WorkflowRuleDTO) =>
-      apiPut(`/automation/rules/${rule.id}`, { isActive: !rule.isActive }, { auth: true }),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
-      toast.success('Đã cập nhật trạng thái');
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiDelete(`/automation/rules/${id}`, { auth: true }),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
-      toast.success('Đã xóa rule');
-    },
-  });
+  const { data: rules, isLoading } = useAutomationRules(workspaceId, projectId);
+  const toggleMutation = useToggleAutomationRule(workspaceId, projectId);
+  const deleteMutation = useDeleteAutomationRule(workspaceId, projectId);
 
   if (isLoading)
     return (

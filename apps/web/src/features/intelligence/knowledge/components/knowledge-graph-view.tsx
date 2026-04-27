@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Database, Users, FileText, RefreshCw, Zap } from 'lucide-react';
+import { getKnowledgeGraph, type KnowledgeGraphData } from '../api/knowledge-service';
 
 interface Node {
   id: string;
@@ -17,11 +18,6 @@ interface Edge {
   from: string;
   to: string;
   type: string;
-}
-
-interface GraphData {
-  nodes: { id: string; type: 'task' | 'doc' | 'user'; label: string }[];
-  edges: Edge[];
 }
 
 export function KnowledgeGraphView({
@@ -40,10 +36,9 @@ export function KnowledgeGraphView({
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/v1/knowledge/graph/${projectId}`);
-      const body = (await res.json()) as { data: GraphData };
+      const data = (await getKnowledgeGraph(projectId)) as KnowledgeGraphData;
 
-      const initialNodes = body.data.nodes.map((n) => ({
+      const initialNodes = data.nodes.map((n) => ({
         ...n,
         x: Math.random() * 800,
         y: Math.random() * 600,
@@ -52,7 +47,7 @@ export function KnowledgeGraphView({
       }));
 
       setNodes(initialNodes);
-      setEdges(body.data.edges);
+      setEdges(data.edges);
     } catch (err) {
       console.error(err);
     } finally {

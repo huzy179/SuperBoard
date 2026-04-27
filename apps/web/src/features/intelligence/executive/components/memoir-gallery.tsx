@@ -3,18 +3,15 @@
 import { useState, useEffect } from 'react';
 import { Book, History, Sparkles, User, ArrowRight, X, Plus } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface Memoir {
-  id: string;
-  title: string;
-  content: string;
-  persona: string;
-  createdAt: string;
-}
+import {
+  generateProjectMemoir,
+  getProjectMemoirs,
+  type ProjectMemoir,
+} from '../api/executive-service';
 
 export function ProjectMemoirGallery({ projectId }: { projectId: string }) {
-  const [memoirs, setMemoirs] = useState<Memoir[]>([]);
-  const [selectedMemoir, setSelectedMemoir] = useState<Memoir | null>(null);
+  const [memoirs, setMemoirs] = useState<ProjectMemoir[]>([]);
+  const [selectedMemoir, setSelectedMemoir] = useState<ProjectMemoir | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [activePersona, setActivePersona] = useState('executive');
 
@@ -24,9 +21,7 @@ export function ProjectMemoirGallery({ projectId }: { projectId: string }) {
 
   const fetchMemoirs = async () => {
     try {
-      const res = await fetch(`/api/v1/executive/projects/${projectId}/memoirs`);
-      const body = await res.json();
-      if (res.ok) setMemoirs(body.data);
+      setMemoirs(await getProjectMemoirs(projectId));
     } catch {
       toast.error('Không tải được memoir');
     }
@@ -35,15 +30,9 @@ export function ProjectMemoirGallery({ projectId }: { projectId: string }) {
   const generateMemoir = async () => {
     setIsGenerating(true);
     try {
-      const res = await fetch(`/api/v1/executive/projects/${projectId}/memoir`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ persona: activePersona }),
-      });
-      if (res.ok) {
-        toast.success('Đã tạo memoir thành công');
-        fetchMemoirs();
-      }
+      await generateProjectMemoir(projectId, activePersona);
+      toast.success('Đã tạo memoir thành công');
+      fetchMemoirs();
     } catch {
       toast.error('Tạo memoir thất bại');
     } finally {

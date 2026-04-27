@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSearch } from '@/features/system/search/hooks/use-search';
+import { getSearchAnswer } from '@/features/system/search/api/search-service';
 import { ProjectItemDTO, ProjectTaskItemDTO } from '@superboard/shared';
 
 interface SearchModalProps {
@@ -86,9 +87,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
   async function fetchAnswer() {
     setIsAnswering(true);
     try {
-      const res = await fetch(`/api/v1/search/answer?q=${encodeURIComponent(query)}`);
-      const body = await res.json();
-      if (res.ok) setAnswer(body.data);
+      setAnswer(await getSearchAnswer(query));
     } catch {
       // Silently fail for neural answers
     } finally {

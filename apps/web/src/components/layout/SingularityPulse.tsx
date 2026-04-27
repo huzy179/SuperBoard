@@ -6,6 +6,10 @@ import { Sparkles, Activity, Zap, ExternalLink, Globe } from 'lucide-react';
 import { useWorkspaces } from '@/features/system/workspace/hooks/use-workspaces';
 import Link from 'next/link';
 import { TheVoid } from '@/features/specialized/automation/components/TheVoid';
+import {
+  getAutomationProposals,
+  triggerAutomationPulse,
+} from '@/features/specialized/automation/api/automation-service';
 
 type ConsciousnessState = 'observing' | 'analyzing' | 'correcting';
 
@@ -23,15 +27,12 @@ export function SingularityPulse() {
     const cycle = async () => {
       setState('analyzing');
       try {
-        const res = await fetch(`/api/v1/automation/pulse?workspaceId=${activeWorkspace.id}`, {
-          method: 'POST',
-        });
-        const data = await res.json();
-        if (data.data.healed > 0 || data.data.nudged > 0) {
+        const data = await triggerAutomationPulse(activeWorkspace.id);
+        if (data.healed > 0 || data.nudged > 0) {
           setState('correcting');
           setStats((prev) => ({
-            healed: prev.healed + data.data.healed,
-            nudged: prev.nudged + data.data.nudged,
+            healed: prev.healed + data.healed,
+            nudged: prev.nudged + data.nudged,
           }));
           setTimeout(() => setState('observing'), 5000);
         } else {
@@ -44,9 +45,8 @@ export function SingularityPulse() {
 
     const checkProposals = async () => {
       try {
-        const res = await fetch(`/api/v1/automation/proposals?workspaceId=${activeWorkspace.id}`);
-        const result = await res.json();
-        setHasProposals(result.data?.length > 0);
+        const proposals = await getAutomationProposals(activeWorkspace.id);
+        setHasProposals(proposals.length > 0);
       } catch (e) {
         console.error('Failed to fetch proposals', e);
       }

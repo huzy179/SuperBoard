@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ShieldAlert, ArrowDown, Settings2, Zap, Fingerprint, CheckCircle2 } from 'lucide-react';
+import { executeExecutiveDirective, getExecutiveDirective } from '../api/automation-service';
 
 interface Directive {
   id: string;
@@ -21,20 +22,16 @@ export function ExecutiveDirective({ workspaceId }: { workspaceId: string }) {
   const [isExecuting, setIsExecuting] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/v1/automation/executive/directive?workspaceId=${workspaceId}`)
-      .then((res) => res.json())
-      .then((res) => {
-        setDirective(res.data);
-        setIsLoading(false);
-      });
+    getExecutiveDirective(workspaceId).then((data) => {
+      setDirective(data as Directive);
+      setIsLoading(false);
+    });
   }, [workspaceId]);
 
   const handleExecute = async () => {
     if (!directive) return;
     setIsExecuting(true);
-    await fetch(`/api/v1/automation/executive/directive/${directive.id}/execute`, {
-      method: 'POST',
-    });
+    await executeExecutiveDirective(directive.id);
     setDirective((prev) =>
       prev ? { ...prev, metadata: { ...prev.metadata, status: 'EXECUTED' } } : null,
     );

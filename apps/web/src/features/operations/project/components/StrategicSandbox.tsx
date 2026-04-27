@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Settings2, Wind, Layers, Telescope, AlertCircle } from 'lucide-react';
+import { simulateProject } from '../api/project-service';
 
 interface SimulationResult {
   prediction: string;
@@ -31,13 +32,8 @@ export function StrategicSandbox({
 
   useEffect(() => {
     const simulate = async () => {
-      const res = await fetch(`/api/v1/projects/${projectId}/simulate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params),
-      });
-      const data = await res.json();
-      onResultUpdate(data.data);
+      const data = await simulateProject(projectId, params);
+      onResultUpdate(data);
     };
 
     const delay = setTimeout(simulate, 300);

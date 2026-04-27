@@ -11,18 +11,14 @@ import {
   Construction,
 } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface Integration {
-  id: string;
-  name: string;
-  provider: 'SLACK' | 'GITHUB' | 'DISCORD' | 'GITLAB' | 'ZAPIER';
-  type: string;
-  status: string;
-  createdAt: string;
-}
+import {
+  disconnectIntegration,
+  getIntegrations,
+  type IntegrationItem,
+} from '@/features/specialized/connect/api/connect-service';
 
 export function ConnectHub({ workspaceId }: { workspaceId: string }) {
-  const [integrations, setIntegrations] = useState<Integration[]>([]);
+  const [integrations, setIntegrations] = useState<IntegrationItem[]>([]);
   const [activeTab, setActiveTab] = useState<'connections' | 'monitor'>('connections');
 
   useEffect(() => {
@@ -31,11 +27,8 @@ export function ConnectHub({ workspaceId }: { workspaceId: string }) {
 
   const fetchIntegrations = async () => {
     try {
-      const res = await fetch(`/api/v1/connect/integrations?workspaceId=${workspaceId}`);
-      const body = await res.json();
-      if (res.ok) {
-        setIntegrations(body.data.integrations);
-      }
+      const body = await getIntegrations(workspaceId);
+      setIntegrations(body.integrations);
     } catch {
       toast.error('Failed to fetch integrations');
     }
@@ -43,13 +36,9 @@ export function ConnectHub({ workspaceId }: { workspaceId: string }) {
 
   const deleteIntegration = async (id: string) => {
     try {
-      const res = await fetch(`/api/v1/connect/integrations/${id}?workspaceId=${workspaceId}`, {
-        method: 'DELETE',
-      });
-      if (res.ok) {
-        toast.success('Integration disconnected');
-        fetchIntegrations();
-      }
+      await disconnectIntegration(workspaceId, id);
+      toast.success('Integration disconnected');
+      fetchIntegrations();
     } catch {
       toast.error('Failed to disconnect');
     }

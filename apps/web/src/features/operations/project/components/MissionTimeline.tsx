@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { History, ChevronRight, ChevronLeft, Layers, Brain } from 'lucide-react';
+import { getProjectChronology } from '../api/project-service';
 
 interface TimelinePulse {
   id: string;
@@ -25,10 +26,9 @@ export function MissionTimeline({ projectId }: { projectId: string }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch(`/api/v1/projects/${projectId}/chronology`)
-      .then((res) => res.json())
-      .then((res) => {
-        setPulses(res.data);
+    getProjectChronology(projectId)
+      .then((data) => {
+        setPulses(data);
         setIsLoading(false);
       })
       .catch(() => setIsLoading(false));

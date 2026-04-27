@@ -6,6 +6,7 @@ import {
   type TaskPriority,
 } from '@/lib/constants/task';
 import { getInitials } from '@/lib/utils';
+import { getApiBaseUrl } from '@/lib/api-client';
 
 export function TaskTypeIcon({ type }: { type: TaskTypeDTO }) {
   const config = TASK_TYPE_ICONS[type] ?? TASK_TYPE_ICONS.task;
@@ -47,7 +48,7 @@ export function AssigneeAvatar({
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 }) {
   const initials = getInitials(name);
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  const baseUrl = getApiBaseUrl();
   const fullSrc = src ? (src.startsWith('http') ? src : `${baseUrl}${src}`) : null;
 
   const sizeClasses = {

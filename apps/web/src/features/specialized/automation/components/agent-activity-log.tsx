@@ -13,15 +13,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-
-interface AgentLog {
-  id: string;
-  agentName: string;
-  actionType: string;
-  targetId: string;
-  reason: string;
-  createdAt: string;
-}
+import { getAgentLogs, type AgentLog } from '../api/automation-service';
 
 interface AgentActivityLogProps {
   workspaceId: string;
@@ -39,12 +31,8 @@ export function AgentActivityLog({ workspaceId, projectId }: AgentActivityLogPro
   const fetchLogs = async () => {
     setIsLoading(true);
     try {
-      const url = `/api/v1/automation/agents/logs?workspaceId=${workspaceId}${projectId ? `&projectId=${projectId}` : ''}`;
-      const res = await fetch(url);
-      const body = await res.json();
-      if (res.ok) {
-        setLogs(body.data.logs);
-      }
+      const body = await getAgentLogs(workspaceId, projectId);
+      setLogs(body.logs);
     } catch (err) {
       console.error('Failed to fetch agent logs', err);
     } finally {

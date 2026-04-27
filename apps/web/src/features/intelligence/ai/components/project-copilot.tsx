@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Bot, Send, X, Zap, Sparkles, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
+import { chatWithProjectAi, getAiProjectBriefing } from '../api/ai-service';
 
 interface Message {
   id: string;
@@ -36,14 +37,13 @@ export function ProjectCopilot({ projectId }: ProjectCopilotProps) {
   const fetchBriefing = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(`/api/v1/ai/projects/${projectId}/briefing`);
-      const data = await res.json();
-      if (data.data.briefing) {
+      const data = await getAiProjectBriefing(projectId);
+      if (data.briefing) {
         setMessages([
           {
             id: 'briefing',
             role: 'assistant',
-            content: data.data.briefing,
+            content: data.briefing,
             timestamp: new Date(),
           },
         ]);
@@ -70,17 +70,12 @@ export function ProjectCopilot({ projectId }: ProjectCopilotProps) {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`/api/v1/ai/projects/${projectId}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input }),
-      });
-      const data = await res.json();
+      const data = await chatWithProjectAi(projectId, input);
 
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: data.data.response,
+        content: data.response,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, assistantMsg]);

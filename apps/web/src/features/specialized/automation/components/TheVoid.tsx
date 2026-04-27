@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Cpu, Activity, Zap, Globe, ShieldCheck, BrainCircuit, Terminal } from 'lucide-react';
+import { getConsciousnessStream } from '../api/automation-service';
 
 interface Thought {
   id: string;
@@ -19,13 +20,10 @@ export function TheVoid({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     const fetchConsciousness = async () => {
-      const res = await fetch(
-        '/api/v1/automation/consciousness/stream?workspaceId=default-workspace',
-      );
-      const data = await res.json();
-      setThoughts(data.data);
-      if (data.data.length > 0) {
-        setActiveThought(data.data[0].metadata.thoughts[0]);
+      const data = await getConsciousnessStream('default-workspace');
+      setThoughts(data);
+      if (data.length > 0) {
+        setActiveThought(data[0]?.metadata.thoughts[0] ?? 'Đang khởi tạo ngữ cảnh AI...');
       }
     };
 

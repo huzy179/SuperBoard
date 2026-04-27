@@ -11,9 +11,10 @@ import {
   Box,
   Check,
 } from 'lucide-react';
-import { apiPost } from '@/lib/api-client';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useAppMutation } from '@/lib/hooks/use-app-mutation';
+import { generateAutomationRule } from '../api/automation-service';
+import { useCreateAutomationRule } from '../hooks/use-automation-rules';
 
 interface AIAutomationDialogProps {
   workspaceId: string;
@@ -22,7 +23,6 @@ interface AIAutomationDialogProps {
 }
 
 export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutomationDialogProps) {
-  const queryClient = useQueryClient();
   const [prompt, setPrompt] = useState('');
   const [generatedRule, setGeneratedRule] = useState<{
     name: string;
@@ -30,29 +30,20 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
     actions: Array<{ type: string; config: Record<string, unknown> }>;
   } | null>(null);
 
-  const generateMutation = useMutation({
-    mutationFn: (text: string) =>
-      apiPost('/automation/generate-rule', { prompt: text }, { auth: true }),
+  const generateMutation = useAppMutation({
+    mutationFn: generateAutomationRule,
+    successMessage: 'Tổng hợp logic hoàn tất',
     onSuccess: (data) => {
       if (data) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setGeneratedRule(data as any);
-        toast.success('Tổng hợp logic hoàn tất');
       } else {
         toast.error('Xử lý thất bại');
       }
     },
   });
 
-  const saveMutation = useMutation({
-    mutationFn: (data: Record<string, unknown>) =>
-      apiPost(`/automation/rules?workspaceId=${workspaceId}`, data, { auth: true }),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
-      toast.success('Giao thức đã kích hoạt');
-      onClose();
-    },
-  });
+  const saveMutation = useCreateAutomationRule(workspaceId, projectId);
 
   const handleGenerate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,10 +53,16 @@ export function AIAutomationDialog({ workspaceId, projectId, onClose }: AIAutoma
 
   const handleSave = () => {
     if (!generatedRule) return;
-    saveMutation.mutate({
-      ...generatedRule,
-      projectId,
-    });
+    saveMutation.mutate(
+      {
+        ...generatedRule,
+        workspaceId,
+        projectId,
+      },
+      {
+        onSuccess: onClose,
+      },
+    );
   };
 
   return (

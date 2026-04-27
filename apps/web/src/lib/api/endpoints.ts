@@ -38,6 +38,15 @@ export const API_ENDPOINTS = {
     aiDecompose: (taskId: string) => `/api/v1/tasks/${taskId}/ai/decompose`,
     aiRefine: (taskId: string) => `/api/v1/tasks/${taskId}/ai/refine`,
     aiIntelligence: (taskId: string) => `/api/v1/tasks/${taskId}/ai/intelligence`,
+    plan: (projectId: string) => `/api/v1/projects/${projectId}/plan`,
+    chronology: (projectId: string) => `/api/v1/projects/${projectId}/chronology`,
+    briefing: (projectId: string) => `/api/v1/projects/${projectId}/briefing`,
+    forecast: (projectId: string) => `/api/v1/projects/${projectId}/forecast`,
+    simulate: (projectId: string) => `/api/v1/projects/${projectId}/simulate`,
+    predictiveHealth: (projectId: string) => `/api/v1/projects/${projectId}/predictive-health`,
+    reports: (projectId: string) => `/api/v1/projects/${projectId}/reports`,
+    export: (projectId: string) => `/api/v1/projects/${projectId}/export`,
+    exportJson: (projectId: string) => `/api/v1/projects/${projectId}/export/json`,
   },
   notifications: {
     list: '/api/v1/notifications',
@@ -80,6 +89,8 @@ export const API_ENDPOINTS = {
   },
   search: {
     global: (query: string) => `/api/v1/search?q=${encodeURIComponent(query)}`,
+    answer: '/api/v1/search/answer',
+    status: '/api/v1/search/status',
   },
   upload: {
     avatar: '/api/v1/upload/avatar',
@@ -99,5 +110,52 @@ export const API_ENDPOINTS = {
     update: (docId: string) => `/api/v1/docs/${docId}`,
     delete: (docId: string) => `/api/v1/docs/${docId}`,
     versions: (docId: string) => `/api/v1/docs/${docId}/versions`,
+  },
+  executive: {
+    adaptiveLayout: '/api/v1/executive/adaptive-layout',
+    navigationFocus: '/api/v1/executive/navigation-focus',
+    dailyBriefing: '/api/v1/executive/daily-briefing',
+    projectBriefing: (projectId: string) => `/api/v1/executive/projects/${projectId}/briefing`,
+    projectSimulation: (projectId: string) => `/api/v1/executive/projects/${projectId}/simulate`,
+    projectMemoirs: (projectId: string) => `/api/v1/executive/projects/${projectId}/memoirs`,
+    projectMemoir: (projectId: string) => `/api/v1/executive/projects/${projectId}/memoir`,
+  },
+  ai: {
+    workspaceDigest: (workspaceId: string) => `/api/v1/ai/workspace/${workspaceId}/digest`,
+    projectBriefing: (projectId: string) => `/api/v1/ai/projects/${projectId}/briefing`,
+    projectChat: (projectId: string) => `/api/v1/ai/projects/${projectId}/chat`,
+  },
+  automation: {
+    pulse: '/api/v1/automation/pulse',
+    proposals: '/api/v1/automation/proposals',
+    approveProposal: (proposalId: string) => `/api/v1/automation/proposals/${proposalId}/approve`,
+    health: '/api/v1/automation/health',
+    heal: '/api/v1/automation/heal',
+    rules: '/api/v1/automation',
+    rule: (ruleId: string) => `/api/v1/automation/${ruleId}`,
+    generateRule: '/api/v1/automation/generate',
+    agentLogs: '/api/v1/automation/agents/logs',
+    executiveDirective: '/api/v1/automation/executive/directive',
+    executeExecutiveDirective: (directiveId: string) =>
+      `/api/v1/automation/executive/directive/${directiveId}/execute`,
+    consciousnessStream: '/api/v1/automation/consciousness/stream',
+  },
+  knowledge: {
+    graph: (projectId: string) => `/api/v1/knowledge/graph/${projectId}`,
+    diary: (projectId: string) => `/api/v1/knowledge/diary/${projectId}`,
+    atlas: '/api/v1/knowledge/atlas',
+    diagnosis: '/api/v1/knowledge/diagnosis',
+    divergence: '/api/v1/knowledge/diagnosis/divergence',
+  },
+  connect: {
+    integrations: '/api/v1/connect/integrations',
+    integration: (integrationId: string) => `/api/v1/connect/integrations/${integrationId}`,
+  },
+  qa: {
+    diagnoseManual: '/api/v1/qa/diagnose/manual',
+    generateSpec: '/api/v1/qa/generate-spec',
+  },
+  talent: {
+    taskSuggestions: (taskId: string) => `/api/v1/talent/tasks/${taskId}/suggestions`,
   },
 };

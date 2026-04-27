@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trash2, User, Flag, Loader2, SquareCheck, MousePointer2 } from 'lucide-react';
 import type { ProjectMemberDTO, ProjectTaskItemDTO, TaskPriorityDTO } from '@superboard/shared';
 import { BOARD_COLUMNS, PRIORITY_OPTIONS } from '@/lib/constants/task';
+import { TaskBulkActionMenu } from './task-bulk-action-menu';
 
 type TaskBulkActionBarProps = {
   members: ProjectMemberDTO[];
@@ -99,192 +99,135 @@ export function TaskBulkActionBar(props: TaskBulkActionBarProps) {
           {/* Action Hub */}
           <div className="flex flex-1 items-center gap-3">
             {/* Status Protocol */}
-            <div className="relative">
-              <button
-                onClick={() => setActiveMenu(activeMenu === 'status' ? null : 'status')}
-                className={`h-12 px-6 rounded-[1.5rem] flex items-center gap-4 transition-all duration-500 border ${
-                  activeMenu === 'status'
-                    ? 'bg-white border-white text-slate-950 shadow-luxe scale-105'
-                    : 'bg-white/[0.02] border-white/5 text-white/40 hover:text-white hover:bg-white/5'
-                }`}
-              >
+            <TaskBulkActionMenu
+              isOpen={activeMenu === 'status'}
+              label="STATE"
+              widthClass="w-72"
+              accentClass="via-brand-500/40"
+              onToggle={() => setActiveMenu(activeMenu === 'status' ? null : 'status')}
+              icon={
                 <Loader2
                   size={16}
                   className={isStatusPending ? 'animate-spin text-brand-500' : ''}
                 />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] italic">
-                  STATE
-                </span>
-              </button>
-
-              <AnimatePresence>
-                {activeMenu === 'status' && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: -20 }}
-                    animate={{ opacity: 1, scale: 1, y: -12 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                    className="absolute bottom-full left-0 mb-6 rounded-[2.5rem] border border-white/10 bg-slate-950/90 p-3 w-72 backdrop-blur-3xl shadow-luxe z-50 overflow-hidden"
+              }
+            >
+              {(workflow?.statuses || BOARD_COLUMNS).map(
+                (
+                  sw: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+                ) => (
+                  <button
+                    key={sw.key}
+                    onClick={() => {
+                      onBulkStatusChange(sw.key as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+                      onApplyStatus();
+                      setActiveMenu(null);
+                    }}
+                    className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-[10px] font-black uppercase tracking-widest transition-all ${
+                      bulkStatus === sw.key
+                        ? 'text-brand-400 bg-brand-500/10 border border-brand-500/10'
+                        : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'
+                    }`}
                   >
-                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/40 to-transparent" />
-                    <div className="space-y-1.5 p-1">
-                      {(workflow?.statuses || BOARD_COLUMNS).map(
-                        (
-                          sw: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-                        ) => (
-                          <button
-                            key={sw.key}
-                            onClick={() => {
-                              onBulkStatusChange(sw.key as any); // eslint-disable-line @typescript-eslint/no-explicit-any
-                              onApplyStatus();
-                              setActiveMenu(null);
-                            }}
-                            className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-[10px] font-black uppercase tracking-widest transition-all ${
-                              bulkStatus === sw.key
-                                ? 'text-brand-400 bg-brand-500/10 border border-brand-500/10'
-                                : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'
-                            }`}
-                          >
-                            <span className="truncate">{sw.label || sw.name}</span>
-                            {bulkStatus === sw.key && (
-                              <div className="h-1 w-1 rounded-full bg-brand-500 shadow-glow-brand" />
-                            )}
-                          </button>
-                        ),
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                    <span className="truncate">{sw.label || sw.name}</span>
+                    {bulkStatus === sw.key && (
+                      <div className="h-1 w-1 rounded-full bg-brand-500 shadow-glow-brand" />
+                    )}
+                  </button>
+                ),
+              )}
+            </TaskBulkActionMenu>
 
             {/* Priority Protocol */}
-            <div className="relative">
-              <button
-                onClick={() => setActiveMenu(activeMenu === 'priority' ? null : 'priority')}
-                className={`h-12 px-6 rounded-[1.5rem] flex items-center gap-4 transition-all duration-500 border ${
-                  activeMenu === 'priority'
-                    ? 'bg-white border-white text-slate-950 shadow-luxe scale-105'
-                    : 'bg-white/[0.02] border-white/5 text-white/40 hover:text-white hover:bg-white/5'
-                }`}
-              >
+            <TaskBulkActionMenu
+              isOpen={activeMenu === 'priority'}
+              label="RANK"
+              widthClass="w-64"
+              accentClass="via-indigo-500/40"
+              onToggle={() => setActiveMenu(activeMenu === 'priority' ? null : 'priority')}
+              icon={
                 <Flag
                   size={16}
                   className={isPriorityPending ? 'animate-pulse text-indigo-500' : ''}
                 />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] italic">
-                  RANK
-                </span>
-              </button>
-
-              <AnimatePresence>
-                {activeMenu === 'priority' && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: -20 }}
-                    animate={{ opacity: 1, scale: 1, y: -12 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                    className="absolute bottom-full left-0 mb-6 rounded-[2.5rem] border border-white/10 bg-slate-950/90 p-3 w-64 backdrop-blur-3xl shadow-luxe z-50 overflow-hidden"
-                  >
-                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent" />
-                    <div className="space-y-1.5 p-1">
-                      {PRIORITY_OPTIONS.map((p) => (
-                        <button
-                          key={p.key}
-                          onClick={() => {
-                            onBulkPriorityChange(p.key as TaskPriorityDTO);
-                            onApplyPriority();
-                            setActiveMenu(null);
-                          }}
-                          className={`w-full flex items-center justify-between px-6 py-4 text-left rounded-lg transition-all duration-300 group/item ${
-                            bulkPriority === p.key
-                              ? 'text-indigo-400 bg-indigo-500/10 border border-indigo-500/10'
-                              : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'
-                          }`}
-                        >
-                          <span className="text-[11px] font-black uppercase tracking-widest italic group-hover/item:translate-x-1 transition-transform">
-                            {p.label}
-                          </span>
-                          {bulkPriority === p.key && (
-                            <div className="h-1.5 w-1.5 rounded-full bg-indigo-400 shadow-glow-indigo animate-pulse" />
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+              }
+            >
+              {PRIORITY_OPTIONS.map((p) => (
+                <button
+                  key={p.key}
+                  onClick={() => {
+                    onBulkPriorityChange(p.key as TaskPriorityDTO);
+                    onApplyPriority();
+                    setActiveMenu(null);
+                  }}
+                  className={`w-full flex items-center justify-between px-6 py-4 text-left rounded-lg transition-all duration-300 group/item ${
+                    bulkPriority === p.key
+                      ? 'text-indigo-400 bg-indigo-500/10 border border-indigo-500/10'
+                      : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <span className="text-[11px] font-black uppercase tracking-widest italic group-hover/item:translate-x-1 transition-transform">
+                    {p.label}
+                  </span>
+                  {bulkPriority === p.key && (
+                    <div className="h-1.5 w-1.5 rounded-full bg-indigo-400 shadow-glow-indigo animate-pulse" />
+                  )}
+                </button>
+              ))}
+            </TaskBulkActionMenu>
 
             {/* Operator Protocol */}
-            <div className="relative">
-              <button
-                onClick={() => setActiveMenu(activeMenu === 'assignee' ? null : 'assignee')}
-                className={`h-12 px-6 rounded-[1.5rem] flex items-center gap-4 transition-all duration-500 border ${
-                  activeMenu === 'assignee'
-                    ? 'bg-white border-white text-slate-950 shadow-luxe scale-105'
-                    : 'bg-white/[0.02] border-white/5 text-white/40 hover:text-white hover:bg-white/5'
-                }`}
-              >
+            <TaskBulkActionMenu
+              isOpen={activeMenu === 'assignee'}
+              label="OPERATOR"
+              widthClass="w-80"
+              accentClass="via-emerald-500/40"
+              onToggle={() => setActiveMenu(activeMenu === 'assignee' ? null : 'assignee')}
+              icon={
                 <User
                   size={16}
                   className={isAssignPending ? 'animate-pulse text-emerald-500' : ''}
                 />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] italic">
-                  OPERATOR
-                </span>
+              }
+            >
+              <button
+                onClick={() => {
+                  onBulkAssigneeIdChange('');
+                  onApplyAssignee();
+                  setActiveMenu(null);
+                }}
+                className="w-full px-6 py-4 text-left text-[11px] font-black uppercase tracking-[0.2em] text-rose-400 bg-rose-500/5 hover:bg-rose-500/10 rounded-lg transition-all mb-2 border border-rose-500/10 italic"
+              >
+                DE-SYNC ALL_UNITS
               </button>
-
-              <AnimatePresence>
-                {activeMenu === 'assignee' && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: -20 }}
-                    animate={{ opacity: 1, scale: 1, y: -12 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                    className="absolute bottom-full left-0 mb-6 rounded-[2.5rem] border border-white/10 bg-slate-950/90 p-3 w-80 backdrop-blur-3xl shadow-luxe z-50 overflow-hidden"
+              <div className="max-h-72 overflow-y-auto elite-scrollbar space-y-1.5">
+                {members.map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => {
+                      onBulkAssigneeIdChange(m.id);
+                      onApplyAssignee();
+                      setActiveMenu(null);
+                    }}
+                    className={`w-full flex items-center gap-5 px-6 py-4 text-left rounded-lg transition-all duration-300 group/item ${
+                      bulkAssigneeId === m.id
+                        ? 'text-brand-400 bg-brand-500/10 border border-brand-500/10'
+                        : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'
+                    }`}
                   >
-                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
-                    <div className="space-y-1.5 p-1">
-                      <button
-                        onClick={() => {
-                          onBulkAssigneeIdChange('');
-                          onApplyAssignee();
-                          setActiveMenu(null);
-                        }}
-                        className="w-full px-6 py-4 text-left text-[11px] font-black uppercase tracking-[0.2em] text-rose-400 bg-rose-500/5 hover:bg-rose-500/10 rounded-lg transition-all mb-2 border border-rose-500/10 italic"
-                      >
-                        DE-SYNC ALL_UNITS
-                      </button>
-                      <div className="max-h-72 overflow-y-auto elite-scrollbar space-y-1.5">
-                        {members.map((m) => (
-                          <button
-                            key={m.id}
-                            onClick={() => {
-                              onBulkAssigneeIdChange(m.id);
-                              onApplyAssignee();
-                              setActiveMenu(null);
-                            }}
-                            className={`w-full flex items-center gap-5 px-6 py-4 text-left rounded-lg transition-all duration-300 group/item ${
-                              bulkAssigneeId === m.id
-                                ? 'text-brand-400 bg-brand-500/10 border border-brand-500/10'
-                                : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'
-                            }`}
-                          >
-                            <div className="w-9 h-9 rounded-xl bg-white/5 font-black flex items-center justify-center text-[10px] border border-white/5 shadow-inner">
-                              {m.fullName.charAt(0)}
-                            </div>
-                            <span className="text-[11px] font-black uppercase tracking-tight truncate flex-1 italic group-hover/item:translate-x-1 transition-transform">
-                              {m.fullName}
-                            </span>
-                            {bulkAssigneeId === m.id && (
-                              <div className="h-1.5 w-1.5 rounded-full bg-brand-400 shadow-glow-brand animate-pulse" />
-                            )}
-                          </button>
-                        ))}
-                      </div>
+                    <div className="w-9 h-9 rounded-xl bg-white/5 font-black flex items-center justify-center text-[10px] border border-white/5 shadow-inner">
+                      {m.fullName.charAt(0)}
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                    <span className="text-[11px] font-black uppercase tracking-tight truncate flex-1 italic group-hover/item:translate-x-1 transition-transform">
+                      {m.fullName}
+                    </span>
+                    {bulkAssigneeId === m.id && (
+                      <div className="h-1.5 w-1.5 rounded-full bg-brand-400 shadow-glow-brand animate-pulse" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </TaskBulkActionMenu>
 
             {/* Tactical Override Group */}
             <div className="h-10 w-px bg-white/5 mx-2" />

@@ -7,9 +7,7 @@ import { join } from 'path';
 import { BearerAuthGuard } from './common/guards/bearer-auth.guard';
 import { RateLimitGuard } from './common/guards/rate-limit.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { HealthController } from './health.controller';
 import { validateEnv } from './config/env';
-import { HealthService } from './health.service';
 import { HealthModule } from './modules/health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -67,9 +65,8 @@ import { EventBusModule } from './common/event-bus/event-bus.module';
     KnowledgeModule,
     AnalyticsModule,
   ],
-  controllers: [HealthController],
+  controllers: [],
   providers: [
-    HealthService,
     {
       provide: APP_GUARD,
       useClass: BearerAuthGuard,

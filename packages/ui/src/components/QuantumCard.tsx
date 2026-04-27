@@ -69,9 +69,9 @@ export function QuantumCardHeader({
   children?: ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between p-var(--space-6) pb-var(--space-3)">
+    <div className="flex items-start justify-between p-[var(--space-6)] pb-[var(--space-3)]">
       <div className="space-y-1">
-        <div className="flex items-center gap-var(--space-2)">
+        <div className="flex items-center gap-[var(--space-2)]">
           {icon && <div className="text-brand-400">{icon}</div>}
           <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20">
             {title}
@@ -95,5 +95,5 @@ export function QuantumCardContent({
   children: ReactNode;
   className?: string;
 }) {
-  return <div className={`p-var(--space-6) pt-var(--space-2) ${className}`}>{children}</div>;
+  return <div className={`p-[var(--space-6)] pt-[var(--space-2)] ${className}`}>{children}</div>;
 }

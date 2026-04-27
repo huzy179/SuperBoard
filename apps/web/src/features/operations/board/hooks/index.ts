@@ -2,7 +2,7 @@ export * from '@/features/operations/project/hooks/use-projects';
 export * from '@/features/operations/project/hooks/use-project-detail';
 export * from '@/features/operations/project/hooks/use-project-mutations';
 export * from '@/features/operations/project/hooks/use-project-url-state';
-export * from '@/features/integrations/jira/hooks/use-jira-projects-page';
+export * from '@/features/jira/hooks/use-jira-projects-page';
 export * from '@/features/operations/reports/hooks/use-report';
 export * from '@/features/operations/workflow/hooks/use-workflow';
 export * from '@/features/operations/task/hooks/use-task-mutations';

@@ -67,8 +67,8 @@ export function MessageInput({ channelId }: MessageInputProps) {
       {/* High-fidelity rim lighting proxy */}
       <div className="absolute -inset-px bg-gradient-to-r from-brand-500/10 via-transparent to-brand-500/10 rounded-md opacity-0 group-focus-within:opacity-100 transition-opacity blur-sm pointer-events-none" />
 
-      <div className="relative flex flex-col p-var(--space-2) rounded-md bg-slate-950/80 backdrop-blur-3xl border border-white/10 shadow-inner focus-within:border-brand-500/30 transition-all">
-        <div className="flex items-end gap-var(--space-2) px-var(--space-2) pb-var(--space-2)">
+      <div className="relative flex flex-col p-[var(--space-2)] rounded-md bg-slate-950/80 backdrop-blur-3xl border border-white/10 shadow-inner focus-within:border-brand-500/30 transition-all">
+        <div className="flex items-end gap-[var(--space-2)] px-[var(--space-2)] pb-[var(--space-2)]">
           <button className="p-3 text-white/20 hover:text-brand-400 hover:bg-white/[0.03] rounded-sm transition-all border border-transparent hover:border-white/5">
             <Paperclip size={18} />
           </button>
@@ -83,12 +83,12 @@ export function MessageInput({ channelId }: MessageInputProps) {
             className="flex-1 bg-transparent border-none focus:ring-0 resize-none py-4 text-[13px] text-white min-h-[52px] max-h-[200px] placeholder:text-white/5 font-bold uppercase tracking-tight"
           />
 
-          <div className="flex items-center gap-var(--space-2) self-center pb-1">
+          <div className="flex items-center gap-[var(--space-2)] self-center pb-1">
             <button className="p-3 text-white/20 hover:text-amber-400 hover:bg-white/[0.03] rounded-sm transition-all border border-transparent hover:border-white/5">
               <Smile size={18} />
             </button>
 
-            <div className="h-6 w-px bg-white/5 mx-var(--space-1)" />
+            <div className="h-6 w-px bg-white/5 mx-[var(--space-1)]" />
 
             <button
               onClick={handleSend}
@@ -109,8 +109,8 @@ export function MessageInput({ channelId }: MessageInputProps) {
         </div>
 
         {/* Terminal Metadata Footer */}
-        <div className="flex items-center justify-between px-var(--space-5) py-1.5 border-t border-white/5 bg-black/20 rounded-b-md">
-          <div className="flex items-center gap-var(--space-4)">
+        <div className="flex items-center justify-between px-[var(--space-5)] py-1.5 border-t border-white/5 bg-black/20 rounded-b-md">
+          <div className="flex items-center gap-[var(--space-4)]">
             <div className="flex items-center gap-1.5">
               <div className="h-1 w-1 bg-brand-500 rounded-full animate-pulse shadow-glow-brand" />
               <span className="text-[8px] font-bold text-white/20 uppercase tracking-widest">

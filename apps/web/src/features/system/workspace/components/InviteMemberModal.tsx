@@ -165,7 +165,7 @@ export function InviteMemberModal({ workspaceId, onClose }: InviteMemberModalPro
               </div>
 
               {/* Note */}
-              <div className="flex gap-3 rounded-sm bg-amber-500/5 border border-amber-500/20 p-var(--space-4) text-[10px] font-bold text-amber-400/80 leading-relaxed uppercase tracking-tight">
+              <div className="flex gap-3 rounded-sm bg-amber-500/5 border border-amber-500/20 p-[var(--space-4)] text-[10px] font-bold text-amber-400/80 leading-relaxed uppercase tracking-tight">
                 <Info size={12} className="shrink-0 mt-0.5" />
                 <p>
                   <b>NOTICE:</b> Mail server integration is currently offline. Manual peer-to-peer

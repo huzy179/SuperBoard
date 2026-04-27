@@ -62,8 +62,8 @@ export function MorningBriefing({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center p-var(--space-10) bg-slate-950/80 backdrop-blur-3xl animate-in fade-in duration-500 overflow-y-auto scrollbar-hide">
-      <div className="w-full max-w-3xl bg-slate-950/90 backdrop-blur-3xl rounded-md shadow-inner border border-white/10 p-var(--space-12) relative my-10 animate-in slide-in-from-bottom-4 duration-700">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center p-[var(--space-10)] bg-slate-950/80 backdrop-blur-3xl animate-in fade-in duration-500 overflow-y-auto scrollbar-hide">
+      <div className="w-full max-w-3xl bg-slate-950/90 backdrop-blur-3xl rounded-md shadow-inner border border-white/10 p-[var(--space-12)] relative my-10 animate-in slide-in-from-bottom-4 duration-700">
         {/* Close button */}
         <button
           onClick={onClose}
@@ -72,8 +72,8 @@ export function MorningBriefing({
           <X size={24} />
         </button>
 
-        <div className="flex flex-col items-center text-center mb-var(--space-12)">
-          <div className="flex items-center gap-4 mb-var(--space-6)">
+        <div className="flex flex-col items-center text-center mb-[var(--space-12)]">
+          <div className="flex items-center gap-4 mb-[var(--space-6)]">
             <span className="h-px w-8 bg-white/10" />
             <div className="w-10 h-10 rounded-sm bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center">
               <Sunrise size={20} />
@@ -94,9 +94,9 @@ export function MorningBriefing({
           </div>
         </div>
 
-        <div className="space-y-var(--space-12)">
+        <div className="space-y-[var(--space-12)]">
           {/* Tình trạng hoạt động */}
-          <div className="relative p-var(--space-10) rounded-md bg-white/[0.01] border border-white/5 overflow-hidden group hover:border-brand-500/20 transition-all duration-500 shadow-inner">
+          <div className="relative p-[var(--space-10)] rounded-md bg-white/[0.01] border border-white/5 overflow-hidden group hover:border-brand-500/20 transition-all duration-500 shadow-inner">
             <div className="absolute top-0 right-0 p-8 text-white/5 group-hover:text-white/10 transition-colors">
               <Wind size={60} strokeWidth={1} />
             </div>
@@ -111,18 +111,18 @@ export function MorningBriefing({
             </p>
 
             <div className="mt-6 flex items-center gap-2">
-              <div className="px-var(--space-3) py-1 bg-white/[0.02] rounded-xs border border-white/5 text-[8px] font-bold text-white/30 uppercase tracking-widest">
+              <div className="px-[var(--space-3)] py-1 bg-white/[0.02] rounded-xs border border-white/5 text-[8px] font-bold text-white/30 uppercase tracking-widest">
                 Stable
               </div>
-              <div className="px-var(--space-3) py-1 bg-white/[0.02] rounded-xs border border-white/5 text-[8px] font-bold text-brand-400 uppercase tracking-widest">
+              <div className="px-[var(--space-3)] py-1 bg-white/[0.02] rounded-xs border border-white/5 text-[8px] font-bold text-brand-400 uppercase tracking-widest">
                 Synergy_High
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-var(--space-10)">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--space-10)]">
             {/* Command Intent */}
-            <div className="space-y-var(--space-6)">
+            <div className="space-y-[var(--space-6)]">
               <h3 className="text-[9px] font-bold text-white/30 uppercase tracking-widest px-1 flex items-center gap-2">
                 <Target size={12} className="text-brand-400" />
                 Strategic_Goals
@@ -132,7 +132,7 @@ export function MorningBriefing({
                 {data?.commandIntent.map((intent, i) => (
                   <div
                     key={i}
-                    className="flex gap-4 p-var(--space-4) rounded-sm bg-white/[0.01] border border-white/5 group hover:border-brand-500/20 transition-all cursor-default"
+                    className="flex gap-4 p-[var(--space-4)] rounded-sm bg-white/[0.01] border border-white/5 group hover:border-brand-500/20 transition-all cursor-default"
                   >
                     <div className="text-lg font-black text-brand-500/10 tabular-nums opacity-50 group-hover:opacity-100 transition-opacity">
                       0{i + 1}
@@ -148,13 +148,13 @@ export function MorningBriefing({
             </div>
 
             {/* Hoạt động gần đây */}
-            <div className="space-y-var(--space-6)">
+            <div className="space-y-[var(--space-6)]">
               <h3 className="text-[9px] font-bold text-white/30 uppercase tracking-widest px-1 flex items-center gap-2">
                 <Brain size={12} className="text-brand-400" />
                 Key_Highlights
               </h3>
 
-              <div className="flex flex-col h-full bg-white/[0.01] rounded-md p-var(--space-8) text-white relative overflow-hidden group border border-white/5 shadow-inner">
+              <div className="flex flex-col h-full bg-white/[0.01] rounded-md p-[var(--space-8)] text-white relative overflow-hidden group border border-white/5 shadow-inner">
                 <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 Transition-opacity">
                   <Zap size={80} strokeWidth={1} />
                 </div>

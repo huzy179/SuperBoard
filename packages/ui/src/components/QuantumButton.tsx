@@ -33,10 +33,10 @@ export function QuantumButton({
   };
 
   const sizes = {
-    sm: 'px-var(--space-4) py-var(--space-2)',
-    md: 'px-var(--space-6) py-var(--space-3)',
-    lg: 'px-var(--space-10) py-var(--space-4) text-[11px]',
-    icon: 'p-var(--space-3)',
+    sm: 'px-[var(--space-4)] py-[var(--space-2)]',
+    md: 'px-[var(--space-6)] py-[var(--space-3)]',
+    lg: 'px-[var(--space-10)] py-[var(--space-4)] text-[11px]',
+    icon: 'p-[var(--space-3)]',
   };
 
   return (

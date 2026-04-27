@@ -29,7 +29,7 @@ export function QuantumBadge({ children, variant = 'brand', dot = false }: Quant
 
   return (
     <div
-      className={`inline-flex items-center gap-2 rounded-xs border px-var(--space-3) py-var(--space-1) text-[8px] font-bold uppercase tracking-[0.2em] backdrop-blur-xl ${variants[variant]}`}
+      className={`inline-flex items-center gap-2 rounded-xs border px-[var(--space-3)] py-[var(--space-1)] text-[8px] font-bold uppercase tracking-[0.2em] backdrop-blur-xl ${variants[variant]}`}
     >
       {dot && <div className={`h-1 w-1 rounded-full ${dots[variant]} animate-pulse`} />}
       <span className="leading-none">{children}</span>

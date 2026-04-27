@@ -126,7 +126,7 @@ export function ThreadPanel({ parentMessage, onClose }: ThreadPanelProps) {
             {replies?.map((reply) => (
               <div key={reply.id} className="relative animate-in slide-in-from-left-4 duration-500">
                 <div className="absolute -left-[23px] top-4 w-5 h-px bg-white/10" />
-                <div className="flex gap-var(--space-4) p-var(--space-3) rounded-sm hover:bg-white/[0.01] transition-all border border-transparent hover:border-white/5">
+                <div className="flex gap-[var(--space-4)] p-[var(--space-3)] rounded-sm hover:bg-white/[0.01] transition-all border border-transparent hover:border-white/5">
                   <div className="relative shrink-0">
                     <AssigneeAvatar
                       name={reply.author?.fullName || ''}

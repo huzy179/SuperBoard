@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
-import type { ViewMode } from '@/features/integrations/jira/stores/jira-project-ui-store';
+import type { ViewMode } from '@/features/jira/stores/jira-project-ui-store';
 import type { TaskSortBy, SortDirection } from '@/features/operations/task/utils/task-view';
 import { toggleSetFilterValue } from '@/features/operations/task/utils/task-view';
 import type { ProjectTaskItemDTO } from '@superboard/shared';

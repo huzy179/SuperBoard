@@ -120,7 +120,7 @@ export function DirectTransmissionHub({ channelName, onClose }: DirectTransmissi
         </div>
 
         {/* Global Controls */}
-        <div className="absolute bottom-0 inset-x-0 p-var(--space-8) flex justify-center items-center pointer-events-none">
+        <div className="absolute bottom-0 inset-x-0 p-[var(--space-8)] flex justify-center items-center pointer-events-none">
           <div className="flex items-center gap-3 p-1.5 bg-slate-950/90 backdrop-blur-3xl border border-white/10 rounded-sm shadow-2xl pointer-events-auto">
             <ControlBtn
               active={isMuted}

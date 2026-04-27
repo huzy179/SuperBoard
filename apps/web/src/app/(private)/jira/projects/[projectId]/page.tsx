@@ -4,7 +4,7 @@ import { useCallback, useMemo } from 'react';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { CreateTaskRequestDTO, ProjectMemberDTO } from '@superboard/shared';
 import { FullPageError } from '@/components/ui/page-states';
-import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { useKeyboardShortcuts } from '@/lib/hooks/use-keyboard-shortcuts';
 import { ProjectSkeleton } from '@/features/operations/project/components/ProjectSkeleton';
 
 import { ProjectDetailHeader } from '@/features/operations/project/components/project-detail-header';

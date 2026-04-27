@@ -70,9 +70,9 @@ export function QuantumModal({
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/40 to-transparent pointer-events-none" />
 
             {/* Interior Content */}
-            <div className="relative z-10 p-var(--space-8)">
+            <div className="relative z-10 p-[var(--space-8)]">
               {(title || showCloseButton) && (
-                <div className="flex items-center justify-between mb-var(--space-6)">
+                <div className="flex items-center justify-between mb-[var(--space-6)]">
                   {title && (
                     <h3 className="text-lg font-black text-white uppercase tracking-tight">
                       {title}

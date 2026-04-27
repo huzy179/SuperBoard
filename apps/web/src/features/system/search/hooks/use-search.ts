@@ -1,5 +1,5 @@
 import { SearchResponseDTO } from '@superboard/shared';
-import { useDebounce } from '@/hooks/use-debounce';
+import { useDebounce } from '@/lib/hooks/use-debounce';
 import { useAppQuery } from '@/lib/hooks/use-app-query';
 import { queryKeys } from '@/lib/query-keys';
 import { searchGlobal } from '../api/search-service';

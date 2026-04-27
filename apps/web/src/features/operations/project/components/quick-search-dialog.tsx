@@ -122,7 +122,7 @@ export function QuickSearchDialog({ tasks, onClose, onSelectTask }: QuickSearchD
           <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]" />
 
           {/* Search input hub */}
-          <div className="flex items-center gap-var(--space-4) px-var(--space-6) py-var(--space-5) relative border-b border-white/5 bg-white/[0.01]">
+          <div className="flex items-center gap-[var(--space-4)] px-[var(--space-6)] py-[var(--space-5)] relative border-b border-white/5 bg-white/[0.01]">
             <div className="flex items-center justify-center w-10 h-10 rounded-sm bg-brand-500/10 border border-brand-500/20 shadow-[0_0_20px_rgba(var(--color-brand-500),0.1)]">
               <Search size={18} className="text-brand-400" />
             </div>
@@ -145,7 +145,7 @@ export function QuickSearchDialog({ tasks, onClose, onSelectTask }: QuickSearchD
           {/* Results Stream */}
           <div className="max-h-[55vh] overflow-y-auto elite-scrollbar relative bg-black/5">
             {results.length > 0 ? (
-              <ul ref={listRef} className="py-var(--space-3) px-var(--space-3) space-y-1">
+              <ul ref={listRef} className="py-[var(--space-3)] px-[var(--space-3)] space-y-1">
                 {results.map((task, index) => {
                   const statusConfig = STATUS_LABELS[task.status] ?? STATUS_LABELS['todo']!;
                   const isSelected = index === selectedIndex;
@@ -160,7 +160,7 @@ export function QuickSearchDialog({ tasks, onClose, onSelectTask }: QuickSearchD
                       <button
                         type="button"
                         onClick={() => onSelectTask(task.id)}
-                        className={`group relative flex w-full items-center gap-var(--space-4) px-var(--space-4) py-var(--space-3) text-left transition-all duration-200 rounded-sm border overflow-hidden ${
+                        className={`group relative flex w-full items-center gap-[var(--space-4)] px-[var(--space-4)] py-[var(--space-3)] text-left transition-all duration-200 rounded-sm border overflow-hidden ${
                           isSelected
                             ? 'bg-brand-500/5 border-brand-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]'
                             : 'bg-transparent border-transparent hover:bg-white/[0.02]'
@@ -283,7 +283,7 @@ export function QuickSearchDialog({ tasks, onClose, onSelectTask }: QuickSearchD
           </div>
 
           {/* Tactical Footer */}
-          <div className="flex items-center justify-between border-t border-white/5 px-var(--space-6) py-var(--space-4) bg-white/[0.01] backdrop-blur-xl relative z-10">
+          <div className="flex items-center justify-between border-t border-white/5 px-[var(--space-6)] py-[var(--space-4)] bg-white/[0.01] backdrop-blur-xl relative z-10">
             <div className="flex items-center gap-3">
               <div className="h-1 w-1 rounded-full bg-brand-500 shadow-[0_0_8px_var(--color-brand-500)] animate-pulse" />
               <span className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">

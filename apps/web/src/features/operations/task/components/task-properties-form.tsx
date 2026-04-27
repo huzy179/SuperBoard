@@ -122,7 +122,7 @@ export function TaskPropertiesForm({
                 key={t.key}
                 type="button"
                 onClick={() => setEditType(t.key)}
-                className={`flex items-center gap-3 px-var(--space-4) py-var(--space-2) rounded-xs text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 border ${
+                className={`flex items-center gap-3 px-[var(--space-4)] py-[var(--space-2)] rounded-xs text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 border ${
                   editType === t.key
                     ? 'bg-brand-500 text-slate-950 border-brand-500 shadow-glow-brand/10'
                     : 'bg-white/[0.01] border-white/5 text-white/20 hover:text-white/60 hover:bg-white/[0.03] hover:border-white/10'
@@ -261,7 +261,7 @@ export function TaskPropertiesForm({
       </div>
 
       {labels && labels.length > 0 && (
-        <div className="space-y-6 pt-12 border-t border-white/5 bg-white/[0.005] rounded-md p-var(--space-6) mt-4 border-dashed">
+        <div className="space-y-6 pt-12 border-t border-white/5 bg-white/[0.005] rounded-md p-[var(--space-6)] mt-4 border-dashed">
           <label className="text-[10px] font-black text-white/10 uppercase tracking-[0.4em] flex items-center gap-3 mb-1.5 pl-2">
             Classifications Vectors
           </label>

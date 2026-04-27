@@ -41,7 +41,7 @@ export function ProjectMemoirGallery({ projectId }: { projectId: string }) {
   };
 
   return (
-    <div className="flex flex-col gap-var(--space-10) p-var(--space-10) bg-white/[0.01] rounded-md border border-white/10 min-h-[700px] relative overflow-hidden backdrop-blur-2xl shadow-inner">
+    <div className="flex flex-col gap-[var(--space-10)] p-[var(--space-10)] bg-white/[0.01] rounded-md border border-white/10 min-h-[700px] relative overflow-hidden backdrop-blur-2xl shadow-inner">
       {/* Cinematic Header */}
       <div className="flex items-center justify-between relative z-10">
         <div className="flex items-center gap-6">
@@ -91,11 +91,11 @@ export function ProjectMemoirGallery({ projectId }: { projectId: string }) {
           <div
             key={memoir.id}
             onClick={() => setSelectedMemoir(memoir)}
-            className="aspect-[4/5] p-var(--space-8) rounded-md bg-white/[0.01] border border-white/5 hover:border-brand-500/20 hover:bg-white/[0.02] transition-all cursor-pointer group flex flex-col justify-between shadow-inner relative overflow-hidden"
+            className="aspect-[4/5] p-[var(--space-8)] rounded-md bg-white/[0.01] border border-white/5 hover:border-brand-500/20 hover:bg-white/[0.02] transition-all cursor-pointer group flex flex-col justify-between shadow-inner relative overflow-hidden"
           >
             <div>
-              <div className="flex items-center gap-3 mb-var(--space-6)">
-                <span className="px-var(--space-2) py-0.5 bg-brand-500/10 text-[8px] font-bold text-brand-400 rounded-xs uppercase tracking-widest border border-brand-500/20">
+              <div className="flex items-center gap-3 mb-[var(--space-6)]">
+                <span className="px-[var(--space-2)] py-0.5 bg-brand-500/10 text-[8px] font-bold text-brand-400 rounded-xs uppercase tracking-widest border border-brand-500/20">
                   {memoir.persona}
                 </span>
                 <div className="flex-1 h-px bg-white/5" />
@@ -142,9 +142,9 @@ export function ProjectMemoirGallery({ projectId }: { projectId: string }) {
             <X size={28} />
           </button>
 
-          <div className="w-full max-w-3xl max-h-full overflow-y-auto bg-slate-950/95 backdrop-blur-3xl rounded-md p-var(--space-12) shadow-inner border border-white/10 relative animate-in slide-in-from-bottom-4 duration-500 scrollbar-hide select-none">
-            <div className="flex flex-col items-center text-center mb-var(--space-12) px-var(--space-10)">
-              <div className="flex items-center gap-4 mb-var(--space-6)">
+          <div className="w-full max-w-3xl max-h-full overflow-y-auto bg-slate-950/95 backdrop-blur-3xl rounded-md p-[var(--space-12)] shadow-inner border border-white/10 relative animate-in slide-in-from-bottom-4 duration-500 scrollbar-hide select-none">
+            <div className="flex flex-col items-center text-center mb-[var(--space-12)] px-[var(--space-10)]">
+              <div className="flex items-center gap-4 mb-[var(--space-6)]">
                 <span className="h-px w-8 bg-white/10" />
                 <span className="text-[10px] font-bold text-brand-400 uppercase tracking-widest">
                   {selectedMemoir.persona}

@@ -26,7 +26,7 @@ import {
 import { processText } from '../api/doc-service';
 import { DocPropertyBar } from './DocPropertyBar';
 import { TaskNodeEmbed } from './TaskNodeEmbed';
-import { JiraTask } from '@/features/integrations/jira/components/JiraTaskExtension';
+import { JiraTask } from '@/features/jira/components/JiraTaskExtension';
 import { toast } from 'sonner';
 import { useSearch } from '@/features/system/search/hooks/use-search';
 
@@ -451,7 +451,7 @@ export function RichTextEditor({
                   setSlashMenu((prev) => ({ ...prev, show: false, mode: 'default' }));
                   setTaskQuery('');
                 }}
-                className="w-full p-var(--space-3) hover:bg-white/[0.03] rounded-sm transition-all text-left border border-transparent hover:border-white/5 group"
+                className="w-full p-[var(--space-3)] hover:bg-white/[0.03] rounded-sm transition-all text-left border border-transparent hover:border-white/5 group"
               >
                 <div className="text-[11px] font-black text-white uppercase tracking-tight truncate group-hover:text-brand-400">
                   {task.title}
@@ -490,7 +490,7 @@ export function RichTextEditor({
       )}
 
       {editable && (
-        <div className="sticky top-20 z-40 flex flex-wrap items-center gap-1 border border-white/10 bg-slate-950/80 p-2 backdrop-blur-2xl mb-var(--space-12) shadow-inner rounded-md">
+        <div className="sticky top-20 z-40 flex flex-wrap items-center gap-1 border border-white/10 bg-slate-950/80 p-2 backdrop-blur-2xl mb-[var(--space-12)] shadow-inner rounded-md">
           <MenuButton
             onClick={() => editor.chain().focus().toggleBold().run()}
             active={editor.isActive('bold')}

@@ -8,7 +8,7 @@ import { isNavItemActive } from '@/lib/navigation';
 import { AppBrand } from './app-brand';
 import { NotificationBell } from '@/features/system/notifications/components/notification-bell';
 import { CommandPalette } from '@/features/system/search/components/CommandPalette';
-import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { useKeyboardShortcuts } from '@/lib/hooks/use-keyboard-shortcuts';
 import { AssigneeAvatar } from '@/features/operations/task/components/task-badges';
 import { WorkspaceSwitcher } from '@/features/system/workspace/components/WorkspaceSwitcher';
 import { SingularityPulse } from './SingularityPulse';
@@ -75,9 +75,9 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
       {/* Rim Light */}
       <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-brand-500/30 to-transparent" />
 
-      <div className="flex h-16 shrink-0 items-center justify-between px-var(--space-6) border-b border-white/5 bg-white/[0.01]">
+      <div className="flex h-16 shrink-0 items-center justify-between px-[var(--space-6)] border-b border-white/5 bg-white/[0.01]">
         {!sidebarCollapsed && (
-          <div className="flex items-center gap-var(--space-3)">
+          <div className="flex items-center gap-[var(--space-3)]">
             <AppBrand subtitle="Workspace" variant="dark" />
             <SingularityPulse />
           </div>
@@ -102,13 +102,13 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
 
       {/* Search Trigger */}
       <div
-        className={`px-var(--space-4) pt-var(--space-6) pb-var(--space-2) ${sidebarCollapsed ? 'flex justify-center' : ''}`}
+        className={`px-[var(--space-4)] pt-[var(--space-6)] pb-[var(--space-2)] ${sidebarCollapsed ? 'flex justify-center' : ''}`}
       >
         <button
           type="button"
           onClick={() => setSearchOpen(true)}
           className={`group flex items-center gap-3 rounded-md bg-white/[0.02] border border-white/5 transition-all hover:bg-white/[0.04] hover:border-brand-500/30 ${
-            sidebarCollapsed ? 'p-2.5' : 'w-full px-var(--space-4) py-var(--space-3)'
+            sidebarCollapsed ? 'p-2.5' : 'w-full px-[var(--space-4)] py-[var(--space-3)]'
           }`}
         >
           <Search size={14} className="text-white/30 group-hover:text-brand-400" />
@@ -192,9 +192,9 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
       </nav>
 
       {/* Footer User Profile */}
-      <div className="shrink-0 p-var(--space-4) border-t border-white/5 bg-white/[0.01]">
+      <div className="shrink-0 p-[var(--space-4)] border-t border-white/5 bg-white/[0.01]">
         <div
-          className={`flex items-center gap-3 rounded-md bg-slate-950/50 border border-white/5 p-var(--space-2) hover:bg-slate-950 transition-all group ${sidebarCollapsed ? 'justify-center' : ''}`}
+          className={`flex items-center gap-3 rounded-md bg-slate-950/50 border border-white/5 p-[var(--space-2)] hover:bg-slate-950 transition-all group ${sidebarCollapsed ? 'justify-center' : ''}`}
         >
           <div className="relative shrink-0">
             <AssigneeAvatar
@@ -266,7 +266,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden relative">
         {/* Mobile top bar */}
-        <header className="flex h-16 shrink-0 items-center gap-6 border-b border-white/5 bg-slate-950/40 backdrop-blur-xl px-var(--space-6) lg:hidden z-[60]">
+        <header className="flex h-16 shrink-0 items-center gap-6 border-b border-white/5 bg-slate-950/40 backdrop-blur-xl px-[var(--space-6)] lg:hidden z-[60]">
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
@@ -291,7 +291,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-var(--space-8) py-var(--space-8) md:px-var(--space-10) lg:px-var(--space-12) relative z-0">
+        <main className="flex-1 overflow-y-auto px-[var(--space-8)] py-[var(--space-8)] md:px-[var(--space-10)] lg:px-[var(--space-12)] relative z-0">
           {/* Internal Grain Texture */}
           <div className="absolute inset-0 opacity-[0.015] pointer-events-none mix-blend-overlay bg-[url('data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20256%20256%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cfilter%20id%3D%22noiseFilter%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.8%22%20numOctaves%3D%224%22%20stitchTiles%3D%22stitch%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url(%23noiseFilter)%22%2F%3E%3C%2Fsvg%3E')]" />
 

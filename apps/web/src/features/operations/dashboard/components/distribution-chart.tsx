@@ -25,8 +25,8 @@ export function DonutDistributionChart({
 
   if (items.length === 0 || total === 0) {
     return (
-      <div className="py-var(--space-12) flex flex-col items-center justify-center border border-dashed border-white/10 rounded-md bg-white/[0.01]">
-        <Cpu size={24} className="mb-var(--space-4) text-white/10" />
+      <div className="py-[var(--space-12)] flex flex-col items-center justify-center border border-dashed border-white/10 rounded-md bg-white/[0.01]">
+        <Cpu size={24} className="mb-[var(--space-4)] text-white/10" />
         <p className="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em]">
           {emptyMessage}
         </p>
@@ -37,7 +37,7 @@ export function DonutDistributionChart({
   let currentOffset = 0;
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-var(--space-10) items-center">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-[var(--space-10)] items-center">
       <div className="relative flex justify-center">
         <svg
           viewBox="0 0 100 100"
@@ -94,7 +94,7 @@ export function DonutDistributionChart({
           return (
             <div
               key={item.key}
-              className="group/legend flex items-center justify-between px-var(--space-4) py-var(--space-3) bg-white/[0.01] border border-white/5 rounded-sm hover:border-white/20 transition-all hover:bg-white/[0.03]"
+              className="group/legend flex items-center justify-between px-[var(--space-4)] py-[var(--space-3)] bg-white/[0.01] border border-white/5 rounded-sm hover:border-white/20 transition-all hover:bg-white/[0.03]"
             >
               <div className="flex items-center gap-3">
                 <div

@@ -10,7 +10,7 @@ import {
 import { toast } from 'sonner';
 import type { Doc, DocVersion } from '@superboard/shared';
 import type { JSONContent } from '@tiptap/react';
-import { useDebounce } from '@/hooks/use-debounce';
+import { useDebounce } from '@/lib/hooks/use-debounce';
 import { useEffect, useRef, useState } from 'react';
 
 export function useWorkspaceDocs(workspaceId: string | undefined) {

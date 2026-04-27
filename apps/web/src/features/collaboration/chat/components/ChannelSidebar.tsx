@@ -18,7 +18,7 @@ export function ChannelSidebar() {
       {/* Physical noise texture proxy */}
       <div className="absolute inset-0 opacity-[0.01] pointer-events-none bg-[url('data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20256%20256%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cfilter%20id%3D%22noiseFilter%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.8%22%20numOctaves%3D%224%22%20stitchTiles%3D%22stitch%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url(%23noiseFilter)%22%2F%3E%3C%2Fsvg%3E')]" />
 
-      <div className="p-var(--space-6) border-b border-white/5 shrink-0 relative overflow-hidden">
+      <div className="p-[var(--space-6)] border-b border-white/5 shrink-0 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-24 h-24 bg-brand-500/5 blur-3xl rounded-full translate-x-12 -translate-y-12" />
         <AppBrand subtitle="Neural_Terminal" variant="dark" />
       </div>
@@ -26,7 +26,7 @@ export function ChannelSidebar() {
       <div className="flex-1 overflow-y-auto px-4 py-8 space-y-10 scrollbar-none relative">
         {/* Navigation Category */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between px-var(--space-3) group/cat">
+          <div className="flex items-center justify-between px-[var(--space-3)] group/cat">
             <div className="flex items-center gap-2">
               <Radio size={12} className="text-brand-500" />
               <span className="text-[9px] font-bold tracking-widest uppercase text-white/30 group-hover/cat:text-brand-400 transition-colors">
@@ -52,7 +52,7 @@ export function ChannelSidebar() {
                   <Link
                     key={channel.id}
                     href={`/chat/${channel.id}`}
-                    className={`flex items-center gap-3 px-var(--space-4) py-var(--space-2) rounded-sm text-[12px] font-bold uppercase tracking-tight transition-all group/item relative overflow-hidden border ${
+                    className={`flex items-center gap-3 px-[var(--space-4)] py-[var(--space-2)] rounded-sm text-[12px] font-bold uppercase tracking-tight transition-all group/item relative overflow-hidden border ${
                       isActive
                         ? 'bg-brand-500/10 border-brand-500/20 text-white shadow-inner'
                         : 'border-transparent text-white/30 hover:bg-white/[0.03] hover:text-white hover:border-white/5'
@@ -83,7 +83,7 @@ export function ChannelSidebar() {
 
         {/* Private Data Category */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between px-var(--space-3) group/cat">
+          <div className="flex items-center justify-between px-[var(--space-3)] group/cat">
             <div className="flex items-center gap-2">
               <Layers size={12} className="text-indigo-500/50" />
               <span className="text-[9px] font-bold tracking-widest uppercase text-white/30 group-hover/cat:text-indigo-400 transition-colors">
@@ -92,8 +92,8 @@ export function ChannelSidebar() {
             </div>
           </div>
 
-          <div className="px-var(--space-3) space-y-var(--space-4)">
-            <div className="p-var(--space-5) rounded-md border border-dashed border-white/5 bg-white/[0.01] flex flex-col items-center justify-center text-center group/empty">
+          <div className="px-[var(--space-3)] space-y-[var(--space-4)]">
+            <div className="p-[var(--space-5)] rounded-md border border-dashed border-white/5 bg-white/[0.01] flex flex-col items-center justify-center text-center group/empty">
               <Cpu
                 size={20}
                 className="text-white/5 mb-3 group-hover/empty:text-brand-500/20 transition-colors"
@@ -109,7 +109,7 @@ export function ChannelSidebar() {
       </div>
 
       {/* Controller Footer */}
-      <div className="p-var(--space-4) border-t border-white/5 bg-slate-950/40 shrink-0 relative overflow-hidden">
+      <div className="p-[var(--space-4)] border-t border-white/5 bg-slate-950/40 shrink-0 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-32 h-32 bg-brand-500/5 blur-3xl rounded-full -translate-x-16 -translate-y-16" />
         <div className="flex items-center gap-3 relative z-10">
           <div className="relative group/avatar">

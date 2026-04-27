@@ -27,14 +27,14 @@ export function QuantumInput({ label, error, icon, className = '', ...props }: Q
 
         <div className="relative flex items-center bg-white/[0.01] backdrop-blur-xl transition-all group-focus-within:bg-white/[0.03] shadow-inner">
           {icon && (
-            <div className="pl-var(--space-4) text-white/20 group-focus-within:text-brand-400 transition-colors">
+            <div className="pl-[var(--space-4)] text-white/20 group-focus-within:text-brand-400 transition-colors">
               {icon}
             </div>
           )}
 
           <input
             {...props}
-            className="w-full bg-transparent px-var(--space-4) py-var(--space-3) text-sm text-white placeholder:text-white/10 outline-none transition-all font-bold tracking-tight"
+            className="w-full bg-transparent px-[var(--space-4)] py-[var(--space-3)] text-sm text-white placeholder:text-white/10 outline-none transition-all font-bold tracking-tight"
           />
         </div>
 

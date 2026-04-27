@@ -10,7 +10,7 @@ interface DocPropertyBarProps {
 
 export function DocPropertyBar({ classification, status, ownerName }: DocPropertyBarProps) {
   return (
-    <div className="flex flex-wrap items-center gap-var(--space-6) py-var(--space-6) border-y border-white/10 mb-var(--space-12)">
+    <div className="flex flex-wrap items-center gap-[var(--space-6)] py-[var(--space-6)] border-y border-white/10 mb-[var(--space-12)]">
       {/* Classification Node */}
       <div className="flex items-center gap-3 group">
         <div

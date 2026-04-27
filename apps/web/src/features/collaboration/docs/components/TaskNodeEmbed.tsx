@@ -15,7 +15,7 @@ export function TaskNodeEmbed(
   const content = (
     <motion.div
       whileHover={{ x: 4 }}
-      className="my-var(--space-8) p-var(--space-6) bg-slate-900/20 border border-white/10 rounded-md shadow-inner relative group cursor-pointer overflow-hidden"
+      className="my-[var(--space-8)] p-[var(--space-6)] bg-slate-900/20 border border-white/10 rounded-md shadow-inner relative group cursor-pointer overflow-hidden"
     >
       <div className="absolute inset-0 bg-gradient-to-r from-brand-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 

@@ -64,11 +64,11 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-transparent">
       {hasNextPage && (
-        <div className="flex justify-center py-var(--space-4)">
+        <div className="flex justify-center py-[var(--space-4)]">
           <button
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
-            className="px-var(--space-6) py-var(--space-2) rounded-sm bg-white/[0.03] border border-white/10 text-[9px] font-bold text-brand-400 uppercase tracking-widest hover:bg-white/[0.08] hover:text-white transition-all shadow-inner"
+            className="px-[var(--space-6)] py-[var(--space-2)] rounded-sm bg-white/[0.03] border border-white/10 text-[9px] font-bold text-brand-400 uppercase tracking-widest hover:bg-white/[0.08] hover:text-white transition-all shadow-inner"
           >
             {isFetchingNextPage ? 'SYNCING...' : 'Past_Intel'}
           </button>
@@ -112,7 +112,7 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
                 <div className={`flex-1 min-w-0 max-w-3xl ${isMe ? 'ml-auto text-right' : ''}`}>
                   {showHeader && (
                     <div
-                      className={`flex items-center gap-2 mb-var(--space-2) ${isMe ? 'justify-end' : ''}`}
+                      className={`flex items-center gap-2 mb-[var(--space-2)] ${isMe ? 'justify-end' : ''}`}
                     >
                       <span className="font-bold text-white/80 text-[12px] uppercase tracking-tight">
                         {message.author?.fullName}
@@ -126,7 +126,7 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
 
                   <div className="relative group/bubble">
                     <div
-                      className={`relative text-[13px] leading-relaxed break-words whitespace-pre-wrap px-var(--space-4) py-var(--space-3) rounded-md border transition-all duration-300 shadow-inner group-hover/bubble:shadow-glow-brand/5 ${
+                      className={`relative text-[13px] leading-relaxed break-words whitespace-pre-wrap px-[var(--space-4)] py-[var(--space-3)] rounded-md border transition-all duration-300 shadow-inner group-hover/bubble:shadow-glow-brand/5 ${
                         isMe
                           ? 'bg-brand-500/10 border-brand-500/20 text-brand-100'
                           : 'bg-white/[0.02] border-white/5 text-white/80 group-hover/bubble:bg-white/[0.04] group-hover/bubble:border-white/10'
@@ -143,21 +143,21 @@ export function MessageList({ channelId, onOpenThread }: MessageListProps) {
 
                     {/* Reaction System */}
                     <div
-                      className={`flex flex-wrap gap-var(--space-2) mt-var(--space-2) px-1 ${isMe ? 'justify-end' : ''}`}
+                      className={`flex flex-wrap gap-[var(--space-2)] mt-[var(--space-2)] px-1 ${isMe ? 'justify-end' : ''}`}
                     >
                       {reactions[message.id]?.map((emoji, i) => (
                         <motion.button
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           key={i}
-                          className="flex items-center gap-2 px-var(--space-2) py-0.5 bg-brand-500/10 border border-brand-500/20 rounded-xs text-[10px] shadow-glow-brand/5"
+                          className="flex items-center gap-2 px-[var(--space-2)] py-0.5 bg-brand-500/10 border border-brand-500/20 rounded-xs text-[10px] shadow-glow-brand/5"
                         >
                           {emoji}
                         </motion.button>
                       ))}
 
                       {!reactions[message.id]?.length && (
-                        <button className="group/pip relative flex items-center gap-2 px-var(--space-3) py-1 bg-brand-500/5 border border-white/5 rounded-xs">
+                        <button className="group/pip relative flex items-center gap-2 px-[var(--space-3)] py-1 bg-brand-500/5 border border-white/5 rounded-xs">
                           <div className="relative flex h-1.5 w-1.5">
                             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-brand-500/30"></span>
                           </div>
@@ -236,11 +236,11 @@ function NeuralLinkPreview({ content }: { content: string }) {
     <motion.div
       initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mt-var(--space-3) p-var(--space-3) bg-black/40 border border-white/10 rounded-sm group/preview hover:border-brand-500/30 transition-all cursor-pointer relative overflow-hidden shadow-inner"
+      className="mt-[var(--space-3)] p-[var(--space-3)] bg-black/40 border border-white/10 rounded-sm group/preview hover:border-brand-500/30 transition-all cursor-pointer relative overflow-hidden shadow-inner"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 via-transparent to-transparent opacity-0 group-hover/preview:opacity-100 transition-opacity" />
 
-      <div className="flex items-center justify-between mb-var(--space-3) relative z-10">
+      <div className="flex items-center justify-between mb-[var(--space-3)] relative z-10">
         <div className="flex items-center gap-2">
           {isJiraMatch ? (
             <Box size={12} className="text-brand-400" />
@@ -268,7 +268,7 @@ function NeuralLinkPreview({ content }: { content: string }) {
         </p>
       </div>
 
-      <div className="mt-var(--space-4) flex items-center gap-2 relative z-10">
+      <div className="mt-[var(--space-4)] flex items-center gap-2 relative z-10">
         <div className="h-5 w-5 rounded-sm bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
           <div className="h-1 w-1 rounded-full bg-brand-400 animate-pulse" />
         </div>

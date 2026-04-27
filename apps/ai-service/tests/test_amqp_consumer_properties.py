@@ -8,11 +8,17 @@ Requirements: 4.3, 4.4, 5.4, 6.3, 6.4, 7.3, 7.4
 """
 import asyncio
 import json
+import os
+import sys
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 from typing import Any, Dict
 
 import pytest
 from hypothesis import given, strategies as st
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from amqp_consumer import AIAMQPConsumer
 

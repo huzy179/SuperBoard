@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CollaborationModule } from './collaboration/collaboration.module';
 import { HealthModule } from './health/health.module';
+import { MetricsModule } from './metrics/metrics.module';
 import { validateEnv } from './config/env';
 import { SharedConfigModule } from './config/shared-config.module';
 
@@ -14,6 +15,7 @@ import { SharedConfigModule } from './config/shared-config.module';
     }),
     SharedConfigModule,
     HealthModule,
+    MetricsModule,
     CollaborationModule,
   ],
 })

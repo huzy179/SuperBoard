@@ -6,9 +6,15 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
+import sys
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from event_consumer import EventConsumer, SUPPORTED_EVENTS, DLQ_NAME, MAX_RETRIES
 

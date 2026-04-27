@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { NotificationWorkerModule } from './worker/notification-worker.module';
 import { MetricsModule } from './metrics/metrics.module';
+import { HealthModule } from './health/health.module';
 import { validateEnv } from './config/env';
 import { SharedConfigModule } from './config/shared-config.module';
 
@@ -14,6 +15,7 @@ import { SharedConfigModule } from './config/shared-config.module';
     }),
     MetricsModule,
     SharedConfigModule,
+    HealthModule,
     NotificationWorkerModule,
   ],
 })

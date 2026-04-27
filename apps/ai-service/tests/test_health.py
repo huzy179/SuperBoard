@@ -3,9 +3,14 @@ Unit tests for AI Service health check endpoints.
 Requirements: 5.2, 5.4, 5.6
 """
 import os
+import sys
+from pathlib import Path
 import pytest
 from unittest.mock import patch
 from fastapi.testclient import TestClient
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Ensure env vars are set before importing app
 os.environ.setdefault("AI_PROVIDER", "gemini")

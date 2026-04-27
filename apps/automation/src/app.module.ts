@@ -4,6 +4,8 @@ import { AutomationEventConsumerModule } from './consumer/automation-event-consu
 import { AmqpEventConsumerModule } from './amqp/amqp-event-consumer.module';
 import { validateEnv } from './config/env';
 import { SharedConfigModule } from './config/shared-config.module';
+import { HealthModule } from './health/health.module';
+import { MetricsModule } from './metrics/metrics.module';
 
 @Module({
   imports: [
@@ -13,6 +15,8 @@ import { SharedConfigModule } from './config/shared-config.module';
       validate: validateEnv,
     }),
     SharedConfigModule,
+    HealthModule,
+    MetricsModule,
     AutomationEventConsumerModule,
     AmqpEventConsumerModule,
   ],

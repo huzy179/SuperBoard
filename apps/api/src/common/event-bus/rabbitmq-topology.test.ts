@@ -23,7 +23,7 @@ describe('RabbitMQ Topology Properties', () => {
             return Promise.resolve();
           },
           bindQueue: () => Promise.resolve(),
-        } as unknown as amqplib.Channel;
+        } as unknown as amqplib.ConfirmChannel;
 
         await declareConsumerTopology(mockChannel);
 
@@ -70,7 +70,7 @@ describe('RabbitMQ Topology Properties', () => {
             allBindQueueCalls.push({ queue, exchange, routingKey });
             return Promise.resolve();
           },
-        } as unknown as amqplib.Channel;
+        } as unknown as amqplib.ConfirmChannel;
 
         // Call topology setup N times
         for (let i = 0; i < numCalls; i++) {

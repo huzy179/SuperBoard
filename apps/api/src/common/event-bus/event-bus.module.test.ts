@@ -118,8 +118,8 @@ describe('EventBusModule Property Tests', () => {
 
           // Simulate notification job processing (independent of domain event routing)
           // This represents the notification service adding jobs to BullMQ notification queue
-          await mockNotificationQueue.add(notificationJob.type, notificationJob, {
-            jobId: `notification-${notificationJob.correlationId}`,
+          await mockNotificationQueue.add(notificationJob.type as string, notificationJob, {
+            jobId: `notification-${notificationJob.correlationId as string}`,
           });
 
           // Verify that notification processing works regardless of feature flag

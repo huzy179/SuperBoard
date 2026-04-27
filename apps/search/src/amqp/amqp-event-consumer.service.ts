@@ -73,8 +73,10 @@ export class AmqpEventConsumerService implements OnModuleInit, OnModuleDestroy {
 
   private async connect(): Promise<void> {
     try {
-      this.connection = await amqplib.connect(this.rabbitmqUrl);
-      this.channel = await this.connection.createChannel();
+      this.connection = (await amqplib.connect(this.rabbitmqUrl)) as unknown as amqplib.Connection;
+      this.channel = await (
+        this.connection as unknown as { createChannel: () => Promise<amqplib.Channel> }
+      ).createChannel();
 
       // Set up connection event handlers
       this.connection.on('error', (err: Error) => {

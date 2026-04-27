@@ -11,6 +11,17 @@ import { ConfigService } from '@nestjs/config';
 import * as amqplib from 'amqplib';
 import { AmqpEventConsumerService } from './amqp-event-consumer.service';
 import type { DomainEvent } from '@superboard/shared';
+import { MetricsService } from '@superboard/backend-shared/metrics';
+
+function mockFields(routingKey: string): amqplib.ConsumeMessageFields {
+  return {
+    consumerTag: 'test',
+    deliveryTag: 1,
+    redelivered: false,
+    exchange: 'superboard.domain.events',
+    routingKey,
+  };
+}
 
 /**
  * Generator for valid domain events that the search service should process
@@ -41,13 +52,15 @@ describe('AmqpEventConsumerService - Property 8: ACK Sent If and Only If Process
   let service: AmqpEventConsumerService;
   let mockConfigService: Partial<ConfigService>;
   let mockChannel: Partial<amqplib.Channel>;
-  let mockConnection: amqplib.Connection;
+  let mockMetrics: MetricsService;
   let ackCalls: number;
   let nackCalls: number;
+  let publishCalls: number;
 
   beforeEach(() => {
     ackCalls = 0;
     nackCalls = 0;
+    publishCalls = 0;
 
     // Mock ConfigService
     mockConfigService = {
@@ -60,44 +73,32 @@ describe('AmqpEventConsumerService - Property 8: ACK Sent If and Only If Process
       },
     };
 
-    // Mock Channel
+    mockMetrics = new MetricsService({ enabled: false });
+
+    // Mock Channel (only the methods used by BaseAMQPConsumer)
     mockChannel = {
-      assertExchange: async () =>
-        ({ exchange: 'test' }) as unknown as amqplib.Replies.AssertExchange,
-      assertQueue: async () =>
-        ({
-          queue: 'test',
-          messageCount: 0,
-          consumerCount: 0,
-        }) as unknown as amqplib.Replies.AssertQueue,
-      bindQueue: async () => ({}) as unknown as amqplib.Replies.Empty,
-      prefetch: async () => ({}) as unknown as amqplib.Replies.Empty,
-      consume: async () => ({ consumerTag: 'test' }) as unknown as amqplib.Replies.Consume,
       ack: () => {
         ackCalls++;
       },
       nack: () => {
         nackCalls++;
       },
+      publish: () => {
+        publishCalls++;
+        return true;
+      },
       close: async () => {},
     };
 
-    // Mock Connection
-    mockConnection = {
-      createChannel: async () => mockChannel as amqplib.Channel,
-      on: () => mockConnection,
-      close: async () => {},
-    } as unknown as amqplib.Connection;
-
     // Create service instance
-    service = new AmqpEventConsumerService(mockConfigService as ConfigService);
-    service['connection'] = mockConnection;
+    service = new AmqpEventConsumerService(mockConfigService as ConfigService, mockMetrics);
     service['channel'] = mockChannel as amqplib.Channel;
   });
 
   afterEach(() => {
     ackCalls = 0;
     nackCalls = 0;
+    publishCalls = 0;
   });
 
   it('should ACK message when event processing succeeds', async () => {
@@ -105,66 +106,68 @@ describe('AmqpEventConsumerService - Property 8: ACK Sent If and Only If Process
       fc.asyncProperty(domainEventArb, async (event: DomainEvent) => {
         ackCalls = 0;
         nackCalls = 0;
+        publishCalls = 0;
 
         // Create a mock message
-        const mockMessage: Partial<amqplib.Message> = {
+        const mockMessage: Partial<amqplib.ConsumeMessage> = {
           content: Buffer.from(JSON.stringify(event)),
+          fields: mockFields(event.eventType),
           properties: {
             messageId: event.idempotencyKey,
             correlationId: event.correlationId,
+            headers: {},
           } as unknown as amqplib.MessageProperties,
         };
 
-        // Mock successful index update
-        const originalUpdateSearchIndex = service['updateSearchIndex'];
-        service['updateSearchIndex'] = async () => {
-          // Simulate successful processing
-        };
+        const originalPublish = service['eventBus'].publish.bind(service['eventBus']);
+        service['eventBus'].publish = async () => {};
 
         // Handle the message
-        await service['handleMessage'](mockMessage as amqplib.Message);
+        await service['onMessage'](mockMessage as amqplib.ConsumeMessage);
 
         // Verify ACK was called exactly once
         assert.equal(ackCalls, 1, 'ACK should be called exactly once on success');
         assert.equal(nackCalls, 0, 'NACK should not be called on success');
+        assert.equal(publishCalls, 0, 'DLQ publish should not occur on success');
 
-        // Restore original method
-        service['updateSearchIndex'] = originalUpdateSearchIndex;
+        service['eventBus'].publish = originalPublish;
       }),
       { numRuns: 100 },
     );
   });
 
-  it('should NACK message with requeue=false when event processing fails', async () => {
+  it('should publish to DLQ and ACK when event processing fails', async () => {
     await fc.assert(
       fc.asyncProperty(domainEventArb, async (event: DomainEvent) => {
         ackCalls = 0;
         nackCalls = 0;
+        publishCalls = 0;
 
         // Create a mock message
-        const mockMessage: Partial<amqplib.Message> = {
+        const mockMessage: Partial<amqplib.ConsumeMessage> = {
           content: Buffer.from(JSON.stringify(event)),
+          fields: mockFields(event.eventType),
           properties: {
             messageId: event.idempotencyKey,
             correlationId: event.correlationId,
+            headers: {},
           } as unknown as amqplib.MessageProperties,
         };
 
-        // Mock failed index update
-        const originalUpdateSearchIndex = service['updateSearchIndex'];
-        service['updateSearchIndex'] = async () => {
+        const originalPublish = service['eventBus'].publish.bind(service['eventBus']);
+        service['eventBus'].publish = async () => {
           throw new Error('Index update failed');
         };
 
         // Handle the message
-        await service['handleMessage'](mockMessage as amqplib.Message);
+        await service['onMessage'](mockMessage as amqplib.ConsumeMessage);
 
-        // Verify NACK was called exactly once
-        assert.equal(nackCalls, 1, 'NACK should be called exactly once on failure');
-        assert.equal(ackCalls, 0, 'ACK should not be called on failure');
+        // With shared consumer DLQ publish enabled, failure is ACKed after DLQ publish.
+        assert.equal(publishCalls, 1, 'DLQ publish should be called exactly once on failure');
+        assert.equal(ackCalls, 1, 'ACK should be called exactly once after DLQ publish');
+        assert.equal(nackCalls, 0, 'NACK should not be called when DLQ publish succeeds');
 
-        // Restore original method
-        service['updateSearchIndex'] = originalUpdateSearchIndex;
+        service['eventBus'].publish = originalPublish;
       }),
       { numRuns: 100 },
     );
@@ -187,22 +190,26 @@ describe('AmqpEventConsumerService - Property 8: ACK Sent If and Only If Process
         async (event: DomainEvent) => {
           ackCalls = 0;
           nackCalls = 0;
+          publishCalls = 0;
 
           // Create a mock message
-          const mockMessage: Partial<amqplib.Message> = {
+          const mockMessage: Partial<amqplib.ConsumeMessage> = {
             content: Buffer.from(JSON.stringify(event)),
+            fields: mockFields(event.eventType),
             properties: {
               messageId: event.idempotencyKey,
               correlationId: event.correlationId,
+              headers: {},
             } as unknown as amqplib.MessageProperties,
           };
 
           // Handle the message
-          await service['handleMessage'](mockMessage as amqplib.Message);
+          await service['onMessage'](mockMessage as amqplib.ConsumeMessage);
 
           // Verify ACK was called (unsupported events are discarded gracefully)
           assert.equal(ackCalls, 1, 'ACK should be called for unsupported event types');
           assert.equal(nackCalls, 0, 'NACK should not be called for unsupported event types');
+          assert.equal(publishCalls, 0, 'DLQ publish should not occur for ignored event types');
         },
       ),
       { numRuns: 100 },
@@ -212,18 +219,20 @@ describe('AmqpEventConsumerService - Property 8: ACK Sent If and Only If Process
   it('should NACK message when JSON parsing fails', async () => {
     ackCalls = 0;
     nackCalls = 0;
+    publishCalls = 0;
 
     // Create a mock message with invalid JSON
-    const mockMessage: Partial<amqplib.Message> = {
+    const mockMessage: Partial<amqplib.ConsumeMessage> = {
       content: Buffer.from('invalid json'),
-      properties: {} as unknown as amqplib.MessageProperties,
+      fields: mockFields('task.created'),
+      properties: { headers: {} } as unknown as amqplib.MessageProperties,
     };
 
     // Handle the message
-    await service['handleMessage'](mockMessage as amqplib.Message);
+    await service['onMessage'](mockMessage as amqplib.ConsumeMessage);
 
-    // Verify NACK was called
-    assert.equal(nackCalls, 1, 'NACK should be called when JSON parsing fails');
-    assert.equal(ackCalls, 0, 'ACK should not be called when JSON parsing fails');
+    assert.equal(publishCalls, 1, 'DLQ publish should be called when JSON parsing fails');
+    assert.equal(ackCalls, 1, 'ACK should be called after DLQ publish');
+    assert.equal(nackCalls, 0, 'NACK should not be called when DLQ publish succeeds');
   });
 });

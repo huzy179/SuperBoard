@@ -4,57 +4,57 @@
   "private": true,
   "description": "Shared backend infrastructure components for SuperBoard microservices",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "types": "src/index.ts",
   "exports": {
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./src/index.ts"
     },
     "./amqp": {
       "import": "./dist/amqp/index.js",
       "require": "./dist/amqp/index.js",
-      "types": "./dist/amqp/index.d.ts"
+      "types": "./src/amqp/index.ts"
     },
     "./health": {
       "import": "./dist/health/index.js",
       "require": "./dist/health/index.js",
-      "types": "./dist/health/index.d.ts"
+      "types": "./src/health/index.ts"
     },
     "./config": {
       "import": "./dist/config/index.js",
       "require": "./dist/config/index.js",
-      "types": "./dist/config/index.d.ts"
+      "types": "./src/config/index.ts"
     },
     "./events": {
       "import": "./dist/events/index.js",
       "require": "./dist/events/index.js",
-      "types": "./dist/events/index.d.ts"
+      "types": "./src/events/index.ts"
     },
     "./metrics": {
       "import": "./dist/metrics/index.js",
       "require": "./dist/metrics/index.js",
-      "types": "./dist/metrics/index.d.ts"
+      "types": "./src/metrics/index.ts"
     },
     "./bootstrap": {
       "import": "./dist/bootstrap/index.js",
       "require": "./dist/bootstrap/index.js",
-      "types": "./dist/bootstrap/index.d.ts"
+      "types": "./src/bootstrap/index.ts"
     },
     "./connections": {
       "import": "./dist/connections/index.js",
       "require": "./dist/connections/index.js",
-      "types": "./dist/connections/index.d.ts"
+      "types": "./src/connections/index.ts"
     },
     "./errors": {
       "import": "./dist/errors/index.js",
       "require": "./dist/errors/index.js",
-      "types": "./dist/errors/index.d.ts"
+      "types": "./src/errors/index.ts"
     },
     "./testing": {
       "import": "./dist/testing/index.js",
       "require": "./dist/testing/index.js",
-      "types": "./dist/testing/index.d.ts"
+      "types": "./src/testing/index.ts"
     }
   },
   "files": [

@@ -6,5 +6,8 @@
  */
 
 export * from './metrics.service';
+export * from './metrics.controller';
 export * from './collectors';
+export * from './standard';
+export * from './http-metrics.interceptor';
 export * from './types';

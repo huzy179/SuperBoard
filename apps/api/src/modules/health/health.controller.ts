@@ -2,11 +2,8 @@ import { Controller, Get, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Response } from 'express';
 import type { DependencyHealthDTO, HealthDataDTO } from '@superboard/shared';
+import { HealthCheckService } from '@superboard/backend-shared/health';
 import { Public } from '../../common/decorators/public.decorator';
-import { HealthService } from './health.service';
-import { RedisService } from '../../common/redis.service';
-import { QueueService } from '../../common/queue.service';
-import { RabbitMQHealthIndicator } from './rabbitmq.health';
 
 @Controller()
 export class HealthCheckController {
@@ -14,10 +11,7 @@ export class HealthCheckController {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly healthService: HealthService,
-    private readonly redisService: RedisService,
-    private readonly queueService: QueueService,
-    private readonly rabbitMQHealthIndicator: RabbitMQHealthIndicator,
+    private readonly healthCheckService: HealthCheckService,
   ) {}
 
   @Public()
@@ -35,15 +29,14 @@ export class HealthCheckController {
   @Public()
   @Get('ready')
   async readiness(@Res() res: Response): Promise<void> {
-    const [postgres, redis, queue, rabbitmq] = await Promise.all([
-      this.checkPostgres(),
-      this.checkRedis(),
-      this.checkQueue(),
-      this.checkRabbitMQ(),
-    ]);
-
-    const dependencies: DependencyHealthDTO[] = [postgres, redis, queue, rabbitmq];
-    const allHealthy = dependencies.every((d) => d.status === 'healthy');
+    const readiness = await this.healthCheckService.checkReadiness();
+    const dependencies: DependencyHealthDTO[] = readiness.dependencies.map((d) => ({
+      name: d.name,
+      status: d.status,
+      latencyMs: d.latencyMs,
+      error: d.error,
+    }));
+    const allHealthy = readiness.dependencies.every((d) => d.status === 'healthy');
 
     const body: HealthDataDTO = {
       status: allHealthy ? 'ok' : 'not_ready',
@@ -54,84 +47,5 @@ export class HealthCheckController {
     };
 
     res.status(allHealthy ? 200 : 503).json(body);
-  }
-
-  private async checkPostgres(): Promise<DependencyHealthDTO> {
-    const start = Date.now();
-    try {
-      await this.healthService.checkDatabase();
-      return {
-        name: 'postgres',
-        status: 'healthy',
-        latencyMs: Date.now() - start,
-      };
-    } catch (error) {
-      return {
-        name: 'postgres',
-        status: 'unhealthy',
-        latencyMs: Date.now() - start,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
-    }
-  }
-
-  private async checkRedis(): Promise<DependencyHealthDTO> {
-    const start = Date.now();
-    try {
-      const pong = await this.redisService.ping();
-      return {
-        name: 'redis',
-        status: pong === 'PONG' || pong === 'DISABLED' ? 'healthy' : 'unhealthy',
-        latencyMs: Date.now() - start,
-      };
-    } catch (error) {
-      return {
-        name: 'redis',
-        status: 'unhealthy',
-        latencyMs: Date.now() - start,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
-    }
-  }
-
-  private async checkQueue(): Promise<DependencyHealthDTO> {
-    const start = Date.now();
-    try {
-      await this.queueService.isHealthy();
-      return {
-        name: 'bullmq',
-        status: 'healthy',
-        latencyMs: Date.now() - start,
-      };
-    } catch (error) {
-      return {
-        name: 'bullmq',
-        status: 'unhealthy',
-        latencyMs: Date.now() - start,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
-    }
-  }
-
-  private async checkRabbitMQ(): Promise<DependencyHealthDTO> {
-    const start = Date.now();
-    try {
-      const result = await this.rabbitMQHealthIndicator.isHealthy('rabbitmq');
-      const isHealthy = result.rabbitmq.status === 'up';
-
-      return {
-        name: 'rabbitmq',
-        status: isHealthy ? 'healthy' : 'unhealthy',
-        latencyMs: Date.now() - start,
-        error: !isHealthy ? result.rabbitmq.error : undefined,
-      };
-    } catch (error) {
-      return {
-        name: 'rabbitmq',
-        status: 'unhealthy',
-        latencyMs: Date.now() - start,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
-    }
   }
 }

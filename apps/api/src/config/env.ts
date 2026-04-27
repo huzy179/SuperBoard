@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
 const booleanFromEnv = z
-  .enum(['true', 'false'])
+  .union([z.boolean(), z.enum(['true', 'false'])])
   .optional()
-  .default('false')
-  .transform((value) => value === 'true');
+  .default(false)
+  .transform((value) => (typeof value === 'boolean' ? value : value === 'true'));
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -22,6 +22,7 @@ const envSchema = z.object({
 });
 
 export type AppEnv = z.infer<typeof envSchema>;
+export { envSchema };
 
 export function validateEnv(config: Record<string, unknown>): AppEnv {
   const result = envSchema.safeParse(config);

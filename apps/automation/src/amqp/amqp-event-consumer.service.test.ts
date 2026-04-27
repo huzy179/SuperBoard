@@ -1,196 +1,170 @@
 /**
- * Property-Based Tests for Automation Service AMQP Consumer
+ * Integration tests for Automation AMQP consumer migration
  *
- * Feature: rabbitmq-event-bus
- * Property 8: ACK Sent If and Only If Processing Succeeds
- * Property 14: Consume Metrics Are Emitted for Every Event
+ * Validates: Requirements 1.1, 1.4, 1.5
  */
+
 import { describe, it } from 'node:test';
-import assert from 'node:assert';
-import * as fc from 'fast-check';
+import assert from 'node:assert/strict';
+import type { ConsumeMessage } from 'amqplib';
+import { MetricsService } from '@superboard/backend-shared/metrics';
 import type { DomainEvent } from '@superboard/shared';
+import { AutomationAmqpConsumerService } from './automation-amqp-consumer.service';
 
-// Helper to generate valid DomainEvents
-const domainEventArb = fc.record({
-  eventId: fc.uuid(),
-  eventType: fc.constantFrom(
-    'task.created',
-    'task.updated',
-    'task.status_changed',
-    'project.updated',
-  ),
-  eventVersion: fc.constant(1),
-  producer: fc.constant('automation-service'),
-  idempotencyKey: fc.uuid(),
-  correlationId: fc.uuid(),
-  timestamp: fc.date().map((d) => d.toISOString()),
-  payload: fc.record({
-    taskId: fc.uuid(),
-    projectId: fc.uuid(),
-    oldStatus: fc.constantFrom('todo', 'in_progress'),
-    newStatus: fc.constantFrom('in_progress', 'done'),
-  }),
-}) as unknown as fc.Arbitrary<DomainEvent>;
+function makeConfigService(values: Record<string, string>) {
+  return {
+    get: (key: string) => values[key],
+  };
+}
 
-describe('AmqpEventConsumerService', () => {
-  describe('Property 8: ACK Sent If and Only If Processing Succeeds', () => {
-    it('should ACK message when event processing succeeds', async () => {
-      await fc.assert(
-        fc.asyncProperty(domainEventArb, async (eventData) => {
-          const event: DomainEvent = eventData;
-          let ackCalled = false;
-          let nackCalled = false;
+function buildEvent(eventType: string): DomainEvent {
+  return {
+    eventId: '01HZZZZZZZZZZZZZZZZZZZZZZZ',
+    eventType,
+    eventVersion: '1.0',
+    producer: 'automation-service',
+    correlationId: 'corr-1',
+    idempotencyKey: 'idem-1',
+    occurredAt: new Date().toISOString(),
+    payload: { taskId: 't1', projectId: 'p1', oldStatus: 'todo', newStatus: 'done' },
+  };
+}
 
-          // Simulate message handling with successful processing
-          try {
-            // Parse event successfully
-            JSON.parse(JSON.stringify(event));
-            // Check if event type is supported
-            if (
-              ['task.created', 'task.updated', 'task.status_changed', 'project.updated'].includes(
-                event.eventType,
-              )
-            ) {
-              ackCalled = true;
-            }
-          } catch {
-            nackCalled = true;
-          }
+function buildConsumeMessage(body: unknown, correlationId: string = 'corr-1'): ConsumeMessage {
+  return {
+    content: Buffer.from(JSON.stringify(body), 'utf8'),
+    fields: {
+      deliveryTag: 1,
+      redelivered: false,
+      exchange: 'ex',
+      routingKey: 'task.created',
+       
+    } as any,
+    properties: { correlationId, headers: {} },
+  } as ConsumeMessage;
+}
 
-          // Verify ACK was called for valid events
-          assert.ok(ackCalled, 'ACK should be called for valid events');
-          assert.ok(!nackCalled, 'NACK should not be called for valid events');
-        }),
-        { numRuns: 100 },
-      );
-    });
+describe('AutomationAmqpConsumerService', () => {
+  it('ACKs supported event types and processes them', async () => {
+    const consumer = new AutomationAmqpConsumerService(
+      makeConfigService({
+        RABBITMQ_URL: 'amqp://localhost:5672',
+        RABBITMQ_PREFETCH_COUNT: '10',
+      }) as never,
+      new MetricsService({
+        enabled: true,
+        collectDefaultMetrics: false,
+        defaultLabels: { service: 'automation' },
+      }),
+    );
 
-    it('should NACK with requeue=false when event processing fails', async () => {
-      await fc.assert(
-        fc.asyncProperty(
-          fc.tuple(domainEventArb, fc.boolean()),
-          async ([eventData, shouldFail]) => {
-            let ackCalled = false;
-            let nackCalled = false;
+    let acked = false;
+    let processed = false;
 
-            // Simulate message handling with potential failure
-            try {
-              if (shouldFail) {
-                throw new Error('Processing failed');
-              }
-              // Parse event successfully
-              JSON.parse(JSON.stringify(eventData));
-              ackCalled = true;
-            } catch {
-              nackCalled = true;
-            }
+     
+    (consumer as any).evaluateRules = async () => {
+      processed = true;
+    };
 
-            // Verify correct ACK/NACK behavior
-            if (shouldFail) {
-              assert.ok(nackCalled, 'NACK should be called on failure');
-              assert.ok(!ackCalled, 'ACK should not be called on failure');
-            } else {
-              assert.ok(ackCalled, 'ACK should be called on success');
-              assert.ok(!nackCalled, 'NACK should not be called on success');
-            }
-          },
-        ),
-        { numRuns: 100 },
-      );
-    });
+     
+    (consumer as any).channel = {
+      ack: () => {
+        acked = true;
+      },
+      nack: () => {
+        throw new Error('should not nack');
+      },
+      publish: () => true,
+    };
 
-    it('should ACK unsupported event types without processing', async () => {
-      await fc.assert(
-        fc.asyncProperty(
-          fc.record({
-            eventId: fc.uuid(),
-            eventType: fc.constant('unsupported.event'),
-            eventVersion: fc.constant(1),
-            producer: fc.constant('test'),
-            idempotencyKey: fc.uuid(),
-            correlationId: fc.uuid(),
-            timestamp: fc.date().map((d) => d.toISOString()),
-            payload: fc.record({}),
-          }),
-          async (eventData) => {
-            let ackCalled = false;
+    const msg = buildConsumeMessage(buildEvent('task.created'));
+     
+    await (consumer as any).onMessage(msg);
 
-            // Unsupported events should still be ACKed (graceful discard)
-            const supportedTypes = [
-              'task.created',
-              'task.updated',
-              'task.status_changed',
-              'project.updated',
-            ];
-            if (!supportedTypes.includes(eventData.eventType)) {
-              ackCalled = true;
-            }
-
-            assert.ok(ackCalled, 'ACK should be called for unsupported event types');
-          },
-        ),
-        { numRuns: 50 },
-      );
-    });
+    assert.equal(processed, true);
+    assert.equal(acked, true);
   });
 
-  describe('Property 14: Consume Metrics Are Emitted for Every Event', () => {
-    it('should emit metrics with correct labels for all events', async () => {
-      await fc.assert(
-        fc.asyncProperty(
-          fc.tuple(domainEventArb, fc.boolean()),
-          async ([eventData, shouldFail]) => {
-            const event: DomainEvent = eventData;
-            const supportedTypes = [
-              'task.created',
-              'task.updated',
-              'task.status_changed',
-              'project.updated',
-            ];
+  it('ACKs unsupported event types without processing', async () => {
+    const consumer = new AutomationAmqpConsumerService(
+      makeConfigService({
+        RABBITMQ_URL: 'amqp://localhost:5672',
+        RABBITMQ_PREFETCH_COUNT: '10',
+      }) as never,
+      new MetricsService({
+        enabled: true,
+        collectDefaultMetrics: false,
+        defaultLabels: { service: 'automation' },
+      }),
+    );
 
-            // Verify metrics would be emitted with correct labels
-            const _isSupported = supportedTypes.includes(event.eventType);
-            const expectedStatus = shouldFail ? 'failure' : 'success';
+    let acked = false;
+    let processed = false;
 
-            // Metrics should always include service label
-            assert.ok(true, 'service="automation" label should be present');
+     
+    (consumer as any).evaluateRules = async () => {
+      processed = true;
+    };
 
-            // Metrics should include event_type label
-            assert.ok(event.eventType, `event_type="${event.eventType}" label should be present`);
+     
+    (consumer as any).channel = {
+      ack: () => {
+        acked = true;
+      },
+      nack: () => {
+        throw new Error('should not nack');
+      },
+      publish: () => true,
+    };
 
-            // Metrics should include status label
-            assert.ok(
-              expectedStatus === 'success' || expectedStatus === 'failure',
-              `status="${expectedStatus}" label should be present`,
-            );
-          },
-        ),
-        { numRuns: 100 },
-      );
-    });
+    const msg = buildConsumeMessage(buildEvent('unsupported.event'));
+     
+    await (consumer as any).onMessage(msg);
 
-    it('should emit metrics for every event regardless of outcome', async () => {
-      await fc.assert(
-        fc.asyncProperty(
-          fc.tuple(domainEventArb, fc.boolean()),
-          async ([eventData, shouldFail]) => {
-            const _event: DomainEvent = eventData;
+    assert.equal(processed, false);
+    assert.equal(acked, true);
+  });
 
-            // Verify metrics are always emitted
-            const metricsEmitted = true; // In real implementation, check counter increment
+  it('routes to DLQ when processing fails', async () => {
+    const consumer = new AutomationAmqpConsumerService(
+      makeConfigService({
+        RABBITMQ_URL: 'amqp://localhost:5672',
+        RABBITMQ_PREFETCH_COUNT: '10',
+      }) as never,
+      new MetricsService({
+        enabled: true,
+        collectDefaultMetrics: false,
+        defaultLabels: { service: 'automation' },
+      }),
+    );
 
-            assert.ok(metricsEmitted, 'Metrics should be emitted for every event');
+    let acked = false;
+    let published = false;
 
-            // Verify labels are correct
-            const expectedStatus = shouldFail ? 'failure' : 'success';
-            assert.ok(
-              expectedStatus === 'success' || expectedStatus === 'failure',
-              'Status label should be either success or failure',
-            );
-          },
-        ),
-        { numRuns: 100 },
-      );
-    });
+     
+    (consumer as any).evaluateRules = async () => {
+      throw new Error('fail');
+    };
+
+     
+    (consumer as any).channel = {
+      ack: () => {
+        acked = true;
+      },
+      nack: () => {
+        throw new Error('should not nack when DLQ publish works');
+      },
+      publish: () => {
+        published = true;
+        return true;
+      },
+    };
+
+    const msg = buildConsumeMessage(buildEvent('task.created'));
+     
+    await (consumer as any).onMessage(msg);
+
+    assert.equal(published, true);
+    assert.equal(acked, true);
   });
 });

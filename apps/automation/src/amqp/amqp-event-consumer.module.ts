@@ -4,10 +4,11 @@
  * Provides the AMQP event consumer service for consuming domain events from RabbitMQ.
  */
 import { Module } from '@nestjs/common';
-import { AmqpEventConsumerService } from './amqp-event-consumer.service';
+import { MetricsService } from '@superboard/backend-shared/metrics';
+import { AutomationAmqpConsumerService } from './automation-amqp-consumer.service';
 
 @Module({
-  providers: [AmqpEventConsumerService],
-  exports: [AmqpEventConsumerService],
+  providers: [MetricsService, AutomationAmqpConsumerService],
+  exports: [AutomationAmqpConsumerService],
 })
 export class AmqpEventConsumerModule {}

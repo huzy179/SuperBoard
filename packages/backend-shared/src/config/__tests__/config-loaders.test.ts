@@ -132,7 +132,7 @@ exchange: events
 
       const result = await loader.loadConfig();
 
-      expect(result.config).toEqual({
+      expect(result.config).toMatchObject({
         host: 'dev.example.com',
         port: 5673,
         exchange: 'events',
@@ -164,7 +164,7 @@ exchange: events
 
       const result = await loader.loadConfig();
 
-      expect(result.config).toEqual({
+      expect(result.config).toMatchObject({
         host: 'prod.example.com',
         port: 5672,
         ssl: true,

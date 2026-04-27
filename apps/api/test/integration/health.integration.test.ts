@@ -27,27 +27,58 @@ function makeMockResponse() {
 
 const mockConfigService = { get: () => '1.0.0' };
 
-const healthyHealthService = { checkDatabase: async () => undefined };
-const healthyRedis = { ping: async () => 'PONG' };
-const healthyQueue = { isHealthy: async () => true };
-const healthyRabbitMQ = {
-  isHealthy: async () => ({
-    rabbitmq: { status: 'up', enabled: false, message: 'RabbitMQ is disabled' },
-  }),
-};
-
-function buildController(overrides: {
-  healthService?: object;
-  redis?: object;
-  queue?: object;
-  rabbitMQ?: object;
+function createHealthCheckService(overrides?: {
+  postgresHealthy?: boolean;
+  redisHealthy?: boolean;
+  queueHealthy?: boolean;
+  rabbitmqHealthy?: boolean;
 }) {
+  const postgresHealthy = overrides?.postgresHealthy ?? true;
+  const redisHealthy = overrides?.redisHealthy ?? true;
+  const queueHealthy = overrides?.queueHealthy ?? true;
+  const rabbitmqHealthy = overrides?.rabbitmqHealthy ?? true;
+
+  return {
+    checkReadiness: async () => ({
+      status: postgresHealthy && redisHealthy && queueHealthy && rabbitmqHealthy ? 'ok' : 'error',
+      service: 'core-api',
+      version: '1.0.0',
+      uptime: 1,
+      timestamp: new Date().toISOString(),
+      dependencies: [
+        {
+          name: 'postgres',
+          status: postgresHealthy ? 'healthy' : 'unhealthy',
+          latencyMs: 1,
+          error: postgresHealthy ? undefined : 'Connection refused',
+        },
+        {
+          name: 'redis',
+          status: redisHealthy ? 'healthy' : 'unhealthy',
+          latencyMs: 1,
+          error: redisHealthy ? undefined : 'Redis connection failed',
+        },
+        {
+          name: 'bullmq',
+          status: queueHealthy ? 'healthy' : 'unhealthy',
+          latencyMs: 1,
+          error: queueHealthy ? undefined : 'Queue down',
+        },
+        {
+          name: 'rabbitmq',
+          status: rabbitmqHealthy ? 'healthy' : 'unhealthy',
+          latencyMs: 1,
+          error: rabbitmqHealthy ? undefined : 'RabbitMQ down',
+        },
+      ],
+    }),
+  };
+}
+
+function buildController(overrides: { healthCheckService?: object }) {
   return new HealthCheckController(
     mockConfigService as never,
-    (overrides.healthService ?? healthyHealthService) as never,
-    (overrides.redis ?? healthyRedis) as never,
-    (overrides.queue ?? healthyQueue) as never,
-    (overrides.rabbitMQ ?? healthyRabbitMQ) as never,
+    (overrides.healthCheckService ?? createHealthCheckService()) as never,
   );
 }
 
@@ -85,11 +116,7 @@ describe('HealthCheckController integration', () => {
 
     it('returns 503 when database is not connected', async () => {
       const controller = buildController({
-        healthService: {
-          checkDatabase: async () => {
-            throw new Error('Connection refused');
-          },
-        },
+        healthCheckService: createHealthCheckService({ postgresHealthy: false }),
       });
       const res = makeMockResponse();
       await controller.readiness(res as never);
@@ -108,11 +135,7 @@ describe('HealthCheckController integration', () => {
 
     it('returns 503 when Redis is down', async () => {
       const controller = buildController({
-        redis: {
-          ping: async () => {
-            throw new Error('Redis connection failed');
-          },
-        },
+        healthCheckService: createHealthCheckService({ redisHealthy: false }),
       });
       const res = makeMockResponse();
       await controller.readiness(res as never);

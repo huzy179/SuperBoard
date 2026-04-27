@@ -1,8 +1,16 @@
-/**
- * Metrics Collectors (placeholder for Task 1)
- * Full implementation will be done in later tasks
- */
+import type { Registry } from 'prom-client';
+import { collectDefaultMetrics } from 'prom-client';
 
 export class DefaultMetricsCollector {
-  // Placeholder - will be implemented in Task 9
+  private started = false;
+  constructor(
+    private readonly registry: Registry,
+    private readonly prefix: string = '',
+  ) {}
+
+  start(): void {
+    if (this.started) return;
+    collectDefaultMetrics({ register: this.registry, prefix: this.prefix });
+    this.started = true;
+  }
 }

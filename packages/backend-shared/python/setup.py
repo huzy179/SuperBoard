@@ -33,6 +33,7 @@ setup(
     python_requires='>=3.9',
     install_requires=[
         'pika>=1.3.0',  # AMQP client
+        'aio-pika>=9.4.0',  # Async AMQP client
         'redis>=4.5.0',  # Redis client
         'psycopg2-binary>=2.9.0',  # PostgreSQL client
         'pydantic>=2.0.0',  # Data validation

@@ -1,68 +1,57 @@
 import { Injectable } from '@nestjs/common';
-import { Counter, Gauge, register } from 'prom-client';
+import type { Counter, Gauge } from 'prom-client';
+import { MetricsService } from '@superboard/backend-shared/metrics';
 
 @Injectable()
 export class NotificationMetricsService {
-  readonly jobsTotal: Counter<string>;
-  readonly jobsFailed: Counter<string>;
-  readonly queueBacklog: Gauge<string>;
+  private readonly jobsTotal: Counter<string>;
+  private readonly jobsFailed: Counter<string>;
+  private readonly queueBacklog: Gauge<string>;
 
   // Event consumer metrics (Requirements: 13.4)
-  readonly eventsProcessedTotal: Counter<string>;
-  readonly eventsFailedTotal: Counter<string>;
-  readonly eventDlqDepth: Gauge<string>;
+  private readonly eventsProcessedTotal: Counter<string>;
+  private readonly eventsFailedTotal: Counter<string>;
+  private readonly eventDlqDepth: Gauge<string>;
 
   // RabbitMQ consume metrics (Requirements: 9.3)
-  readonly rabbitmqConsumeTotal: Counter<string>;
+  private readonly rabbitmqConsumeTotal: Counter<string>;
 
-  constructor() {
-    register.removeSingleMetric('notification_jobs_total');
-    register.removeSingleMetric('notification_jobs_failed_total');
-    register.removeSingleMetric('notification_queue_backlog');
-    register.removeSingleMetric('notification_events_processed_total');
-    register.removeSingleMetric('notification_events_failed_total');
-    register.removeSingleMetric('notification_event_dlq_depth');
-    register.removeSingleMetric('rabbitmq_consume_total');
+  constructor(metrics: MetricsService) {
+    this.jobsTotal = metrics.counter(
+      'notification_jobs_total',
+      'Total notification jobs processed',
+      ['type', 'status'],
+    );
+    this.jobsFailed = metrics.counter(
+      'notification_jobs_failed_total',
+      'Total notification jobs failed per channel',
+      ['type'],
+    );
+    this.queueBacklog = metrics.gauge(
+      'notification_queue_backlog',
+      'Current number of waiting jobs in the notifications queue',
+    );
 
-    this.jobsTotal = new Counter({
-      name: 'notification_jobs_total',
-      help: 'Total notification jobs processed',
-      labelNames: ['type', 'status'],
-    });
+    this.eventsProcessedTotal = metrics.counter(
+      'notification_events_processed_total',
+      'Total domain events processed by the notification event consumer',
+      ['event_type', 'status'],
+    );
+    this.eventsFailedTotal = metrics.counter(
+      'notification_events_failed_total',
+      'Total domain events that failed processing and were routed to DLQ',
+      ['event_type'],
+    );
+    this.eventDlqDepth = metrics.gauge(
+      'notification_event_dlq_depth',
+      'Current number of events in the domain-events DLQ',
+    );
 
-    this.jobsFailed = new Counter({
-      name: 'notification_jobs_failed_total',
-      help: 'Total notification jobs failed per channel',
-      labelNames: ['type'],
-    });
-
-    this.queueBacklog = new Gauge({
-      name: 'notification_queue_backlog',
-      help: 'Current number of waiting jobs in the notifications queue',
-    });
-
-    this.eventsProcessedTotal = new Counter({
-      name: 'notification_events_processed_total',
-      help: 'Total domain events processed by the notification event consumer',
-      labelNames: ['event_type', 'status'],
-    });
-
-    this.eventsFailedTotal = new Counter({
-      name: 'notification_events_failed_total',
-      help: 'Total domain events that failed processing and were routed to DLQ',
-      labelNames: ['event_type'],
-    });
-
-    this.eventDlqDepth = new Gauge({
-      name: 'notification_event_dlq_depth',
-      help: 'Current number of events in the domain-events DLQ',
-    });
-
-    this.rabbitmqConsumeTotal = new Counter({
-      name: 'rabbitmq_consume_total',
-      help: 'Total RabbitMQ events consumed by service',
-      labelNames: ['service', 'event_type', 'status'],
-    });
+    this.rabbitmqConsumeTotal = metrics.counter(
+      'rabbitmq_consume_total',
+      'Total RabbitMQ events consumed by service',
+      ['service', 'event_type', 'status'],
+    );
   }
 
   recordSuccess(type: string): void {

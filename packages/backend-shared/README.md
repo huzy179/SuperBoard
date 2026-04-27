@@ -63,8 +63,8 @@ class MyConsumer extends BaseAMQPConsumer {
 }
 
 // Health Check
-const healthService = new HealthCheckService();
-healthService.registerIndicator('database', new DatabaseHealthIndicator(dbConfig));
+const healthService = new HealthCheckService({ service: 'my-service', version: '0.1.0' });
+healthService.registerIndicator(new DatabaseHealthIndicator('database', dbPool, dbConfig));
 
 // Configuration
 const configService = new ConfigService(myConfigSchema);
@@ -94,11 +94,11 @@ class MyConsumer(BaseAMQPConsumer):
         print(f'Processing message: {message}')
 
 # Health Check
-health_service = HealthCheckService()
-health_service.register_indicator('database', DatabaseHealthIndicator(db_config))
+health_service = HealthCheckService(service="my-service", version="0.1.0")
+health_service.register_indicator(DatabaseHealthIndicator("database", dsn=db_dsn))
 
 # Configuration
-config_service = ConfigService(my_config_schema)
+config_service = ConfigService(schema=my_config_schema)
 port = config_service.get('PORT')
 ```
 

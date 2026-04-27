@@ -3,5 +3,8 @@
  * Full tests will be implemented in later tasks
  */
 
-// Placeholder test - will be expanded as modules are implemented
-export const placeholder = true;
+describe('Smoke', () => {
+  it('should run jest in this package', () => {
+    expect(true).toBe(true);
+  });
+});

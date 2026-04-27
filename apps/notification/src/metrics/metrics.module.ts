@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { MetricsController } from './metrics.controller';
+import { MetricsController, MetricsService } from '@superboard/backend-shared/metrics';
 import { NotificationMetricsService } from './notification-metrics.service';
 
 @Module({
   controllers: [MetricsController],
-  providers: [NotificationMetricsService],
-  exports: [NotificationMetricsService],
+  providers: [MetricsService, NotificationMetricsService],
+  exports: [MetricsService, NotificationMetricsService],
 })
 export class MetricsModule {}

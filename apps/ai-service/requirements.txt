@@ -11,3 +11,4 @@ aio-pika==9.4.3
 hypothesis==6.112.5
 pytest==8.3.4
 pytest-asyncio==0.24.0
+-e ../../packages/backend-shared/python

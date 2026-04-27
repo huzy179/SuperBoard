@@ -1,6 +1,7 @@
 /**
  * Manual test for configuration loaders
- * This file can be run with ts-node to verify the implementation
+ *
+ * Run manually with: `tsx packages/backend-shared/src/config/manual/config-loaders.manual.ts`
  */
 
 import * as fs from 'fs';

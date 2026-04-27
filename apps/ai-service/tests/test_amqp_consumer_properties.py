@@ -14,7 +14,7 @@ from typing import Any, Dict
 import pytest
 from hypothesis import given, strategies as st
 
-from amqp_consumer import AMQPEventConsumer
+from amqp_consumer import AIAMQPConsumer
 
 
 class MockIncomingMessage:
@@ -26,6 +26,12 @@ class MockIncomingMessage:
         self._acked = False
         self._nacked = False
         self._requeue = None
+        self.correlation_id = "test-correlation"
+        self.message_id = "test-message"
+        self.headers = {}
+        self.routing_key = "test"
+        self.exchange = MagicMock()
+        self.exchange.name = "superboard.domain.events"
     
     async def __aenter__(self):
         return self
@@ -91,25 +97,23 @@ class TestAMQPEventConsumerProperties:
         **Validates: Requirements 4.3, 4.4**
         """
         # Arrange
-        consumer = AMQPEventConsumer()
+        consumer = AIAMQPConsumer()
         message_body = json.dumps(event_data).encode()
         mock_message = MockIncomingMessage(message_body)
         
-        # Mock the process_event method to succeed or fail based on should_succeed
-        with patch.object(consumer, 'process_event') as mock_process:
+        # Mock the process_message method to succeed or fail based on should_succeed
+        with patch.object(consumer, 'process_message', new_callable=AsyncMock) as mock_process:
             if should_succeed:
-                mock_process.return_value = asyncio.Future()
-                mock_process.return_value.set_result(None)
+                mock_process.return_value = None
             else:
                 mock_process.side_effect = Exception("Processing failed")
             
-            # Mock metrics to avoid import issues in tests
-            with patch('amqp_consumer.record_event_processed'), \
-                 patch('amqp_consumer.record_event_failure'), \
-                 patch('amqp_consumer.record_event_dlq'):
-                
-                # Act
+            # Act
+            try:
                 await consumer._on_message(mock_message)
+            except Exception:
+                # Base consumer re-raises to let aio-pika NACK the message.
+                pass
         
         # Assert
         if should_succeed:
@@ -135,16 +139,17 @@ class TestAMQPEventConsumerProperties:
         **Validates: Requirements 4.4**
         """
         # Arrange
-        consumer = AMQPEventConsumer()
+        consumer = AIAMQPConsumer()
         # Create malformed JSON by truncating valid JSON
         valid_json = json.dumps(event_data)
         malformed_json = valid_json[:-5].encode()  # Remove last 5 characters
         mock_message = MockIncomingMessage(malformed_json)
         
-        # Mock metrics to avoid import issues in tests
-        with patch('amqp_consumer.record_event_dlq'):
-            # Act
+        # Act
+        try:
             await consumer._on_message(mock_message)
+        except Exception:
+            pass
         
         # Assert
         assert mock_message._acked is False, "Expected no ACK for malformed JSON"
@@ -169,7 +174,7 @@ class TestAMQPEventConsumerProperties:
         **Validates: Requirements 4.2**
         """
         # Arrange
-        consumer = AMQPEventConsumer()
+        consumer = AIAMQPConsumer()
         event_data = {
             "eventType": event_type,
             "correlationId": correlation_id,

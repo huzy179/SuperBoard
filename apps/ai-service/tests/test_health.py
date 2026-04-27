@@ -26,6 +26,9 @@ class TestHealthEndpoint:
         body = response.json()
         assert body["status"] == "ok"
         assert body["service"] == "ai-service"
+        assert "version" in body
+        assert "uptime" in body
+        assert "timestamp" in body
 
     def test_health_does_not_check_dependencies(self):
         """Liveness endpoint should always return 200 regardless of dependencies."""
@@ -49,7 +52,7 @@ class TestReadyEndpoint:
             with patch.dict(os.environ, {"AI_PROVIDER": "gemini", "GEMINI_API_KEY": "key"}):
                 response = client.get("/ready")
         body = response.json()
-        assert body["status"] == "ready"
+        assert body["status"] == "ok"
         assert isinstance(body["dependencies"], list)
         names = [d["name"] for d in body["dependencies"]]
         assert "grpc" in names
@@ -66,7 +69,7 @@ class TestReadyEndpoint:
             with patch.dict(os.environ, {"AI_PROVIDER": "gemini", "GEMINI_API_KEY": "key"}):
                 response = client.get("/ready")
         body = response.json()
-        assert body["status"] == "not_ready"
+        assert body["status"] == "error"
         assert isinstance(body["dependencies"], list)
 
     def test_ready_503_when_model_not_configured(self):

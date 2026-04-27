@@ -10,6 +10,8 @@ from .indicators import (
     DatabaseHealthIndicator,
     RedisHealthIndicator,
     RabbitMQHealthIndicator,
+    GRPCHealthIndicator,
+    CallableHealthIndicator,
 )
 from .types import HealthResult, ReadinessResult, DependencyHealth
 
@@ -18,6 +20,8 @@ __all__ = [
     'DatabaseHealthIndicator',
     'RedisHealthIndicator', 
     'RabbitMQHealthIndicator',
+    'GRPCHealthIndicator',
+    'CallableHealthIndicator',
     'HealthResult',
     'ReadinessResult',
     'DependencyHealth',

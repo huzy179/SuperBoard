@@ -30,9 +30,9 @@ describe('Property 4: Configuration Validation Completeness', () => {
       minLength: 1,
       maxLength: 5,
     }),
-    prefetchCount: fc.option(fc.integer({ min: 1, max: 1000 })),
-    reconnectInterval: fc.option(fc.integer({ min: 1000, max: 60000 })),
-    maxReconnectAttempts: fc.option(fc.integer({ min: 1, max: 50 })),
+    prefetchCount: fc.option(fc.integer({ min: 1, max: 1000 }), { nil: undefined }),
+    reconnectInterval: fc.option(fc.integer({ min: 1000, max: 60000 }), { nil: undefined }),
+    maxReconnectAttempts: fc.option(fc.integer({ min: 1, max: 50 }), { nil: undefined }),
   });
 
   // Generator for invalid AMQP configuration (missing required fields)
@@ -63,8 +63,8 @@ describe('Property 4: Configuration Validation Completeness', () => {
   const validRedisConfigArb = fc.record({
     host: fc.string({ minLength: 1, maxLength: 100 }),
     port: fc.integer({ min: 1, max: 65535 }),
-    password: fc.option(fc.string({ minLength: 1, maxLength: 100 })),
-    db: fc.option(fc.integer({ min: 0, max: 15 })),
+    password: fc.option(fc.string({ minLength: 1, maxLength: 100 }), { nil: undefined }),
+    db: fc.option(fc.integer({ min: 0, max: 15 }), { nil: undefined }),
   });
 
   // Generator for configuration with missing required fields

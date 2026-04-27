@@ -6,8 +6,9 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { BearerAuthGuard } from './common/guards/bearer-auth.guard';
 import { RateLimitGuard } from './common/guards/rate-limit.guard';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { ApiGlobalExceptionFilter } from './common/filters/api-global-exception.filter';
 import { validateEnv } from './config/env';
+import { SharedConfigModule } from './config/shared-config.module';
 import { HealthModule } from './modules/health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -39,6 +40,7 @@ import { EventBusModule } from './common/event-bus/event-bus.module';
       envFilePath: ['.env.local', '.env', '.env.example'],
       validate: validateEnv,
     }),
+    SharedConfigModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
@@ -81,7 +83,7 @@ import { EventBusModule } from './common/event-bus/event-bus.module';
     },
     {
       provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
+      useClass: ApiGlobalExceptionFilter,
     },
   ],
 })

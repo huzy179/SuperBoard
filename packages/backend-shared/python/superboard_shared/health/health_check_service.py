@@ -1,42 +1,69 @@
 """
-Health Check Service (Python) - Placeholder for Task 1
-Full implementation will be done in later tasks
+Health Check Service (Python)
+
+- `/health` (liveness): basic process status
+- `/ready` (readiness): checks registered dependency indicators
 """
 
-from typing import Dict, Any, List
-from .types import HealthResult, ReadinessResult
+from __future__ import annotations
+
+import time
+from datetime import datetime, timezone
+from typing import Dict
+
+from .types import DependencyHealth, HealthIndicator, HealthResult, ReadinessResult
 
 
 class HealthCheckService:
-    """
-    Health Check Service class (placeholder)
-    Full implementation will be done in Task 8
-    """
-    
-    def __init__(self):
-        self.indicators: Dict[str, Any] = {}
-    
-    def register_indicator(self, name: str, indicator: Any) -> None:
-        """Register a health indicator (placeholder)"""
-        self.indicators[name] = indicator
-    
-    async def check_health(self) -> HealthResult:
-        """Check basic health (placeholder)"""
+    def __init__(self, *, service: str, version: str, start_time_ms: int | None = None) -> None:
+        self._service = service
+        self._version = version
+        self._start_time_ms = start_time_ms if start_time_ms is not None else int(time.time() * 1000)
+        self._indicators: Dict[str, HealthIndicator] = {}
+
+    def register_indicator(self, indicator: HealthIndicator) -> None:
+        self._indicators[indicator.name] = indicator
+
+    def check_health(self) -> HealthResult:
         return HealthResult(
-            status='ok',
-            service='placeholder',
-            version='0.1.0',
-            uptime=0,
-            timestamp='2024-01-01T00:00:00Z'
+            status="ok",
+            service=self._service,
+            version=self._version,
+            uptime=int((int(time.time() * 1000) - self._start_time_ms) / 1000),
+            timestamp=datetime.now(timezone.utc).isoformat(),
         )
-    
+
     async def check_readiness(self) -> ReadinessResult:
-        """Check readiness with dependencies (placeholder)"""
+        deps: list[DependencyHealth] = []
+        for indicator in self._indicators.values():
+            start = int(time.time() * 1000)
+            try:
+                status = await indicator.check()
+                deps.append(
+                    DependencyHealth(
+                        name=indicator.name,
+                        status=status.status,
+                        latency_ms=status.latency_ms if status.latency_ms else int(time.time() * 1000) - start,
+                        error=status.error,
+                    )
+                )
+            except Exception as exc:
+                deps.append(
+                    DependencyHealth(
+                        name=indicator.name,
+                        status="unhealthy",
+                        latency_ms=int(time.time() * 1000) - start,
+                        error=str(exc),
+                    )
+                )
+
+        all_healthy = all(d.status == "healthy" for d in deps)
+        base = self.check_health()
         return ReadinessResult(
-            status='ok',
-            service='placeholder',
-            version='0.1.0',
-            uptime=0,
-            timestamp='2024-01-01T00:00:00Z',
-            dependencies=[]
+            status="ok" if all_healthy else "error",
+            service=base.service,
+            version=base.version,
+            uptime=base.uptime,
+            timestamp=base.timestamp,
+            dependencies=deps,
         )

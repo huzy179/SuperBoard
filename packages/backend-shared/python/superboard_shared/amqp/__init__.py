@@ -7,7 +7,7 @@ with connection management, reconnection logic, and dead letter queue handling.
 
 from .base_consumer import BaseAMQPConsumer
 from .connection_manager import AMQPConnectionManager
-from .types import AMQPConfig, AMQPMessage, DeadLetterQueueConfig
+from .types import AMQPConfig, AMQPMessage, DeadLetterQueueConfig, MessageProcessingContext
 
 __all__ = [
     'BaseAMQPConsumer',
@@ -15,4 +15,5 @@ __all__ = [
     'AMQPConfig',
     'AMQPMessage',
     'DeadLetterQueueConfig',
+    'MessageProcessingContext',
 ]

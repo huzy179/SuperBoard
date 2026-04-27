@@ -260,7 +260,7 @@ export class AmqpEventConsumerService implements OnModuleInit, OnModuleDestroy {
   private async disconnect(): Promise<void> {
     try {
       await this.channel?.close();
-      await this.connection?.close();
+      await (this.connection as unknown as { close: () => Promise<void> })?.close();
       this.logger.log('[amqp-consumer] disconnected from RabbitMQ');
     } catch (error) {
       this.logger.error(`[amqp-consumer] error during disconnect: ${(error as Error).message}`);

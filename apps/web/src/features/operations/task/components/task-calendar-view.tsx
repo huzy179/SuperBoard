@@ -10,8 +10,8 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  sortableKeyboardCoordinates,
 } from '@dnd-kit/core';
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
 import { motion, AnimatePresence } from 'framer-motion';
 import {

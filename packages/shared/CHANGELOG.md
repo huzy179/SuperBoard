@@ -1,5 +1,26 @@
 # @superboard/shared Changelog
 
+## v0.2.0 — RabbitMQ Event Bus Schema
+
+### Added
+
+**RabbitMQ Event Schema & Routing**
+
+- `events/rabbitmq.event.ts` — Added `RabbitMQDomainEvent<T>` interface extending `DomainEvent<T>` with AMQP-specific metadata fields: `routingKey` and `exchange`
+- `RABBITMQ_EXCHANGES` constants — `DOMAIN_EVENTS: 'superboard.domain.events'`, `DEAD_LETTER: 'superboard.domain.events.dlx'`
+- `RABBITMQ_QUEUES` constants — Per-service queue names: `AI`, `NOTIFICATION`, `SEARCH`, `AUTOMATION`
+- `RABBITMQ_DLQ_NAMES` constants — Per-service dead-letter queue names
+- `VALID_ROUTING_KEYS` tuple — Canonical routing keys following `{domain}.{action}` format (12 keys from Event Taxonomy v1)
+- `ValidRoutingKey` type — Union type for routing key validation
+
+### Notes
+
+- Non-breaking additive change: new RabbitMQ event schema exports do not affect existing `DomainEvent` consumers
+- Routing key format: `{domain}.{action}` (e.g., `task.created`, `doc.updated`)
+- All RabbitMQ exports available from `src/events/index.ts`
+
+---
+
 ## v1.1.0 — Event Taxonomy v1
 
 ### Added

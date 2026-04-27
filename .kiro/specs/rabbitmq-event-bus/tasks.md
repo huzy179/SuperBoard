@@ -206,62 +206,62 @@ Thêm RabbitMQ làm Event Bus chuyên dụng cho domain events trong SuperBoard,
     - Thêm `RABBITMQ_URL`, `RABBITMQ_PREFETCH_COUNT`
     - _Requirements: 10.5_
 
-- [ ] 10. Search Service — AMQP Consumer (NestJS)
-  - [~] 10.1 Implement `AmqpEventConsumerService` cho Search Service
+- [x] 10. Search Service — AMQP Consumer (NestJS)
+  - [x] 10.1 Implement `AmqpEventConsumerService` cho Search Service
     - Tạo `apps/search/src/amqp/amqp-event-consumer.service.ts`
     - Queue: `search.domain.events`, binding keys: `task.*`, `doc.updated`, `project.updated`
     - Prefetch = 10, ACK sau khi index update thành công, NACK(false, false) nếu thất bại
     - Reconnect với exponential backoff khi connection lost
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-  - [~] 10.2 Implement consume metrics cho Search Service
+  - [x] 10.2 Implement consume metrics cho Search Service
     - Thêm counter `rabbitmq_consume_total` với labels `service="search"`, `event_type`, `status`
     - _Requirements: 9.3_
 
-  - [~] 10.3 Write property test for ACK iff success — Search Service (P8)
+  - [x] 10.3 Write property test for ACK iff success — Search Service (P8)
     - **Property 8: ACK Sent If and Only If Processing Succeeds**
     - Dùng fast-check: generate events với index update success/failure, verify ACK/NACK behavior
     - **Validates: Requirements 6.3, 6.4**
 
-  - [~] 10.4 Cập nhật `.env.example` của Search Service
+  - [x] 10.4 Cập nhật `.env.example` của Search Service
     - Thêm `RABBITMQ_URL`, `RABBITMQ_PREFETCH_COUNT`
     - _Requirements: 10.5_
 
-- [ ] 11. Automation Service — AMQP Consumer (NestJS)
-  - [~] 11.1 Implement `AmqpEventConsumerService` cho Automation Service
+- [x] 11. Automation Service — AMQP Consumer (NestJS)
+  - [x] 11.1 Implement `AmqpEventConsumerService` cho Automation Service
     - Tạo `apps/automation/src/amqp/amqp-event-consumer.service.ts`
     - Queue: `automation.domain.events`, binding keys: `task.*`, `project.updated`
     - Prefetch = 10, ACK sau khi rule evaluation thành công, NACK(false, false) nếu thất bại
     - Reconnect với exponential backoff khi connection lost
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-  - [~] 11.2 Implement consume metrics cho Automation Service
+  - [x] 11.2 Implement consume metrics cho Automation Service
     - Thêm counter `rabbitmq_consume_total` với labels `service="automation"`, `event_type`, `status`
     - _Requirements: 9.3_
 
-  - [~] 11.3 Write property test for ACK iff success — Automation Service (P8)
+  - [x] 11.3 Write property test for ACK iff success — Automation Service (P8)
     - **Property 8: ACK Sent If and Only If Processing Succeeds**
     - Dùng fast-check: generate events với rule evaluation success/failure, verify ACK/NACK behavior
     - **Validates: Requirements 7.3, 7.4**
 
-  - [~] 11.4 Write property test for consume metrics (P14)
+  - [x] 11.4 Write property test for consume metrics (P14)
     - **Property 14: Consume Metrics Are Emitted for Every Event**
     - Dùng fast-check: generate events với success/failure/dlq outcomes, verify `rabbitmq_consume_total` increment với đúng labels `service`, `event_type`, `status`
     - **Validates: Requirements 9.3**
 
-  - [~] 11.5 Cập nhật `.env.example` của Automation Service
+  - [x] 11.5 Cập nhật `.env.example` của Automation Service
     - Thêm `RABBITMQ_URL`, `RABBITMQ_PREFETCH_COUNT`
     - _Requirements: 10.5_
 
-- [~] 12. Checkpoint — Consumer Services
+- [x] 12. Checkpoint — Consumer Services
   - Ensure all tests pass, ask the user if questions arise.
 
-- [~] 13. Contract Package — Versioning và Changelog
+- [x] 13. Contract Package — Versioning và Changelog
   - Cập nhật `packages/shared/package.json`: bump version theo semver (minor version increment)
   - Tạo hoặc cập nhật `packages/shared/CHANGELOG.md`: ghi nhận addition của RabbitMQ event schema là non-breaking additive change
   - _Requirements: 11.4, 11.5_
 
-- [~] 14. Final Checkpoint — Ensure all tests pass
+- [x] 14. Final Checkpoint — Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

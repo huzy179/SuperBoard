@@ -127,52 +127,54 @@ class AMQPEventConsumer:
         """
         Handle incoming AMQP message.
         Uses message.process(requeue=False) context manager for automatic ACK/NACK.
+        All processing (including JSON parsing) happens inside the context manager
+        so that any exception triggers a NACK with requeue=False.
         """
         correlation_id = "unknown"
         
         try:
-            # Parse message body
-            event_data: dict[str, Any] = json.loads(message.body.decode())
-            correlation_id = event_data.get("correlationId", "unknown")
-            event_type = event_data.get("eventType", "")
-            
-            log = _get_logger(correlation_id)
-            
-            # Use message.process context manager for automatic ACK/NACK
-            async with message.process(requeue=False):  # NACK with requeue=False on exception
+            # Use message.process context manager for automatic ACK/NACK.
+            # Any exception raised inside will trigger NACK with requeue=False.
+            async with message.process(requeue=False):
+                try:
+                    # Parse message body
+                    event_data: dict[str, Any] = json.loads(message.body.decode())
+                except json.JSONDecodeError as exc:
+                    log = _get_logger(correlation_id)
+                    log.error(f"[amqp-consumer] failed to parse message JSON: {exc}")
+                    record_event_dlq("malformed")
+                    raise  # Re-raise so context manager sends NACK
+                
+                correlation_id = event_data.get("correlationId", "unknown")
+                event_type = event_data.get("eventType", "")
+                log = _get_logger(correlation_id)
+                
                 if event_type not in SUPPORTED_EVENTS:
-                    log.info(f"[amqp-consumer] ignoring unsupported event type '{event_type}'")
+                    log.debug(f"[amqp-consumer] ignoring event type '{event_type}'")
                     return  # ACK (discard gracefully)
                 
                 log.info(f"[amqp-consumer] processing event '{event_type}'")
                 
-                # Process the event
-                await self.process_event(event_data, correlation_id)
-                
-                # Record success metrics
-                record_event_processed(event_type)
-                
-                log.info(f"[amqp-consumer] event '{event_type}' processed successfully")
-                # ACK is sent automatically by context manager on success
-                
-        except json.JSONDecodeError as exc:
-            log = _get_logger(correlation_id)
-            log.error(f"[amqp-consumer] failed to parse message JSON: {exc}")
-            # NACK will be sent by context manager, routing to DLQ
-            record_event_dlq("malformed")
-            
-        except Exception as exc:
-            log = _get_logger(correlation_id)
-            log.error(f"[amqp-consumer] event processing failed: {exc}")
-            # NACK will be sent by context manager, routing to DLQ
-            event_type = "unknown"
-            try:
-                event_data = json.loads(message.body.decode())
-                event_type = event_data.get("eventType", "unknown")
-            except:
-                pass
-            record_event_failure(event_type)
-            record_event_dlq(event_type)
+                try:
+                    # Process the event
+                    await self.process_event(event_data, correlation_id)
+                    
+                    # Record success metrics
+                    record_event_processed(event_type)
+                    
+                    log.info(f"[amqp-consumer] event '{event_type}' processed successfully")
+                    # ACK is sent automatically by context manager on success
+                    
+                except Exception as exc:
+                    log.error(f"[amqp-consumer] failed to process event '{event_type}': {exc}")
+                    log.error({"correlationId": correlation_id})
+                    record_event_failure(event_type)
+                    record_event_dlq(event_type)
+                    raise  # Re-raise so context manager sends NACK
+        except Exception:
+            # Exceptions are handled by the message.process() context manager (NACK sent).
+            # Swallow here to prevent crashing the consumer loop.
+            pass
 
     # ------------------------------------------------------------------
     # Event routing

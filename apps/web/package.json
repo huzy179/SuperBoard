@@ -15,7 +15,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@hocuspocus/provider": "^3.4.4",
     "@hookform/resolvers": "^5.2.2",
-    "@superboard/shared": "0.1.0",
+    "@superboard/shared": "0.2.0",
     "@superboard/ui": "*",
     "@tanstack/react-query": "^5.90.21",
     "@tiptap/extension-collaboration": "^3.22.4",

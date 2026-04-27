@@ -1,0 +1,14 @@
+packages/backend-shared/src/amqp/connection-manager.ts(63,21): error TS2339: Property 'close' does not exist on type 'Connection'.
+packages/backend-shared/src/amqp/connection-manager.ts(86,40): error TS2339: Property 'createChannel' does not exist on type 'Connection'.
+packages/backend-shared/src/amqp/connection-manager.ts(129,9): error TS2739: Type 'ChannelModel' is missing the following properties from type 'Connection': serverProperties, expectSocketClose, sentSinceLastCheck, recvSinceLastCheck, sendMessage
+packages/backend-shared/src/amqp/connection-manager.ts(183,28): error TS2339: Property 'close' does not exist on type 'Connection'.
+packages/backend-shared/src/config/config.service.ts(234,18): error TS2344: Type 'EnvironmentConfig' does not satisfy the constraint 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'EnvironmentConfig'.
+packages/backend-shared/src/config/config.service.ts(235,28): error TS2344: Type 'EnvironmentConfig' does not satisfy the constraint 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'EnvironmentConfig'.
+packages/backend-shared/src/config/examples/usage-example.ts(185,44): error TS2352: Conversion of type 'Error' to type '{ validationErrors: unknown; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Property 'validationErrors' is missing in type 'Error' but required in type '{ validationErrors: unknown; }'.
+packages/backend-shared/src/config/loaders.ts(152,9): error TS2322: Type 'T' is not assignable to type 'Record<string, unknown>'.
+packages/backend-shared/src/config/loaders.ts(267,48): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown>'.
+packages/backend-shared/src/config/loaders.ts(472,3): error TS2322: Type 'Record<string, unknown>' is not assignable to type 'T'.
+  'T' could be instantiated with an arbitrary type which could be unrelated to 'Record<string, unknown>'.

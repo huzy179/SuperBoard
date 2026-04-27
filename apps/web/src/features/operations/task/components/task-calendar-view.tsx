@@ -6,9 +6,11 @@ import {
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
+  KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
+  sortableKeyboardCoordinates,
 } from '@dnd-kit/core';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -131,7 +133,7 @@ function DraggableTaskChip({
       {...attributes}
       whileHover={{ scale: 1.02, x: 2 }}
       whileTap={{ scale: 0.98 }}
-      className={`group w-full cursor-grab rounded-sm border border-white/5 bg-white/[0.03] px-var(--space-3) py-var(--space-2) text-left transition-all hover:bg-white/[0.08] hover:border-white/20 shadow-inner ${isDragging ? 'opacity-0' : ''}`}
+      className={`group w-full cursor-grab rounded-sm border border-white/5 bg-white/[0.03] px-[var(--space-3)] py-[var(--space-2)] text-left transition-all hover:bg-white/[0.08] hover:border-white/20 shadow-inner ${isDragging ? 'opacity-0' : ''}`}
       title={`${task.title} - ${statusInfo?.name ?? task.status}`}
     >
       <div className="flex items-center gap-2">
@@ -173,7 +175,7 @@ function DroppableDayCell({
   return (
     <div
       ref={setNodeRef}
-      className={`min-h-[10rem] rounded-md border p-var(--space-4) transition-all duration-300 relative overflow-hidden group/cell ${
+      className={`min-h-[10rem] rounded-md border p-[var(--space-4)] transition-all duration-300 relative overflow-hidden group/cell ${
         isOver
           ? 'border-brand-500/50 bg-brand-500/[0.03] shadow-glow-brand/5 scale-[1.02] z-30'
           : cell.inMonth
@@ -193,7 +195,7 @@ function DroppableDayCell({
         )}
       </AnimatePresence>
 
-      <div className="flex items-center justify-between mb-var(--space-4) relative z-10">
+      <div className="flex items-center justify-between mb-[var(--space-4)] relative z-10">
         <p
           className={`text-[10px] font-black uppercase tracking-[0.2em] ${
             isToday ? 'text-brand-400' : cell.inMonth ? 'text-white/20' : 'text-white/5'
@@ -232,7 +234,7 @@ function DroppableDayCell({
         </AnimatePresence>
 
         {visibleTasks.length > 3 ? (
-          <div className="px-var(--space-3) py-var(--space-1) rounded-xs bg-white/5 border border-white/5 transition-all hover:bg-brand-500/10 hover:border-brand-500/20 group/more">
+          <div className="px-[var(--space-3)] py-[var(--space-1)] rounded-xs bg-white/5 border border-white/5 transition-all hover:bg-brand-500/10 hover:border-brand-500/20 group/more">
             <p className="text-[8px] font-bold text-white/20 uppercase tracking-widest group-hover/more:text-brand-400 transition-colors">
               +{visibleTasks.length - 3} Packets
             </p>
@@ -262,6 +264,9 @@ export function TaskCalendarView({
       activationConstraint: {
         distance: 5,
       },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
 
@@ -296,13 +301,13 @@ export function TaskCalendarView({
   return (
     <div className="space-y-10">
       {/* Header nav bar */}
-      <div className="flex items-center justify-between rounded-md border border-white/10 bg-white/[0.01] px-var(--space-6) py-var(--space-4) backdrop-blur-2xl shadow-inner relative overflow-hidden group">
+      <div className="flex items-center justify-between rounded-md border border-white/10 bg-white/[0.01] px-[var(--space-6)] py-[var(--space-4)] backdrop-blur-2xl shadow-inner relative overflow-hidden group">
         <div className="absolute inset-0 bg-brand-500/[0.01] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
         <button
           type="button"
           onClick={onPrevMonth}
-          className="flex items-center gap-3 rounded-sm border border-white/5 bg-white/[0.02] px-var(--space-4) py-var(--space-2) text-[10px] font-bold uppercase tracking-widest text-white/30 hover:bg-white/10 hover:text-white transition-all active:scale-95"
+          className="flex items-center gap-3 rounded-sm border border-white/5 bg-white/[0.02] px-[var(--space-4)] py-[var(--space-2)] text-[10px] font-bold uppercase tracking-widest text-white/30 hover:bg-white/10 hover:text-white transition-all active:scale-95"
         >
           <ChevronLeft size={14} />
           <span className="hidden sm:inline">Past_Cycle</span>
@@ -345,7 +350,7 @@ export function TaskCalendarView({
         <button
           type="button"
           onClick={onNextMonth}
-          className="flex items-center gap-3 rounded-sm border border-white/5 bg-white/[0.02] px-var(--space-4) py-var(--space-2) text-[10px] font-bold uppercase tracking-widest text-white/30 hover:bg-white/10 hover:text-white transition-all active:scale-95"
+          className="flex items-center gap-3 rounded-sm border border-white/5 bg-white/[0.02] px-[var(--space-4)] py-[var(--space-2)] text-[10px] font-bold uppercase tracking-widest text-white/30 hover:bg-white/10 hover:text-white transition-all active:scale-95"
         >
           <span className="hidden sm:inline">Future_Cycle</span>
           <ChevronRight size={14} />
@@ -396,7 +401,7 @@ export function TaskCalendarView({
                     <motion.div
                       initial={{ scale: 1, rotate: 0 }}
                       animate={{ scale: 1.05, rotate: 1 }}
-                      className="w-full cursor-grabbing rounded-md border border-brand-500/50 bg-brand-500/10 px-var(--space-4) py-var(--space-3) shadow-glow-brand/20 backdrop-blur-2xl overflow-hidden"
+                      className="w-full cursor-grabbing rounded-md border border-brand-500/50 bg-brand-500/10 px-[var(--space-4)] py-[var(--space-3)] shadow-glow-brand/20 backdrop-blur-2xl overflow-hidden"
                     >
                       <div className="absolute inset-0 bg-brand-500/5 animate-pulse" />
                       <div className="flex items-center gap-3 relative z-10">
@@ -421,10 +426,10 @@ export function TaskCalendarView({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-md border border-white/5 bg-white/[0.01] p-var(--space-6) backdrop-blur-2xl shadow-inner group/unscheduled relative overflow-hidden"
+          className="rounded-md border border-white/5 bg-white/[0.01] p-[var(--space-6)] backdrop-blur-2xl shadow-inner group/unscheduled relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-brand-500/[0.005] opacity-0 group-hover/unscheduled:opacity-100 transition-opacity pointer-events-none" />
-          <div className="flex items-center gap-4 mb-var(--space-6)">
+          <div className="flex items-center gap-4 mb-[var(--space-6)]">
             <div className="w-10 h-10 rounded-sm bg-white/[0.03] flex items-center justify-center border border-white/5 shadow-inner">
               <CalendarIcon size={16} className="text-white/20" />
             </div>
@@ -447,7 +452,7 @@ export function TaskCalendarView({
                   key={task.id}
                   type="button"
                   onClick={() => onOpenEdit(task)}
-                  className="flex items-center gap-3 rounded-sm border border-white/5 bg-white/[0.03] px-var(--space-4) py-var(--space-3) transition-all hover:bg-white/10 hover:border-brand-500/20 hover:scale-[1.02] active:scale-98 group/packet"
+                  className="flex items-center gap-3 rounded-sm border border-white/5 bg-white/[0.03] px-[var(--space-4)] py-[var(--space-3)] transition-all hover:bg-white/10 hover:border-brand-500/20 hover:scale-[1.02] active:scale-98 group/packet"
                 >
                   <div
                     className={`${colorClass} opacity-30 group-hover/packet:opacity-100 transition-opacity`}

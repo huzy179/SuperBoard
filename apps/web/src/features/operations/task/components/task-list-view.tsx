@@ -75,29 +75,30 @@ export function TaskListView({
       <table className="min-w-full border-collapse text-sm tabular-nums relative z-10">
         <thead>
           <tr className="bg-white/[0.02] border-b border-white/5">
-            <th className="px-var(--space-6) py-var(--space-4) text-left w-16">
+            <th className="px-[var(--space-6)] py-[var(--space-4)] text-left w-16">
               <div className="relative flex items-center justify-center">
                 <input
                   type="checkbox"
                   checked={visibleTasks.length > 0 && selectedVisibleCount === visibleTasks.length}
                   onChange={toggleSelectAllVisible}
+                  aria-label="Chọn tất cả task"
                   className="h-4 w-4 rounded-sm border-white/10 bg-white/5 text-brand-500 focus:ring-brand-500/50 shadow-inner cursor-pointer transition-all"
                 />
               </div>
             </th>
-            <th className="px-var(--space-4) py-var(--space-4) text-left text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">
+            <th className="px-[var(--space-4)] py-[var(--space-4)] text-left text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">
               Operational_Task
             </th>
-            <th className="px-var(--space-4) py-var(--space-4) text-left text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">
+            <th className="px-[var(--space-4)] py-[var(--space-4)] text-left text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">
               Frequency_Hub
             </th>
-            <th className="px-var(--space-4) py-var(--space-4) text-left text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">
+            <th className="px-[var(--space-4)] py-[var(--space-4)] text-left text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">
               Priority_Rank
             </th>
-            <th className="px-var(--space-4) py-var(--space-4) text-left text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">
+            <th className="px-[var(--space-4)] py-[var(--space-4)] text-left text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">
               Operator_Id
             </th>
-            <th className="px-var(--space-6) py-var(--space-4) text-right text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">
+            <th className="px-[var(--space-6)] py-[var(--space-4)] text-right text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">
               System_Sync
             </th>
           </tr>
@@ -115,30 +116,43 @@ export function TaskListView({
                     onOpenEdit(task);
                   }
                 }}
-                className={`group cursor-pointer transition-all duration-500 hover:bg-white/[0.04] relative ${
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (e.metaKey || e.ctrlKey || e.shiftKey) {
+                      onSelectTask(task.id, e);
+                    } else {
+                      onOpenEdit(task);
+                    }
+                  }
+                }}
+                tabIndex={0}
+                aria-label={`Task: ${task.title}`}
+                className={`group cursor-pointer transition-all duration-500 hover:bg-white/[0.04] relative focus:outline-none focus:ring-1 focus:ring-brand-500/40 ${
                   isSelected ? 'bg-brand-500/[0.03]' : ''
                 } ${task.deletedAt ? 'opacity-20 grayscale pointer-events-none' : ''}`}
               >
                 <td
-                  className="px-var(--space-6) py-var(--space-3)"
+                  className="px-[var(--space-6)] py-[var(--space-3)]"
                   onClick={(event) => event.stopPropagation()}
                 >
                   <div className="relative flex items-center justify-center">
                     {isSelected && (
                       <motion.div
                         layoutId={`selected-row-${task.id}`}
-                        className="absolute -left-var(--space-6) w-0.5 h-8 bg-brand-500 shadow-glow-brand rounded-r-xs"
+                        className="absolute -left-[var(--space-6)] w-0.5 h-8 bg-brand-500 shadow-glow-brand rounded-r-xs"
                       />
                     )}
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={(e) => onSelectTask(task.id, e)}
+                      aria-label={`Chọn task: ${task.title}`}
                       className={`h-4 w-4 rounded-sm border-white/10 bg-white/5 text-brand-500 transition-all ${isSelected ? 'opacity-100' : 'opacity-20 group-hover:opacity-100'}`}
                     />
                   </div>
                 </td>
-                <td className="px-var(--space-4) py-var(--space-3)">
+                <td className="px-[var(--space-4)] py-[var(--space-3)]">
                   <div className="flex items-center gap-4">
                     <div className="w-8 h-8 rounded-sm bg-white/[0.03] flex items-center justify-center border border-white/5 shadow-inner transition-all duration-300 group-hover:border-white/20">
                       <TaskTypeIcon type={task.type ?? 'task'} />

@@ -9,6 +9,7 @@
   
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 body {
@@ -27,19 +28,19 @@ h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
 
 /* Label chuẩn */
 .form-label {
-  @apply flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-var(--space-2);
+  @apply flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-[var(--space-2)];
 }
 
 /* Input / Select / Textarea chuẩn — Technical Dark */
 .form-input {
-  @apply w-full rounded-xs border border-white/5 bg-white/[0.02] px-var(--space-3) py-var(--space-2)
+  @apply w-full rounded-xs border border-white/5 bg-white/[0.02] px-[var(--space-3)] py-[var(--space-2)]
          text-sm font-medium text-white placeholder:text-white/20
          focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.04]
          transition-all;
 }
 
 .form-input-lg {
-  @apply w-full rounded-sm border border-white/5 bg-white/[0.02] px-var(--space-4) py-var(--space-3)
+  @apply w-full rounded-sm border border-white/5 bg-white/[0.02] px-[var(--space-4)] py-[var(--space-3)]
          text-base font-medium text-white placeholder:text-white/20
          focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.04]
          transition-all;
@@ -47,7 +48,7 @@ h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
 
 /* Select */
 .form-select {
-  @apply w-full rounded-xs border border-white/5 bg-white/[0.02] px-var(--space-3) py-var(--space-2)
+  @apply w-full rounded-xs border border-white/5 bg-white/[0.02] px-[var(--space-3)] py-[var(--space-2)]
          text-sm font-medium text-white placeholder:text-white/20
          focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.04]
          transition-all appearance-none cursor-pointer;
@@ -55,7 +56,7 @@ h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
 
 /* Textarea */
 .form-textarea {
-  @apply w-full rounded-md border border-white/8 bg-white/[0.03] px-var(--space-4) py-var(--space-3)
+  @apply w-full rounded-md border border-white/8 bg-white/[0.03] px-[var(--space-4)] py-[var(--space-3)]
          text-sm font-medium text-white placeholder:text-white/20
          focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.05]
          transition-all shadow-inner resize-none leading-relaxed;
@@ -63,8 +64,8 @@ h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
 
 /* Error message chuẩn */
 .form-error {
-  @apply flex items-center gap-var(--space-3) rounded-sm bg-rose-500/8 border border-rose-500/20
-         px-var(--space-4) py-var(--space-3) text-[11px] font-bold text-rose-400;
+  @apply flex items-center gap-[var(--space-3)] rounded-sm bg-rose-500/8 border border-rose-500/20
+         px-[var(--space-4)] py-[var(--space-3)] text-[11px] font-bold text-rose-400;
 }
 
 /* ============================================================
@@ -85,7 +86,7 @@ h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
 }
 
 .modal-header {
-  @apply flex items-center justify-between px-var(--space-6) py-var(--space-4) border-b border-white/5;
+  @apply flex items-center justify-between px-[var(--space-6)] py-[var(--space-4)] border-b border-white/5;
 }
 
 .modal-title {
@@ -103,11 +104,11 @@ h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
 }
 
 .modal-body {
-  @apply p-var(--space-6);
+  @apply p-[var(--space-6)];
 }
 
 .modal-footer {
-  @apply flex items-center gap-var(--space-3) pt-var(--space-4) border-t border-white/5 mt-var(--space-4);
+  @apply flex items-center gap-[var(--space-3)] pt-[var(--space-4)] border-t border-white/5 mt-[var(--space-4)];
 }
 
 /* ============================================================
@@ -116,10 +117,10 @@ h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
    ============================================================ */
 
 .btn {
-  @apply inline-flex items-center justify-center gap-var(--space-2) font-bold text-[10px]
+  @apply inline-flex items-center justify-center gap-[var(--space-2)] font-bold text-[10px]
          uppercase tracking-[0.2em] transition-all duration-200
          active:scale-95 disabled:opacity-40 disabled:pointer-events-none
-         rounded-button px-var(--space-4) py-var(--space-2);
+         rounded-button px-[var(--space-4)] py-[var(--space-2)];
 }
 
 .btn-primary {
@@ -349,4 +350,59 @@ textarea {
   pointer-events: none;
   z-index: 50;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================================
+   MISSING UTILITY CLASSES
+   ============================================================ */
+
+/* Glow shadows */
+.shadow-glow-brand {
+  box-shadow: 0 0 12px oklch(0.68 0.13 160 / 0.3);
+}
+.shadow-glow-slate {
+  box-shadow: 0 0 12px oklch(0.5 0.01 255 / 0.2);
+}
+.shadow-glow-indigo {
+  box-shadow: 0 0 12px oklch(0.55 0.15 270 / 0.3);
+}
+.shadow-glow-emerald {
+  box-shadow: 0 0 12px oklch(0.7 0.15 160 / 0.3);
+}
+.shadow-glow-rose {
+  box-shadow: 0 0 12px oklch(0.65 0.2 10 / 0.3);
+}
+
+/* Scrollbar utilities */
+.elite-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.elite-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.elite-scrollbar::-webkit-scrollbar-thumb {
+  background: oklch(0.3 0.01 260);
+  border-radius: 2px;
+}
+.elite-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.4 0.01 260);
+}
+
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Text glow */
+.text-glow {
+  text-shadow: 0 0 20px oklch(0.68 0.13 160 / 0.4);
+}
+
+/* Noise background */
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }

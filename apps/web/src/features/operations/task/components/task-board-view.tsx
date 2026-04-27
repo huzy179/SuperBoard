@@ -190,7 +190,7 @@ export function TaskBoardView({
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="flex gap-var(--space-6) overflow-x-auto pb-var(--space-8) pt-var(--space-4) elite-scrollbar"
+      className="flex gap-[var(--space-6)] overflow-x-auto pb-[var(--space-8)] pt-[var(--space-4)] elite-scrollbar"
     >
       {columns.map((column) => {
         const tasks = boardData.get(column.key) ?? [];
@@ -241,7 +241,7 @@ export function TaskBoardView({
             )}
 
             {/* Column Header */}
-            <div className="flex items-center justify-between px-var(--space-5) py-var(--space-3) border-b border-white/5 relative z-10 bg-white/[0.01] rounded-t-md">
+            <div className="flex items-center justify-between px-[var(--space-5)] py-[var(--space-3)] border-b border-white/5 relative z-10 bg-white/[0.01] rounded-t-md">
               <div className="flex flex-col gap-0.5">
                 <span
                   className={`text-[7px] font-black uppercase tracking-[0.4em] transition-colors duration-500 ${isDragOver ? 'text-brand-400' : 'text-white/10'}`}
@@ -268,7 +268,7 @@ export function TaskBoardView({
             </div>
 
             {/* Task List Container */}
-            <div className="flex-1 overflow-y-auto space-y-var(--space-3) p-var(--space-4) min-h-[200px] elite-scrollbar relative z-10">
+            <div className="flex-1 overflow-y-auto space-y-[var(--space-3)] p-[var(--space-4)] min-h-[200px] elite-scrollbar relative z-10">
               <AnimatePresence mode="popLayout">
                 {tasks.length === 0 ? (
                   <motion.div
@@ -329,7 +329,20 @@ export function TaskBoardView({
                               onOpenEdit(task);
                             }
                           }}
-                          className="p-var(--space-4) space-y-var(--space-4)"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              if (e.metaKey || e.ctrlKey || e.shiftKey) {
+                                onSelectTask(task.id, e);
+                              } else {
+                                onOpenEdit(task);
+                              }
+                            }
+                          }}
+                          role="button"
+                          tabIndex={0}
+                          aria-label={`Task: ${task.title}`}
+                          className="p-[var(--space-4)] space-y-[var(--space-4)]"
                         >
                           {/* Top Protocols */}
                           <div className="flex items-center justify-between">
@@ -373,7 +386,7 @@ export function TaskBoardView({
                           ) : null}
 
                           {/* Tactical Metadata Footer */}
-                          <div className="flex items-center justify-between pt-var(--space-3) border-t border-white/5">
+                          <div className="flex items-center justify-between pt-[var(--space-3)] border-t border-white/5">
                             <div className="flex items-center gap-3">
                               <PriorityBadge priority={task.priority} />
                               {task.dueDate ? (
@@ -408,7 +421,7 @@ export function TaskBoardView({
             </div>
 
             {/* Signal Input Footer */}
-            <div className="px-var(--space-4) pb-var(--space-4) relative z-10">
+            <div className="px-[var(--space-4)] pb-[var(--space-4)] relative z-10">
               <button
                 type="button"
                 onClick={() => onAddTask(column.key)}

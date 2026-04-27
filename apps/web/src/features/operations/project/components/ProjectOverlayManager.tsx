@@ -3,9 +3,26 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { TaskEditSlideOver } from '@/features/operations/task/components/task-edit-slide-over';
 import { QuickSearchDialog } from './quick-search-dialog';
-import { AutomationSlideOver } from '@/features/specialized/automation/components/automation-slide-over';
-import { KnowledgeMap } from '@/features/system/search/components/knowledge-map';
-import { ProjectCopilot } from '@/features/intelligence/ai/components/project-copilot';
+import dynamic from 'next/dynamic';
+
+const AutomationSlideOver = dynamic(
+  () =>
+    import('@/features/specialized/automation/components/automation-slide-over').then(
+      (m) => m.AutomationSlideOver,
+    ),
+  { ssr: false },
+);
+
+const KnowledgeMap = dynamic(
+  () => import('@/features/system/search/components/knowledge-map').then((m) => m.KnowledgeMap),
+  { ssr: false },
+);
+
+const ProjectCopilot = dynamic(
+  () =>
+    import('@/features/intelligence/ai/components/project-copilot').then((m) => m.ProjectCopilot),
+  { ssr: false },
+);
 import { useProjectDetailContext } from '../context/ProjectDetailContext';
 import type {
   ProjectTaskItemDTO,

@@ -29,8 +29,8 @@ function LoginContent() {
   const form = useAppForm({
     schema: loginSchema,
     defaultValues: {
-      email: 'nguyen.minh.tuan@techviet.local',
-      password: 'Passw0rd!',
+      email: '',
+      password: '',
     },
   });
 
@@ -130,20 +130,6 @@ function LoginContent() {
               </span>
             </div>
           )}
-
-          <div className="mt-10 pt-6 border-t border-white/5 w-full flex flex-col items-center gap-4">
-            <span className="text-[8px] font-black text-white/10 uppercase tracking-[0.4em]">
-              SEED_UPLINK_PROTOCOL
-            </span>
-            <div className="flex flex-wrap justify-center gap-3">
-              <div className="px-3 py-2 bg-white/[0.01] rounded-lg border border-white/5 text-[9px] font-bold text-white/20 hover:text-white/40 transition-colors">
-                nguyen.minh.tuan@techviet.local
-              </div>
-              <div className="px-3 py-2 bg-white/[0.01] rounded-lg border border-white/5 text-[9px] font-bold text-white/20 font-mono hover:text-white/40 transition-colors">
-                Passw0rd!
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

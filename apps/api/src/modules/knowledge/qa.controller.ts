@@ -3,7 +3,7 @@ import { DiagnosisService } from './diagnosis.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { apiSuccess } from '../../common/api-response';
 
-@Controller('v1/qa')
+@Controller('qa')
 @UseGuards(JwtAuthGuard)
 export class QaController {
   constructor(private diagnosisService: DiagnosisService) {}

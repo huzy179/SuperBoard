@@ -5,7 +5,7 @@ import { apiSuccess } from '../../common/api-response';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { AuthUserDTO } from '@superboard/shared';
 
-@Controller('v1/talent')
+@Controller('talent')
 @UseGuards(JwtAuthGuard)
 export class TalentController {
   constructor(private talentService: TalentService) {}

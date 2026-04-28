@@ -3,7 +3,7 @@ import { ConnectService } from './connect.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { apiSuccess } from '../../common/api-response';
 
-@Controller('v1/connect')
+@Controller('connect')
 export class ConnectController {
   constructor(private connectService: ConnectService) {}
 

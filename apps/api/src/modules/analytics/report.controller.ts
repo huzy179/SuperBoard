@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { ReportService } from './report.service';
 import { apiSuccess } from '../../common/api-response';
 
-@Controller('v1/projects')
+@Controller('projects')
 export class ReportController {
   constructor(private readonly reportService: ReportService) {}
 

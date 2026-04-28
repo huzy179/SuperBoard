@@ -9,7 +9,7 @@ import { SingularityService } from './singularity.service';
 import { SymbiosisService } from './symbiosis.service';
 import { ExecutiveService } from './executive.service';
 
-@Controller('v1/automation')
+@Controller('automation')
 export class AutomationController {
   constructor(
     private automationService: AutomationService,

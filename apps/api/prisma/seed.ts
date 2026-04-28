@@ -167,6 +167,71 @@ type TaskSeed = {
   parentTaskId?: string;
 };
 
+const SEED_SCALE = Number.parseInt(process.env['SEED_SCALE'] ?? '3', 10) || 3;
+const SEED_NOW = new Date(process.env['SEED_NOW'] ?? '2026-04-28T00:00:00.000Z');
+
+function clampInt(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, Math.trunc(value)));
+}
+
+function toDateISO(date: Date): string {
+  const year = date.getUTCFullYear();
+  const month = `${date.getUTCMonth() + 1}`.padStart(2, '0');
+  const day = `${date.getUTCDate()}`.padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function xorshift32(state: number): number {
+  let x = state >>> 0;
+  x ^= x << 13;
+  x ^= x >>> 17;
+  x ^= x << 5;
+  return x >>> 0;
+}
+
+function makeRng(seed: string) {
+  let state = stableSeed(seed) || 1;
+  return {
+    nextU32() {
+      state = xorshift32(state);
+      return state;
+    },
+    int(min: number, max: number) {
+      const lo = Math.ceil(min);
+      const hi = Math.floor(max);
+      const span = hi - lo + 1;
+      if (span <= 1) return lo;
+      return lo + (this.nextU32() % span);
+    },
+    bool(pTrue = 0.5) {
+      const threshold = Math.floor(pTrue * 0xffffffff);
+      return this.nextU32() <= threshold;
+    },
+    pick<T>(arr: readonly T[]) {
+      return arr[this.int(0, arr.length - 1)]!;
+    },
+    sample<T>(arr: readonly T[], count: number) {
+      const target = clampInt(count, 0, arr.length);
+      const picked = new Set<number>();
+      while (picked.size < target) picked.add(this.int(0, arr.length - 1));
+      return [...picked].map((idx) => arr[idx]!);
+    },
+  };
+}
+
+function weightedPick<T>(
+  rng: ReturnType<typeof makeRng>,
+  items: Array<{ value: T; w: number }>,
+): T {
+  const total = items.reduce((sum, item) => sum + item.w, 0);
+  let roll = rng.int(1, total);
+  for (const item of items) {
+    roll -= item.w;
+    if (roll <= 0) return item.value;
+  }
+  return items[items.length - 1]!.value;
+}
+
 const TASKS: TaskSeed[] = [
   {
     id: 'seed-task-ecom-1',
@@ -437,6 +502,288 @@ const TASKS: TaskSeed[] = [
   },
 ];
 
+function buildExtraUsers() {
+  const rng = makeRng('seed-extra-users');
+  const firstNames = [
+    'Anh',
+    'Bình',
+    'Châu',
+    'Chi',
+    'Dũng',
+    'Duy',
+    'Giang',
+    'Hà',
+    'Hải',
+    'Hạnh',
+    'Hiếu',
+    'Hùng',
+    'Khánh',
+    'Khoa',
+    'Linh',
+    'Long',
+    'Minh',
+    'My',
+    'Nam',
+    'Nga',
+    'Nhi',
+    'Phúc',
+    'Quân',
+    'Quỳnh',
+    'Sơn',
+    'Thảo',
+    'Trang',
+    'Trí',
+    'Tú',
+    'Vân',
+  ] as const;
+  const lastNames = [
+    'Nguyễn',
+    'Trần',
+    'Lê',
+    'Phạm',
+    'Hoàng',
+    'Võ',
+    'Đặng',
+    'Bùi',
+    'Đỗ',
+    'Hồ',
+    'Dương',
+    'Lý',
+  ] as const;
+
+  const colors = [
+    '#2563eb',
+    '#059669',
+    '#7c3aed',
+    '#dc2626',
+    '#d97706',
+    '#db2777',
+    '#0ea5e9',
+    '#22c55e',
+    '#f97316',
+    '#a855f7',
+    '#ef4444',
+    '#14b8a6',
+  ] as const;
+
+  const extraCount = clampInt(SEED_SCALE * 8, 8, 80);
+  const users: Array<{
+    email: string;
+    fullName: string;
+    wsRole: WorkspaceMemberRole;
+    roleKey: string;
+    avatarColor: string;
+  }> = [];
+
+  for (let i = 0; i < extraCount; i += 1) {
+    const first = rng.pick(firstNames);
+    const last = rng.pick(lastNames);
+    const fullName = `${last} ${first}`;
+    const local = `${last}.${first}.${i + 1}`.toLowerCase().replaceAll(' ', '');
+    const email = `${local}@techviet.local`;
+    const wsRole = rng.bool(0.1) ? WorkspaceMemberRole.viewer : WorkspaceMemberRole.member;
+    const roleKey = wsRole === WorkspaceMemberRole.viewer ? 'workspace-viewer' : 'workspace-member';
+    users.push({
+      email,
+      fullName,
+      wsRole,
+      roleKey,
+      avatarColor: colors[i % colors.length]!,
+    });
+  }
+
+  return users;
+}
+
+const EXTRA_USER_SPECS = buildExtraUsers();
+const ALL_USER_SPECS = [...USER_SPECS, ...EXTRA_USER_SPECS] as const;
+
+function buildExtraProjects() {
+  const base = [
+    {
+      id: 'seed-project-ai',
+      name: 'Trợ lý AI nội bộ',
+      description: 'AI assistant cho triage issue, tóm tắt docs và gợi ý plan.',
+      color: '#0ea5e9',
+      icon: '🤖',
+      key: 'AI',
+    },
+    {
+      id: 'seed-project-data',
+      name: 'Nền tảng Dữ liệu',
+      description: 'Data ingestion, warehouse, BI dashboard, quality checks.',
+      color: '#14b8a6',
+      icon: '📊',
+      key: 'DATA',
+    },
+    {
+      id: 'seed-project-support',
+      name: 'Vận hành & CSKH',
+      description: 'Ticketing, SLA, knowledge base và tooling nội bộ.',
+      color: '#f97316',
+      icon: '🎧',
+      key: 'SUP',
+    },
+    {
+      id: 'seed-project-growth',
+      name: 'Growth & Experiment',
+      description: 'A/B testing, funnel analytics, onboarding optimization.',
+      color: '#a855f7',
+      icon: '📈',
+      key: 'GROW',
+    },
+  ] as const;
+
+  const count = clampInt(SEED_SCALE, 1, base.length);
+  return base.slice(0, count);
+}
+
+const EXTRA_PROJECT_SPECS = buildExtraProjects();
+const ALL_PROJECT_SPECS = [...PROJECT_SPECS, ...EXTRA_PROJECT_SPECS] as const;
+
+function maxTaskNumberByProject(existing: readonly TaskSeed[]) {
+  const map = new Map<string, number>();
+  for (const task of existing) {
+    map.set(task.projectId, Math.max(map.get(task.projectId) ?? 0, task.number));
+  }
+  return map;
+}
+
+function buildExtraTasks() {
+  const rng = makeRng('seed-extra-tasks');
+  const maxByProject = maxTaskNumberByProject(TASKS);
+
+  const statuses = [
+    { value: 'todo', w: 35 },
+    { value: 'in_progress', w: 30 },
+    { value: 'in_review', w: 15 },
+    { value: 'blocked', w: 5 },
+    { value: 'done', w: 15 },
+  ] as const;
+
+  const priorities = [
+    { value: TaskPriority.low, w: 10 },
+    { value: TaskPriority.medium, w: 45 },
+    { value: TaskPriority.high, w: 30 },
+    { value: TaskPriority.urgent, w: 15 },
+  ] as const;
+
+  const types = [
+    { value: TaskType.task, w: 45 },
+    { value: TaskType.story, w: 30 },
+    { value: TaskType.bug, w: 15 },
+    { value: TaskType.epic, w: 10 },
+  ] as const;
+
+  const templates = [
+    {
+      title: 'Chuẩn hóa API contract {area}',
+      desc: 'Định nghĩa schema, error code và versioning cho {area}.',
+    },
+    {
+      title: 'Tối ưu truy vấn DB cho {area}',
+      desc: 'Add index, giảm N+1 và benchmark p95 cho {area}.',
+    },
+    {
+      title: 'Viết integration test cho {area}',
+      desc: 'Bao phủ edge-cases, race conditions và regression cho {area}.',
+    },
+    {
+      title: 'Thiết kế UI flow {area}',
+      desc: 'Prototype + review UX, đảm bảo accessibility và empty state cho {area}.',
+    },
+    {
+      title: 'Hardening bảo mật {area}',
+      desc: 'Threat model, rate-limit và audit log cho {area}.',
+    },
+    {
+      title: 'Refactor module {area}',
+      desc: 'Tách layer, chuẩn hóa naming và giảm cyclomatic complexity cho {area}.',
+    },
+    {
+      title: 'Thiết lập observability {area}',
+      desc: 'Metrics, tracing và alert cho critical path {area}.',
+    },
+  ] as const;
+
+  const areasByProjectKey: Record<string, readonly string[]> = {
+    ECOM: ['checkout', 'catalog', 'inventory', 'pricing', 'promotion', 'shipment', 'refund'],
+    BANK: ['ledger', 'otp', 'fraud', 'settlement', 'reconciliation', 'kyc', 'notifications'],
+    HR: ['onboarding', 'attendance', 'leave', 'payroll', 'benefits', 'org-chart', 'reports'],
+    INFRA: ['ci-cd', 'autoscaling', 'logging', 'monitoring', 'queues', 'redis', 'security'],
+    AI: ['prompting', 'retrieval', 'evals', 'agent-runner', 'embeddings', 'safety'],
+    DATA: ['pipelines', 'warehouse', 'dbt', 'quality', 'catalog', 'lineage', 'dashboards'],
+    SUP: ['tickets', 'sla', 'kb', 'macros', 'routing', 'csat', 'ops'],
+    GROW: ['ab-test', 'funnel', 'onboarding', 'activation', 'retention', 'pricing', 'analytics'],
+  };
+
+  const tasksPerProject = clampInt(40 + SEED_SCALE * 30, 60, 240);
+  const all: TaskSeed[] = [];
+
+  for (const project of ALL_PROJECT_SPECS) {
+    const start = (maxByProject.get(project.id) ?? 0) + 1;
+    const areas = areasByProjectKey[project.key ?? ''] ?? ['core'];
+
+    for (let offset = 0; offset < tasksPerProject; offset += 1) {
+      const number = start + offset;
+      const id = `seed-task-${(project.key ?? project.id).toLowerCase()}-${number}`;
+      const tpl = rng.pick(templates);
+      const area = rng.pick(areas);
+      const status = weightedPick(rng, [...statuses]);
+      const priority = weightedPick(rng, [...priorities]);
+      const type = weightedPick(rng, [...types]);
+      const storyPoints = rng.pick([1, 2, 3, 5, 8, 13] as const);
+
+      const hasAssignee = rng.bool(0.88);
+      const dueShift = rng.int(-30, 45);
+      const due = new Date(SEED_NOW.getTime());
+      due.setUTCDate(due.getUTCDate() + dueShift);
+
+      all.push({
+        id,
+        projectId: project.id,
+        number,
+        title: tpl.title.replace('{area}', area),
+        description: tpl.desc.replace('{area}', area),
+        type,
+        priority,
+        status,
+        storyPoints,
+        assigneeEmail: hasAssignee ? rng.pick(ALL_USER_SPECS).email : null,
+        dueDate: rng.bool(0.85) ? toDateISO(due) : null,
+        position: `${number * 1000}`,
+      });
+
+      if (rng.bool(0.22)) {
+        const subCount = rng.int(1, 3);
+        for (let s = 0; s < subCount; s += 1) {
+          const subNumber = number * 1000 + (s + 1);
+          all.push({
+            id: `${id}-sub-${s + 1}`,
+            projectId: project.id,
+            number: subNumber,
+            title: `Subtask: ${tpl.title.replace('{area}', area)}`,
+            description: `Tách nhỏ để triển khai dần: ${tpl.desc.replace('{area}', area)}`,
+            type: TaskType.task,
+            priority: rng.pick([TaskPriority.low, TaskPriority.medium, TaskPriority.high] as const),
+            status: rng.pick(['todo', 'in_progress', 'in_review'] as const),
+            storyPoints: rng.pick([1, 2, 3, 5] as const),
+            assigneeEmail: rng.bool(0.75) ? rng.pick(ALL_USER_SPECS).email : null,
+            dueDate: rng.bool(0.7) ? toDateISO(due) : null,
+            position: `${number * 1000 + (s + 1) * 10}`,
+            parentTaskId: id,
+          });
+        }
+      }
+    }
+  }
+
+  return all;
+}
+
+const EXTRA_TASKS = buildExtraTasks();
+const ALL_TASKS = [...TASKS, ...EXTRA_TASKS];
+
 const LABELS = [
   { id: 'seed-label-backend', name: 'Backend', color: '#2563eb' },
   { id: 'seed-label-frontend', name: 'Frontend', color: '#db2777' },
@@ -512,6 +859,105 @@ const COMMENTS = [
     content: 'HPA policy cần theo dõi cả memory khi spike traffic ban đêm.',
   },
 ] as const;
+
+function buildExtraLabels() {
+  const base = [
+    { name: 'Observability', color: '#0ea5e9' },
+    { name: 'Performance', color: '#f97316' },
+    { name: 'Refactor', color: '#64748b' },
+    { name: 'Tech Debt', color: '#6b7280' },
+    { name: 'UX', color: '#db2777' },
+    { name: 'Accessibility', color: '#22c55e' },
+    { name: 'Reliability', color: '#dc2626' },
+    { name: 'Data', color: '#14b8a6' },
+    { name: 'AI', color: '#a855f7' },
+    { name: 'Incident', color: '#ef4444' },
+    { name: 'Experiment', color: '#f59e0b' },
+    { name: 'Release', color: '#2563eb' },
+  ] as const;
+
+  const count = clampInt(6 + SEED_SCALE * 4, 8, base.length);
+  return base.slice(0, count).map((l, idx) => ({
+    id: `seed-label-extra-${idx + 1}`,
+    name: l.name,
+    color: l.color,
+  }));
+}
+
+const EXTRA_LABELS = buildExtraLabels();
+const ALL_LABELS = [...LABELS, ...EXTRA_LABELS] as const;
+
+function buildExtraTaskLabels() {
+  const rng = makeRng('seed-extra-task-labels');
+  const taskLabelPairs: Array<[string, string]> = [];
+  const labelIds = ALL_LABELS.map((l) => l.id);
+  const maxPairs = clampInt(ALL_TASKS.length * 2, 200, 5000);
+
+  for (let i = 0; i < ALL_TASKS.length && taskLabelPairs.length < maxPairs; i += 1) {
+    const task = ALL_TASKS[i]!;
+    const count = rng.int(0, 3);
+    const picks = rng.sample(labelIds, count);
+    for (const labelId of picks) taskLabelPairs.push([task.id, labelId]);
+  }
+  return taskLabelPairs;
+}
+
+const EXTRA_TASK_LABELS = buildExtraTaskLabels();
+const ALL_TASK_LABELS = (() => {
+  const seen = new Set<string>();
+  const out: Array<readonly [string, string]> = [];
+  for (const [taskId, labelId] of [...TASK_LABELS, ...EXTRA_TASK_LABELS]) {
+    const key = `${taskId}::${labelId}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push([taskId, labelId] as const);
+  }
+  return out;
+})();
+
+function buildExtraComments() {
+  const rng = makeRng('seed-extra-comments');
+  const snippets = [
+    'Đã update theo feedback, nhờ review thêm.',
+    'Có risk edge-case; đề xuất thêm test regression.',
+    'Có thể optimize bằng index + cache; em sẽ benchmark.',
+    'Chỗ này cần clarify acceptance criteria trước khi merge.',
+    'Em gặp blocker phụ thuộc service khác, đang ping owner.',
+    'OK, em tách thành 2 PR cho dễ review.',
+    'Đã thêm metrics/tracing cho đường đi chính.',
+    'Cần confirm behavior khi retry/idempotency.',
+    'Em bổ sung docs + runbook để handoff.',
+  ] as const;
+
+  const comments: Array<{
+    id: string;
+    taskId: string;
+    authorEmail: string;
+    content: string;
+  }> = [];
+
+  const targetTasks = ALL_TASKS.filter(() => rng.bool(0.35));
+  const maxComments = clampInt(500 * SEED_SCALE, 600, 6000);
+
+  for (const task of targetTasks) {
+    const count = rng.int(0, 4);
+    for (let i = 0; i < count && comments.length < maxComments; i += 1) {
+      const authorEmail = rng.pick(ALL_USER_SPECS).email;
+      comments.push({
+        id: `seed-cmt-${task.id}-${i + 1}`,
+        taskId: task.id,
+        authorEmail,
+        content: rng.pick(snippets),
+      });
+    }
+    if (comments.length >= maxComments) break;
+  }
+
+  return comments;
+}
+
+const EXTRA_COMMENTS = buildExtraComments();
+const ALL_COMMENTS = [...COMMENTS, ...EXTRA_COMMENTS] as const;
 
 const availableTables = new Set<string>();
 
@@ -774,7 +1220,7 @@ async function main() {
   console.log(`  ✓ Permission/Role: ${permissionKeys.length}/${roleSpecs.length}`);
 
   const usersByEmail = new Map<string, { id: string; fullName: string }>();
-  for (const spec of USER_SPECS) {
+  for (const spec of ALL_USER_SPECS) {
     const user = await prisma.user.upsert({
       where: { email: spec.email },
       update: {
@@ -869,7 +1315,7 @@ async function main() {
   }
 
   if (hasTable('Label')) {
-    for (const label of LABELS) {
+    for (const label of ALL_LABELS) {
       await prisma.label.upsert({
         where: { id: label.id },
         update: { name: label.name, color: label.color },
@@ -878,7 +1324,7 @@ async function main() {
     }
   }
 
-  for (const spec of PROJECT_SPECS) {
+  for (const spec of ALL_PROJECT_SPECS) {
     const project = await prisma.project.upsert({
       where: { id: spec.id },
       update: {
@@ -931,9 +1377,9 @@ async function main() {
       }
     }
   }
-  console.log(`  ✓ Projects: ${PROJECT_SPECS.length}`);
+  console.log(`  ✓ Projects: ${ALL_PROJECT_SPECS.length}`);
 
-  for (const task of TASKS) {
+  for (const task of ALL_TASKS) {
     const assignee = task.assigneeEmail ? usersByEmail.get(task.assigneeEmail) : undefined;
     await prisma.task.upsert({
       where: { id: task.id },
@@ -998,7 +1444,7 @@ async function main() {
   }
 
   if (hasTable('TaskLabel')) {
-    for (const [taskId, labelId] of TASK_LABELS) {
+    for (const [taskId, labelId] of ALL_TASK_LABELS) {
       await prisma.taskLabel.create({ data: { taskId, labelId } });
     }
   }
@@ -1024,10 +1470,10 @@ async function main() {
       ],
     });
   }
-  console.log(`  ✓ Tasks: ${TASKS.length}`);
+  console.log(`  ✓ Tasks: ${ALL_TASKS.length}`);
 
   if (hasTable('Comment')) {
-    for (const comment of COMMENTS) {
+    for (const comment of ALL_COMMENTS) {
       const author = usersByEmail.get(comment.authorEmail);
       await prisma.comment.upsert({
         where: { id: comment.id },
@@ -1061,6 +1507,44 @@ async function main() {
       description: 'Kênh xử lý sự cố P1/P2',
       type: ChannelType.private,
     },
+    ...(SEED_SCALE >= 2
+      ? ([
+          {
+            id: 'seed-chan-product',
+            name: 'product',
+            description: 'Trao đổi roadmap, PRD và quyết định sản phẩm',
+            type: ChannelType.public,
+          },
+          {
+            id: 'seed-chan-design',
+            name: 'design-system',
+            description: 'UI kit, tokens và review accessibility',
+            type: ChannelType.public,
+          },
+          {
+            id: 'seed-chan-data',
+            name: 'data-platform',
+            description: 'Pipelines, quality và dashboard BI',
+            type: ChannelType.public,
+          },
+        ] as const)
+      : ([] as const)),
+    ...(SEED_SCALE >= 3
+      ? ([
+          {
+            id: 'seed-chan-ai',
+            name: 'ai-lab',
+            description: 'Evals, prompts và agent workflows',
+            type: ChannelType.public,
+          },
+          {
+            id: 'seed-chan-random',
+            name: 'random',
+            description: 'Chém gió, chia sẻ, và thảo luận tự do',
+            type: ChannelType.public,
+          },
+        ] as const)
+      : ([] as const)),
   ] as const;
 
   if (hasTable('Channel')) {
@@ -1080,18 +1564,16 @@ async function main() {
   }
 
   if (hasTable('ChannelMember')) {
-    for (const [email, user] of usersByEmail) {
-      await prisma.channelMember.upsert({
-        where: { channelId_userId: { channelId: 'seed-chan-general', userId: user.id } },
-        update: {},
-        create: { channelId: 'seed-chan-general', userId: user.id },
-      });
-
-      if (email !== 'vo.thi.mai@techviet.local') {
+    const rng = makeRng('seed-channel-members');
+    for (const [, user] of usersByEmail) {
+      for (const channel of channels) {
+        if (channel.type === ChannelType.private) {
+          if (!rng.bool(0.35)) continue;
+        }
         await prisma.channelMember.upsert({
-          where: { channelId_userId: { channelId: 'seed-chan-backend', userId: user.id } },
+          where: { channelId_userId: { channelId: channel.id, userId: user.id } },
           update: {},
-          create: { channelId: 'seed-chan-backend', userId: user.id },
+          create: { channelId: channel.id, userId: user.id },
         });
       }
     }
@@ -1136,6 +1618,69 @@ async function main() {
         content: 'Đã rõ, em cập nhật thêm runbook rollback trong hôm nay.',
       },
     });
+
+    const rng = makeRng('seed-auto-messages');
+    const authors = [...usersByEmail.values()].map((u) => u.id);
+    const messageSnippets = [
+      'Đã merge PR, nhờ mọi người pull về test nhanh.',
+      'Có ai rảnh review giúp phần edge-case này không?',
+      'Em vừa cập nhật dashboard latency p95, nhìn có spike lúc 2AM.',
+      'Đề xuất add index cho query này, hiện đang chậm ở staging.',
+      'Checklist release hôm nay: migrate + feature flag + rollback.',
+      'Có thể split task này thành 2 phần để giảm risk.',
+      'Note: cần đảm bảo idempotency cho endpoint callback.',
+      'Em đã viết thêm test và fix flaky case.',
+      'Cập nhật tiến độ: đang blocked do phụ thuộc service khác.',
+      'Nice, demo ổn rồi. Mai polish thêm UI.',
+    ] as const;
+
+    const basePerChannel = clampInt(40 + SEED_SCALE * 40, 80, 500);
+    const totalTarget = basePerChannel * channels.length;
+
+    const baseMessages: Array<{
+      id: string;
+      channelId: string;
+      authorId: string;
+      content: string;
+    }> = [];
+
+    for (let i = 0; i < totalTarget; i += 1) {
+      const channel = rng.pick(channels);
+      baseMessages.push({
+        id: `seed-msg-auto-${i + 1}`,
+        channelId: channel.id,
+        authorId: rng.pick(authors),
+        content: rng.pick(messageSnippets),
+      });
+    }
+
+    if (baseMessages.length > 0) {
+      await prisma.message.createMany({ data: baseMessages });
+    }
+
+    const replyCount = clampInt(Math.floor(baseMessages.length * 0.12), 20, 400);
+    const replies: Array<{
+      id: string;
+      channelId: string;
+      authorId: string;
+      parentId: string;
+      content: string;
+    }> = [];
+
+    for (let i = 0; i < replyCount; i += 1) {
+      const parent = rng.pick(baseMessages);
+      replies.push({
+        id: `seed-msg-reply-${i + 1}`,
+        channelId: parent.channelId,
+        authorId: rng.pick(authors),
+        parentId: parent.id,
+        content: rng.pick(messageSnippets),
+      });
+    }
+
+    if (replies.length > 0) {
+      await prisma.message.createMany({ data: replies });
+    }
   }
 
   if (hasTable('MessageReaction')) {
@@ -1146,6 +1691,21 @@ async function main() {
         { messageId: 'seed-msg-3', userId: bao.id, emoji: '👍' },
       ],
     });
+
+    const rng = makeRng('seed-auto-reactions');
+    const users = [...usersByEmail.values()].map((u) => u.id);
+    const emojis = ['👍', '✅', '🎉', '🔥', '👀', '💡', '🧪', '🚀'] as const;
+    const reactionCount = clampInt(200 * SEED_SCALE, 200, 4000);
+
+    const reactions: Array<{ messageId: string; userId: string; emoji: string }> = [];
+    for (let i = 0; i < reactionCount; i += 1) {
+      const messageId = rng.bool(0.8)
+        ? `seed-msg-auto-${rng.int(1, clampInt(40 + SEED_SCALE * 40, 80, 500) * channels.length)}`
+        : `seed-msg-reply-${rng.int(1, clampInt(Math.floor(clampInt(40 + SEED_SCALE * 40, 80, 500) * channels.length * 0.12), 20, 400))}`;
+      reactions.push({ messageId, userId: rng.pick(users), emoji: rng.pick(emojis) });
+    }
+
+    await prisma.messageReaction.createMany({ data: reactions, skipDuplicates: true });
   }
 
   if (hasTable('Doc')) {
@@ -1283,70 +1843,237 @@ async function main() {
         },
       },
     });
+
+    const rng = makeRng('seed-auto-docs');
+    const creators = [tuan.id, lan.id, duc.id, bao.id];
+
+    await prisma.doc.upsert({
+      where: { id: 'seed-doc-wiki' },
+      update: { title: 'TechViet Wiki' },
+      create: {
+        id: 'seed-doc-wiki',
+        workspaceId: workspace.id,
+        title: 'TechViet Wiki',
+        createdById: tuan.id,
+        lastEditedBy: tuan.id,
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', text: 'Tổng hợp tài liệu nội bộ theo team và dự án.' }],
+            },
+          ],
+        },
+      },
+    });
+
+    const sectionDocs = [
+      { id: 'seed-doc-sec-engineering', title: 'Engineering Handbook' },
+      { id: 'seed-doc-sec-product', title: 'Product Handbook' },
+      { id: 'seed-doc-sec-ops', title: 'Operations Handbook' },
+    ] as const;
+
+    for (const sec of sectionDocs) {
+      await prisma.doc.upsert({
+        where: { id: sec.id },
+        update: { title: sec.title, parentDocId: 'seed-doc-wiki' },
+        create: {
+          id: sec.id,
+          workspaceId: workspace.id,
+          title: sec.title,
+          parentDocId: 'seed-doc-wiki',
+          createdById: rng.pick(creators),
+          lastEditedBy: rng.pick(creators),
+          content: {
+            type: 'doc',
+            content: [
+              { type: 'paragraph', content: [{ type: 'text', text: `Section: ${sec.title}` }] },
+            ],
+          },
+        },
+      });
+    }
+
+    const docCountPerProject = clampInt(6 + SEED_SCALE * 6, 10, 60);
+    for (const project of ALL_PROJECT_SPECS) {
+      const folderId = `seed-doc-folder-${(project.key ?? project.id).toLowerCase()}`;
+      await prisma.doc.upsert({
+        where: { id: folderId },
+        update: { title: `Project: ${project.name}`, parentDocId: 'seed-doc-sec-engineering' },
+        create: {
+          id: folderId,
+          workspaceId: workspace.id,
+          title: `Project: ${project.name}`,
+          parentDocId: 'seed-doc-sec-engineering',
+          projectId: project.id,
+          createdById: rng.pick(creators),
+          lastEditedBy: rng.pick(creators),
+          content: {
+            type: 'doc',
+            content: [
+              {
+                type: 'paragraph',
+                content: [{ type: 'text', text: `Tài liệu dự án ${project.key ?? ''}` }],
+              },
+            ],
+          },
+        },
+      });
+
+      for (let i = 0; i < docCountPerProject; i += 1) {
+        const docId = `seed-doc-auto-${(project.key ?? project.id).toLowerCase()}-${i + 1}`;
+        const title = rng.pick([
+          'Decision log',
+          'Runbook',
+          'API contract',
+          'Architecture note',
+          'Release checklist',
+          'Onboarding guide',
+          'Testing strategy',
+          'Security notes',
+          'Observability guide',
+        ] as const);
+
+        await prisma.doc.upsert({
+          where: { id: docId },
+          update: { title: `${title} #${i + 1}`, projectId: project.id, parentDocId: folderId },
+          create: {
+            id: docId,
+            workspaceId: workspace.id,
+            title: `${title} #${i + 1}`,
+            projectId: project.id,
+            parentDocId: folderId,
+            createdById: rng.pick(creators),
+            lastEditedBy: rng.pick(creators),
+            content: {
+              type: 'doc',
+              content: [
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: `Doc: ${title}. Nội dung mẫu để demo search, link và AI summary.`,
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        });
+      }
+    }
   }
 
   if (hasTable('DocVersion')) {
-    await prisma.docVersion.createMany({
-      data: [
-        {
-          id: 'seed-docv-1',
-          docId: 'seed-doc-architecture',
-          content: { version: 1, note: 'Khởi tạo outline checkout architecture' },
-        },
-        {
-          id: 'seed-docv-2',
-          docId: 'seed-doc-slo',
-          content: { version: 1, note: 'Khởi tạo SLO baseline' },
-        },
-        {
-          id: 'seed-docv-3',
-          docId: 'seed-doc-banking-architecture',
-          content: { version: 1, note: 'Khởi tạo transaction lifecycle' },
-        },
-        {
-          id: 'seed-docv-4',
-          docId: 'seed-doc-hr-handbook',
-          content: { version: 1, note: 'Khởi tạo HR handbook' },
-        },
-        {
-          id: 'seed-docv-5',
-          docId: 'seed-doc-infra-runbook',
-          content: { version: 1, note: 'Khởi tạo incident runbook' },
-        },
-      ],
+    const rng = makeRng('seed-doc-versions');
+    const baseVersions = [
+      {
+        id: 'seed-docv-1',
+        docId: 'seed-doc-architecture',
+        content: { version: 1, note: 'Khởi tạo outline checkout architecture' },
+      },
+      {
+        id: 'seed-docv-2',
+        docId: 'seed-doc-slo',
+        content: { version: 1, note: 'Khởi tạo SLO baseline' },
+      },
+      {
+        id: 'seed-docv-3',
+        docId: 'seed-doc-banking-architecture',
+        content: { version: 1, note: 'Khởi tạo transaction lifecycle' },
+      },
+      {
+        id: 'seed-docv-4',
+        docId: 'seed-doc-hr-handbook',
+        content: { version: 1, note: 'Khởi tạo HR handbook' },
+      },
+      {
+        id: 'seed-docv-5',
+        docId: 'seed-doc-infra-runbook',
+        content: { version: 1, note: 'Khởi tạo incident runbook' },
+      },
+    ];
+
+    const extraDocIds = await prisma.doc.findMany({
+      where: { id: { startsWith: 'seed-doc-auto-' } },
+      select: { id: true },
     });
+
+    const extraVersions = extraDocIds.flatMap((doc, idx) => {
+      const count = rng.int(1, 3);
+      return Array.from({ length: count }).map((_, v) => ({
+        id: `seed-docv-auto-${idx + 1}-${v + 1}`,
+        docId: doc.id,
+        content: {
+          version: v + 1,
+          note: rng.pick(['Draft', 'Review update', 'Final pass'] as const),
+        },
+      }));
+    });
+
+    await prisma.docVersion.createMany({ data: [...baseVersions, ...extraVersions] });
   }
 
   if (hasTable('TaskDocLink')) {
-    await prisma.taskDocLink.createMany({
-      data: [
-        {
-          taskId: 'seed-task-ecom-2',
-          docId: 'seed-doc-architecture',
-          type: 'manual',
-          strength: 0.95,
-        },
-        { taskId: 'seed-task-infra-2', docId: 'seed-doc-slo', type: 'manual', strength: 0.9 },
-        {
-          taskId: 'seed-task-bank-1',
-          docId: 'seed-doc-banking-architecture',
-          type: 'manual',
-          strength: 0.9,
-        },
-        {
-          taskId: 'seed-task-hr-1',
-          docId: 'seed-doc-hr-handbook',
-          type: 'manual',
-          strength: 0.85,
-        },
-        {
-          taskId: 'seed-task-infra-3',
-          docId: 'seed-doc-infra-runbook',
-          type: 'manual',
-          strength: 0.92,
-        },
-      ],
+    const baseLinks = [
+      {
+        taskId: 'seed-task-ecom-2',
+        docId: 'seed-doc-architecture',
+        type: 'manual',
+        strength: 0.95,
+      },
+      { taskId: 'seed-task-infra-2', docId: 'seed-doc-slo', type: 'manual', strength: 0.9 },
+      {
+        taskId: 'seed-task-bank-1',
+        docId: 'seed-doc-banking-architecture',
+        type: 'manual',
+        strength: 0.9,
+      },
+      {
+        taskId: 'seed-task-hr-1',
+        docId: 'seed-doc-hr-handbook',
+        type: 'manual',
+        strength: 0.85,
+      },
+      {
+        taskId: 'seed-task-infra-3',
+        docId: 'seed-doc-infra-runbook',
+        type: 'manual',
+        strength: 0.92,
+      },
+    ];
+
+    const rng = makeRng('seed-auto-task-doc-links');
+    const autoDocs = await prisma.doc.findMany({
+      where: { id: { startsWith: 'seed-doc-auto-' } },
+      select: { id: true, projectId: true },
     });
+
+    const links: Array<{ taskId: string; docId: string; type: string; strength: number }> = [
+      ...baseLinks,
+    ];
+
+    const maxLinks = clampInt(600 * SEED_SCALE, 800, 8000);
+    for (const doc of autoDocs) {
+      if (!doc.projectId) continue;
+      const candidates = ALL_TASKS.filter((t) => t.projectId === doc.projectId);
+      if (candidates.length === 0) continue;
+      const count = rng.int(0, 3);
+      for (let i = 0; i < count && links.length < maxLinks; i += 1) {
+        const taskId = rng.pick(candidates).id;
+        links.push({
+          taskId,
+          docId: doc.id,
+          type: rng.pick(['manual', 'suggested'] as const),
+          strength: Number((0.5 + rng.int(0, 45) / 100).toFixed(2)),
+        });
+      }
+      if (links.length >= maxLinks) break;
+    }
+
+    await prisma.taskDocLink.createMany({ data: links, skipDuplicates: true });
   }
 
   if (hasTable('ProjectMemoir')) {
@@ -1612,7 +2339,7 @@ async function main() {
   }
 
   if (hasTable('ProjectEmbedding')) {
-    for (const project of PROJECT_SPECS) {
+    for (const project of ALL_PROJECT_SPECS) {
       await upsertEmbedding(
         'ProjectEmbedding',
         'projectId',
@@ -1623,7 +2350,7 @@ async function main() {
   }
 
   if (hasTable('TaskEmbedding')) {
-    for (const task of TASKS) {
+    for (const task of ALL_TASKS) {
       await upsertEmbedding(
         'TaskEmbedding',
         'taskId',
@@ -1634,54 +2361,24 @@ async function main() {
   }
 
   if (hasTable('DocEmbedding')) {
-    const docSeeds = [
-      {
-        id: 'seed-doc-architecture',
-        title: 'Kiến trúc checkout resilient',
-        content: 'Thiết kế retry + idempotency cho callback payment.',
-      },
-      {
-        id: 'seed-doc-slo',
-        title: 'SLO handbook',
-        content: 'Mục tiêu availability: 99.9% cho API thanh toán.',
-      },
-      {
-        id: 'seed-doc-banking-architecture',
-        title: 'Banking transaction lifecycle',
-        content: 'Chuỗi xử lý chuyển khoản: initiate verify settle reconcile.',
-      },
-      {
-        id: 'seed-doc-hr-handbook',
-        title: 'HR operations handbook',
-        content: 'Quy trình onboarding offboarding và duyệt nghỉ phép.',
-      },
-      {
-        id: 'seed-doc-infra-runbook',
-        title: 'Incident and rollout runbook',
-        content: 'Checklist rollback communication và incident handoff.',
-      },
-    ];
+    const docs = await prisma.doc.findMany({
+      where: { id: { startsWith: 'seed-doc-' } },
+      select: { id: true, title: true, content: true },
+    });
 
-    for (const doc of docSeeds) {
-      await upsertEmbedding('DocEmbedding', 'docId', doc.id, `${doc.title}\n${doc.content}`);
+    for (const doc of docs) {
+      const content = doc.content ? JSON.stringify(doc.content).slice(0, 2000) : '';
+      await upsertEmbedding('DocEmbedding', 'docId', doc.id, `${doc.title}\n${content}`);
     }
   }
 
   if (hasTable('SignalEmbedding')) {
-    const signalSeeds = [
-      {
-        id: 'seed-signal-1',
-        interpretation: 'Tín hiệu cảnh báo SLO degradation cần điều tra ngay.',
-        payload: { text: 'p95 latency vượt ngưỡng 900ms trong 10 phút' },
-      },
-      {
-        id: 'seed-signal-2',
-        interpretation: 'PR liên quan checkout resiliency đã được mở, nên ưu tiên review.',
-        payload: { pr: 142, title: 'feat: harden payment callback' },
-      },
-    ];
+    const signals = await prisma.signalLog.findMany({
+      where: { id: { startsWith: 'seed-signal-' } },
+      select: { id: true, interpretation: true, payload: true },
+    });
 
-    for (const signal of signalSeeds) {
+    for (const signal of signals) {
       await upsertEmbedding(
         'SignalEmbedding',
         'signalId',

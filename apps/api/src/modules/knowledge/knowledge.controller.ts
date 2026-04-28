@@ -8,7 +8,7 @@ import { AuthUserDTO } from '@superboard/shared';
 import { apiSuccess } from '../../common/api-response';
 import { requireWorkspace } from '../../common/helpers';
 
-@Controller('v1/knowledge')
+@Controller('knowledge')
 @UseGuards(JwtAuthGuard)
 export class KnowledgeController {
   constructor(

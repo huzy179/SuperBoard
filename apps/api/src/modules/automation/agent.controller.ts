@@ -3,7 +3,7 @@ import { NeuralAgentService } from './neural-agent.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { apiSuccess } from '../../common/api-response';
 
-@Controller('v1/automation/agents')
+@Controller('automation/agents')
 @UseGuards(JwtAuthGuard)
 export class AgentController {
   constructor(private neuralAgentService: NeuralAgentService) {}

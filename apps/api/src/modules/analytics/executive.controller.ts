@@ -3,7 +3,7 @@ import { ReportService } from './report.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { apiSuccess } from '../../common/api-response';
 
-@Controller('v1/executive')
+@Controller('executive')
 @UseGuards(JwtAuthGuard)
 export class ExecutiveController {
   constructor(private reportService: ReportService) {}

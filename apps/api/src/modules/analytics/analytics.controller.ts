@@ -9,7 +9,7 @@ import { ForecastService } from './forecast.service';
 import { SimulationService } from './simulation.service';
 import { BriefingService } from './briefing.service';
 
-@Controller('v1/projects')
+@Controller('projects')
 export class AnalyticsController {
   constructor(
     private chronologyService: ChronologyService,

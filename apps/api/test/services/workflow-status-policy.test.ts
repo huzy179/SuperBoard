@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import assert from 'node:assert/strict';
 import { BadRequestException } from '@nestjs/common';
 import { describe, it } from 'node:test';

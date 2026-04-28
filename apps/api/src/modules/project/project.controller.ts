@@ -46,7 +46,7 @@ import { TaskService } from '../task/task.service';
 import { ProjectEventsGateway } from '../project-events/project-events.gateway';
 import { CommentService } from '../task/comment.service';
 
-@Controller('v1/projects')
+@Controller('projects')
 export class ProjectController {
   constructor(
     private projectService: ProjectService,

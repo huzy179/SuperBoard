@@ -18,16 +18,8 @@
  *   4. Removes the corresponding entries from skills-lock.json.
  */
 
-import {
-  existsSync,
-  readFileSync,
-  writeFileSync,
-  rmSync,
-  readdirSync,
-  statSync,
-  lstatSync,
-  unlinkSync,
-} from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, rmSync, lstatSync, unlinkSync } from 'node:fs';
+/* global process, console, URL */
 import { join, resolve } from 'node:path';
 
 // Skills that were renamed, merged, or folded in v2.0 and v2.1.

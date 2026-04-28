@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigService as SharedConfigService } from '@superboard/backend-shared/config';
 import { envSchema, type AppEnv } from './env';
 
+import { z } from 'zod';
+
 export const API_SHARED_CONFIG = Symbol('API_SHARED_CONFIG');
 
 @Module({
@@ -10,7 +12,7 @@ export const API_SHARED_CONFIG = Symbol('API_SHARED_CONFIG');
       provide: API_SHARED_CONFIG,
       useFactory: () =>
         new SharedConfigService<AppEnv>({
-          schema: envSchema,
+          schema: envSchema as unknown as z.ZodSchema<AppEnv>,
           validateOnLoad: true,
         }),
     },

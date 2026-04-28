@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { Sparkles, Activity, Zap, ExternalLink, Globe } from 'lucide-react';
 import { useWorkspaces } from '@/features/system/workspace/hooks/use-workspaces';
 import Link from 'next/link';
@@ -64,110 +64,85 @@ export function SingularityPulse() {
   return (
     <>
       <div className="relative group cursor-help">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={state}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.2 }}
-            className="relative flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-xl hover:bg-white/10 transition-all border-b-2"
-            style={{
-              borderColor:
-                state === 'correcting'
-                  ? 'rgba(234, 179, 8, 0.4)'
-                  : state === 'analyzing'
-                    ? 'rgba(99, 102, 241, 0.4)'
-                    : 'rgba(255, 255, 255, 0.1)',
-            }}
-          >
-            <div className="relative h-2 w-2">
-              <motion.div
-                animate={{
-                  scale:
-                    state === 'observing'
-                      ? [1, 1.5, 1]
-                      : state === 'analyzing'
-                        ? [1, 2, 1]
-                        : [1, 3, 1],
-                }}
-                transition={{ duration: state === 'observing' ? 3 : 1, repeat: Infinity }}
-                className={`absolute inset-0 rounded-full blur-sm opacity-60 ${state === 'correcting' ? 'bg-yellow-400' : state === 'analyzing' ? 'bg-indigo-400' : 'bg-brand-500'}`}
-              />
-              <div
-                className={`h-2 w-2 rounded-full relative z-10 ${state === 'correcting' ? 'bg-yellow-500 shadow-glow-amber' : state === 'analyzing' ? 'bg-indigo-500 shadow-glow-brand' : 'bg-brand-500'}`}
-              />
-            </div>
-            <span className="text-[9px] font-black uppercase tracking-widest text-white/60">
-              Neural Singularity
-            </span>
-          </motion.div>
-        </AnimatePresence>
+        <div className="relative flex items-center gap-2 px-3 py-1.5 bg-black/[0.02] border border-surface-border rounded-full hover:bg-black/[0.04] transition-colors">
+          <div
+            className={`h-2 w-2 rounded-full ${
+              state === 'correcting'
+                ? 'bg-amber-500'
+                : state === 'analyzing'
+                  ? 'bg-brand-500'
+                  : 'bg-emerald-500'
+            }`}
+            aria-hidden
+          />
+          <span className="text-xs font-medium text-[color:var(--color-muted)]">
+            Automation pulse
+          </span>
+        </div>
 
-        <div className="absolute top-full right-0 mt-4 w-72 p-6 bg-slate-900/95 border border-white/10 rounded-xl shadow-2xl backdrop-blur-3xl opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all translate-y-2 group-hover:translate-y-0 z-50">
+        <div className="absolute top-full right-0 mt-3 w-72 p-5 bg-surface-card border border-surface-border rounded-xl shadow-glass opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50">
           <div className="space-y-6">
-            <div className="flex items-center justify-between border-b border-white/5 pb-4">
+            <div className="flex items-center justify-between border-b border-surface-border pb-4">
               <div className="flex items-center gap-2">
-                <Sparkles className="text-brand-400" size={12} />
-                <span className="text-[10px] font-black text-white uppercase tracking-widest">
-                  Active Pulse
+                <Sparkles className="text-brand-500" size={12} />
+                <span className="text-sm font-semibold text-[color:var(--color-ink)]">
+                  Automation
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[8px] font-bold text-emerald-400 uppercase">
-                  Synchronized
-                </span>
+                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span className="text-xs text-emerald-700">Active</span>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 bg-white/5 rounded-lg space-y-1">
-                <div className="flex items-center gap-1.5 opacity-40">
+              <div className="p-3 bg-black/[0.02] border border-surface-border rounded-lg space-y-1">
+                <div className="flex items-center gap-1.5 text-[color:var(--color-muted)]">
                   <Activity size={10} />
-                  <span className="text-[8px] font-black uppercase tracking-widest">
-                    Tactical Healing
-                  </span>
+                  <span className="text-xs">Healed</span>
                 </div>
-                <p className="text-sm font-black text-white">{stats.healed}</p>
+                <p className="text-base font-semibold text-[color:var(--color-ink)]">
+                  {stats.healed}
+                </p>
               </div>
-              <div className="p-3 bg-white/5 rounded-lg space-y-1">
-                <div className="flex items-center gap-1.5 opacity-40">
+              <div className="p-3 bg-black/[0.02] border border-surface-border rounded-lg space-y-1">
+                <div className="flex items-center gap-1.5 text-[color:var(--color-muted)]">
                   <Zap size={10} />
-                  <span className="text-[8px] font-black uppercase tracking-widest">
-                    Neural Nudges
-                  </span>
+                  <span className="text-xs">Nudged</span>
                 </div>
-                <p className="text-sm font-black text-white">{stats.nudged}</p>
+                <p className="text-base font-semibold text-[color:var(--color-ink)]">
+                  {stats.nudged}
+                </p>
               </div>
             </div>
             {hasProposals && (
               <Link
                 href="/automation/symbiosis"
-                className="flex items-center justify-between p-4 bg-brand-500/10 border border-brand-500/20 rounded-lg hover:bg-brand-500/20 transition-all group/link"
+                className="flex items-center justify-between p-4 bg-brand-50 border border-brand-500/20 rounded-lg hover:bg-brand-100 transition-colors group/link"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-brand-500/20 rounded-lg">
-                    <Globe size={14} className="text-brand-400" />
+                  <div className="p-2 bg-white rounded-lg border border-brand-500/15">
+                    <Globe size={14} className="text-brand-500" />
                   </div>
-                  <span className="text-[9px] font-black text-white uppercase tracking-widest">
-                    Strategic Proposal
+                  <span className="text-sm font-medium text-[color:var(--color-ink)]">
+                    View proposals
                   </span>
                 </div>
                 <ExternalLink
                   size={12}
-                  className="text-white/20 group-hover/link:text-brand-400 transition-colors"
+                  className="text-[color:var(--color-muted)] group-hover/link:text-brand-500 transition-colors"
                 />
               </Link>
             )}
 
             <button
               onClick={() => setShowVoid(true)}
-              className="w-full flex items-center justify-center gap-3 py-4 bg-white text-slate-900 rounded-lg text-[9px] font-black uppercase tracking-[0.2em] shadow-glow-white hover:scale-[1.02] transition-all"
+              className="w-full flex items-center justify-center gap-2 py-3 bg-black/[0.05] text-[color:var(--color-ink)] border border-surface-border rounded-lg text-sm font-medium hover:bg-black/[0.07] transition-colors"
             >
               <BrainCircuit size={14} /> Final Ascension
             </button>
 
-            <p className="text-[8px] font-bold text-white/20 uppercase text-center leading-relaxed">
-              Neural OS Protocol 55: The Living Singularity. Continuous ecosystem management active.
+            <p className="text-xs text-[color:var(--color-muted)] text-center leading-relaxed">
+              Automation runs periodically to keep the workspace healthy.
             </p>
           </div>
         </div>

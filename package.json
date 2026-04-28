@@ -33,7 +33,9 @@
     "db:studio": "npm --workspace @superboard/api run db:studio",
     "commit": "cz",
     "tech-debt:report": "tsx scripts/tech-debt-report.ts",
-    "tech-debt:report:dry": "tsx scripts/tech-debt-report.ts --dry-run"
+    "tech-debt:report:dry": "tsx scripts/tech-debt-report.ts --dry-run",
+    "ui:audit": "node scripts/fe-ui-audit.mjs",
+    "ui:lint": "node scripts/lint-ui-tokens.mjs"
   },
   "config": {
     "commitizen": {

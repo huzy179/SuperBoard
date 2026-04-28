@@ -145,41 +145,35 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-700">
+    <div className="space-y-10">
       {/* Strategic Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-brand-500/10 rounded-xl border border-brand-500/20 shadow-glow-brand/10">
-              <LayoutDashboard className="h-5 w-5 text-brand-400" />
+            <div className="p-2 bg-brand-50 rounded-lg border border-brand-500/15">
+              <LayoutDashboard className="h-5 w-5 text-brand-500" />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
-              Operational Sector
-            </span>
+            <span className="text-sm font-medium text-[color:var(--color-muted)]">Tổng quan</span>
           </div>
-          <h1 className="text-4xl font-black tracking-tight text-white uppercase leading-none">
-            Strategic <span className="text-brand-500">Command</span>
+          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-[color:var(--color-ink)] leading-tight">
+            Strategic <span className="text-brand-500">Dashboard</span>
           </h1>
         </div>
 
         <div className="flex items-center gap-4">
           <div className="flex flex-col items-end">
-            <span className="text-[9px] font-black uppercase tracking-widest text-white/20">
-              System Status
-            </span>
+            <span className="text-xs text-[color:var(--color-muted)]">System status</span>
             <div className="flex items-center gap-2">
-              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shadow-glow-emerald" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
-                Sync_Active
-              </span>
+              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <span className="text-xs font-medium text-emerald-700">Sync active</span>
             </div>
           </div>
-          <div className="h-10 w-px bg-white/10 hidden md:block" />
+          <div className="h-10 w-px bg-surface-border hidden md:block" />
           <button
             onClick={() => window.location.reload()}
-            className="p-3 bg-white/[0.03] border border-white/10 rounded-lg text-white/40 hover:text-white hover:border-white/20 hover:bg-white/[0.05] transition-all group"
+            className="p-3 bg-black/[0.02] border border-surface-border rounded-lg text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
           >
-            <RefreshCcw className="h-5 w-5 group-hover:rotate-180 transition-transform duration-700" />
+            <RefreshCcw className="h-5 w-5" />
           </button>
         </div>
       </div>
@@ -231,11 +225,11 @@ export default function DashboardPage() {
               return (
                 <div key="DISTRIBUTION" className="grid gap-8 lg:grid-cols-2">
                   <AdaptiveWidget order={module.order} focus={module.focus}>
-                    <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.01] p-8 backdrop-blur-3xl h-full">
+                    <div className="rounded-xl border border-surface-border bg-surface-card p-8 shadow-luxe h-full">
                       <div className="flex items-center gap-3 mb-8">
-                        <BrainCircuit className="h-4 w-4 text-brand-400" />
-                        <h2 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
-                          State Matrix Distribution
+                        <BrainCircuit className="h-4 w-4 text-brand-500" />
+                        <h2 className="text-sm font-semibold text-[color:var(--color-muted)]">
+                          Distribution
                         </h2>
                       </div>
                       <DonutDistributionChart
@@ -249,11 +243,11 @@ export default function DashboardPage() {
                     order={module.order + 1}
                     focus={module.id === 'EFFICIENCY' ? module.focus : false}
                   >
-                    <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.01] p-8 backdrop-blur-3xl h-full space-y-10">
+                    <div className="rounded-xl border border-surface-border bg-surface-card p-8 shadow-luxe h-full space-y-10">
                       <div className="flex items-center gap-3">
-                        <TrendingUp className="h-4 w-4 text-emerald-400" />
-                        <h2 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
-                          Objective Efficiency
+                        <TrendingUp className="h-4 w-4 text-emerald-600" />
+                        <h2 className="text-sm font-semibold text-[color:var(--color-muted)]">
+                          Efficiency
                         </h2>
                       </div>
                       <div className="space-y-8">

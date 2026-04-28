@@ -8,7 +8,8 @@
     "start": "next start -p 3000",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --test --import tsx 'src/lib/**/*.test.ts'"
+    "test": "node --test --import tsx 'src/lib/**/*.test.ts'",
+    "ui:audit": "node ../../scripts/fe-ui-audit.mjs src --out=../../docs/fe-ui-audit.md"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

@@ -121,16 +121,16 @@ export default function SettingsPage() {
   const canChangeRoles = currentMember?.role === 'owner' || currentMember?.role === 'admin';
 
   return (
-    <section className="animate-in fade-in duration-1000 pb-20">
+    <section className="pb-20">
       <div className="mb-12 flex items-center justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
-            <ShieldCheck size={16} className="text-brand-400" />
-            <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">
+            <ShieldCheck size={16} className="text-brand-500" />
+            <span className="text-sm font-medium text-[color:var(--color-muted)]">
               Thiết lập hệ thống
             </span>
           </div>
-          <h1 className="text-4xl font-black text-white uppercase tracking-tighter leading-none">
+          <h1 className="text-3xl md:text-4xl font-semibold text-[color:var(--color-ink)] tracking-tight leading-tight">
             Cài đặt
           </h1>
         </div>
@@ -138,9 +138,9 @@ export default function SettingsPage() {
         <button
           type="button"
           onClick={() => setIsCreateModalOpen(true)}
-          className="group relative flex items-center gap-3 bg-white/[0.03] border border-white/5 px-6 py-3 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-white hover:bg-white/5 hover:border-brand-500/30 transition-all shadow-luxe"
+          className="group relative inline-flex items-center gap-2 bg-brand-500 text-white border border-transparent px-4 py-2 rounded-button text-sm font-medium hover:bg-brand-600 transition-colors shadow-luxe"
         >
-          <div className="p-1 bg-white/5 rounded-lg group-hover:bg-brand-500 group-hover:text-slate-950 transition-colors">
+          <div className="p-1 bg-white/15 rounded-sm">
             <Plus size={14} />
           </div>
           Tạo workspace
@@ -148,7 +148,7 @@ export default function SettingsPage() {
       </div>
 
       <div className="mb-12 relative">
-        <div className="absolute inset-x-0 bottom-0 h-px bg-white/5" />
+        <div className="absolute inset-x-0 bottom-0 h-px bg-surface-border" />
         <nav className="flex space-x-12 relative z-10">
           {[
             { id: 'profile', label: 'Hồ sơ cá nhân', icon: <User size={14} /> },
@@ -163,18 +163,20 @@ export default function SettingsPage() {
               onClick={() =>
                 setActiveTab(tab.id as 'profile' | 'workspace' | 'notifications' | 'workflows')
               }
-              className={`relative flex items-center gap-3 pb-6 px-1 font-black text-[11px] uppercase tracking-[0.2em] transition-all group ${
-                activeTab === tab.id ? 'text-brand-400' : 'text-white/20 hover:text-white/60'
+              className={`relative flex items-center gap-3 pb-4 px-1 text-sm font-medium transition-colors ${
+                activeTab === tab.id
+                  ? 'text-[color:var(--color-ink)]'
+                  : 'text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)]'
               }`}
             >
               <div
-                className={`transition-all duration-500 ${activeTab === tab.id ? 'text-brand-500 animate-pulse' : 'text-white/10 group-hover:text-brand-400'}`}
+                className={`${activeTab === tab.id ? 'text-brand-500' : 'text-[color:var(--color-muted)]'}`}
               >
                 {tab.icon}
               </div>
               {tab.label}
               {activeTab === tab.id && (
-                <div className="absolute inset-x-0 bottom-0 h-1 bg-brand-500 rounded-full shadow-glow-brand animate-in slide-in-from-bottom-2" />
+                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-brand-500 rounded-full" />
               )}
             </button>
           ))}
@@ -184,15 +186,14 @@ export default function SettingsPage() {
       {/* Tab Content */}
       <div className="max-w-4xl space-y-12">
         {activeTab === 'profile' && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <section className="relative rounded-[3rem] border border-white/5 bg-slate-900/40 p-12 shadow-glass backdrop-blur-3xl overflow-hidden group">
-              <div className="absolute inset-0 bg-noise opacity-[0.02] pointer-events-none" />
-              <div className="relative z-10 space-y-12">
+          <div>
+            <section className="rounded-xl border border-surface-border bg-surface-card p-8 shadow-luxe">
+              <div className="space-y-10">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-brand-500/10 rounded-lg border border-brand-500/20 text-brand-400">
+                  <div className="p-3 bg-brand-50 rounded-lg border border-brand-500/15 text-brand-500">
                     <Target size={20} />
                   </div>
-                  <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
+                  <h2 className="text-2xl font-semibold text-[color:var(--color-ink)] tracking-tight">
                     Hồ sơ cá nhân
                   </h2>
                 </div>
@@ -207,20 +208,20 @@ export default function SettingsPage() {
                   className="grid gap-10 md:grid-cols-2"
                 >
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 pl-4">
+                    <label className="text-xs font-medium text-[color:var(--color-muted)] px-1">
                       Họ và tên
                     </label>
                     <input
                       type="text"
                       value={profileName}
                       onChange={(e) => setProfileName(e.target.value)}
-                      className="w-full bg-slate-950 border border-white/5 rounded-xl px-8 py-5 text-sm font-bold text-white placeholder:text-white/5 focus:outline-none focus:border-brand-500 transition-all shadow-inner"
+                      className="form-input-lg"
                       required
                     />
                   </div>
 
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 pl-4">
+                    <label className="text-xs font-medium text-[color:var(--color-muted)] px-1">
                       Email
                     </label>
                     <div className="relative">
@@ -228,11 +229,11 @@ export default function SettingsPage() {
                         type="email"
                         value={user?.email}
                         disabled
-                        className="w-full bg-slate-950 border border-white/5 rounded-xl px-8 py-5 text-sm font-bold text-white/20 cursor-not-allowed shadow-inner"
+                        className="form-input-lg opacity-60 cursor-not-allowed"
                       />
                       <Shield
                         size={14}
-                        className="absolute right-6 top-1/2 -translate-y-1/2 text-white/5"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[color:var(--color-faint)]"
                       />
                     </div>
                   </div>

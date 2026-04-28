@@ -6,7 +6,6 @@ build-backend = "setuptools.build_meta"
 name = "superboard-backend-shared"
 version = "0.1.0"
 description = "Shared backend infrastructure components for SuperBoard microservices"
-readme = "../README.md"
 license = {text = "MIT"}
 authors = [
     {name = "SuperBoard Team", email = "dev@superboard.com"}

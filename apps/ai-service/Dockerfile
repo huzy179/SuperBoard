@@ -8,6 +8,9 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
+# Copy local Python packages that are referenced in requirements.txt via relative paths
+COPY packages/backend-shared /packages/backend-shared
+
 # Copy requirements and install dependencies
 COPY apps/ai-service/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

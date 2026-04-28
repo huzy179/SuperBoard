@@ -48,8 +48,8 @@ services:
       - '5672:5672'
       - '15672:15672'
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-dev}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-devpassword}
       RABBITMQ_DEFAULT_VHOST: superboard
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
@@ -74,9 +74,13 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       DATABASE_URL: postgresql://dev:devpassword@postgres:5432/superboard
       REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-superboard}:${RABBITMQ_PASS:-password}@rabbitmq:5672/superboard
+      JWT_SECRET: superboard-secure-secret-2024
       PRISMA_CLIENT_ENGINE_TYPE: binary
       PRISMA_CLI_QUERY_ENGINE_TYPE: binary
     networks:

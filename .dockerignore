@@ -21,7 +21,7 @@ Makefile
 scripts
 docs
 worklog
-README.md
+/README.md
 CLAUDE.md
 test.md
 api-dev.log

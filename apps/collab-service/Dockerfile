@@ -16,7 +16,7 @@ WORKDIR /app
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/package-lock.json ./package-lock.json
 RUN npm install
-RUN npm install @prisma/client@7.5.0 esbuild
+RUN npm install @prisma/client@7.8.0 esbuild
 
 # Build the project
 COPY --from=builder /app/out/full/ .
@@ -29,7 +29,7 @@ RUN cat apps/api/prisma/schema.prisma
 ENV PRISMA_CLIENT_ENGINE_TYPE=binary
 ENV PRISMA_CLI_QUERY_ENGINE_TYPE=binary
 RUN npx prisma generate --schema apps/api/prisma/schema.prisma
-RUN npm run build --workspace=@superboard/collab-service
+RUN npx turbo run build --filter=@superboard/collab-service
 
 FROM node:20-alpine AS runner
 WORKDIR /app

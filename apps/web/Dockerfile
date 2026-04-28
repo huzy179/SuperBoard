@@ -25,7 +25,7 @@ ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build --workspace=@superboard/web
+RUN npx turbo run build --filter=@superboard/web
 
 FROM node:20-slim AS runner
 WORKDIR /app

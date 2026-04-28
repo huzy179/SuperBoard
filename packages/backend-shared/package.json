@@ -90,10 +90,10 @@
   "author": "SuperBoard Team",
   "license": "MIT",
   "dependencies": {
-    "@nestjs/common": "^10.0.0",
-    "@nestjs/core": "^10.0.0",
-    "@nestjs/platform-express": "^10.0.0",
-    "@nestjs/terminus": "^10.0.0",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/terminus": "^11.0.0",
     "amqplib": "^0.10.0",
     "ioredis": "^5.0.0",
     "js-yaml": "^4.1.0",
@@ -120,8 +120,8 @@
     "eslint": "^9.0.0"
   },
   "peerDependencies": {
-    "@nestjs/common": "^10.0.0",
-    "@nestjs/core": "^10.0.0"
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0"
   },
   "engines": {
     "node": ">=20.11.0",

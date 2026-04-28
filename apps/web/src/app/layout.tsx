@@ -1,46 +1,39 @@
 import type { ReactNode } from 'react';
 import './globals.css';
-import { Sora, Hanken_Grotesk } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import { Toaster } from 'sonner';
 
-const sora = Sora({
+const notionInter = Inter({
   subsets: ['latin', 'latin-ext'],
-  variable: '--font-sora',
-  display: 'swap',
-});
-
-const hanken = Hanken_Grotesk({
-  subsets: ['latin', 'latin-ext'],
-  variable: '--font-hanken',
+  variable: '--font-notion',
   display: 'swap',
 });
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="vi" className={`${sora.variable} ${hanken.variable}`}>
-      <body className="min-h-screen bg-surface-bg font-sans text-slate-200 antialiased selection:bg-brand-500/20 selection:text-white">
+    <html lang="vi" className={notionInter.variable}>
+      <body className="min-h-screen bg-surface-bg font-sans antialiased selection:bg-brand-500/15 selection:text-[color:var(--color-ink)]">
         {children}
         <Toaster
           position="top-center"
           expand={false}
           richColors
           closeButton
-          theme="dark"
+          theme="light"
           toastOptions={{
             style: {
-              background: 'oklch(0.16 0.01 260 / 0.8)',
-              backdropFilter: 'blur(16px)',
-              border: '1px solid oklch(1 0 0 / 0.05)',
-              borderRadius: '12px',
-              padding: '12px 20px',
-              boxShadow: 'var(--shadow-glass)',
-              fontSize: '11px',
-              fontWeight: '700',
-              textTransform: 'uppercase',
-              letterSpacing: '0.15em',
-              fontFamily: 'var(--font-sora)',
+              background: 'rgba(255,255,255,0.98)',
+              border: '1px solid rgba(0,0,0,0.10)',
+              borderRadius: '10px',
+              padding: '10px 14px',
+              boxShadow:
+                'rgba(0,0,0,0.04) 0px 4px 18px, rgba(0,0,0,0.027) 0px 2.025px 7.84688px, rgba(0,0,0,0.02) 0px 0.8px 2.925px, rgba(0,0,0,0.01) 0px 0.175px 1.04062px',
+              fontSize: '13px',
+              fontWeight: '600',
+              letterSpacing: '0',
+              fontFamily: 'var(--font-sans)',
             },
-            className: 'shadow-glass',
+            className: '',
           }}
         />
       </body>

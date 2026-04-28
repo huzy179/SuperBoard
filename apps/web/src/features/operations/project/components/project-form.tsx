@@ -180,13 +180,13 @@ export function ProjectForm({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-3 pt-6 border-t border-white/5">
+        <div className="flex items-center justify-end gap-3 pt-6 border-t border-surface-border">
           <AppButton variant="ghost" onClick={onCancel}>
             Hủy bỏ
           </AppButton>
           <AppButton
             type="submit"
-            variant="white"
+            variant="primary"
             isLoading={isPending}
             leftIcon={<Check size={14} />}
           >

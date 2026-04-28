@@ -2,9 +2,11 @@
 @import "./theme.css";
 
 :root {
-  color-scheme: dark;
-  --font-sans: var(--font-hanken), system-ui, sans-serif;
-  --font-display: var(--font-sora), system-ui, sans-serif;
+  color-scheme: light;
+  --font-sans: var(--font-notion), Inter, -apple-system, system-ui, Segoe UI, Helvetica, Arial,
+    Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, sans-serif;
+  --font-display: var(--font-notion), Inter, -apple-system, system-ui, Segoe UI, Helvetica, Arial,
+    Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -14,13 +16,73 @@
 
 body {
   font-family: var(--font-sans);
+  color: var(--color-ink, rgba(0, 0, 0, 0.95));
 }
 
-h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
-  font-family: var(--font-display);
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Optional dark mode (not default): add `class="dark"` on <html>. */
+html.dark {
+  color-scheme: dark;
+
+  --color-surface-bg: oklch(0.12 0.01 255);
+  --color-surface-card: oklch(0.16 0.01 255);
+  --color-surface-border: oklch(0.24 0.01 255);
+  --color-sidebar-bg: oklch(0.1 0.01 255);
+  --color-sidebar-hover: oklch(1 0 0 / 0.03);
+  --color-sidebar-active: oklch(1 0 0 / 0.05);
+}
+
+/* Keep a single readable UI voice by default (display font can be used per-component). */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-sans);
 }
 
 @layer components {
+  html.dark .form-label {
+    @apply text-white/60;
+  }
+
+  html.dark .form-input,
+  html.dark .form-input-lg,
+  html.dark .form-select,
+  html.dark .form-textarea {
+    @apply bg-white/[0.02] text-white placeholder:text-white/30 border-white/10 focus:border-brand-500/40;
+  }
+
+  html.dark .form-error {
+    @apply bg-rose-500/8 border-rose-500/20 text-rose-300;
+  }
+
+  html.dark .modal-overlay {
+    @apply bg-slate-950/70;
+  }
+
+  html.dark .modal-panel {
+    @apply border-white/10;
+  }
+
+  html.dark .modal-title {
+    @apply text-white;
+  }
+
+  html.dark .modal-subtitle {
+    @apply text-white/50;
+  }
 
 /* ============================================================
    SHARED FORM PRIMITIVES
@@ -29,44 +91,44 @@ h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
 
 /* Label chuẩn */
 .form-label {
-  @apply flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-[var(--space-2)];
+  @apply flex items-center gap-2 text-xs font-medium text-[color:var(--color-muted)] mb-[var(--space-2)];
 }
 
-/* Input / Select / Textarea chuẩn — Technical Dark */
+/* Input / Select / Textarea — Light (default) */
 .form-input {
-  @apply w-full rounded-xs border border-white/5 bg-white/[0.02] px-[var(--space-3)] py-[var(--space-2)]
-         text-sm font-medium text-white placeholder:text-white/20
-         focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.04]
-         transition-all;
+  @apply w-full rounded-sm border border-surface-border bg-surface-card px-[var(--space-3)] py-[var(--space-2)]
+         text-sm font-normal text-[color:var(--color-ink)] placeholder:text-[color:var(--color-faint)]
+         focus:outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-[color:var(--color-focus)]/20
+         transition-colors;
 }
 
 .form-input-lg {
-  @apply w-full rounded-sm border border-white/5 bg-white/[0.02] px-[var(--space-4)] py-[var(--space-3)]
-         text-base font-medium text-white placeholder:text-white/20
-         focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.04]
-         transition-all;
+  @apply w-full rounded-sm border border-surface-border bg-surface-card px-[var(--space-4)] py-[var(--space-3)]
+         text-base font-normal text-[color:var(--color-ink)] placeholder:text-[color:var(--color-faint)]
+         focus:outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-[color:var(--color-focus)]/20
+         transition-colors;
 }
 
 /* Select */
 .form-select {
-  @apply w-full rounded-xs border border-white/5 bg-white/[0.02] px-[var(--space-3)] py-[var(--space-2)]
-         text-sm font-medium text-white placeholder:text-white/20
-         focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.04]
-         transition-all appearance-none cursor-pointer;
+  @apply w-full rounded-sm border border-surface-border bg-surface-card px-[var(--space-3)] py-[var(--space-2)]
+         text-sm font-normal text-[color:var(--color-ink)]
+         focus:outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-[color:var(--color-focus)]/20
+         transition-colors appearance-none cursor-pointer;
 }
 
 /* Textarea */
 .form-textarea {
-  @apply w-full rounded-md border border-white/8 bg-white/[0.03] px-[var(--space-4)] py-[var(--space-3)]
-         text-sm font-medium text-white placeholder:text-white/20
-         focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.05]
-         transition-all shadow-inner resize-none leading-relaxed;
+  @apply w-full rounded-sm border border-surface-border bg-surface-card px-[var(--space-4)] py-[var(--space-3)]
+         text-sm font-normal text-[color:var(--color-ink)] placeholder:text-[color:var(--color-faint)]
+         focus:outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-[color:var(--color-focus)]/20
+         transition-colors resize-none leading-relaxed;
 }
 
 /* Error message chuẩn */
 .form-error {
-  @apply flex items-center gap-[var(--space-3)] rounded-sm bg-rose-500/8 border border-rose-500/20
-         px-[var(--space-4)] py-[var(--space-3)] text-[11px] font-bold text-rose-400;
+  @apply flex items-center gap-[var(--space-3)] rounded-sm bg-rose-50 border border-rose-200
+         px-[var(--space-4)] py-[var(--space-3)] text-xs font-medium text-rose-700;
 }
 
 /* ============================================================
@@ -76,32 +138,32 @@ h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
 
 .modal-overlay {
   @apply fixed inset-0 z-50 flex items-center justify-center
-         bg-slate-950/80 backdrop-blur-sm
+         bg-black/30 backdrop-blur-sm
          animate-fade-in;
 }
 
 .modal-panel {
-  @apply relative w-full rounded-lg border border-white/5
-         bg-surface-card shadow-glass
+  @apply relative w-full rounded-lg border border-surface-border
+         bg-surface-card shadow-luxe
          animate-slide-up overflow-hidden;
 }
 
 .modal-header {
-  @apply flex items-center justify-between px-[var(--space-6)] py-[var(--space-4)] border-b border-white/5;
+  @apply flex items-center justify-between px-[var(--space-6)] py-[var(--space-4)] border-b border-surface-border;
 }
 
 .modal-title {
-  @apply text-lg font-black text-white tracking-tight;
+  @apply text-lg font-semibold text-[color:var(--color-ink)] tracking-tight;
 }
 
 .modal-subtitle {
-  @apply text-xs text-white/30 font-medium mt-0.5;
+  @apply text-xs text-[color:var(--color-muted)] font-medium mt-0.5;
 }
 
 .modal-close-btn {
   @apply w-8 h-8 flex items-center justify-center rounded-sm
-         text-white/20 hover:text-white hover:bg-white/[0.06]
-         transition-all active:scale-90;
+         text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04]
+         transition-colors active:scale-95;
 }
 
 .modal-body {
@@ -118,37 +180,23 @@ h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
    ============================================================ */
 
 .btn {
-  @apply inline-flex items-center justify-center gap-[var(--space-2)] font-bold text-[10px]
-         uppercase tracking-[0.2em] transition-all duration-200
+  @apply inline-flex items-center justify-center gap-[var(--space-2)] font-medium text-sm
+         transition-colors duration-150
          active:scale-95 disabled:opacity-40 disabled:pointer-events-none
          rounded-button px-[var(--space-4)] py-[var(--space-2)];
 }
 
 .btn-primary {
-  @apply inline-flex items-center justify-center gap-[var(--space-2)] font-bold text-[10px]
-         uppercase tracking-[0.2em] transition-all duration-200
-         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
-         rounded-button px-[var(--space-4)] py-[var(--space-2)]
-         bg-brand-500 text-slate-950 hover:bg-brand-400
-         shadow-[0_2px_12px_oklch(0.68_0.13_160/0.2)];
+  @apply bg-brand-500 text-white hover:bg-brand-600;
 }
 
 .btn-secondary {
-  @apply inline-flex items-center justify-center gap-[var(--space-2)] font-bold text-[10px]
-         uppercase tracking-[0.2em] transition-all duration-200
-         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
-         rounded-button px-[var(--space-4)] py-[var(--space-2)]
-         bg-white/[0.04] text-white/70 border border-white/10
-         hover:bg-white/[0.08] hover:text-white hover:border-white/20;
+  @apply bg-black/[0.05] text-[color:var(--color-ink)] border border-surface-border
+         hover:bg-black/[0.07];
 }
 
 .btn-ghost {
-  @apply inline-flex items-center justify-center gap-[var(--space-2)] font-bold text-[10px]
-         uppercase tracking-[0.2em] transition-all duration-200
-         active:scale-95 disabled:opacity-40 disabled:pointer-events-none
-         rounded-button px-[var(--space-4)] py-[var(--space-2)]
-         bg-transparent text-white/40
-         hover:bg-white/[0.05] hover:text-white;
+  @apply bg-transparent text-[color:var(--color-ink)] hover:bg-black/[0.04];
 }
 
 /* Loading spinner dùng trong btn */
@@ -170,7 +218,7 @@ h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
 }
 
 .form-section-label {
-  @apply text-[9px] font-black text-white/20 uppercase tracking-[0.5em] whitespace-nowrap;
+  @apply text-xs font-medium text-white/40 whitespace-nowrap;
 }
 
 .glass-panel {
@@ -195,7 +243,7 @@ h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
 }
 
 .dark-glass-badge {
-  @apply bg-white/[0.04] border border-white/10 text-white/70 rounded-xs text-[9px] font-bold uppercase tracking-widest px-2 py-0.5;
+  @apply bg-white/[0.04] border border-white/10 text-white/70 rounded-sm text-xs font-medium px-2 py-0.5;
 }
 
 .dark-glass-chip {
@@ -211,11 +259,7 @@ h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
 }
 
 .mesh-bg {
-  background:
-    radial-gradient(at 0% 0%, oklch(0.95 0.02 260) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, oklch(0.95 0.05 180) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, oklch(0.95 0.02 240) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, oklch(0.95 0.04 160) 0px, transparent 50%);
+  background: none;
 }
 
 .grain-overlay {
@@ -228,7 +272,7 @@ h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
   inset: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.015; /* Even more subtle */
+  opacity: 0; /* Distilled: no grain */
   pointer-events: none;
   z-index: 1;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -239,7 +283,7 @@ h1, h2, h3, h4, h5, h6, .modal-title, .btn, .form-label {
 }
 
 body {
-  @apply bg-surface-bg text-slate-900 antialiased selection:bg-brand-500/20 selection:text-brand-900;
+  @apply bg-surface-bg text-slate-900 antialiased selection:bg-brand-500/20 selection:text-slate-900;
 }
 
 button,
@@ -249,11 +293,11 @@ select,
 input,
 textarea {
   transition:
-    background-color 300ms var(--ease-in-out),
-    border-color 300ms var(--ease-in-out),
-    color 300ms var(--ease-in-out),
-    box-shadow 400ms var(--ease-spring),
-    transform 400ms var(--ease-spring);
+    background-color 160ms var(--ease-in-out),
+    border-color 160ms var(--ease-in-out),
+    color 160ms var(--ease-in-out),
+    box-shadow 200ms var(--ease-in-out),
+    transform 200ms var(--ease-in-out);
 }
 
 /* Tabular nums for dashboard numbers */
@@ -371,19 +415,19 @@ textarea {
 
 /* Glow shadows */
 .shadow-glow-brand {
-  box-shadow: 0 0 12px oklch(0.68 0.13 160 / 0.3);
+  box-shadow: none;
 }
 .shadow-glow-slate {
-  box-shadow: 0 0 12px oklch(0.5 0.01 255 / 0.2);
+  box-shadow: none;
 }
 .shadow-glow-indigo {
-  box-shadow: 0 0 12px oklch(0.55 0.15 270 / 0.3);
+  box-shadow: none;
 }
 .shadow-glow-emerald {
-  box-shadow: 0 0 12px oklch(0.7 0.15 160 / 0.3);
+  box-shadow: none;
 }
 .shadow-glow-rose {
-  box-shadow: 0 0 12px oklch(0.65 0.2 10 / 0.3);
+  box-shadow: none;
 }
 
 /* Scrollbar utilities */
@@ -412,12 +456,12 @@ textarea {
 
 /* Text glow */
 .text-glow {
-  text-shadow: 0 0 20px oklch(0.68 0.13 160 / 0.4);
+  text-shadow: none;
 }
 
 /* Noise background */
 .bg-noise {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-image: none;
 }
 
 }

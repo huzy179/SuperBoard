@@ -57,30 +57,24 @@ function LoginContent() {
   };
 
   return (
-    <div className="w-full max-w-lg animate-in fade-in zoom-in-95 duration-700">
-      <div className="relative group overflow-hidden rounded-xl border border-white/10 bg-slate-950/40 p-10 shadow-inner backdrop-blur-3xl">
-        {/* Physical noise texture */}
-        <div className="absolute inset-0 opacity-[0.01] pointer-events-none bg-noise" />
-
-        {/* Rim Light */}
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-
-        <div className="relative z-10 flex flex-col items-center text-center">
-          <div className="mb-8 p-4 bg-slate-950 rounded-xl shadow-inner border border-white/10">
-            <AppBrand subtitle="Neural_Entry" variant="dark" />
+    <div className="w-full max-w-lg">
+      <div className="rounded-xl border border-surface-border bg-surface-card p-10 shadow-luxe">
+        <div className="flex flex-col items-center text-center">
+          <div className="mb-8">
+            <AppBrand subtitle="Workspace" variant="light" />
           </div>
 
-          <h1 className="text-3xl font-black tracking-tight text-white uppercase leading-tight mb-2 text-glow">
-            SuperBoard Terminal
+          <h1 className="text-3xl font-semibold tracking-tight text-[color:var(--color-ink)] leading-tight mb-2">
+            Đăng nhập
           </h1>
-          <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-10">
-            Secure_Access_Gateway_v4.2
+          <p className="text-sm text-[color:var(--color-muted)] mb-10">
+            Nhập email và mật khẩu để tiếp tục
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6 text-left">
             <FormField label="Identity Email" error={errors.email?.message} required>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[color:var(--color-faint)]">
                   <Mail size={16} />
                 </div>
                 <FormInput
@@ -96,7 +90,7 @@ function LoginContent() {
 
             <FormField label="Access Secret" error={errors.password?.message} required>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[color:var(--color-faint)]">
                   <Lock size={16} />
                 </div>
                 <FormInput
@@ -112,7 +106,7 @@ function LoginContent() {
 
             <AppButton
               type="submit"
-              variant="white"
+              variant="primary"
               size="xl"
               isLoading={isSubmitting}
               leftIcon={<ShieldCheck size={14} />}
@@ -123,11 +117,9 @@ function LoginContent() {
           </form>
 
           {errors.root && (
-            <div className="mt-6 flex items-center gap-3 text-rose-400 bg-rose-500/5 border border-rose-500/20 px-5 py-4 rounded-xl animate-in slide-in-from-top-2 duration-300 w-full shadow-glow-rose/5">
+            <div className="mt-6 flex items-center gap-3 text-rose-700 bg-rose-50 border border-rose-200 px-5 py-4 rounded-xl w-full">
               <ShieldCheck size={16} className="shrink-0" />
-              <span className="text-[10px] font-bold uppercase tracking-widest leading-relaxed">
-                {errors.root.message}
-              </span>
+              <span className="text-sm leading-relaxed">{errors.root.message}</span>
             </div>
           )}
         </div>

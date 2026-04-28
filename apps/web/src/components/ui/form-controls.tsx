@@ -15,14 +15,14 @@ export function FormField({ label, error, children, className = '', required }: 
   return (
     <div className={`space-y-2 ${className}`}>
       {label && (
-        <label className="text-[11px] font-black text-white/40 uppercase tracking-widest px-1 flex items-center gap-1">
+        <label className="text-xs font-medium text-[color:var(--color-muted)] px-1 flex items-center gap-1">
           {label}
           {required && <span className="text-rose-500">*</span>}
         </label>
       )}
       {children}
       {error && (
-        <p className="text-[11px] font-bold text-rose-400 px-1 animate-in fade-in slide-in-from-top-1">
+        <p className="text-xs font-medium text-rose-700 px-1 animate-in fade-in slide-in-from-top-1">
           {error}
         </p>
       )}

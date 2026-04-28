@@ -19,59 +19,38 @@ export function QuantumButton({
   ...props
 }: QuantumButtonProps) {
   const baseClasses =
-    'relative inline-flex items-center justify-center gap-2 rounded-md font-bold uppercase tracking-[0.2em] text-[10px] transition-all duration-300 overflow-hidden outline-none focus:ring-1 focus:ring-brand-500/50 border shadow-inner';
+    'inline-flex items-center justify-center gap-2 rounded-button text-sm font-medium transition-colors duration-150 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-focus)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg disabled:opacity-50 disabled:pointer-events-none';
 
   const variants = {
-    primary:
-      'bg-white text-slate-950 border-white hover:bg-brand-500 hover:text-white hover:border-brand-500 active:scale-95 transition-all',
+    primary: 'bg-brand-500 text-white hover:bg-brand-600 active:bg-brand-700',
     secondary:
-      'bg-white/[0.03] border-white/10 text-white/60 hover:bg-white/[0.08] hover:text-white hover:border-white/20 active:scale-95',
+      'bg-black/[0.05] text-[color:var(--color-ink)] border border-surface-border hover:bg-black/[0.07] active:bg-black/[0.09]',
     ghost:
-      'bg-transparent border-transparent text-white/30 hover:text-white hover:bg-white/5 active:scale-95',
+      'bg-transparent text-[color:var(--color-ink)] hover:bg-black/[0.04] active:bg-black/[0.06]',
     danger:
-      'bg-rose-500/10 border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white hover:border-rose-500 active:scale-95',
+      'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-600 hover:text-white hover:border-rose-600 active:bg-rose-700',
   };
 
   const sizes = {
-    sm: 'px-[var(--space-4)] py-[var(--space-2)]',
-    md: 'px-[var(--space-6)] py-[var(--space-3)]',
-    lg: 'px-[var(--space-10)] py-[var(--space-4)] text-[11px]',
-    icon: 'p-[var(--space-3)]',
+    sm: 'px-[var(--space-3)] py-[var(--space-2)] text-xs',
+    md: 'px-[var(--space-4)] py-[var(--space-2)]',
+    lg: 'px-[var(--space-6)] py-[var(--space-3)] text-base',
+    icon: 'h-9 w-9',
   };
 
   return (
     <motion.button
-      whileTap={{ scale: 0.96 }}
-      className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className} ${loading ? 'opacity-70 cursor-wait' : ''}`}
+      whileTap={{ scale: 0.98 }}
+      className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className} ${
+        loading ? 'cursor-wait' : ''
+      }`}
       disabled={loading || props.disabled}
       {...props}
     >
-      {/* Background Orbs (Micro-animations) */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <motion.div
-          animate={{
-            x: [0, 20, 0],
-            y: [0, -10, 0],
-            opacity: [0, 0.2, 0],
-          }}
-          transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
-          className="absolute -top-4 -left-4 w-12 h-12 bg-brand-500 rounded-full blur-xl"
-        />
-        <motion.div
-          animate={{
-            x: [0, -20, 0],
-            y: [0, 10, 0],
-            opacity: [0, 0.1, 0],
-          }}
-          transition={{ duration: 7, repeat: Infinity, ease: 'linear', delay: 1 }}
-          className="absolute -bottom-4 -right-4 w-16 h-16 bg-indigo-500 rounded-full blur-xl"
-        />
-      </div>
-
       {loading && (
-        <div className="h-4 w-4 border-2 border-slate-950/20 border-t-slate-950 rounded-full animate-spin shrink-0" />
+        <div className="h-4 w-4 border-2 border-current/25 border-t-current rounded-full animate-spin shrink-0" />
       )}
-      <span className="relative z-10 flex items-center gap-2">{children}</span>
+      <span className="flex items-center gap-2">{children}</span>
     </motion.button>
   );
 }

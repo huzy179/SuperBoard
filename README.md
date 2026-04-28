@@ -42,6 +42,9 @@ npm install
 # Khởi chạy hạ tầng (Database, Redis, MailHog)
 npm run dev:infra
 
+# (Tuỳ chọn) Chạy full stack bằng Docker (API/Web trong container)
+npm run dev:docker
+
 # Khởi tạo Database
 npm run db:migrate
 npm run db:seed

@@ -13,6 +13,7 @@
     "prepare": "husky",
     "dev": "turbo run dev --parallel",
     "dev:infra": "docker compose -f docker/compose/docker-compose.yml up -d",
+    "dev:docker": "docker compose -f docker/compose/docker-compose.yml --profile app up -d",
     "dev:infra:full": "docker compose -f docker/compose/docker-compose.yml --profile full up -d",
     "dev:infra:down": "docker compose -f docker/compose/docker-compose.yml down",
     "health:check": "node scripts/health-check.mjs",

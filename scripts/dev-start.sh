@@ -10,7 +10,8 @@ docker system prune -af --volumes > /dev/null 2>&1 || true
 
 # Step 2: Infrastructure setup
 echo "2️⃣  Starting infrastructure..."
-npm run dev:infra
+echo "   - Using Docker Compose (includes API/Web by default)"
+npm run dev:docker
 
 # Wait for services to be ready
 echo "⏳ Waiting for services to start (15s)..."

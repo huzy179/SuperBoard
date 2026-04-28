@@ -63,6 +63,7 @@ services:
 
   # ===== Application Services (Default) =====
   api:
+    profiles: [app]
     build:
       context: ../..
       dockerfile: apps/api/Dockerfile
@@ -89,6 +90,7 @@ services:
       - superboard
 
   web:
+    profiles: [app]
     build:
       context: ../..
       dockerfile: apps/web/Dockerfile
@@ -103,6 +105,7 @@ services:
       - superboard
 
   collab-service:
+    profiles: [app]
     build:
       context: ../..
       dockerfile: apps/collab-service/Dockerfile

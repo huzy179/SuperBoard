@@ -13,16 +13,22 @@ export class RabbitMQEventBusService implements OnModuleInit, OnModuleDestroy {
   private channel: amqplib.ConfirmChannel | null = null;
   private readonly maxRetries: number;
   private readonly backoffBaseMs: number;
+  private readonly enabled: boolean;
 
   constructor(
     private readonly configService: ConfigService,
     private readonly metricsService: RabbitMQMetricsService,
   ) {
+    this.enabled = this.configService.get('ENABLE_RABBITMQ_EVENT_BUS') === 'true';
     this.maxRetries = this.configService.get<number>('RABBITMQ_PUBLISH_MAX_RETRIES') ?? 3;
     this.backoffBaseMs = this.configService.get<number>('RABBITMQ_PUBLISH_BACKOFF_BASE_MS') ?? 1000;
   }
 
   async onModuleInit(): Promise<void> {
+    if (!this.enabled) {
+      this.logger.warn('RabbitMQEventBusService is disabled (ENABLE_RABBITMQ_EVENT_BUS!=true)');
+      return;
+    }
     await this.connect();
     await this.declareTopology();
   }
@@ -40,7 +46,11 @@ export class RabbitMQEventBusService implements OnModuleInit, OnModuleDestroy {
    * Establish AMQP connection and create confirm channel
    */
   private async connect(): Promise<void> {
-    const rabbitmqUrl = this.configService.getOrThrow<string>('RABBITMQ_URL');
+    const rabbitmqUrl = this.configService.get<string>('RABBITMQ_URL');
+    if (!rabbitmqUrl) {
+      this.logger.warn('RabbitMQEventBusService missing RABBITMQ_URL; skipping connect');
+      return;
+    }
 
     try {
       this.connection = await amqplib.connect(rabbitmqUrl);
@@ -91,6 +101,7 @@ export class RabbitMQEventBusService implements OnModuleInit, OnModuleDestroy {
    * Declare exchanges idempotently (assertExchange is idempotent by AMQP spec)
    */
   private async declareTopology(): Promise<void> {
+    if (!this.enabled) return;
     if (!this.channel) {
       throw new Error('Channel not available for topology declaration');
     }

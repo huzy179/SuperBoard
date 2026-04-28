@@ -28,6 +28,7 @@ import { AutomationModule } from './modules/automation/automation.module';
 import { KnowledgeModule } from './modules/knowledge/knowledge.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { DebugModule } from './modules/debug/debug.module';
 
 import { CommonModule } from './common/common.module';
 import { WorkerModule } from './common/worker.module';
@@ -66,6 +67,7 @@ import { EventBusModule } from './common/event-bus/event-bus.module';
     AutomationModule,
     KnowledgeModule,
     AnalyticsModule,
+    DebugModule,
   ],
   controllers: [],
   providers: [

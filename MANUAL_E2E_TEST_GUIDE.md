@@ -81,6 +81,16 @@ Ghi chú: nếu chưa có user/credential để login, chạy seed/reset DB:
 
 ## 3) Auth / Session
 
+### Troubleshooting: `POST /api/v1/auth/login` trả về `404 Cannot POST /api/v1/auth/login`
+
+Nếu API log ra `Cannot POST /api/v1/auth/login` thì nghĩa là backend **không thấy route** (không phải sai email/password).
+
+- [ ] Bật debug routes rồi restart API:
+  - [ ] `ENABLE_DEBUG_ROUTES=true npm --workspace @superboard/api run dev`
+- [ ] Kiểm tra route có được register không:
+  - [ ] `curl -s \"http://localhost:4000/api/v1/_debug/routes?q=auth\" | jq`
+  - [ ] Bạn phải thấy `POST /api/v1/auth/login` trong danh sách.
+
 ### Login form validation
 
 - [ ] Email trống → báo lỗi bắt buộc

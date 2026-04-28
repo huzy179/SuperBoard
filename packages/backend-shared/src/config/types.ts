@@ -25,7 +25,11 @@ import type {
 } from '../types';
 
 export interface ConfigOptions<T> {
-  schema: z.ZodSchema<T>;
+  /**
+   * Accept schemas that coerce/transform input (e.g. string -> number).
+   * ZodSchema<T> is too strict because it requires input and output types to match.
+   */
+  schema: z.ZodType<T, z.ZodTypeDef, unknown>;
   envOverrides?: Partial<T>;
   envPrefix?: string;
   validateOnLoad?: boolean;

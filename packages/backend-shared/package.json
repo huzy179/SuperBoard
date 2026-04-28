@@ -55,6 +55,11 @@
       "import": "./dist/testing/index.js",
       "require": "./dist/testing/index.js",
       "types": "./src/testing/index.ts"
+    },
+    "./types": {
+      "import": "./dist/types/index.js",
+      "require": "./dist/types/index.js",
+      "types": "./src/types/index.ts"
     }
   },
   "files": [

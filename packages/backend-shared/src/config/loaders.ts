@@ -91,7 +91,9 @@ export class ConfigFileLoader {
    * Load configuration from files with environment-specific overrides
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async loadConfig<T = any>(schema?: z.ZodSchema<T>): Promise<ConfigLoadResult<T>> {
+  async loadConfig<T = any>(
+    schema?: z.ZodType<T, z.ZodTypeDef, unknown>,
+  ): Promise<ConfigLoadResult<Partial<T>>> {
     const sources: ConfigFileInfo[] = [];
     const errors: ConfigLoadError[] = [];
     let config: Record<string, unknown> = {};
@@ -156,7 +158,7 @@ export class ConfigFileLoader {
     }
 
     return {
-      config: config as unknown as T,
+      config: config as unknown as Partial<T>,
       sources,
       errors,
     };
@@ -434,9 +436,9 @@ export class ConfigFileLoader {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function loadConfig<T = any>(
-  schema?: z.ZodSchema<T>,
+  schema?: z.ZodType<T, z.ZodTypeDef, unknown>,
   options?: ConfigLoaderOptions,
-): Promise<ConfigLoadResult<T>> {
+): Promise<ConfigLoadResult<Partial<T>>> {
   const loader = new ConfigFileLoader(options);
   return loader.loadConfig(schema);
 }
@@ -447,9 +449,9 @@ export async function loadConfig<T = any>(
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function loadEnvironmentConfig<T = any>(
   environment: Environment,
-  schema?: z.ZodSchema<T>,
+  schema?: z.ZodType<T, z.ZodTypeDef, unknown>,
   configDir?: string,
-): Promise<ConfigLoadResult<T>> {
+): Promise<ConfigLoadResult<Partial<T>>> {
   return loadConfig(schema, {
     environment,
     configDir,
@@ -464,7 +466,7 @@ export async function loadEnvironmentConfig<T = any>(
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function loadConfigFromFile<T = any>(
   filePath: string,
-  schema?: z.ZodSchema<T>,
+  schema?: z.ZodType<T, z.ZodTypeDef, unknown>,
 ): Promise<T> {
   const loader = new ConfigFileLoader();
   const format = path.extname(filePath).slice(1) as ConfigFileFormat;

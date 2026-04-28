@@ -44,7 +44,7 @@ export interface DependencyConfig {
   name: string;
   type: 'database' | 'redis' | 'rabbitmq' | 'grpc' | 'http';
   config: unknown;
-  timeout?: number;
+  timeout: number;
 }
 
 export interface HealthResult {

@@ -25,6 +25,8 @@ export class ApiGlobalExceptionFilter extends GlobalExceptionFilter {
   }
 
   protected override onException(ctx: GlobalExceptionContext): void {
+    const isNotFound = ctx.status === 404 && ctx.error?.name === 'NotFoundException';
+
     // Only log + diagnose server errors
     if (ctx.status >= 500) {
       logger.error(
@@ -45,7 +47,21 @@ export class ApiGlobalExceptionFilter extends GlobalExceptionFilter {
         workspaceId: String(ctx.request.headers['x-workspace-id'] || 'system'),
       });
     } else {
-      logger.warn({ status: ctx.status, message: ctx.error.message }, 'Client request error');
+      logger.warn(
+        {
+          status: ctx.status,
+          message: ctx.error.message,
+          ...(isNotFound
+            ? {
+                hint:
+                  process.env.ENABLE_DEBUG_ROUTES === 'true'
+                    ? 'Check registered routes at GET /api/v1/_debug/routes'
+                    : 'Set ENABLE_DEBUG_ROUTES=true and check GET /api/v1/_debug/routes',
+              }
+            : {}),
+        },
+        'Client request error',
+      );
     }
   }
 

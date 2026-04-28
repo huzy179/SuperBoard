@@ -81,6 +81,8 @@ services:
       REDIS_URL: redis://redis:6379
       RABBITMQ_URL: amqp://${RABBITMQ_USER:-superboard}:${RABBITMQ_PASS:-password}@rabbitmq:5672/superboard
       JWT_SECRET: superboard-secure-secret-2024
+      # Dev-only helper endpoint: GET /api/v1/_debug/routes
+      ENABLE_DEBUG_ROUTES: 'true'
       PRISMA_CLIENT_ENGINE_TYPE: binary
       PRISMA_CLI_QUERY_ENGINE_TYPE: binary
     networks:

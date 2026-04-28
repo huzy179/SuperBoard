@@ -42,7 +42,7 @@ import { ConfigFileLoader, ConfigLoaderOptions } from './loaders';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class ConfigService<T = any> {
   private config: T;
-  private schema: z.ZodSchema<T>;
+  private schema: z.ZodType<T, z.ZodTypeDef, unknown>;
 
   constructor(options: ConfigOptions<T>) {
     this.schema = options.schema;
@@ -95,7 +95,7 @@ export class ConfigService<T = any> {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static async loadFromFiles<T = any>(
-    schema: z.ZodSchema<T>,
+    schema: z.ZodType<T, z.ZodTypeDef, unknown>,
     options?: ConfigLoaderOptions,
   ): Promise<ConfigService<T>> {
     const loader = new ConfigFileLoader(options);

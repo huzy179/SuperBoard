@@ -38,28 +38,28 @@ monitoring-down: ## Stop Promenade + Grafana
 # ─── Database ──────────────────────────────────────────────
 
 db-generate: ## Regenerate Prisma client after schema changes
-	npm run db:generate
+	npm --workspace @superboard/api run db:generate
 
 db-status: ## Show migration status (pending/applied)
-	npm run db:status
+	npm --workspace @superboard/api run db:status
 
 db-migrate: ## Create + apply migration (interactive, dev only)
-	npm run db:migrate
+	npm --workspace @superboard/api run db:migrate
 
 db-deploy: ## Apply pending migrations (non-interactive, CI/prod)
-	npm run db:deploy
+	npm --workspace @superboard/api run db:deploy
 
 db-seed: ## Seed development data
-	npm run db:seed
+	npm --workspace @superboard/api run db:seed
 
 db-fresh: ## Reset DB + apply all migrations + seed (one command)
-	npm run db:fresh
+	npm --workspace @superboard/api run db:fresh
 
 db-reset: ## Reset via prisma migrate reset + seed
-	npm run db:reset
+	npm --workspace @superboard/api run db:fresh
 
 db-studio: ## Open Prisma Studio (DB browser)
-	npm run db:studio
+	npm --workspace @superboard/api run db:studio
 
 # ─── Quality ───────────────────────────────────────────────
 

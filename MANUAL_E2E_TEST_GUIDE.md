@@ -31,7 +31,7 @@ Seed sẽ tạo sẵn 1 workspace + nhiều project/task/chat/docs để bạn t
 ### Lệnh seed (khuyến nghị)
 
 - Reset DB + migrate + seed: `npm --workspace @superboard/api run db:fresh`
-- Chỉ seed (nếu DB đã migrate): `npm run db:seed`
+- Chỉ seed (nếu DB đã migrate): `npm --workspace @superboard/api run db:seed`
 
 ### Credential đăng nhập (seed)
 
@@ -54,7 +54,7 @@ Mặc định API dùng file `apps/api/.env.local` (hoặc fallback `apps/api/.e
 Seed support biến môi trường:
 
 - `SEED_SCALE` (mặc định `3`) → tăng số lượng users/projects/tasks/comments/messages/docs
-- Ví dụ: `SEED_SCALE=5 npm run db:seed`
+- Ví dụ: `SEED_SCALE=5 npm --workspace @superboard/api run db:seed`
 
 ### Health-check
 
@@ -75,7 +75,7 @@ Seed support biến môi trường:
 
 Ghi chú: nếu chưa có user/credential để login, chạy seed/reset DB:
 
-- [ ] `npm run db:fresh` (hoặc `npm run db:seed` tùy môi trường)
+- [ ] `npm --workspace @superboard/api run db:fresh` (hoặc `npm --workspace @superboard/api run db:seed` tùy môi trường)
 
 ---
 

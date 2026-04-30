@@ -46,8 +46,8 @@ npm run dev:infra
 npm run dev:docker
 
 # Khởi tạo Database
-npm run db:migrate
-npm run db:seed
+npm --workspace @superboard/api run db:migrate
+npm --workspace @superboard/api run db:seed
 
 # Chạy toàn bộ ứng dụng (API, Web, AI Services)
 npm run dev

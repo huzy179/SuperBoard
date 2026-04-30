@@ -24,19 +24,9 @@
     "typecheck": "turbo run typecheck",
     "test": "npm --ws --if-present run test",
     "format": "prettier --write .",
-    "db:generate": "npm --workspace @superboard/api run db:generate",
-    "db:migrate": "npm --workspace @superboard/api run db:migrate",
-    "db:deploy": "npm --workspace @superboard/api run db:deploy",
-    "db:seed": "npm --workspace @superboard/api run db:seed",
-    "db:status": "npm --workspace @superboard/api run db:status",
-    "db:fresh": "npm --workspace @superboard/api run db:fresh",
-    "db:reset": "node scripts/db-reset.mjs",
-    "db:studio": "npm --workspace @superboard/api run db:studio",
     "commit": "cz",
-    "tech-debt:report": "tsx scripts/tech-debt-report.ts",
-    "tech-debt:report:dry": "tsx scripts/tech-debt-report.ts --dry-run",
-    "ui:audit": "node scripts/fe-ui-audit.mjs",
-    "ui:lint": "node scripts/lint-ui-tokens.mjs"
+    "tech-debt": "tsx scripts/tech-debt-report.ts",
+    "ui": "node scripts/ui.mjs"
   },
   "config": {
     "commitizen": {

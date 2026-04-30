@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { History, ChevronRight, ChevronLeft, Layers, Brain } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, History } from 'lucide-react';
 import { getProjectChronology } from '../api/project-service';
 
 interface TimelinePulse {
@@ -35,256 +34,155 @@ export function MissionTimeline({ projectId }: { projectId: string }) {
   }, [projectId]);
 
   const scroll = (direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 400;
-      scrollContainerRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      });
-    }
+    const node = scrollContainerRef.current;
+    if (!node) return;
+    node.scrollBy({
+      left: direction === 'left' ? -360 : 360,
+      behavior: 'smooth',
+    });
   };
 
   if (isLoading) return <TimelineSkeleton />;
   if (pulses.length === 0) return null;
 
   return (
-    <div className="space-y-12 py-16 relative overflow-hidden">
-      {/* Background Atmospheric Pulse */}
-      <div className="absolute inset-0 bg-brand-500/[0.01] pointer-events-none" />
-
-      <div className="flex items-center justify-between px-8 relative z-10">
-        <div className="flex items-center gap-6">
-          <div className="w-14 h-14 flex items-center justify-center bg-brand-500/5 rounded-[1.5rem] border border-brand-500/10 shadow-glow-brand/5 group">
-            <History className="h-6 w-6 text-brand-400 group-hover:scale-110 transition-transform" />
+    <section className="rounded-lg border border-surface-border bg-surface-card shadow-luxe p-[var(--space-6)]">
+      <header className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="h-9 w-9 rounded-lg bg-brand-50 border border-brand-500/15 flex items-center justify-center text-brand-500 shrink-0">
+            <History size={18} />
           </div>
-          <div className="space-y-1">
-            <h2 className="text-[11px] font-black uppercase tracking-[0.6em] text-white/10 italic">
-              MISSION_CHRONOLOGY
-            </h2>
-            <p className="text-2xl font-black text-white uppercase tracking-tighter italic">
-              TEMPORAL PULSE TRACK{' '}
-              <span className="text-brand-500/40 font-mono text-sm ml-2">V7.4</span>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-[color:var(--color-ink)] truncate">Timeline</p>
+            <p className="text-xs text-[color:var(--color-muted)] truncate">
+              Nhật ký hoạt động gần đây theo ngày
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => scroll('left')}
-            className="w-12 h-12 flex items-center justify-center bg-white/[0.01] border border-white/5 rounded-lg hover:bg-white/5 hover:border-white/10 transition-all active:scale-95 shadow-inner group"
+            className="h-9 w-9 rounded-sm border border-surface-border bg-surface-bg text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)] transition-colors"
+            aria-label="Scroll left"
           >
-            <ChevronLeft size={20} className="text-white/20 group-hover:text-white" />
+            <ChevronLeft size={16} className="mx-auto" />
           </button>
           <button
+            type="button"
             onClick={() => scroll('right')}
-            className="w-12 h-12 flex items-center justify-center bg-white/[0.01] border border-white/5 rounded-lg hover:bg-white/5 hover:border-white/10 transition-all active:scale-95 shadow-inner group"
+            className="h-9 w-9 rounded-sm border border-surface-border bg-surface-bg text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)] transition-colors"
+            aria-label="Scroll right"
           >
-            <ChevronRight size={20} className="text-white/20 group-hover:text-white" />
+            <ChevronRight size={16} className="mx-auto" />
           </button>
         </div>
-      </div>
+      </header>
 
-      <div className="relative">
-        {/* The Track with Gradient Masks */}
-        <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-slate-950 to-transparent z-20 pointer-events-none" />
-        <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-slate-950 to-transparent z-20 pointer-events-none" />
-
-        <div
-          ref={scrollContainerRef}
-          className="flex gap-20 overflow-x-auto pb-20 pt-12 px-32 elite-scrollbar"
-        >
-          {pulses.map((pulse, i) => (
-            <TimelineNode
-              key={pulse.id}
-              pulse={pulse}
-              isSelected={selectedPulse?.id === pulse.id}
-              onClick={() => setSelectedPulse(pulse)}
-              isLast={i === pulses.length - 1}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Selected Pulse Detail - Neural Manifest */}
-      <AnimatePresence mode="wait">
-        {selectedPulse && (
-          <motion.div
-            key={selectedPulse.id}
-            initial={{ opacity: 0, scale: 0.98, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: 20 }}
-            transition={{ type: 'spring', damping: 20, stiffness: 100 }}
-            className="mx-8 p-12 rounded-[4rem] border border-white/5 bg-white/[0.01] backdrop-blur-[40px] shadow-luxe grid grid-cols-1 lg:grid-cols-3 gap-16 relative overflow-hidden group"
+      <div
+        ref={scrollContainerRef}
+        className="mt-5 flex gap-4 overflow-x-auto pb-2 elite-scrollbar"
+      >
+        {pulses.map((pulse, index) => (
+          <button
+            key={pulse.id}
+            type="button"
+            onClick={() => setSelectedPulse(pulse)}
+            className={`shrink-0 text-left rounded-lg border px-4 py-3 transition-colors ${
+              selectedPulse?.id === pulse.id
+                ? 'bg-brand-50 border-brand-500/25'
+                : 'bg-surface-bg border-surface-border hover:bg-black/[0.03]'
+            }`}
+            aria-label={`Select ${pulse.date}`}
           >
-            {/* Internal Rim Light */}
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/20 to-transparent" />
-
-            <div className="lg:col-span-2 space-y-10">
-              <div className="flex items-center gap-6">
-                <div className="px-6 py-2 bg-brand-500/10 border border-brand-500/20 rounded-full shadow-inner">
-                  <span className="text-[11px] font-black text-brand-400 uppercase tracking-[0.3em]">
-                    STAMP_{selectedPulse.date.toUpperCase()}
-                  </span>
-                </div>
-                <div className="h-px flex-1 bg-white/5" />
-              </div>
-
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <Brain className="text-brand-500/40" size={18} />
-                  <span className="text-[10px] font-black text-white/10 uppercase tracking-[0.5em]">
-                    AI_SYNTHESIS_RECON
-                  </span>
-                </div>
-                <p className="text-3xl font-black text-white uppercase tracking-tighter leading-tight italic border-l-[6px] border-brand-500 pl-10 py-4 bg-gradient-to-r from-brand-500/5 to-transparent rounded-r-3xl">
-                  "{selectedPulse.narrative}"
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-[color:var(--color-ink)] truncate">
+                  {pulse.date}
+                </p>
+                <p className="text-[11px] text-[color:var(--color-muted)] truncate">
+                  {pulse.events.length} events
                 </p>
               </div>
-            </div>
-
-            <div className="space-y-8">
-              <div className="flex items-center gap-4">
-                <Layers className="text-indigo-500/40" size={18} />
-                <span className="text-[10px] font-black text-white/10 uppercase tracking-[0.5em]">
-                  TACTICAL_SIGNALS
-                </span>
-              </div>
-              <div className="space-y-4 max-h-[300px] overflow-y-auto pr-6 elite-scrollbar">
-                {selectedPulse.events.map((event) => (
-                  <div
-                    key={event.id}
-                    className="p-6 bg-white/[0.02] border border-white/5 rounded-[1.5rem] flex items-start gap-5 group/event hover:border-white/10 hover:bg-white/[0.04] transition-all duration-500"
-                  >
-                    <div className="w-10 h-10 flex items-center justify-center bg-indigo-500/10 rounded-xl text-indigo-400 border border-indigo-500/10 group-hover/event:shadow-glow-indigo/20 transition-all">
-                      <Layers size={16} />
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-xs font-black text-white/80 uppercase tracking-tight italic">
-                        {event.title}
-                      </p>
-                      <div className="flex items-center gap-3">
-                        <span className="text-[9px] font-black text-white/20 uppercase tracking-widest leading-none">
-                          {event.actor.toUpperCase()}
-                        </span>
-                        <span className="h-1 w-1 rounded-full bg-white/5" />
-                        <span className="text-[9px] font-bold text-brand-500/40 uppercase tracking-widest leading-none">
-                          {event.time}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-function TimelineNode({
-  pulse,
-  isSelected,
-  onClick,
-  isLast,
-}: {
-  pulse: TimelinePulse;
-  isSelected: boolean;
-  onClick: () => void;
-  isLast: boolean;
-}) {
-  return (
-    <div className="flex-shrink-0 relative flex items-center group">
-      {/* Dynamic Connecting Segment */}
-      {!isLast && (
-        <div
-          className={`absolute left-1/2 top-1/2 w-[220%] h-[2px] transition-all duration-1000 ${isSelected ? 'bg-gradient-to-r from-brand-500 to-indigo-500/20 shadow-glow-brand/20' : 'bg-white/5 opacity-40'}`}
-        />
-      )}
-
-      <button
-        onClick={onClick}
-        className="relative flex flex-col items-center gap-8 z-10 transition-all duration-700"
-      >
-        <div className="flex flex-col items-center">
-          <span
-            className={`text-[10px] font-black uppercase tracking-[0.3em] mb-4 transition-all duration-500 ${isSelected ? 'text-brand-400 scale-110' : 'text-white/10 group-hover:text-white/30'}`}
-          >
-            {pulse.date.split('-').slice(1).join('_')}
-          </span>
-
-          {/* The Neural Pulse Core */}
-          <div className="relative h-16 w-16 flex items-center justify-center">
-            {/* Visual Scaling based on intensity */}
-            <motion.div
-              animate={{
-                scale: isSelected ? [1, 1.2, 1] : [1, 1.1, 1],
-                opacity: isSelected ? [0.4, 0.6, 0.4] : [0.2, 0.3, 0.2],
-              }}
-              transition={{ duration: isSelected ? 1.5 : 3, repeat: Infinity }}
-              className="absolute inset-0 rounded-full blur-[30px] transition-all duration-1000 pointer-events-none"
-              style={{
-                background: `radial-gradient(circle, ${pulse.intensity > 0.5 ? '#6366f1' : '#818cf8'}, transparent)`,
-              }}
-            />
-
-            <div
-              className={`
-                   relative h-3.5 w-3.5 rounded-full border-[3px] transition-all duration-700
-                   ${
-                     isSelected
-                       ? 'bg-white border-white scale-[1.8] shadow-glow-white ring-[12px] ring-brand-500/20'
-                       : 'bg-brand-500/40 border-brand-500/40 shadow-glow-brand/10 group-hover:scale-110 group-hover:border-brand-500'
-                   }
-                `}
-            />
-
-            {isSelected && (
-              <motion.div
-                layoutId="pulse-ring"
-                className="absolute -inset-4 border-2 border-brand-500/40 rounded-full shadow-glow-brand/5"
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  pulse.intensity >= 0.66
+                    ? 'bg-brand-500'
+                    : pulse.intensity >= 0.33
+                      ? 'bg-indigo-500'
+                      : 'bg-slate-400'
+                }`}
+                aria-hidden
               />
-            )}
+            </div>
+
+            {index < pulses.length - 1 ? (
+              <div className="mt-3 h-px w-10 bg-surface-border" aria-hidden />
+            ) : null}
+          </button>
+        ))}
+      </div>
+
+      {selectedPulse ? (
+        <div className="mt-6 rounded-lg border border-surface-border bg-[color:var(--color-surface-alt)]/45 p-[var(--space-6)]">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-[color:var(--color-ink)]">
+                {selectedPulse.date}
+              </p>
+              <p className="mt-1 text-sm text-[color:var(--color-muted)] leading-relaxed">
+                {selectedPulse.narrative}
+              </p>
+            </div>
+            <span className="shrink-0 inline-flex items-center rounded-full border border-surface-border bg-surface-bg px-2.5 py-1 text-xs font-semibold text-[color:var(--color-muted)]">
+              {selectedPulse.events.length} events
+            </span>
+          </div>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            {selectedPulse.events.map((event) => (
+              <div
+                key={event.id}
+                className="rounded-lg border border-surface-border bg-surface-bg p-4"
+              >
+                <p className="text-sm font-semibold text-[color:var(--color-ink)]">{event.title}</p>
+                <div className="mt-2 flex items-center gap-2 text-xs text-[color:var(--color-muted)]">
+                  <span className="font-semibold">{event.actor}</span>
+                  <span className="h-1 w-1 rounded-full bg-surface-border" aria-hidden />
+                  <span>{event.time}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-
-        <div
-          className={`px-6 py-3 rounded-lg border transition-all duration-700 backdrop-blur-md ${isSelected ? 'border-brand-500/40 bg-brand-500/10 scale-110 shadow-luxe' : 'bg-white/[0.01] border-white/5 group-hover:bg-white/[0.03] group-hover:border-white/10'}`}
-        >
-          <span
-            className={`text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap ${isSelected ? 'text-white' : 'text-white/20'}`}
-          >
-            {pulse.events.length} SIGNALS
-          </span>
-        </div>
-      </button>
-    </div>
+      ) : null}
+    </section>
   );
 }
 
 function TimelineSkeleton() {
   return (
-    <div className="space-y-12 py-16 animate-pulse px-8">
-      <div className="flex justify-between items-center">
-        <div className="space-y-3">
-          <div className="h-4 w-32 bg-white/5 rounded-full" />
-          <div className="h-8 w-64 bg-white/5 rounded-xl" />
+    <section className="rounded-lg border border-surface-border bg-surface-card shadow-luxe p-[var(--space-6)]">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-lg bg-black/[0.05]" />
+          <div>
+            <div className="h-3 w-24 bg-black/[0.05] rounded" />
+            <div className="mt-2 h-3 w-40 bg-black/[0.05] rounded" />
+          </div>
         </div>
-        <div className="flex gap-4">
-          <div className="h-12 w-12 bg-white/5 rounded-lg" />
-          <div className="h-12 w-12 bg-white/5 rounded-lg" />
+        <div className="flex gap-2">
+          <div className="h-9 w-9 rounded-sm bg-black/[0.05]" />
+          <div className="h-9 w-9 rounded-sm bg-black/[0.05]" />
         </div>
       </div>
-      <div className="flex gap-20 px-32 overflow-hidden">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="flex flex-col items-center gap-8 flex-shrink-0">
-            <div className="h-4 w-12 bg-white/5 rounded-full" />
-            <div className="h-16 w-16 bg-white/5 rounded-full" />
-            <div className="h-10 w-24 bg-white/5 rounded-lg" />
-          </div>
+
+      <div className="mt-5 flex gap-4 overflow-hidden">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="w-52 h-16 rounded-lg bg-black/[0.04]" />
         ))}
       </div>
-    </div>
+    </section>
   );
 }

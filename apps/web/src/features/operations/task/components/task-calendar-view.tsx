@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   DndContext,
-  DragEndEvent,
+  type DragEndEvent,
   DragOverlay,
-  DragStartEvent,
+  type DragStartEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -13,22 +13,21 @@ import {
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
-  CheckCircle2,
-  Circle,
-  Clock,
   AlertCircle,
-  XCircle,
-  HelpCircle,
+  Calendar as CalendarIcon,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  Calendar as CalendarIcon,
+  Circle,
+  Clock,
+  HelpCircle,
+  XCircle,
 } from 'lucide-react';
 import type {
   ProjectTaskItemDTO,
-  WorkflowStatusTemplateDTO,
   WorkflowStatusDTO,
+  WorkflowStatusTemplateDTO,
 } from '@superboard/shared';
 
 interface CalendarCell {
@@ -56,21 +55,21 @@ function getCategoryColor(category: string | undefined) {
     case 'todo':
       return 'text-slate-400';
     case 'in_progress':
-      return 'text-blue-400';
+      return 'text-brand-500';
     case 'in_review':
-      return 'text-indigo-400';
+      return 'text-indigo-500';
     case 'done':
-      return 'text-emerald-400';
+      return 'text-emerald-500';
     case 'blocked':
-      return 'text-rose-400';
+      return 'text-rose-500';
     case 'cancelled':
-      return 'text-white/30';
+      return 'text-[color:var(--color-faint)]';
     default:
       return 'text-slate-400';
   }
 }
 
-function getCategoryIcon(category: string | undefined, size = 10) {
+function getCategoryIcon(category: string | undefined, size = 12) {
   switch (category) {
     case 'todo':
       return <Circle size={size} />;
@@ -107,16 +106,13 @@ function Activity({ size, className }: { size: number; className?: string }) {
   );
 }
 
-// --- Draggable Task Chip ---
 function DraggableTaskChip({
   task,
   statusInfo,
-  colorClass,
   onClick,
 }: {
   task: ProjectTaskItemDTO;
   statusInfo?: WorkflowStatusDTO | { name?: string; category?: string } | undefined;
-  colorClass: string;
   onClick: () => void;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
@@ -124,33 +120,32 @@ function DraggableTaskChip({
     data: { task },
   });
 
+  const colorClass = getCategoryColor(statusInfo?.category);
+
   return (
-    <motion.button
+    <button
       ref={setNodeRef}
       type="button"
       onClick={onClick}
       {...listeners}
       {...attributes}
-      whileHover={{ scale: 1.02, x: 2 }}
-      whileTap={{ scale: 0.98 }}
-      className={`group w-full cursor-grab rounded-sm border border-white/5 bg-white/[0.03] px-[var(--space-3)] py-[var(--space-2)] text-left transition-all hover:bg-white/[0.08] hover:border-white/20 shadow-inner ${isDragging ? 'opacity-0' : ''}`}
+      className={`group w-full cursor-grab rounded-md border border-surface-border bg-surface-bg px-3 py-2 text-left transition-colors hover:bg-black/[0.03] ${
+        isDragging ? 'opacity-0' : ''
+      }`}
       title={`${task.title} - ${statusInfo?.name ?? task.status}`}
     >
       <div className="flex items-center gap-2">
-        <div
-          className={`shrink-0 ${colorClass} opacity-40 group-hover:opacity-100 transition-opacity`}
-        >
+        <span className={`shrink-0 ${colorClass} opacity-80`} aria-hidden>
           {getCategoryIcon(statusInfo?.category, 12)}
-        </div>
-        <span className="line-clamp-1 text-[10px] font-bold uppercase tracking-tight text-white/60 group-hover:text-white transition-colors">
+        </span>
+        <span className="line-clamp-1 text-xs font-medium text-[color:var(--color-ink)]">
           {task.title}
         </span>
       </div>
-    </motion.button>
+    </button>
   );
 }
 
-// --- Droppable Day Cell ---
 function DroppableDayCell({
   cell,
   dayTasks,
@@ -175,68 +170,48 @@ function DroppableDayCell({
   return (
     <div
       ref={setNodeRef}
-      className={`min-h-[10rem] rounded-md border p-[var(--space-4)] transition-all duration-300 relative overflow-hidden group/cell ${
+      className={`min-h-[10rem] rounded-lg border p-[var(--space-4)] transition-colors ${
         isOver
-          ? 'border-brand-500/50 bg-brand-500/[0.03] shadow-glow-brand/5 scale-[1.02] z-30'
+          ? 'border-brand-500/35 bg-brand-50'
           : cell.inMonth
-            ? 'border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/10'
-            : 'border-white/5 bg-white/[0.005] opacity-20 grayscale'
+            ? 'border-surface-border bg-surface-bg hover:bg-black/[0.02]'
+            : 'border-surface-border bg-surface-bg opacity-50'
       }`}
     >
-      {/* Background Pulse for Over state */}
-      <AnimatePresence>
-        {isOver && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-brand-500/5 pointer-events-none rounded-md blur-2xl animate-pulse"
-          />
-        )}
-      </AnimatePresence>
-
-      <div className="flex items-center justify-between mb-[var(--space-4)] relative z-10">
-        <p
-          className={`text-[10px] font-black uppercase tracking-[0.2em] ${
-            isToday ? 'text-brand-400' : cell.inMonth ? 'text-white/20' : 'text-white/5'
-          }`}
-        >
-          {cell.date.getDate().toString().padStart(2, '0')}
-        </p>
-        {isToday && (
-          <div className="h-1 w-1 rounded-full bg-brand-500 shadow-glow-brand animate-pulse" />
-        )}
+      <div className="flex items-center justify-between mb-[var(--space-4)]">
+        <div className="flex items-center gap-2">
+          <p
+            className={`text-xs font-semibold ${
+              isToday
+                ? 'text-brand-700'
+                : cell.inMonth
+                  ? 'text-[color:var(--color-muted)]'
+                  : 'text-[color:var(--color-faint)]'
+            }`}
+          >
+            {cell.date.getDate().toString().padStart(2, '0')}
+          </p>
+          {isToday ? <span className="h-1.5 w-1.5 rounded-full bg-brand-500" aria-hidden /> : null}
+        </div>
       </div>
 
-      <div className="space-y-2 relative z-10">
-        <AnimatePresence>
-          {visibleTasks.slice(0, 3).map((task) => {
-            const statusInfo = workflow?.statuses.find((s) => s.key === task.status);
-            const colorClass = getCategoryColor(statusInfo?.category);
-
-            return (
-              <motion.div
-                key={task.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-              >
-                <DraggableTaskChip
-                  task={task}
-                  statusInfo={statusInfo}
-                  colorClass={colorClass}
-                  onClick={() => onOpenEdit(task)}
-                />
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
+      <div className="space-y-2">
+        {visibleTasks.slice(0, 3).map((task) => {
+          const statusInfo = workflow?.statuses.find((s) => s.key === task.status);
+          return (
+            <DraggableTaskChip
+              key={task.id}
+              task={task}
+              statusInfo={statusInfo}
+              onClick={() => onOpenEdit(task)}
+            />
+          );
+        })}
 
         {visibleTasks.length > 3 ? (
-          <div className="px-[var(--space-3)] py-[var(--space-1)] rounded-xs bg-white/5 border border-white/5 transition-all hover:bg-brand-500/10 hover:border-brand-500/20 group/more">
-            <p className="text-[8px] font-bold text-white/20 uppercase tracking-widest group-hover/more:text-brand-400 transition-colors">
-              +{visibleTasks.length - 3} Packets
+          <div className="px-3 py-1 rounded-sm bg-black/[0.03] border border-surface-border">
+            <p className="text-[11px] font-medium text-[color:var(--color-muted)]">
+              +{visibleTasks.length - 3} more
             </p>
           </div>
         ) : null}
@@ -260,17 +235,23 @@ export function TaskCalendarView({
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 5,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  const displayCells = viewMode === 'week' ? calendarCells.slice(0, 7) : calendarCells;
+  const displayCells = useMemo(
+    () => (viewMode === 'week' ? calendarCells.slice(0, 7) : calendarCells),
+    [viewMode, calendarCells],
+  );
+
+  const draggedTask = useMemo(() => {
+    if (!draggedTaskId) return null;
+    for (const tasks of dueTasksByDate.values()) {
+      const found = tasks.find((t) => t.id === draggedTaskId);
+      if (found) return found;
+    }
+    return null;
+  }, [draggedTaskId, dueTasksByDate]);
 
   const handleDragStart = (event: DragStartEvent) => {
     setDraggedTaskId(event.active.id as string);
@@ -279,7 +260,6 @@ export function TaskCalendarView({
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setDraggedTaskId(null);
-
     if (!over) return;
 
     const taskId = active.id as string;
@@ -298,37 +278,37 @@ export function TaskCalendarView({
     onDropTask(taskId, overData.date);
   };
 
+  const overlayStatus = draggedTask
+    ? workflow?.statuses.find((s) => s.key === draggedTask.status)
+    : undefined;
+
   return (
     <div className="space-y-10">
-      {/* Header nav bar */}
-      <div className="flex items-center justify-between rounded-md border border-white/10 bg-white/[0.01] px-[var(--space-6)] py-[var(--space-4)] backdrop-blur-2xl shadow-inner relative overflow-hidden group">
-        <div className="absolute inset-0 bg-brand-500/[0.01] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-
+      <div className="flex items-center justify-between rounded-lg border border-surface-border bg-surface-card px-[var(--space-6)] py-[var(--space-4)] shadow-luxe">
         <button
           type="button"
           onClick={onPrevMonth}
-          className="flex items-center gap-3 rounded-sm border border-white/5 bg-white/[0.02] px-[var(--space-4)] py-[var(--space-2)] text-[10px] font-bold uppercase tracking-widest text-white/30 hover:bg-white/10 hover:text-white transition-all active:scale-95"
+          className="flex items-center gap-2 rounded-sm border border-surface-border bg-surface-bg px-3 py-2 text-sm font-semibold text-[color:var(--color-ink)] hover:bg-black/[0.03] transition-colors"
         >
           <ChevronLeft size={14} />
-          <span className="hidden sm:inline">Past_Cycle</span>
+          <span className="hidden sm:inline">Prev</span>
         </button>
 
-        {/* View mode toggle */}
-        <div className="flex flex-col items-center gap-2 relative z-10">
+        <div className="flex flex-col items-center gap-2">
           <div className="flex items-center gap-2">
-            <div className="w-1 h-1 rounded-full bg-brand-500 animate-pulse shadow-glow-brand" />
-            <p className="text-base font-black text-white uppercase tracking-[0.4em] pl-1">
+            <span className="h-2 w-2 rounded-full bg-brand-500" aria-hidden />
+            <p className="text-base font-semibold text-[color:var(--color-ink)]">
               {calendarMonthLabel}
             </p>
           </div>
-          <div className="flex rounded-sm border border-white/5 bg-slate-950/40 p-1 backdrop-blur-xl">
+          <div className="flex rounded-full border border-surface-border bg-surface-bg p-1">
             <button
               type="button"
               onClick={() => setViewMode('month')}
-              className={`rounded-xs px-6 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all ${
+              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
                 viewMode === 'month'
-                  ? 'bg-white text-slate-950 shadow-inner scale-105'
-                  : 'text-white/20 hover:text-white'
+                  ? 'bg-brand-50 border border-brand-500/25 text-brand-700'
+                  : 'text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.03]'
               }`}
             >
               Month
@@ -336,10 +316,10 @@ export function TaskCalendarView({
             <button
               type="button"
               onClick={() => setViewMode('week')}
-              className={`rounded-xs px-6 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all ${
+              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
                 viewMode === 'week'
-                  ? 'bg-white text-slate-950 shadow-inner scale-105'
-                  : 'text-white/20 hover:text-white'
+                  ? 'bg-brand-50 border border-brand-500/25 text-brand-700'
+                  : 'text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.03]'
               }`}
             >
               Week
@@ -350,26 +330,15 @@ export function TaskCalendarView({
         <button
           type="button"
           onClick={onNextMonth}
-          className="flex items-center gap-3 rounded-sm border border-white/5 bg-white/[0.02] px-[var(--space-4)] py-[var(--space-2)] text-[10px] font-bold uppercase tracking-widest text-white/30 hover:bg-white/10 hover:text-white transition-all active:scale-95"
+          className="flex items-center gap-2 rounded-sm border border-surface-border bg-surface-bg px-3 py-2 text-sm font-semibold text-[color:var(--color-ink)] hover:bg-black/[0.03] transition-colors"
         >
-          <span className="hidden sm:inline">Future_Cycle</span>
+          <span className="hidden sm:inline">Next</span>
           <ChevronRight size={14} />
         </button>
       </div>
 
-      {/* Day header labels */}
-      <div className="grid grid-cols-7 gap-5 text-center text-[11px] font-black tracking-[0.6em] text-white/20 uppercase italic border-b border-white/5 pb-8">
-        {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((day) => (
-          <div key={day}>{day}</div>
-        ))}
-      </div>
-
-      {/* Calendar grid with DnD context */}
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-7 gap-5 relative group/grid">
-          {/* Subtle Grid Pattern Overlay */}
-          <div className="absolute inset-x-0 -inset-y-5 bg-[radial-gradient(circle_at_center,_white/0.005_1px,_transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-40" />
-
+        <div className="grid grid-cols-7 gap-5">
           {displayCells.map((cell) => {
             const dayTasks = dueTasksByDate.get(cell.key) ?? [];
             return (
@@ -386,87 +355,60 @@ export function TaskCalendarView({
         </div>
 
         <DragOverlay dropAnimation={null}>
-          {draggedTaskId
-            ? (() => {
-                let found: ProjectTaskItemDTO | undefined;
-                for (const tasks of dueTasksByDate.values()) {
-                  found = tasks.find((t) => t.id === draggedTaskId);
-                  if (found) break;
-                }
-
-                if (found) {
-                  const statusInfo = workflow?.statuses.find((s) => s.key === found!.status);
-                  const colorClass = getCategoryColor(statusInfo?.category);
-                  return (
-                    <motion.div
-                      initial={{ scale: 1, rotate: 0 }}
-                      animate={{ scale: 1.05, rotate: 1 }}
-                      className="w-full cursor-grabbing rounded-md border border-brand-500/50 bg-brand-500/10 px-[var(--space-4)] py-[var(--space-3)] shadow-glow-brand/20 backdrop-blur-2xl overflow-hidden"
-                    >
-                      <div className="absolute inset-0 bg-brand-500/5 animate-pulse" />
-                      <div className="flex items-center gap-3 relative z-10">
-                        <div className={`shrink-0 ${colorClass}`}>
-                          {getCategoryIcon(statusInfo?.category, 14)}
-                        </div>
-                        <span className="line-clamp-1 text-[10px] font-bold uppercase tracking-widest text-white">
-                          {found.title}
-                        </span>
-                      </div>
-                    </motion.div>
-                  );
-                }
-                return null;
-              })()
-            : null}
+          {draggedTask ? (
+            <div className="w-[260px] rounded-md border border-brand-500/25 bg-brand-50 px-3 py-2 shadow-luxe">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`${getCategoryColor(overlayStatus?.category)} opacity-90`}
+                  aria-hidden
+                >
+                  {getCategoryIcon(overlayStatus?.category, 14)}
+                </span>
+                <span className="line-clamp-1 text-sm font-semibold text-[color:var(--color-ink)]">
+                  {draggedTask.title}
+                </span>
+              </div>
+            </div>
+          ) : null}
         </DragOverlay>
       </DndContext>
 
-      {/* Tasks without due date */}
       {tasksWithoutDueDate.length > 0 ? (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-md border border-white/5 bg-white/[0.01] p-[var(--space-6)] backdrop-blur-2xl shadow-inner group/unscheduled relative overflow-hidden"
-        >
-          <div className="absolute inset-0 bg-brand-500/[0.005] opacity-0 group-hover/unscheduled:opacity-100 transition-opacity pointer-events-none" />
+        <section className="rounded-lg border border-surface-border bg-surface-card shadow-luxe p-[var(--space-6)]">
           <div className="flex items-center gap-4 mb-[var(--space-6)]">
-            <div className="w-10 h-10 rounded-sm bg-white/[0.03] flex items-center justify-center border border-white/5 shadow-inner">
-              <CalendarIcon size={16} className="text-white/20" />
+            <div className="w-10 h-10 rounded-sm bg-brand-50 flex items-center justify-center border border-brand-500/15">
+              <CalendarIcon size={16} className="text-brand-500" />
             </div>
             <div className="flex flex-col">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
-                Unscheduled_Protocols
-              </p>
-              <span className="text-[7px] font-bold text-white/10 uppercase tracking-widest">
-                Waiting_For_Allocation
+              <p className="text-sm font-semibold text-[color:var(--color-ink)]">Unscheduled</p>
+              <span className="text-xs text-[color:var(--color-muted)]">
+                Tasks chưa có due date
               </span>
             </div>
           </div>
-          <div className="flex flex-wrap gap-4">
+
+          <div className="flex flex-wrap gap-3">
             {tasksWithoutDueDate.map((task) => {
               const statusInfo = workflow?.statuses.find((s) => s.key === task.status);
-              const colorClass = getCategoryColor(statusInfo?.category);
-
               return (
                 <button
                   key={task.id}
                   type="button"
                   onClick={() => onOpenEdit(task)}
-                  className="flex items-center gap-3 rounded-sm border border-white/5 bg-white/[0.03] px-[var(--space-4)] py-[var(--space-3)] transition-all hover:bg-white/10 hover:border-brand-500/20 hover:scale-[1.02] active:scale-98 group/packet"
+                  className="flex items-center gap-2 rounded-sm border border-surface-border bg-surface-bg px-3 py-2 text-sm font-medium text-[color:var(--color-ink)] hover:bg-black/[0.03] transition-colors"
                 >
-                  <div
-                    className={`${colorClass} opacity-30 group-hover/packet:opacity-100 transition-opacity`}
+                  <span
+                    className={`${getCategoryColor(statusInfo?.category)} opacity-80`}
+                    aria-hidden
                   >
                     {getCategoryIcon(statusInfo?.category, 12)}
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-tight text-white/60 group-hover/packet:text-white transition-colors">
-                    {task.title}
                   </span>
+                  <span className="line-clamp-1">{task.title}</span>
                 </button>
               );
             })}
           </div>
-        </motion.div>
+        </section>
       ) : null}
     </div>
   );

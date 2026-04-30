@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { BOARD_COLUMNS, PRIORITY_OPTIONS, TASK_TYPE_OPTIONS } from '@/lib/constants/task';
-import type { TaskSortBy } from '@/features/operations/task/utils/task-view';
+import type { ProjectMemberDTO, WorkflowStatusTemplateDTO } from '@superboard/shared';
+import { ArrowUpDown, RotateCcw, Search } from 'lucide-react';
+import { AppButton } from '@/components/ui/app-button';
 import { useProjectDetailContext } from '@/features/operations/project/context/ProjectDetailContext';
-import { ProjectMemberDTO, WorkflowStatusTemplateDTO } from '@superboard/shared';
-import { Sparkles, ChevronRight } from 'lucide-react';
+import type { TaskSortBy } from '@/features/operations/task/utils/task-view';
+import { BOARD_COLUMNS, PRIORITY_OPTIONS, TASK_TYPE_OPTIONS } from '@/lib/constants/task';
 
 type TaskFilterBarProps = {
   members: ProjectMemberDTO[];
@@ -40,52 +41,92 @@ export function TaskFilterBar({ members, workflow }: TaskFilterBarProps) {
     showArchived;
 
   return (
-    <div className="mb-10 rounded-[3rem] border border-white/5 bg-white/[0.01] p-6 shadow-luxe backdrop-blur-[40px] relative overflow-hidden group">
-      {/* Internal Rim Lighting */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-      <div className="mb-6 flex items-center justify-between px-4 relative z-10">
-        <div className="flex items-center gap-4">
-          <div className="w-2 h-2 rounded-full bg-brand-500 shadow-glow-brand animate-pulse" />
-          <p className="text-[11px] font-black tracking-[0.6em] text-white/20 uppercase italic">
-            SIGNAL_CHANNEL_HUB
-          </p>
+    <section className="mb-8 rounded-lg border border-surface-border bg-surface-card shadow-luxe p-[var(--space-6)]">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-2 w-2 rounded-full bg-brand-500" />
+          <p className="text-sm font-semibold text-[color:var(--color-ink)]">Bộ lọc</p>
+          {hasActiveFilters ? (
+            <span className="text-xs font-medium text-[color:var(--color-muted)]">
+              (đang áp dụng)
+            </span>
+          ) : null}
         </div>
+
         {hasActiveFilters ? (
-          <button
+          <AppButton
             type="button"
+            variant="secondary"
+            size="sm"
+            leftIcon={<RotateCcw size={14} />}
             onClick={resetFilters}
-            className="group relative rounded-lg px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-rose-400 bg-rose-500/5 border border-rose-500/10 hover:bg-rose-500 hover:text-white transition-all active:scale-95 shadow-inner overflow-hidden"
           >
-            <span className="relative z-10 italic">RESET_SYSTEMS</span>
-          </button>
+            Reset
+          </AppButton>
         ) : null}
       </div>
 
-      <div className="flex flex-wrap items-center gap-6 relative z-10">
-        {/* Frequency Search */}
-        <div className="relative w-full sm:w-80 group/input">
-          <div className="absolute left-6 top-1/2 -translate-y-1/2 text-white/10 group-focus-within/input:text-brand-400 transition-colors">
-            <Sparkles size={14} />
+      <div className="mt-4 flex flex-col gap-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+          <div className="relative w-full md:max-w-sm">
+            <Search
+              size={14}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--color-faint)]"
+            />
+            <input
+              type="text"
+              value={filterQuery}
+              onChange={(event) => setFilterQuery(event.target.value)}
+              placeholder="Tìm task…"
+              className="form-input pl-9"
+              aria-label="Search tasks"
+            />
           </div>
-          <input
-            type="text"
-            value={filterQuery}
-            onChange={(event) => setFilterQuery(event.target.value)}
-            placeholder="FREQUENCY SEARCH..."
-            className="w-full rounded-[1.5rem] border border-white/5 bg-white/[0.02] pl-14 pr-6 py-4 text-xs font-black text-white placeholder:text-white/5 focus:bg-white/[0.04] focus:border-brand-500/30 outline-none transition-all shadow-inner italic tracking-widest"
-            aria-label="Frequency search"
-          />
+
+          <select
+            value={filterAssignee}
+            onChange={(event) => setFilterAssignee(event.target.value)}
+            className="form-select md:max-w-xs"
+            aria-label="Assignee"
+          >
+            <option value="">Assignee (all)</option>
+            {members.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.fullName}
+              </option>
+            ))}
+          </select>
+
+          <div className="flex items-center gap-2 md:ml-auto">
+            <select
+              value={sortBy}
+              onChange={(event) => setSortBy(event.target.value as TaskSortBy)}
+              className="form-select"
+              aria-label="Sort by"
+            >
+              <option value="">Sort (default)</option>
+              <option value="dueDate">Due date</option>
+              <option value="createdAt">Created</option>
+              <option value="priority">Priority</option>
+              <option value="storyPoints">Story points</option>
+            </select>
+            <button
+              type="button"
+              disabled={!sortBy}
+              onClick={() => setSortDir(sortDir === 'asc' ? 'desc' : 'asc')}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-sm border border-surface-border bg-surface-bg text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)] disabled:opacity-40"
+              title="Toggle sort direction"
+            >
+              <ArrowUpDown size={16} />
+            </button>
+          </div>
         </div>
 
-        <div className="h-10 w-px bg-white/5 mx-2 hidden sm:block" />
-
-        {/* Status Channels */}
-        <div className="flex flex-wrap items-center gap-3 rounded-[1.75rem] bg-slate-950/40 border border-white/5 px-5 py-3 shadow-inner">
-          <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/10 mr-2 italic">
-            STATUS
-          </span>
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold text-[color:var(--color-muted)] mr-1">
+              Status:
+            </span>
             {(workflow?.statuses || BOARD_COLUMNS).map((s: any) => {
               const key = s.key;
               const label = s.name || s.label;
@@ -95,47 +136,22 @@ export function TaskFilterBar({ members, workflow }: TaskFilterBarProps) {
                   key={key}
                   type="button"
                   onClick={() => toggleFilter('status', key)}
-                  className={`relative rounded-xl px-5 py-2.5 text-[9px] font-black uppercase tracking-widest transition-all duration-500 overflow-hidden ${
+                  className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
                     isActive
-                      ? 'bg-brand-500 text-white shadow-glow-brand/20 scale-105'
-                      : 'bg-white/[0.02] text-white/20 border border-white/5 hover:bg-white/5 hover:text-white/40'
+                      ? 'bg-brand-50 border-brand-500/25 text-brand-700'
+                      : 'bg-surface-bg border-surface-border text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
                   }`}
                 >
-                  <span className="relative z-10">{label}</span>
+                  {label}
                 </button>
               );
             })}
           </div>
-        </div>
 
-        {/* Operator Channel */}
-        <div className="relative group/operator">
-          <select
-            value={filterAssignee}
-            onChange={(event) => setFilterAssignee(event.target.value)}
-            className="appearance-none rounded-[1.5rem] border border-white/5 bg-white/[0.02] pl-6 pr-12 py-4 text-[10px] font-black text-white/40 uppercase tracking-[0.2em] focus:bg-white/[0.04] focus:text-white outline-none transition-all cursor-pointer shadow-inner italic"
-            aria-label="Operator filter"
-          >
-            <option value="" className="bg-slate-950">
-              SELECT_OPERATOR
-            </option>
-            {members.map((member) => (
-              <option key={member.id} value={member.id} className="bg-slate-950 italic">
-                {member.fullName.toUpperCase()}
-              </option>
-            ))}
-          </select>
-          <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-white/10">
-            <ChevronRight size={14} className="rotate-90" />
-          </div>
-        </div>
-
-        {/* Rank Channels */}
-        <div className="flex flex-wrap items-center gap-3 rounded-[1.75rem] bg-slate-950/40 border border-white/5 px-5 py-3 shadow-inner">
-          <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/10 mr-2 italic">
-            RANK
-          </span>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold text-[color:var(--color-muted)] mr-1">
+              Priority:
+            </span>
             {PRIORITY_OPTIONS.map((priority) => {
               const isActive = filterPriorities.has(priority.key);
               return (
@@ -143,10 +159,10 @@ export function TaskFilterBar({ members, workflow }: TaskFilterBarProps) {
                   key={priority.key}
                   type="button"
                   onClick={() => toggleFilter('priority', priority.key)}
-                  className={`rounded-xl px-4 py-2.5 text-[9px] font-black uppercase tracking-widest transition-all duration-500 ${
+                  className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
                     isActive
-                      ? 'bg-indigo-500 text-white shadow-glow-indigo/20 scale-105'
-                      : 'bg-white/[0.02] text-white/20 border border-white/5 hover:bg-white/5 hover:text-white/40'
+                      ? 'bg-brand-50 border-brand-500/25 text-brand-700'
+                      : 'bg-surface-bg border-surface-border text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
                   }`}
                 >
                   {priority.label}
@@ -154,14 +170,11 @@ export function TaskFilterBar({ members, workflow }: TaskFilterBarProps) {
               );
             })}
           </div>
-        </div>
 
-        {/* Class Channels */}
-        <div className="flex flex-wrap items-center gap-3 rounded-[1.75rem] bg-slate-950/40 border border-white/5 px-5 py-3 shadow-inner">
-          <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/10 mr-2 italic">
-            CLASS
-          </span>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold text-[color:var(--color-muted)] mr-1">
+              Type:
+            </span>
             {TASK_TYPE_OPTIONS.map((taskType) => {
               const isActive = filterTypes.has(taskType.key);
               return (
@@ -169,10 +182,10 @@ export function TaskFilterBar({ members, workflow }: TaskFilterBarProps) {
                   key={taskType.key}
                   type="button"
                   onClick={() => toggleFilter('type', taskType.key)}
-                  className={`rounded-xl px-4 py-2.5 text-[9px] font-black uppercase tracking-widest transition-all duration-500 ${
+                  className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
                     isActive
-                      ? 'bg-emerald-500 text-white shadow-glow-emerald/20 scale-105'
-                      : 'bg-white/[0.02] text-white/20 border border-white/5 hover:bg-white/5 hover:text-white/40'
+                      ? 'bg-brand-50 border-brand-500/25 text-brand-700'
+                      : 'bg-surface-bg border-surface-border text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
                   }`}
                 >
                   {taskType.label}
@@ -182,64 +195,23 @@ export function TaskFilterBar({ members, workflow }: TaskFilterBarProps) {
           </div>
         </div>
 
-        {/* Sort Protocol */}
-        <div className="flex items-center gap-4 rounded-[1.75rem] bg-white/[0.01] border border-white/5 px-6 py-3 shadow-inner">
-          <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/10 italic">
-            SORT_SEQ
-          </span>
-          <select
-            value={sortBy}
-            onChange={(event) => setSortBy(event.target.value as TaskSortBy)}
-            className="bg-transparent text-[10px] font-black uppercase text-white/40 outline-none cursor-pointer hover:text-white transition-colors italic tracking-widest"
-            aria-label="Sort Protocol"
+        <div className="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => setShowArchived(!showArchived)}
+            className={`inline-flex items-center gap-2 rounded-sm border px-3 py-2 text-xs font-semibold transition-colors ${
+              showArchived
+                ? 'bg-amber-50 border-amber-200 text-amber-700'
+                : 'bg-surface-bg border-surface-border text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
+            }`}
           >
-            <option value="" className="bg-slate-950">
-              DEFAULT
-            </option>
-            <option value="dueDate" className="bg-slate-950">
-              DUE_DATE
-            </option>
-            <option value="createdAt" className="bg-slate-950">
-              INIT_DATE
-            </option>
-            <option value="priority" className="bg-slate-950">
-              PRIORITY
-            </option>
-            <option value="storyPoints" className="bg-slate-950">
-              POINTS
-            </option>
-          </select>
-          {sortBy ? (
-            <button
-              type="button"
-              onClick={() => setSortDir(sortDir === 'asc' ? 'desc' : 'asc')}
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-400 hover:bg-brand-500 hover:text-white transition-all shadow-glow-brand/10 active:scale-90"
-            >
-              <span className="text-[8px] font-black tracking-tighter">
-                {sortDir === 'asc' ? '↑' : '↓'}
-              </span>
-            </button>
-          ) : null}
+            {showArchived ? 'Đang xem archived' : 'Ẩn archived'}
+          </button>
+          <div className="text-xs text-[color:var(--color-faint)]">
+            Mẹo: giữ <span className="font-semibold">Ctrl/⌘</span> để chọn nhiều task.
+          </div>
         </div>
-
-        {/* Archive Protocol */}
-        <button
-          type="button"
-          onClick={() => setShowArchived(!showArchived)}
-          className={`flex items-center gap-4 rounded-[1.75rem] border px-8 py-4 text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-700 italic overflow-hidden group/archive relative ${
-            showArchived
-              ? 'border-amber-500/40 bg-amber-500 text-white shadow-glow-amber/20 scale-105'
-              : 'border-white/5 bg-white/[0.02] text-white/20 hover:bg-white/5 hover:text-white/40 hover:border-white/10'
-          }`}
-        >
-          <div
-            className={`h-2 w-2 rounded-full transition-all duration-500 ${showArchived ? 'bg-white shadow-glow-white animate-pulse' : 'bg-white/5 animate-ping'}`}
-          />
-          <span className="relative z-10">
-            {showArchived ? 'ARCHIVE_OVERRIDE_ENABLED' : 'VIEW_ARCHIVE_VOID'}
-          </span>
-        </button>
       </div>
-    </div>
+    </section>
   );
 }

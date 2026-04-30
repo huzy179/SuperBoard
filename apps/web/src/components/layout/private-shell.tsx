@@ -25,8 +25,6 @@ import {
   PanelLeft,
 } from 'lucide-react';
 
-import { motion, AnimatePresence } from 'framer-motion';
-
 type PrivateShellProps = {
   children: ReactNode;
   user: AuthUserDTO;
@@ -219,7 +217,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
     <div className="flex h-screen overflow-hidden bg-surface-bg font-sans text-[color:var(--color-ink)]">
       {/* Desktop sidebar */}
       <aside
-        className={`hidden lg:flex shrink-0 flex-col z-50 transition-all duration-700 ease-in-out ${sidebarCollapsed ? 'w-24' : 'w-80'}`}
+        className={`hidden lg:flex shrink-0 flex-col z-50 transition-all duration-200 ease-in-out ${sidebarCollapsed ? 'w-24' : 'w-80'}`}
       >
         {sidebar}
       </aside>
@@ -267,19 +265,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
         </header>
 
         <main className="flex-1 overflow-y-auto px-[var(--space-8)] py-[var(--space-8)] md:px-[var(--space-10)] lg:px-[var(--space-12)] relative z-0">
-          <div className="max-w-[1700px] mx-auto relative z-10">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={pathname}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.12, ease: [0.2, 0, 0, 1] }}
-              >
-                {children}
-              </motion.div>
-            </AnimatePresence>
-          </div>
+          <div className="max-w-[1700px] mx-auto relative z-10">{children}</div>
         </main>
       </div>
 

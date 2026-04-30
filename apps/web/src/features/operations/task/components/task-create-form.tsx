@@ -121,25 +121,22 @@ export function TaskCreateForm({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="relative mb-8 rounded-xl border border-white/8 bg-white/[0.02] p-8 shadow-inner backdrop-blur-xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-500"
+      className="mb-8 rounded-lg border border-surface-border bg-surface-card shadow-luxe p-6"
     >
-      {/* Decorative glow */}
-      <div className="absolute -top-20 -right-20 w-56 h-56 bg-brand-500/5 rounded-full blur-[80px] pointer-events-none" />
-
       {/* Form header */}
-      <div className="relative z-10 flex items-center justify-between mb-8 pb-6 border-b border-white/5">
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-surface-border">
         <div>
-          <h3 className="text-sm font-black text-white tracking-tight text-glow">
+          <h3 className="text-base font-semibold text-[color:var(--color-ink)]">
             Tạo công việc mới
           </h3>
-          <p className="text-[11px] text-white/30 mt-0.5">Điền thông tin và bấm Tạo để lưu</p>
+          <p className="text-sm text-[color:var(--color-muted)] mt-0.5">
+            Điền thông tin và bấm Tạo để lưu
+          </p>
         </div>
         {isListening && (
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-full animate-pulse">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-rose-50 border border-rose-200 rounded-full">
             <div className="w-1.5 h-1.5 bg-rose-500 rounded-full" />
-            <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest">
-              Đang nghe...
-            </span>
+            <span className="text-xs font-semibold text-rose-700">Đang nghe…</span>
           </div>
         )}
       </div>
@@ -159,10 +156,10 @@ export function TaskCreateForm({
               <button
                 type="button"
                 onClick={toggleListening}
-                className={`absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-all ${
+                className={`absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-sm transition-colors ${
                   isListening
-                    ? 'bg-rose-500 text-white shadow-glow-sm'
-                    : 'text-white/20 hover:text-brand-400 hover:bg-white/5'
+                    ? 'bg-rose-600 text-white'
+                    : 'text-[color:var(--color-muted)] hover:text-brand-500 hover:bg-black/[0.04]'
                 }`}
               >
                 {isListening ? <Mic size={16} /> : <MicOff size={16} />}
@@ -246,11 +243,11 @@ export function TaskCreateForm({
       </div>
 
       {/* Actions */}
-      <div className="relative z-10 mt-10 flex items-center justify-end gap-3 pt-6 border-t border-white/5">
+      <div className="mt-8 flex items-center justify-end gap-3 pt-4 border-t border-surface-border">
         <button type="button" onClick={onCancel} className="btn-ghost px-6">
           Hủy
         </button>
-        <button type="submit" disabled={isPending} className="btn-primary px-8 shadow-glow-sm">
+        <button type="submit" disabled={isPending} className="btn-primary px-8">
           {isPending ? <Loader2 className="btn-spinner mr-2" /> : null}
           {isPending ? 'Đang tạo...' : 'Tạo công việc'}
         </button>

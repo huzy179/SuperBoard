@@ -145,12 +145,10 @@ export function MissionArchitectTerminal() {
     <div className="relative z-50">
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-4 py-2 bg-brand-500/10 border border-brand-500/20 text-brand-400 rounded-xl hover:bg-brand-500 hover:text-white transition-all shadow-glow-brand/5 group"
+        className="flex items-center gap-2 px-4 py-2 rounded-md border border-surface-border bg-surface-card text-[color:var(--color-ink)] hover:bg-black/[0.03] transition-colors"
       >
-        <Terminal size={18} className="group-hover:rotate-12 transition-transform" />
-        <span className="text-xs font-black uppercase tracking-widest italic">
-          Mission Architect
-        </span>
+        <Terminal size={18} className="text-brand-500" />
+        <span className="text-sm font-semibold">Mission Architect</span>
       </button>
 
       <AnimatePresence>
@@ -161,33 +159,31 @@ export function MissionArchitectTerminal() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[100]"
+              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[100]"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-slate-900/90 border border-white/10 rounded-[2.5rem] shadow-luxe p-8 z-[101] overflow-hidden"
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-surface-card border border-surface-border rounded-lg shadow-glass p-6 z-[101] overflow-hidden"
             >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-500 to-transparent" />
-
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-brand-500/20 rounded-lg text-brand-400">
+                  <div className="p-3 bg-brand-50 border border-brand-500/15 rounded-lg text-brand-500">
                     <Sparkles size={24} />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black text-white uppercase tracking-tight italic">
+                    <h2 className="text-lg font-semibold text-[color:var(--color-ink)]">
                       Mission Architect
                     </h2>
-                    <p className="text-[10px] text-white/40 uppercase tracking-[0.3em] font-black">
-                      Neural Objective Decomposition
+                    <p className="text-sm text-[color:var(--color-muted)]">
+                      Phân rã mục tiêu thành danh sách nhiệm vụ
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-2 hover:bg-white/5 rounded-full text-white/40 hover:text-white transition-colors"
+                  className="p-2 rounded-sm text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
                 >
                   <X size={20} />
                 </button>
@@ -200,7 +196,7 @@ export function MissionArchitectTerminal() {
                       value={goal}
                       onChange={(e) => setGoal(e.target.value)}
                       placeholder="Nhập mục tiêu chiến lược của bạn... (ví dụ: Xây dựng hệ thống thanh toán tự động)"
-                      className="w-full h-32 bg-slate-950/50 border border-white/5 rounded-lg p-6 text-white text-sm placeholder:text-white/10 focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/50 transition-all outline-none resize-none"
+                      className="form-textarea h-32"
                     />
                   </div>
 
@@ -229,10 +225,10 @@ export function MissionArchitectTerminal() {
                     ) : (
                       <button
                         onClick={() => fileInputRef.current?.click()}
-                        className="h-20 w-20 border-2 border-dashed border-white/10 rounded-lg flex flex-col items-center justify-center gap-1 hover:border-brand-500/40 transition-colors"
+                        className="h-20 w-20 border-2 border-dashed border-surface-border rounded-lg flex flex-col items-center justify-center gap-1 hover:border-brand-500/40 transition-colors"
                       >
-                        <Upload size={16} className="text-white/20" />
-                        <span className="text-[8px] font-black text-white/20 uppercase">
+                        <Upload size={16} className="text-[color:var(--color-muted)]" />
+                        <span className="text-[10px] font-semibold text-[color:var(--color-muted)]">
                           Upload
                         </span>
                       </button>
@@ -240,7 +236,7 @@ export function MissionArchitectTerminal() {
                     <button
                       onClick={handleAnalyze}
                       disabled={isAnalyzing || (!goal.trim() && !imageEncoded)}
-                      className="flex-1 h-20 bg-brand-500 text-white rounded-lg font-black uppercase tracking-widest hover:bg-brand-400 disabled:opacity-50 transition-all flex items-center justify-center"
+                      className="flex-1 h-20 bg-brand-500 text-white rounded-lg text-sm font-semibold hover:bg-brand-600 disabled:opacity-50 transition-colors flex items-center justify-center"
                     >
                       {isAnalyzing ? <Activity className="animate-spin" /> : 'Phân tích kiến trúc'}
                     </button>

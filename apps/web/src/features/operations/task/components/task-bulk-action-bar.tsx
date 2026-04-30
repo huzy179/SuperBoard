@@ -1,10 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { X, Trash2, User, Flag, Loader2, SquareCheck, MousePointer2 } from 'lucide-react';
 import type { ProjectMemberDTO, ProjectTaskItemDTO, TaskPriorityDTO } from '@superboard/shared';
+import { CheckSquare, Loader2, Trash2, X } from 'lucide-react';
+import { AppButton } from '@/components/ui/app-button';
 import { BOARD_COLUMNS, PRIORITY_OPTIONS } from '@/lib/constants/task';
-import { TaskBulkActionMenu } from './task-bulk-action-menu';
 
 type TaskBulkActionBarProps = {
   members: ProjectMemberDTO[];
@@ -59,220 +58,129 @@ export function TaskBulkActionBar(props: TaskBulkActionBarProps) {
     workflow,
   } = props;
 
-  const [activeMenu, setActiveMenu] = useState<'status' | 'priority' | 'assignee' | null>(null);
-
   if (selectedCount === 0) return null;
 
-  return (
-    <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[200] w-full max-w-4xl px-6 pointer-events-none">
-      <div className="pointer-events-auto rounded-[3rem] border border-white/10 bg-slate-950/40 p-2 shadow-luxe backdrop-blur-[60px] animate-in slide-in-from-bottom-20 fade-in duration-1000 relative group overflow-hidden">
-        {/* Rim Light */}
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+  const statuses = workflow?.statuses?.length ? workflow.statuses : BOARD_COLUMNS;
 
-        {/* Unified Bridge Container */}
-        <div className="bg-white/[0.01] rounded-[2.5rem] flex items-center h-20 px-4 gap-4 border border-white/5 relative z-10">
-          {/* Tactical Intel Section */}
-          <div className="flex items-center gap-6 pl-6 pr-8 border-r border-white/5 h-12">
-            <div className="relative">
-              <div className="absolute inset-0 bg-brand-500 blur-lg opacity-40 animate-pulse" />
-              <div className="relative w-10 h-10 bg-brand-500 rounded-lg flex items-center justify-center text-xs font-black text-white shadow-glow-brand/20">
-                {selectedCount}
-              </div>
-            </div>
-            <div className="space-y-0.5">
-              <span className="text-[10px] font-black text-white uppercase tracking-[0.4em] block leading-none italic">
-                SYNCED_UNITS
-              </span>
-              <span className="text-[8px] font-bold text-white/10 uppercase tracking-[0.2em] block">
-                STABLE_NODE_LINK
-              </span>
-            </div>
+  return (
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] w-full max-w-5xl px-4">
+      <div className="rounded-lg border border-surface-border bg-surface-card shadow-glass p-3">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center rounded-full border border-surface-border bg-black/[0.03] px-3 py-1 text-xs font-semibold text-[color:var(--color-muted)]">
+              Selected: <span className="ml-1 text-[color:var(--color-ink)]">{selectedCount}</span>
+            </span>
+            <span className="text-xs text-[color:var(--color-faint)]">
+              Visible: {selectedVisibleCount}/{totalVisibleCount}
+            </span>
             <button
+              type="button"
               onClick={onClearSelection}
-              className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 text-white/20 hover:text-rose-400 hover:bg-rose-500/10 transition-all active:scale-95 group/clear"
-              title="Clear Selection"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-transparent text-[color:var(--color-muted)] hover:bg-black/[0.04] hover:text-[color:var(--color-ink)]"
+              title="Clear selection"
             >
-              <X size={16} className="group-hover/clear:rotate-90 transition-transform" />
+              <X size={16} />
             </button>
           </div>
 
-          {/* Action Hub */}
-          <div className="flex flex-1 items-center gap-3">
-            {/* Status Protocol */}
-            <TaskBulkActionMenu
-              isOpen={activeMenu === 'status'}
-              label="STATE"
-              widthClass="w-72"
-              accentClass="via-brand-500/40"
-              onToggle={() => setActiveMenu(activeMenu === 'status' ? null : 'status')}
-              icon={
-                <Loader2
-                  size={16}
-                  className={isStatusPending ? 'animate-spin text-brand-500' : ''}
-                />
-              }
-            >
-              {(workflow?.statuses || BOARD_COLUMNS).map(
-                (
-                  sw: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-                ) => (
-                  <button
-                    key={sw.key}
-                    onClick={() => {
-                      onBulkStatusChange(sw.key as any); // eslint-disable-line @typescript-eslint/no-explicit-any
-                      onApplyStatus();
-                      setActiveMenu(null);
-                    }}
-                    className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-[10px] font-black uppercase tracking-widest transition-all ${
-                      bulkStatus === sw.key
-                        ? 'text-brand-400 bg-brand-500/10 border border-brand-500/10'
-                        : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    <span className="truncate">{sw.label || sw.name}</span>
-                    {bulkStatus === sw.key && (
-                      <div className="h-1 w-1 rounded-full bg-brand-500 shadow-glow-brand" />
-                    )}
-                  </button>
-                ),
-              )}
-            </TaskBulkActionMenu>
-
-            {/* Priority Protocol */}
-            <TaskBulkActionMenu
-              isOpen={activeMenu === 'priority'}
-              label="RANK"
-              widthClass="w-64"
-              accentClass="via-indigo-500/40"
-              onToggle={() => setActiveMenu(activeMenu === 'priority' ? null : 'priority')}
-              icon={
-                <Flag
-                  size={16}
-                  className={isPriorityPending ? 'animate-pulse text-indigo-500' : ''}
-                />
-              }
-            >
-              {PRIORITY_OPTIONS.map((p) => (
-                <button
-                  key={p.key}
-                  onClick={() => {
-                    onBulkPriorityChange(p.key as TaskPriorityDTO);
-                    onApplyPriority();
-                    setActiveMenu(null);
-                  }}
-                  className={`w-full flex items-center justify-between px-6 py-4 text-left rounded-lg transition-all duration-300 group/item ${
-                    bulkPriority === p.key
-                      ? 'text-indigo-400 bg-indigo-500/10 border border-indigo-500/10'
-                      : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'
-                  }`}
-                >
-                  <span className="text-[11px] font-black uppercase tracking-widest italic group-hover/item:translate-x-1 transition-transform">
-                    {p.label}
-                  </span>
-                  {bulkPriority === p.key && (
-                    <div className="h-1.5 w-1.5 rounded-full bg-indigo-400 shadow-glow-indigo animate-pulse" />
-                  )}
-                </button>
-              ))}
-            </TaskBulkActionMenu>
-
-            {/* Operator Protocol */}
-            <TaskBulkActionMenu
-              isOpen={activeMenu === 'assignee'}
-              label="OPERATOR"
-              widthClass="w-80"
-              accentClass="via-emerald-500/40"
-              onToggle={() => setActiveMenu(activeMenu === 'assignee' ? null : 'assignee')}
-              icon={
-                <User
-                  size={16}
-                  className={isAssignPending ? 'animate-pulse text-emerald-500' : ''}
-                />
-              }
-            >
-              <button
-                onClick={() => {
-                  onBulkAssigneeIdChange('');
-                  onApplyAssignee();
-                  setActiveMenu(null);
-                }}
-                className="w-full px-6 py-4 text-left text-[11px] font-black uppercase tracking-[0.2em] text-rose-400 bg-rose-500/5 hover:bg-rose-500/10 rounded-lg transition-all mb-2 border border-rose-500/10 italic"
-              >
-                DE-SYNC ALL_UNITS
-              </button>
-              <div className="max-h-72 overflow-y-auto elite-scrollbar space-y-1.5">
-                {members.map((m) => (
-                  <button
-                    key={m.id}
-                    onClick={() => {
-                      onBulkAssigneeIdChange(m.id);
-                      onApplyAssignee();
-                      setActiveMenu(null);
-                    }}
-                    className={`w-full flex items-center gap-5 px-6 py-4 text-left rounded-lg transition-all duration-300 group/item ${
-                      bulkAssigneeId === m.id
-                        ? 'text-brand-400 bg-brand-500/10 border border-brand-500/10'
-                        : 'text-white/30 border border-transparent hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    <div className="w-9 h-9 rounded-xl bg-white/5 font-black flex items-center justify-center text-[10px] border border-white/5 shadow-inner">
-                      {m.fullName.charAt(0)}
-                    </div>
-                    <span className="text-[11px] font-black uppercase tracking-tight truncate flex-1 italic group-hover/item:translate-x-1 transition-transform">
-                      {m.fullName}
-                    </span>
-                    {bulkAssigneeId === m.id && (
-                      <div className="h-1.5 w-1.5 rounded-full bg-brand-400 shadow-glow-brand animate-pulse" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </TaskBulkActionMenu>
-
-            {/* Tactical Override Group */}
-            <div className="h-10 w-px bg-white/5 mx-2" />
+          <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-2">
-              <button
-                onClick={onToggleSelectAllVisible}
-                className={`h-12 w-12 rounded-[1.25rem] flex items-center justify-center border transition-all duration-500 active:scale-90 ${
-                  selectedVisibleCount === totalVisibleCount
-                    ? 'bg-brand-500 border-brand-500 text-white shadow-glow-brand/20'
-                    : 'bg-white/[0.02] border-white/5 text-white/20 hover:text-white/80 hover:bg-white/5'
-                }`}
-                title={
-                  selectedVisibleCount === totalVisibleCount ? 'Deselect All' : 'Select All Visible'
-                }
+              <select
+                value={bulkStatus}
+                onChange={(e) => onBulkStatusChange(e.target.value as ProjectTaskItemDTO['status'])}
+                className="form-select"
+                aria-label="Bulk status"
               >
-                {selectedVisibleCount === totalVisibleCount ? (
-                  <SquareCheck size={18} />
-                ) : (
-                  <MousePointer2 size={18} />
-                )}
-              </button>
-
-              <button
-                onClick={onDeleteSelected}
-                disabled={isDeletePending}
-                className="h-12 w-12 rounded-[1.25rem] flex items-center justify-center text-rose-500/30 hover:text-white hover:bg-rose-500 border border-transparent hover:border-rose-500/20 transition-all disabled:opacity-30 active:scale-90 shadow-glow-rose/0 hover:shadow-glow-rose/20"
-                title="Purge Task"
+                {statuses.map((s) => {
+                  const label = 'name' in s ? (s.name ?? s.label ?? s.key) : (s.label ?? s.key);
+                  return (
+                    <option key={s.key} value={s.key}>
+                      {label}
+                    </option>
+                  );
+                })}
+              </select>
+              <AppButton
+                type="button"
+                variant="secondary"
+                size="sm"
+                isLoading={isStatusPending}
+                onClick={onApplyStatus}
               >
-                {isDeletePending ? (
-                  <Loader2 size={18} className="animate-spin text-rose-500" />
-                ) : (
-                  <Trash2 size={18} />
-                )}
-              </button>
+                Apply
+              </AppButton>
             </div>
-          </div>
 
-          {/* Mission Conclusion */}
-          <div className="pl-6 pr-2">
+            <div className="flex items-center gap-2">
+              <select
+                value={bulkPriority}
+                onChange={(e) => onBulkPriorityChange(e.target.value as TaskPriorityDTO)}
+                className="form-select"
+                aria-label="Bulk priority"
+              >
+                {PRIORITY_OPTIONS.map((p) => (
+                  <option key={p.key} value={p.key}>
+                    {p.label}
+                  </option>
+                ))}
+              </select>
+              <AppButton
+                type="button"
+                variant="secondary"
+                size="sm"
+                isLoading={isPriorityPending}
+                onClick={onApplyPriority}
+              >
+                Apply
+              </AppButton>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <select
+                value={bulkAssigneeId}
+                onChange={(e) => onBulkAssigneeIdChange(e.target.value)}
+                className="form-select"
+                aria-label="Bulk assignee"
+              >
+                <option value="">Assignee (none)</option>
+                {members.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.fullName}
+                  </option>
+                ))}
+              </select>
+              <AppButton
+                type="button"
+                variant="secondary"
+                size="sm"
+                isLoading={isAssignPending}
+                onClick={onApplyAssignee}
+              >
+                Apply
+              </AppButton>
+            </div>
+
             <button
-              onClick={onClearSelection}
-              className="group relative h-14 px-10 rounded-[1.5rem] bg-white border border-white text-slate-950 font-black text-xs uppercase tracking-[0.4em] hover:scale-105 active:scale-95 transition-all shadow-luxe overflow-hidden"
+              type="button"
+              onClick={onToggleSelectAllVisible}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-sm border border-surface-border bg-surface-bg text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]"
+              title="Toggle select all visible"
             >
-              <span className="relative z-10 italic">DONE</span>
-              <div className="absolute inset-0 bg-brand-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <CheckSquare size={16} />
+            </button>
+
+            <button
+              type="button"
+              onClick={onDeleteSelected}
+              disabled={isDeletePending}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-sm border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-600 hover:text-white hover:border-rose-600 disabled:opacity-40"
+              title="Delete selected"
+            >
+              {isDeletePending ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Trash2 size={16} />
+              )}
             </button>
           </div>
         </div>

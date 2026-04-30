@@ -79,7 +79,7 @@ export function LabelDots({ labels }: { labels: LabelDTO[] }) {
       {labels.map((label) => (
         <span
           key={label.id}
-          className="inline-flex items-center gap-1 rounded-full bg-white/[0.03] px-2 py-0.5 text-[10px] font-medium text-white/60 border border-white/5"
+          className="inline-flex items-center gap-1 rounded-full bg-black/[0.03] px-2 py-0.5 text-[10px] font-medium text-[color:var(--color-muted)] border border-surface-border"
           title={label.name}
         >
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: label.color }} />
@@ -99,7 +99,7 @@ export function TaskIdBadge({
 }) {
   if (!projectKey || !number) return null;
   return (
-    <span className="font-mono text-[11px] text-slate-400">
+    <span className="font-mono text-[11px] text-[color:var(--color-muted)]">
       {projectKey}-{number}
     </span>
   );

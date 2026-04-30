@@ -242,8 +242,8 @@ export function WorkflowEditor({
               <AppButton
                 type="button"
                 onClick={() => void handleAddStatus()}
-                disabled={isPending || !newStatusName.trim()}
-                isLoading={isPending}
+                disabled={Boolean(isPending) || !newStatusName.trim()}
+                isLoading={Boolean(isPending)}
                 variant="primary"
               >
                 Add
@@ -269,8 +269,8 @@ export function WorkflowEditor({
             <AppButton
               type="button"
               onClick={handleSaveTransitions}
-              disabled={isPending}
-              isLoading={isPending}
+              disabled={Boolean(isPending)}
+              isLoading={Boolean(isPending)}
               variant="primary"
             >
               Save

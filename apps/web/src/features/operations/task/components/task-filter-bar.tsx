@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import { useMemo, useState } from 'react';
 import type { ProjectMemberDTO, WorkflowStatusTemplateDTO } from '@superboard/shared';
-import { ArrowUpDown, RotateCcw, Search } from 'lucide-react';
+import { ArrowUpDown, ChevronDown, RotateCcw, Search } from 'lucide-react';
 import { AppButton } from '@/components/ui/app-button';
 import { useProjectDetailContext } from '@/features/operations/project/context/ProjectDetailContext';
 import type { TaskSortBy } from '@/features/operations/task/utils/task-view';
@@ -40,8 +41,19 @@ export function TaskFilterBar({ members, workflow }: TaskFilterBarProps) {
     !!filterQuery ||
     showArchived;
 
+  const activeCounts = useMemo(
+    () => ({
+      statuses: filterStatuses.size,
+      priorities: filterPriorities.size,
+      types: filterTypes.size,
+    }),
+    [filterStatuses.size, filterPriorities.size, filterTypes.size],
+  );
+
+  const [advancedOpen, setAdvancedOpen] = useState(hasActiveFilters);
+
   return (
-    <section className="mb-8 rounded-lg border border-surface-border bg-surface-card shadow-luxe p-[var(--space-6)]">
+    <section className="mb-6 rounded-lg border border-surface-border bg-surface-card shadow-luxe p-4 md:p-5">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
           <div className="h-2 w-2 rounded-full bg-brand-500" />
@@ -53,17 +65,33 @@ export function TaskFilterBar({ members, workflow }: TaskFilterBarProps) {
           ) : null}
         </div>
 
-        {hasActiveFilters ? (
-          <AppButton
+        <div className="flex items-center gap-2">
+          <button
             type="button"
-            variant="secondary"
-            size="sm"
-            leftIcon={<RotateCcw size={14} />}
-            onClick={resetFilters}
+            onClick={() => setAdvancedOpen((prev) => !prev)}
+            className="inline-flex items-center gap-2 rounded-md border border-surface-border bg-black/[0.02] px-3 py-2 text-xs font-semibold text-[color:var(--color-muted)] hover:bg-black/[0.04] hover:text-[color:var(--color-ink)] transition-colors"
+            aria-expanded={advancedOpen}
           >
-            Reset
-          </AppButton>
-        ) : null}
+            Bộ lọc nâng cao
+            <ChevronDown
+              size={14}
+              className={`transition-transform ${advancedOpen ? 'rotate-180' : ''}`}
+              aria-hidden
+            />
+          </button>
+
+          {hasActiveFilters ? (
+            <AppButton
+              type="button"
+              variant="secondary"
+              size="sm"
+              leftIcon={<RotateCcw size={14} />}
+              onClick={resetFilters}
+            >
+              Reset
+            </AppButton>
+          ) : null}
+        </div>
       </div>
 
       <div className="mt-4 flex flex-col gap-4">
@@ -122,95 +150,123 @@ export function TaskFilterBar({ members, workflow }: TaskFilterBarProps) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold text-[color:var(--color-muted)] mr-1">
-              Status:
-            </span>
-            {(workflow?.statuses || BOARD_COLUMNS).map((s: any) => {
-              const key = s.key;
-              const label = s.name || s.label;
-              const isActive = filterStatuses.has(key);
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => toggleFilter('status', key)}
-                  className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
-                    isActive
-                      ? 'bg-brand-50 border-brand-500/25 text-brand-700'
-                      : 'bg-surface-bg border-surface-border text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
-                  }`}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+        {advancedOpen ? (
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2 overflow-x-auto elite-scrollbar scrollbar-hide pb-1 md:flex-wrap">
+              <span className="text-xs font-semibold text-[color:var(--color-muted)] mr-1 shrink-0">
+                Status:
+              </span>
+              {(workflow?.statuses || BOARD_COLUMNS).map((s: any) => {
+                const key = s.key;
+                const label = s.name || s.label;
+                const isActive = filterStatuses.has(key);
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => toggleFilter('status', key)}
+                    className={`inline-flex shrink-0 items-center rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
+                      isActive
+                        ? 'bg-brand-50 border-brand-500/25 text-brand-700'
+                        : 'bg-surface-bg border-surface-border text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold text-[color:var(--color-muted)] mr-1">
-              Priority:
-            </span>
-            {PRIORITY_OPTIONS.map((priority) => {
-              const isActive = filterPriorities.has(priority.key);
-              return (
-                <button
-                  key={priority.key}
-                  type="button"
-                  onClick={() => toggleFilter('priority', priority.key)}
-                  className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
-                    isActive
-                      ? 'bg-brand-50 border-brand-500/25 text-brand-700'
-                      : 'bg-surface-bg border-surface-border text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
-                  }`}
-                >
-                  {priority.label}
-                </button>
-              );
-            })}
-          </div>
+            <div className="flex items-center gap-2 overflow-x-auto elite-scrollbar scrollbar-hide pb-1 md:flex-wrap">
+              <span className="text-xs font-semibold text-[color:var(--color-muted)] mr-1 shrink-0">
+                Priority:
+              </span>
+              {PRIORITY_OPTIONS.map((priority) => {
+                const isActive = filterPriorities.has(priority.key);
+                return (
+                  <button
+                    key={priority.key}
+                    type="button"
+                    onClick={() => toggleFilter('priority', priority.key)}
+                    className={`inline-flex shrink-0 items-center rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
+                      isActive
+                        ? 'bg-brand-50 border-brand-500/25 text-brand-700'
+                        : 'bg-surface-bg border-surface-border text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
+                    }`}
+                  >
+                    {priority.label}
+                  </button>
+                );
+              })}
+            </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold text-[color:var(--color-muted)] mr-1">
-              Type:
-            </span>
-            {TASK_TYPE_OPTIONS.map((taskType) => {
-              const isActive = filterTypes.has(taskType.key);
-              return (
-                <button
-                  key={taskType.key}
-                  type="button"
-                  onClick={() => toggleFilter('type', taskType.key)}
-                  className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
-                    isActive
-                      ? 'bg-brand-50 border-brand-500/25 text-brand-700'
-                      : 'bg-surface-bg border-surface-border text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
-                  }`}
-                >
-                  {taskType.label}
-                </button>
-              );
-            })}
+            <div className="flex items-center gap-2 overflow-x-auto elite-scrollbar scrollbar-hide pb-1 md:flex-wrap">
+              <span className="text-xs font-semibold text-[color:var(--color-muted)] mr-1 shrink-0">
+                Type:
+              </span>
+              {TASK_TYPE_OPTIONS.map((taskType) => {
+                const isActive = filterTypes.has(taskType.key);
+                return (
+                  <button
+                    key={taskType.key}
+                    type="button"
+                    onClick={() => toggleFilter('type', taskType.key)}
+                    className={`inline-flex shrink-0 items-center rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
+                      isActive
+                        ? 'bg-brand-50 border-brand-500/25 text-brand-700'
+                        : 'bg-surface-bg border-surface-border text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
+                    }`}
+                  >
+                    {taskType.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center justify-between gap-3 rounded-md border border-surface-border bg-[color:var(--color-surface-alt)]/35 px-3 py-2">
+            <div className="text-xs text-[color:var(--color-muted)]">
+              {hasActiveFilters ? (
+                <>
+                  Status {activeCounts.statuses} · Priority {activeCounts.priorities} · Type{' '}
+                  {activeCounts.types}
+                </>
+              ) : (
+                <>Chọn “Bộ lọc nâng cao” để lọc theo trạng thái / priority / type.</>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowArchived(!showArchived)}
+              className={`inline-flex items-center gap-2 rounded-sm border px-3 py-2 text-xs font-semibold transition-colors ${
+                showArchived
+                  ? 'bg-amber-50 border-amber-200 text-amber-700'
+                  : 'bg-surface-bg border-surface-border text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
+              }`}
+            >
+              {showArchived ? 'Đang xem archived' : 'Ẩn archived'}
+            </button>
+          </div>
+        )}
 
-        <div className="flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => setShowArchived(!showArchived)}
-            className={`inline-flex items-center gap-2 rounded-sm border px-3 py-2 text-xs font-semibold transition-colors ${
-              showArchived
-                ? 'bg-amber-50 border-amber-200 text-amber-700'
-                : 'bg-surface-bg border-surface-border text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
-            }`}
-          >
-            {showArchived ? 'Đang xem archived' : 'Ẩn archived'}
-          </button>
-          <div className="text-xs text-[color:var(--color-faint)]">
-            Mẹo: giữ <span className="font-semibold">Ctrl/⌘</span> để chọn nhiều task.
+        {advancedOpen ? (
+          <div className="flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => setShowArchived(!showArchived)}
+              className={`inline-flex items-center gap-2 rounded-sm border px-3 py-2 text-xs font-semibold transition-colors ${
+                showArchived
+                  ? 'bg-amber-50 border-amber-200 text-amber-700'
+                  : 'bg-surface-bg border-surface-border text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
+              }`}
+            >
+              {showArchived ? 'Đang xem archived' : 'Ẩn archived'}
+            </button>
+            <div className="hidden md:block text-xs text-[color:var(--color-faint)]">
+              Mẹo: giữ <span className="font-semibold">Ctrl/⌘</span> để chọn nhiều task.
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </section>
   );

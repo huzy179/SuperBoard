@@ -50,7 +50,7 @@ export default function WorkflowSettingsPage() {
   };
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="mx-auto w-full max-w-[1400px]">
       <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
         <Link
           href={`/jira/projects/${projectId}`}

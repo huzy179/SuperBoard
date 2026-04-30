@@ -24,7 +24,7 @@ export default function AutomationPage() {
 
   return (
     <div className="min-h-screen bg-surface-bg">
-      <div className="mx-auto w-full max-w-6xl px-6 py-10">
+      <div className="mx-auto w-full max-w-[1400px] px-6 py-8">
         <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="space-y-2">
             <button

@@ -75,7 +75,7 @@ export function WorkspaceMemberSettings({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-[color:var(--color-ink)] tracking-tight">
@@ -98,7 +98,7 @@ export function WorkspaceMemberSettings({
         ) : null}
       </header>
 
-      <section className="rounded-xl border border-surface-border bg-surface-card p-4 space-y-3">
+      <section className="rounded-xl border border-surface-border bg-[color:var(--color-surface-alt)]/35 p-4 space-y-3">
         <div className="flex flex-col gap-3 md:flex-row md:items-center">
           <div className="relative flex-1 min-w-[240px]">
             <Search
@@ -141,20 +141,20 @@ export function WorkspaceMemberSettings({
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-surface-border">
-          <table className="w-full text-left">
+        <div className="overflow-x-auto rounded-xl border border-surface-border bg-surface-card elite-scrollbar">
+          <table className="w-full min-w-[820px] text-left">
             <thead className="bg-black/[0.02] border-b border-surface-border">
               <tr>
-                <th className="px-6 py-3 text-xs font-medium text-[color:var(--color-muted)]">
+                <th className="px-4 sm:px-6 py-3 text-xs font-medium text-[color:var(--color-muted)]">
                   Thành viên
                 </th>
-                <th className="px-6 py-3 text-xs font-medium text-[color:var(--color-muted)]">
+                <th className="px-4 sm:px-6 py-3 text-xs font-medium text-[color:var(--color-muted)]">
                   Vai trò
                 </th>
-                <th className="px-6 py-3 text-xs font-medium text-[color:var(--color-muted)]">
+                <th className="px-4 sm:px-6 py-3 text-xs font-medium text-[color:var(--color-muted)]">
                   Ngày gia nhập
                 </th>
-                <th className="px-6 py-3 text-xs font-medium text-[color:var(--color-muted)] text-right">
+                <th className="px-4 sm:px-6 py-3 text-xs font-medium text-[color:var(--color-muted)] text-right">
                   Thao tác
                 </th>
               </tr>
@@ -165,7 +165,7 @@ export function WorkspaceMemberSettings({
                   key={m.id}
                   className="group border-b border-surface-border last:border-b-0 hover:bg-black/[0.02] transition-colors"
                 >
-                  <td className="px-6 py-4">
+                  <td className="px-4 sm:px-6 py-4">
                     <div className="flex items-center gap-4">
                       <AssigneeAvatar name={m.fullName} color={m.avatarColor} size="lg" />
                       <div className="min-w-0">
@@ -179,7 +179,7 @@ export function WorkspaceMemberSettings({
                     </div>
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="px-4 sm:px-6 py-4">
                     {canManage && m.role !== 'owner' && m.userId !== currentUserId ? (
                       <select
                         value={m.role}
@@ -205,12 +205,12 @@ export function WorkspaceMemberSettings({
                     )}
                   </td>
 
-                  <td className="px-6 py-4 text-sm text-[color:var(--color-muted)]">
+                  <td className="px-4 sm:px-6 py-4 text-sm text-[color:var(--color-muted)]">
                     {formatDate(m.joinedAt)}
                   </td>
 
-                  <td className="px-6 py-4 text-right">
-                    <div className="inline-flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <td className="px-4 sm:px-6 py-4 text-right">
+                    <div className="inline-flex items-center justify-end gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                       {isOwner && m.role !== 'owner' ? (
                         <button
                           type="button"

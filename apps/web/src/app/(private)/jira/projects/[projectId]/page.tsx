@@ -304,8 +304,8 @@ function ProjectDetailPageContent() {
     );
 
   return (
-    <section className="flex flex-col gap-6 p-6 min-h-screen bg-surface-bg">
-      <div className="flex flex-col gap-8">
+    <section className="flex flex-col gap-5 p-6 min-h-screen bg-surface-bg">
+      <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between gap-4">
           <ProjectDetailHeader
             project={project!}

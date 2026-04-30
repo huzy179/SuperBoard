@@ -114,7 +114,7 @@ export function TaskBoardView({
   }, [draggedTask, workflow, getAllowedTargetStatuses]);
 
   return (
-    <div className="flex gap-[var(--space-6)] overflow-x-auto pb-[var(--space-8)] pt-[var(--space-4)] elite-scrollbar">
+    <div className="flex gap-[var(--space-6)] overflow-x-auto pb-[var(--space-6)] pt-[var(--space-2)] elite-scrollbar">
       {columns.map((column) => {
         const tasks = boardData.get(column.key) ?? [];
         const isDragOver = dragOverColumn === column.key;

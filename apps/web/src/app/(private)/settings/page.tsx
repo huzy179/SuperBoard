@@ -149,7 +149,7 @@ export default function SettingsPage() {
 
       <div className="mb-12 relative">
         <div className="absolute inset-x-0 bottom-0 h-px bg-surface-border" />
-        <nav className="flex space-x-12 relative z-10">
+        <nav className="flex gap-10 overflow-x-auto elite-scrollbar scrollbar-hide relative z-10">
           {[
             { id: 'profile', label: 'Hồ sơ cá nhân', icon: <User size={14} /> },
             { id: 'workspace', label: 'Thành viên workspace', icon: <Users size={14} /> },
@@ -184,10 +184,10 @@ export default function SettingsPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="max-w-4xl space-y-12">
+      <div className="w-full space-y-10">
         {activeTab === 'profile' && (
           <div>
-            <section className="rounded-xl border border-surface-border bg-surface-card p-8 shadow-luxe">
+            <section className="rounded-xl border border-surface-border bg-surface-card p-6 md:p-8 shadow-luxe">
               <div className="space-y-10">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-brand-50 rounded-lg border border-brand-500/15 text-brand-500">
@@ -261,13 +261,13 @@ export default function SettingsPage() {
         )}
 
         {activeTab === 'workspace' && workspaceId && (
-          <section className="rounded-xl border border-surface-border bg-surface-card p-4 shadow-sm">
+          <section className="rounded-xl border border-surface-border bg-surface-card p-6 shadow-sm">
             <WorkspaceMemberSettings workspaceId={workspaceId} currentUserId={user?.id || ''} />
           </section>
         )}
 
         {activeTab === 'notifications' && (
-          <section className="rounded-xl border border-surface-border bg-surface-card p-8 shadow-sm">
+          <section className="rounded-xl border border-surface-border bg-surface-card p-6 md:p-8 shadow-sm">
             <div className="space-y-10">
               <div className="flex items-start justify-between gap-6">
                 <div className="flex items-start gap-4">
@@ -370,49 +370,48 @@ export default function SettingsPage() {
         )}
 
         {activeTab === 'workflows' && canChangeRoles && (
-          <section className="rounded-xl border border-surface-border bg-surface-card shadow-sm">
-            <WorkflowEditor
-              {...(workflow ? { data: workflow } : {})}
-              isLoading={isWorkflowLoading}
-              title="Quy trình mặc định của workspace"
-              description="Thiết lập trạng thái và luồng chuyển trạng thái cho tất cả dự án trong workspace."
-              onAddStatus={async (data) => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await createWorkspaceStatus.mutateAsync(data as any);
-              }}
-              onUpdateStatus={async (statusId, data) => {
-                await updateWorkspaceStatus.mutateAsync({ statusId, data });
-              }}
-              onDeleteStatus={async (statusId) => {
-                if (confirm('Bạn có chắc muốn xóa trạng thái này?')) {
-                  await deleteWorkspaceStatus.mutateAsync({ statusId });
+          <WorkflowEditor
+            variant="embedded"
+            {...(workflow ? { data: workflow } : {})}
+            isLoading={isWorkflowLoading}
+            title="Quy trình mặc định của workspace"
+            description="Thiết lập trạng thái và luồng chuyển trạng thái cho tất cả dự án trong workspace."
+            onAddStatus={async (data) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              await createWorkspaceStatus.mutateAsync(data as any);
+            }}
+            onUpdateStatus={async (statusId, data) => {
+              await updateWorkspaceStatus.mutateAsync({ statusId, data });
+            }}
+            onDeleteStatus={async (statusId) => {
+              if (confirm('Bạn có chắc muốn xóa trạng thái này?')) {
+                await deleteWorkspaceStatus.mutateAsync({ statusId });
+              }
+            }}
+            onSaveTransitions={async (transitions) => {
+              await updateWorkspaceTransitions.mutateAsync({ transitions });
+            }}
+            isPending={
+              createWorkspaceStatus.isPending ||
+              updateWorkspaceStatus.isPending ||
+              deleteWorkspaceStatus.isPending ||
+              updateWorkspaceTransitions.isPending ||
+              syncWorkflow.isPending
+            }
+            extraActions={
+              <button
+                type="button"
+                onClick={() =>
+                  confirm('Áp dụng quy trình này cho toàn bộ dự án trong workspace?') &&
+                  syncWorkflow.mutate()
                 }
-              }}
-              onSaveTransitions={async (transitions) => {
-                await updateWorkspaceTransitions.mutateAsync({ transitions });
-              }}
-              isPending={
-                createWorkspaceStatus.isPending ||
-                updateWorkspaceStatus.isPending ||
-                deleteWorkspaceStatus.isPending ||
-                updateWorkspaceTransitions.isPending ||
-                syncWorkflow.isPending
-              }
-              extraActions={
-                <button
-                  type="button"
-                  onClick={() =>
-                    confirm('Áp dụng quy trình này cho toàn bộ dự án trong workspace?') &&
-                    syncWorkflow.mutate()
-                  }
-                  disabled={syncWorkflow.isPending}
-                  className="btn btn-secondary"
-                >
-                  {syncWorkflow.isPending ? 'Đang đồng bộ…' : 'Đồng bộ cho toàn workspace'}
-                </button>
-              }
-            />
-          </section>
+                disabled={syncWorkflow.isPending}
+                className="btn btn-secondary"
+              >
+                {syncWorkflow.isPending ? 'Đang đồng bộ…' : 'Đồng bộ cho toàn workspace'}
+              </button>
+            }
+          />
         )}
       </div>
 

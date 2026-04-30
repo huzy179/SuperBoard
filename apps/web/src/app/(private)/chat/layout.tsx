@@ -30,20 +30,22 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-full overflow-hidden rounded-xl border border-surface-border bg-surface-card shadow-sm">
       {/* Secondary Sidebar: Channels */}
-      <aside className="flex w-64 shrink-0 flex-col border-r border-surface-border bg-slate-50/50">
-        <div className="flex h-14 items-center justify-between px-4 border-b border-surface-border bg-white/50">
-          <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-            Kênh thảo luận
-          </h2>
-          <button className="p-1 hover:bg-slate-200 rounded-md transition-colors">
-            <Plus size={16} className="text-slate-600" />
+      <aside className="flex w-64 shrink-0 flex-col border-r border-surface-border bg-black/[0.02]">
+        <div className="flex h-14 items-center justify-between px-4 border-b border-surface-border bg-surface-card">
+          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">Kênh thảo luận</h2>
+          <button
+            type="button"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-transparent text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)] transition-colors"
+            aria-label="Tạo kênh mới"
+          >
+            <Plus size={16} />
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto py-4 px-2 space-y-6">
           {/* Public Channels */}
           <div>
-            <div className="px-2 mb-1 flex items-center justify-between text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-none">
+            <div className="px-2 mb-1 flex items-center justify-between text-xs font-medium text-[color:var(--color-muted)] leading-none">
               <span>Công khai</span>
             </div>
             <div className="space-y-0.5">
@@ -56,10 +58,13 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
                     className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] font-medium transition-colors ${
                       isActive
                         ? 'bg-brand-600 text-white shadow-sm'
-                        : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-900'
+                        : 'text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
                     }`}
                   >
-                    <Hash size={14} className={isActive ? 'text-white' : 'text-slate-400'} />
+                    <Hash
+                      size={14}
+                      className={isActive ? 'text-white' : 'text-[color:var(--color-faint)]'}
+                    />
                     <span className="truncate">{channel.name}</span>
                   </Link>
                 );
@@ -69,7 +74,7 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
 
           {/* Private Channels */}
           <div>
-            <div className="px-2 mb-1 flex items-center justify-between text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-none">
+            <div className="px-2 mb-1 flex items-center justify-between text-xs font-medium text-[color:var(--color-muted)] leading-none">
               <span>Riêng tư</span>
             </div>
             <div className="space-y-0.5">
@@ -85,11 +90,14 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
                     className={`flex items-center justify-between px-2 py-1.5 rounded-md text-[13px] transition-colors ${
                       isActive
                         ? 'bg-brand-600 text-white shadow-sm font-bold'
-                        : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-900 font-medium'
+                        : 'text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)] font-medium'
                     }`}
                   >
                     <div className="flex items-center gap-2 truncate">
-                      <Lock size={14} className={isActive ? 'text-white' : 'text-slate-400'} />
+                      <Lock
+                        size={14}
+                        className={isActive ? 'text-white' : 'text-[color:var(--color-faint)]'}
+                      />
                       <span className="truncate">{channel.name}</span>
                     </div>
                     {isUnread && !isActive && <div className="h-2 w-2 rounded-full bg-brand-500" />}
@@ -97,16 +105,22 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
                 );
               })}
               {privateChannels.length === 0 && (
-                <p className="px-2 text-[12px] text-slate-400 italic">Không có kênh riêng tư</p>
+                <p className="px-2 text-[12px] text-[color:var(--color-muted)] italic">
+                  Không có kênh riêng tư
+                </p>
               )}
             </div>
           </div>
 
           {/* DM Section */}
           <div>
-            <div className="px-2 mb-2 flex items-center justify-between text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-none">
+            <div className="px-2 mb-2 flex items-center justify-between text-xs font-medium text-[color:var(--color-muted)] leading-none">
               <span>Tin nhắn trực tiếp</span>
-              <button className="hover:text-slate-900 transition-colors">
+              <button
+                type="button"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-transparent text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)] transition-colors"
+                aria-label="Tạo cuộc trò chuyện"
+              >
                 <Plus size={12} />
               </button>
             </div>
@@ -116,33 +130,34 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
                 { name: 'Trần Thị B', status: 'away' },
                 { name: 'Lê Văn C', status: 'offline' },
               ].map((user, i) => (
-                <div
+                <button
+                  type="button"
                   key={i}
-                  className="flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] font-medium text-slate-600 hover:bg-slate-200/50 hover:text-slate-900 transition-colors cursor-pointer group"
+                  className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] font-medium text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)] transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-focus)]/35"
                 >
                   <div className="relative">
-                    <div className="h-4 w-4 rounded bg-slate-200 flex items-center justify-center text-[8px] text-slate-500 font-bold uppercase">
+                    <div className="h-4 w-4 rounded bg-black/[0.06] flex items-center justify-center text-[8px] text-[color:var(--color-muted)] font-bold uppercase">
                       {user.name[0]}
                     </div>
                     <div
-                      className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border-2 border-white ${
+                      className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border-2 border-surface-card ${
                         user.status === 'online'
                           ? 'bg-emerald-500'
                           : user.status === 'away'
                             ? 'bg-amber-500'
-                            : 'bg-slate-300'
+                            : 'bg-black/[0.18]'
                       }`}
                     />
                   </div>
                   <span className="truncate flex-1">{user.name}</span>
-                </div>
+                </button>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="p-4 border-t border-surface-border bg-white/30">
-          <div className="flex items-center gap-2 px-2 py-1.5 text-[12px] text-slate-500">
+        <div className="p-4 border-t border-surface-border bg-surface-card">
+          <div className="flex items-center gap-2 px-2 py-1.5 text-[12px] text-[color:var(--color-muted)]">
             <Settings size={14} />
             <span>Cài đặt Chat</span>
           </div>
@@ -150,7 +165,7 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Main Chat Area */}
-      <main className="flex-1 flex flex-col min-w-0 bg-white">{children}</main>
+      <main className="flex-1 flex flex-col min-w-0 bg-surface-bg">{children}</main>
     </div>
   );
 }

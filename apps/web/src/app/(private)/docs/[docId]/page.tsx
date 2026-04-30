@@ -145,7 +145,7 @@ export default function DocDetailPage() {
                 value={localTitle}
                 onChange={(e) => setLocalTitle(e.target.value)}
                 placeholder="Tiêu đề…"
-                className="w-full border-none bg-transparent focus:outline-none text-4xl md:text-5xl font-semibold tracking-tight text-[color:var(--color-ink)] placeholder:text-[color:var(--color-faint)]"
+                className="w-full -mx-2 px-2 py-1 rounded-md border-none bg-transparent text-4xl md:text-5xl font-semibold tracking-tight text-[color:var(--color-ink)] placeholder:text-[color:var(--color-faint)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-focus)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg"
               />
 
               <div className="flex flex-wrap items-center gap-4 text-sm text-[color:var(--color-muted)]">

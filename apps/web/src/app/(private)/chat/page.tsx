@@ -27,15 +27,17 @@ export default function ChatHomePage() {
 
   if (!channels || channels.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-slate-50/20">
-        <div className="w-16 h-16 mb-4 rounded-full bg-brand-100 flex items-center justify-center">
-          <span className="text-2xl text-brand-600">💬</span>
+      <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-surface-bg">
+        <div className="w-16 h-16 mb-4 rounded-full bg-brand-50 border border-brand-200 flex items-center justify-center">
+          <span className="text-2xl text-brand-700">💬</span>
         </div>
-        <h3 className="text-lg font-bold text-slate-800">Chào mừng đến với Trò chuyện!</h3>
-        <p className="mt-2 text-slate-500 max-w-sm">
+        <h3 className="text-lg font-semibold text-[color:var(--color-ink)]">
+          Chào mừng đến với Trò chuyện
+        </h3>
+        <p className="mt-2 text-[color:var(--color-muted)] max-w-sm leading-relaxed">
           Hãy tạo một kênh mới để bắt đầu thảo luận với nhóm của bạn.
         </p>
-        <button className="mt-6 px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors shadow-sm">
+        <button type="button" className="mt-6 btn btn-primary">
           + Tạo kênh đầu tiên
         </button>
       </div>
@@ -43,10 +45,12 @@ export default function ChatHomePage() {
   }
 
   return (
-    <div className="flex h-full items-center justify-center p-8 bg-slate-50/20">
+    <div className="flex h-full items-center justify-center p-8 bg-surface-bg">
       <div className="flex flex-col items-center">
-        <div className="animate-bounce mb-4 text-4xl">🚀</div>
-        <p className="text-slate-500 font-medium">Đang chuyển đến kênh thảo luận...</p>
+        <div className="mb-4 text-4xl opacity-80">🚀</div>
+        <p className="text-[color:var(--color-muted)] font-medium">
+          Đang chuyển đến kênh thảo luận…
+        </p>
       </div>
     </div>
   );

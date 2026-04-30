@@ -109,7 +109,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
           <input
             ref={inputRef}
             type="text"
-            className="flex-1 text-base font-medium text-[color:var(--color-ink)] outline-none placeholder:text-[color:var(--color-faint)] tracking-tight bg-transparent"
+            className="flex-1 text-base font-medium text-[color:var(--color-ink)] outline-none placeholder:text-[color:var(--color-faint)] bg-transparent"
             placeholder="Tìm project, task…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -139,7 +139,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
                   </div>
                 ) : (
                   <div className="space-y-6">
-                    <p className="text-[14px] leading-relaxed text-slate-800 font-medium">
+                    <p className="text-[14px] leading-relaxed text-[color:var(--color-ink)] font-medium">
                       {answer?.answer}
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -152,7 +152,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
                               id: citation.id,
                             })
                           }
-                          className="px-3 py-1.5 rounded-xl bg-white/60 border border-brand-500/10 text-[10px] font-bold text-brand-600 hover:bg-brand-500/10 transition-colors flex items-center gap-2"
+                          className="px-3 py-1.5 rounded-xl bg-surface-bg border border-brand-500/15 text-xs font-semibold text-brand-700 hover:bg-brand-50 transition-colors flex items-center gap-2"
                         >
                           <span className="opacity-60">{citation.type}</span>
                           {citation.title}
@@ -178,8 +178,8 @@ export function SearchModal({ onClose }: SearchModalProps) {
             <div className="space-y-6 px-4 pb-6">
               {projects.length > 0 && (
                 <div>
-                  <h3 className="px-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-3">
-                    Mission Nodes
+                  <h3 className="px-4 text-xs font-semibold text-[color:var(--color-muted)] mb-3">
+                    Projects
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
                     {projects.map((p: ProjectItemDTO, i: number) => (
@@ -196,9 +196,9 @@ export function SearchModal({ onClose }: SearchModalProps) {
                 </div>
               )}
               {tasks.length > 0 && (
-                <div className="border-t border-slate-50 pt-6">
-                  <h3 className="px-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-3">
-                    Tactical Items
+                <div className="border-t border-surface-border pt-6">
+                  <h3 className="px-4 text-xs font-semibold text-[color:var(--color-muted)] mb-3">
+                    Tasks
                   </h3>
                   <div className="grid grid-cols-1 gap-2">
                     {tasks.map((t: ProjectTaskItemDTO, i: number) => (
@@ -226,18 +226,18 @@ export function SearchModal({ onClose }: SearchModalProps) {
             !isAnswering &&
             !answer && (
               <div className="px-4 py-20 text-center flex flex-col items-center gap-4">
-                <div className="h-20 w-20 bg-slate-50 rounded-xl flex items-center justify-center text-4xl opacity-50 shadow-inner grayscale">
+                <div className="h-20 w-20 bg-black/[0.03] rounded-xl flex items-center justify-center text-4xl opacity-60 border border-surface-border">
                   👻
                 </div>
-                <p className="text-xs font-black text-slate-400 uppercase tracking-[0.4em]">
-                  Null Reference
+                <p className="text-sm font-medium text-[color:var(--color-muted)]">
+                  Không tìm thấy kết quả phù hợp.
                 </p>
               </div>
             )
           )}
         </div>
 
-        <div className="flex items-center justify-between border-t border-slate-50 bg-slate-50/50 px-4 py-2.5 text-[10px] text-slate-400 font-medium">
+        <div className="flex items-center justify-between border-t border-surface-border bg-black/[0.02] px-4 py-2.5 text-xs text-[color:var(--color-muted)] font-medium">
           <div className="flex items-center gap-3">
             <span>↑↓ di chuyển</span>
             <span>↵ chọn</span>
@@ -267,25 +267,25 @@ function SearchResultItem({
       type="button"
       onClick={onClick}
       className={`flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors ${
-        isSelected ? 'bg-brand-50 shadow-sm ring-1 ring-brand-100' : 'hover:bg-slate-50'
+        isSelected ? 'bg-brand-50 shadow-sm ring-1 ring-brand-100' : 'hover:bg-black/[0.02]'
       }`}
     >
-      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white border border-slate-200 text-sm shadow-sm">
+      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/[0.02] border border-surface-border text-sm">
         {icon}
       </span>
       <div className="min-w-0 flex-1">
         <p
           className={`truncate text-[13px] font-semibold ${
-            isSelected ? 'text-brand-700' : 'text-slate-900'
+            isSelected ? 'text-brand-700' : 'text-[color:var(--color-ink)]'
           }`}
         >
           {title}
         </p>
-        <p className="truncate text-[11px] text-slate-500 font-medium">{subtitle}</p>
+        <p className="truncate text-[11px] text-[color:var(--color-muted)] font-medium">
+          {subtitle}
+        </p>
       </div>
-      {isSelected && (
-        <span className="text-brand-400 animate-in fade-in slide-in-from-right-1">↵</span>
-      )}
+      {isSelected && <span className="text-brand-600">↵</span>}
     </button>
   );
 }

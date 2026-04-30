@@ -46,16 +46,16 @@ export function JiraDashboard() {
   const { user } = useAuthSession();
 
   return (
-    <div className="relative min-h-screen bg-surface-bg overflow-x-hidden pt-8 pb-16 px-6 md:px-10 font-sans">
-      <div className="relative z-10 max-w-7xl mx-auto space-y-10">
+    <div className="relative min-h-screen bg-surface-bg overflow-x-hidden pt-6 pb-14 px-6 md:px-10 font-sans">
+      <div className="relative z-10 mx-auto w-full max-w-[1400px] space-y-8">
         {/* Workspace Hub Header */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <div className="space-y-3">
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2">
             <div className="flex items-center gap-3">
               <div className="h-1 w-8 bg-brand-500 rounded-full" />
               <span className="text-sm font-medium text-slate-600">Workspace</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-semibold text-slate-900 tracking-tight leading-none">
+            <h1 className="text-3xl md:text-4xl font-semibold text-slate-900 tracking-tight leading-tight">
               Workspace hub
             </h1>
             <p className="text-sm text-slate-600 max-w-lg">
@@ -66,7 +66,7 @@ export function JiraDashboard() {
           <button
             type="button"
             onClick={() => setShowCreatePanel((value) => !value)}
-            className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-5 py-3 text-sm font-semibold text-slate-950 hover:bg-brand-400 active:bg-brand-600 transition-colors"
+            className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-4 py-2.5 text-sm font-semibold text-slate-950 hover:bg-brand-400 active:bg-brand-600 transition-colors"
           >
             <Plus size={16} />
             {showCreatePanel ? 'Close' : 'New project'}

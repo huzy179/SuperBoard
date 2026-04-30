@@ -24,6 +24,7 @@ interface WorkflowData {
 interface WorkflowEditorProps {
   data?: WorkflowData;
   isLoading: boolean;
+  variant?: 'page' | 'embedded';
   onAddStatus: (data: {
     key: string;
     name: string;
@@ -42,6 +43,7 @@ interface WorkflowEditorProps {
 export function WorkflowEditor({
   data,
   isLoading,
+  variant = 'page',
   onAddStatus,
   onUpdateStatus,
   onDeleteStatus,
@@ -112,12 +114,17 @@ export function WorkflowEditor({
   if (isLoading) return <div className="p-8">Đang tải cấu hình quy trình...</div>;
 
   const statuses = data?.statuses || [];
+  const isEmbedded = variant === 'embedded';
 
   return (
-    <div className="flex flex-col gap-10 pb-20">
-      <header className="flex items-center justify-between px-8">
+    <div className={`flex flex-col ${isEmbedded ? 'gap-8' : 'gap-10 pb-20'}`}>
+      <header className={`flex items-center justify-between ${isEmbedded ? '' : 'px-6 sm:px-8'}`}>
         <div>
-          <h1 className="text-3xl md:text-4xl font-semibold text-[color:var(--color-ink)] tracking-tight mb-2">
+          <h1
+            className={`font-semibold text-[color:var(--color-ink)] tracking-tight mb-2 ${
+              isEmbedded ? 'text-2xl md:text-3xl' : 'text-3xl md:text-4xl'
+            }`}
+          >
             {title || 'Workflow Core'}
           </h1>
           <div className="flex items-center gap-4">
@@ -132,7 +139,7 @@ export function WorkflowEditor({
 
       {/* STATUSES SECTION */}
       <section className="rounded-2xl border border-surface-border bg-surface-card shadow-luxe">
-        <div className="px-8 py-6 border-b border-surface-border flex justify-between items-center">
+        <div className="px-6 sm:px-8 py-6 border-b border-surface-border flex justify-between items-center">
           <h2 className="text-sm font-semibold text-[color:var(--color-ink)] flex items-center gap-3">
             <div className="h-1.5 w-1.5 rounded-full bg-brand-500" />
             Logic states
@@ -141,7 +148,7 @@ export function WorkflowEditor({
             {statuses.length} statuses
           </span>
         </div>
-        <div className="p-8">
+        <div className="p-6 sm:p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {statuses.map((status) => (
               <div
@@ -257,7 +264,7 @@ export function WorkflowEditor({
 
       {/* TRANSITION MATRIX SECTION */}
       <section className="rounded-2xl border border-surface-border bg-surface-card shadow-luxe">
-        <div className="px-8 py-6 border-b border-surface-border flex justify-between items-center">
+        <div className="px-6 sm:px-8 py-6 border-b border-surface-border flex justify-between items-center">
           <div>
             <h2 className="text-sm font-semibold text-[color:var(--color-ink)] flex items-center gap-3">
               <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -279,7 +286,7 @@ export function WorkflowEditor({
             </AppButton>
           )}
         </div>
-        <div className="p-8 overflow-x-auto elite-scrollbar">
+        <div className="p-6 sm:p-8 overflow-x-auto elite-scrollbar">
           <table className="w-full border-separate border-spacing-3">
             <thead>
               <tr>

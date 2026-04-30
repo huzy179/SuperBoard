@@ -14,7 +14,7 @@
     "dev": "turbo run dev --parallel",
     "dev:infra": "docker compose -f docker/compose/docker-compose.yml up -d",
     "dev:docker": "docker compose -f docker/compose/docker-compose.yml --profile app up -d",
-    "dev:docker:hot": "docker compose -f docker/compose/docker-compose.yml -f docker/compose/docker-compose.dev.yml --profile app up",
+    "dev:docker:hot": "docker compose -f docker/compose/docker-compose.yml -f docker/compose/docker-compose.dev.yml --profile app --profile full up",
     "dev:infra:full": "docker compose -f docker/compose/docker-compose.yml --profile full up -d",
     "dev:infra:down": "docker compose -f docker/compose/docker-compose.yml down",
     "health:check": "node scripts/health-check.mjs",

@@ -1,6 +1,7 @@
 import asyncio
 import os
 import socket
+import threading
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
@@ -13,6 +14,7 @@ from superboard_shared.health import CallableHealthIndicator, HealthCheckService
 
 from amqp_consumer import AIAMQPConsumer
 from config import load_config
+from grpc_server import start_grpc_server
 
 _amqp_consumer: AIAMQPConsumer | None = None
 
@@ -23,6 +25,13 @@ async def lifespan(app: FastAPI):
     global _amqp_consumer
     _amqp_consumer = AIAMQPConsumer()
     await _amqp_consumer.start()
+
+    # Start gRPC server in background thread for dev mode
+    if os.getenv("NODE_ENV") == "development" or os.getenv("PYTHON_ENV") == "development":
+        t = threading.Thread(target=start_grpc_server, daemon=True)
+        t.start()
+        set_grpc_started(True)
+
     yield
     if _amqp_consumer:
         await _amqp_consumer.stop()

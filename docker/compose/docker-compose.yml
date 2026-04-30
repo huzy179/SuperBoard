@@ -123,6 +123,23 @@ services:
     networks:
       - superboard
 
+  collaboration:
+    profiles: [app]
+    build:
+      context: ../..
+      dockerfile: apps/collaboration/Dockerfile
+    container_name: superboard-collaboration
+    ports:
+      - '3001:3001'
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - NODE_ENV=production
+    networks:
+      - superboard
+
   # ===== Full Stack Services (Profile: full) =====
   minio:
     profiles: [full]
@@ -198,6 +215,8 @@ services:
         condition: service_healthy
     environment:
       REDIS_URL: redis://redis:6379
+      AMQP_URL: amqp://${RABBITMQ_USER:-dev}:${RABBITMQ_PASS:-devpassword}@rabbitmq:5672/superboard
+      NODE_ENV: production
     networks:
       - superboard
 

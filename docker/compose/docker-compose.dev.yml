@@ -44,3 +44,24 @@ services:
       - ../../apps/collab-service:/app/apps/collab-service
       - ../../apps/api/prisma:/app/apps/api/prisma
       - ../../packages:/app/packages
+
+  collaboration:
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: 'true'
+      CHOKIDAR_INTERVAL: '300'
+    command: npm run dev --workspace=@superboard/collaboration
+    user: root
+    volumes:
+      - ../../apps/collaboration:/app/apps/collaboration
+      - ../../packages:/app/packages
+
+  ai-service:
+    environment:
+      NODE_ENV: development
+      PYTHONUNBUFFERED: '1'
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    user: root
+    volumes:
+      - ../../apps/ai-service:/app
+      - ../../packages/backend-shared:/packages/backend-shared

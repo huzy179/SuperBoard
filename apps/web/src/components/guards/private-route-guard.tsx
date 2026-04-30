@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useSyncExternalStore, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import type { AuthUserDTO } from '@superboard/shared';
 import { FullPageError, FullPageLoader } from '@/components/ui/page-states';
@@ -15,11 +15,19 @@ type PrivateRouteGuardProps = {
   children: (props: GuardRenderProps) => ReactNode;
 };
 
+const emptySubscribe = () => () => {};
+
 export function PrivateRouteGuard({ children }: PrivateRouteGuardProps) {
   const router = useRouter();
   const { loading, error, user, logout } = useAuthSession();
 
-  if (loading) {
+  const isClient = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
+
+  if (!isClient || loading) {
     return <FullPageLoader label="Đang xác thực người dùng..." />;
   }
 

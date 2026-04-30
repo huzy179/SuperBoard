@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
-  output          = "../../../node_modules/.prisma/client"
+  output          = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -513,11 +513,12 @@ model Channel {
   type         ChannelType     @default(public)
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
+  deletedAt    DateTime?
   members      ChannelMember[]
   messages     Message[]
 
   @@unique([workspaceId, name])
-  @@index([workspaceId])
+  @@index([workspaceId, deletedAt])
 }
 
 model ChannelMember {

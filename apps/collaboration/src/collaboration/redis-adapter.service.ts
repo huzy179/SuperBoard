@@ -13,47 +13,37 @@ export class RedisAdapterService implements OnModuleInit, OnModuleDestroy {
     private config: ConfigService,
     private redisPool: RedisPoolManager,
     private dbPool: DatabasePoolManager,
-  ) {}
+  ) {
+    const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:6379';
+    try {
+      const parsed = new URL(redisUrl);
+      const host = parsed.hostname || 'localhost';
+      const port = Number(parsed.port || 6379);
+      const password = parsed.password || undefined;
+      const db = parsed.pathname && parsed.pathname !== '/' ? Number(parsed.pathname.slice(1)) : 0;
+
+      const redisOptions = {
+        host,
+        port,
+        password,
+        db: Number.isFinite(db) ? db : 0,
+        maxRetriesPerRequest: null,
+      };
+
+      this.pubClient = new Redis(redisOptions);
+      this.subClient = new Redis(redisOptions);
+      this.logger.log(`Redis clients initialized in constructor: ${host}:${port}/${db}`);
+    } catch (e) {
+      this.logger.error('Failed to parse REDIS_URL in constructor', e);
+      // Fallback
+      this.pubClient = new Redis();
+      this.subClient = new Redis();
+    }
+  }
 
   async onModuleInit() {
-    const redisUrl = this.config.get<string>('REDIS_URL') ?? 'redis://localhost:6379';
-    const parsed = new URL(redisUrl);
-    const host = parsed.hostname;
-    const port = Number(parsed.port || 6379);
-    const password = parsed.password || undefined;
-    const db = parsed.pathname && parsed.pathname !== '/' ? Number(parsed.pathname.slice(1)) : 0;
-
-    // Get connection from shared RedisPoolManager with health checking
-    this.pubClient = await this.redisPool.getConnection({
-      host: host || 'localhost',
-      port,
-      password,
-      db: Number.isFinite(db) ? db : 0,
-      maxRetriesPerRequest: null,
-    });
-
-    this.logger.log(
-      `Redis connection established: ${host}:${port}/${Number.isFinite(db) ? db : 0}`,
-    );
-
-    // socket.io redis adapter expects separate pub/sub clients; reuse config via duplicate()
-    this.subClient = this.pubClient.duplicate();
-    await new Promise<void>((resolve, reject) => {
-      const timeout = setTimeout(
-        () => reject(new Error('Redis duplicate connection timeout')),
-        5000,
-      );
-      this.subClient.on('ready', () => {
-        clearTimeout(timeout);
-        resolve();
-      });
-      this.subClient.on('error', (err) => {
-        clearTimeout(timeout);
-        reject(err);
-      });
-    });
-
-    this.logger.log('Redis pub/sub clients initialized');
+    // Clients are already initialized in constructor.
+    // We can still await subClient ready if needed, but not required for the adapter instance.
 
     // Initialize database pool if configured
     const dbUrl = this.config.get<string>('DATABASE_URL');

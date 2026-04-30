@@ -39,29 +39,54 @@ SuperBoard không phải là một project đơn lẻ, mà là một hệ sinh t
 - **Shared Contracts:** Mọi giao tiếp dữ liệu giữa Web và API đều phải thông qua các DTO được định nghĩa trong `packages/shared`. Điều này đảm bảo "Type-safety" tuyệt đối.
 - **Domain Decoupling:** Các module (như Task, Chat, Auth) được thiết kế để ít phụ thuộc trực tiếp vào nhau nhất có thể, thường giao tiếp qua Sự kiện (Events).
 
-### B. Kiến Trúc Đa Tầng (Layered Architecture) o API
+### B. Kiến Trúc Đa Tầng (Layered Architecture)
 
 1. **Controller Layer:** Chỉ tiếp nhận Request, Validate dữ liệu sơ bộ và gọi Service.
 2. **Business Logic Layer (Service):** Nơi thực hiện các quy tắc nghiệp vụ, kiểm tra quyền hạn.
 3. **Data Access Layer (Prisma):** Tương tác với Database.
 
-### C. Cơ Chế Xử Lý Bất Đồng Bộ (Background Processing)
+---
 
-Để đảm bảo API luôn phản hồi dưới 100ms, các tác vụ nặng (như gửi Email, đánh chỉ mục tìm kiếm) luôn được đẩy vào **Redis Queue (BullMQ)** để xử lý sau.
+## 4. Backend Directory Structure Standardization 📂
+
+Tất cả các dịch vụ backend đều tuân theo cấu trúc thư mục chuẩn hóa để đảm bảo tính nhất quán và dễ bảo trì.
+
+### Standardized Directory Structure
+
+```
+src/
+├── controllers/              # HTTP request handlers
+│   ├── *.controller.ts      # Controller files
+│   └── dto/                 # Data Transfer Objects
+├── services/                # Business logic layer
+│   ├── *.service.ts         # Service implementations
+│   └── interfaces/          # Service interfaces
+├── modules/                 # NestJS modules
+│   ├── *.module.ts          # Module definitions
+├── common/                  # Shared utilities and helpers
+├── config/                  # Configuration management
+├── __tests__/               # Test files (Unit, Integration, Property)
+├── app.module.ts            # Root application module
+└── main.ts                  # Application entry point
+```
+
+### File Naming Conventions
+
+- **Controllers**: `{feature}.controller.ts` (e.g., `user.controller.ts`)
+- **Services**: `{feature}.service.ts` (e.g., `user.service.ts`)
+- **Modules**: `{feature}.module.ts` (e.g., `user.module.ts`)
+- **DTOs**: `{feature}.dto.ts` or `create-{feature}.dto.ts`
 
 ---
 
-## 4. Luồng Vận Hành Thực Tế 🔄
+## 5. Luồng Vận Hành Thực Tế 🔄
 
 1. **Thao tác người dùng:** Người dùng nhấn "Hoàn thành Task".
 2. **Optimistic Update:** Frontend hiển thị Task đã hoàn thành ngay lập tức.
 3. **API Processing:** API nhận yêu cầu, cập nhật Database qua Prisma Transaction.
 4. **Event Dispatch:** API đẩy sự kiện `task.completed` vào Redis.
-5. **Background Workers:**
-   - `Automation Service` kiểm tra xem có cần chuyển task tiếp theo hay không.
-   - `Notification Service` gửi mail cho Project Manager.
-   - `Search Service` cập nhật lại chỉ mục tìm kiếm.
+5. **Background Workers:** `Automation Service`, `Notification Service`, `Search Service` xử lý các tác vụ liên quan.
 
 ---
 
-_Tài liệu này được thiết kế để bạn có thể nắm bắt nhanh "linh hồn" của dự án. Để bắt đầu code, hãy đọc thêm file `README.md` trong từng thư mục app._
+_Để biết thêm chi tiết về lộ trình phát triển kỹ thuật, vui lòng đọc [ADVANCED_LEARNING.md](./ADVANCED_LEARNING.md)._

@@ -21,6 +21,20 @@ docker/
 
 Lưu ý: Mọi lệnh nên được chạy từ **thư mục gốc (root)** của dự án.
 
+### 0. Chạy app trong Docker + tự cập nhật khi sửa code (Hot reload)
+
+Mặc định, profile `app` đang chạy theo chế độ **production** (build một lần). Nếu bạn muốn sửa code trên máy và container cập nhật ngay, hãy chạy kèm file override dev:
+
+```bash
+docker compose -f docker/compose/docker-compose.yml -f docker/compose/docker-compose.dev.yml --profile app up
+```
+
+Hoặc dùng script:
+
+```bash
+npm run dev:docker:hot
+```
+
 ### 1. Chạy hệ thống tối thiểu (Cho dev core)
 
 ```bash

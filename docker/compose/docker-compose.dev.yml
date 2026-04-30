@@ -1,0 +1,46 @@
+# SuperBoard — Dev overrides (hot reload)
+#
+# Usage:
+#   docker compose -f docker/compose/docker-compose.yml -f docker/compose/docker-compose.dev.yml --profile app up
+#
+# Notes:
+# - Uses bind-mounts for source code so edits on host reflect immediately.
+# - Keeps the image's root `node_modules` (we do NOT mount the repo root to /app).
+# - Enables polling watchers for better reliability on Docker Desktop (macOS/Windows).
+
+services:
+  api:
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: 'true'
+      CHOKIDAR_INTERVAL: '300'
+    command: npm run dev --workspace=@superboard/api
+    user: root
+    volumes:
+      - ../../apps/api:/app/apps/api
+      - ../../packages:/app/packages
+
+  web:
+    environment:
+      NODE_ENV: development
+      NEXT_TELEMETRY_DISABLED: '1'
+      WATCHPACK_POLLING: 'true'
+      CHOKIDAR_USEPOLLING: 'true'
+      CHOKIDAR_INTERVAL: '300'
+    command: npm run dev --workspace=@superboard/web -- -H 0.0.0.0
+    user: root
+    volumes:
+      - ../../apps/web:/app/apps/web
+      - ../../packages:/app/packages
+
+  collab-service:
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: 'true'
+      CHOKIDAR_INTERVAL: '300'
+    command: npm run dev --workspace=@superboard/collab-service
+    user: root
+    volumes:
+      - ../../apps/collab-service:/app/apps/collab-service
+      - ../../apps/api/prisma:/app/apps/api/prisma
+      - ../../packages:/app/packages

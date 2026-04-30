@@ -7,21 +7,21 @@ import { z } from 'zod';
 // Re-export common types from main types module
 export type {
   AMQPConfig,
-  RedisConfig,
-  DatabaseConfig,
-  HealthConfig,
-  DependencyConfig,
-  MetricsConfig,
   BootstrapConfig,
+  DatabaseConfig,
+  DependencyConfig,
+  HealthConfig,
+  MetricsConfig,
+  RedisConfig,
 } from '../types';
 
 import type {
   AMQPConfig,
-  RedisConfig,
+  BootstrapConfig,
   DatabaseConfig,
   HealthConfig,
   MetricsConfig,
-  BootstrapConfig,
+  RedisConfig,
 } from '../types';
 
 export interface ConfigOptions<T> {

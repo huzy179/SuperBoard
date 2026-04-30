@@ -1,12 +1,12 @@
 import {
-  Registry,
   collectDefaultMetrics,
   Counter,
-  Histogram,
   Gauge,
+  Histogram,
+  Registry,
   type CounterConfiguration,
-  type HistogramConfiguration,
   type GaugeConfiguration,
+  type HistogramConfiguration,
 } from 'prom-client';
 import type { MetricsConfig } from '../types';
 

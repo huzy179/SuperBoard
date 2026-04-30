@@ -1,4 +1,4 @@
-import { Catch, type ArgumentsHost, HttpStatus, Logger } from '@nestjs/common';
+import { type ArgumentsHost, Catch, HttpStatus, Logger } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { BaseError } from '../error-types';
 import type { StandardErrorResponse } from '../../types';
@@ -87,7 +87,6 @@ export class GlobalExceptionFilter {
     this.logger = new Logger(GlobalExceptionFilter.name);
   }
 
-   
   protected onException(_ctx: GlobalExceptionContext): void {
     // Hook for subclasses.
   }
@@ -117,8 +116,8 @@ export class GlobalExceptionFilter {
     const err = exception instanceof Error ? exception : new Error(String(exception));
 
     const correlationId =
-      (exception instanceof BaseError && exception.correlationId) ||
-      (request.headers['x-correlation-id'] as string | undefined) ||
+      (exception instanceof BaseError ? exception.correlationId : undefined) ??
+      (request.headers['x-correlation-id'] as string | undefined) ??
       generateCorrelationId();
 
     const { type, severity } = mapTypeSeverity(exception);

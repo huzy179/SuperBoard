@@ -10,7 +10,7 @@ interface TOCItem {
 }
 
 interface DocTOCProps {
-  content: JSONContent; // TipTap JSON
+  content?: JSONContent | null; // TipTap JSON
 }
 
 export function DocTOC({ content }: DocTOCProps) {

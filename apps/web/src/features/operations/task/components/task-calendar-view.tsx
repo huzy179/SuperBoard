@@ -31,9 +31,9 @@ import type {
 } from '@superboard/shared';
 
 interface CalendarCell {
-  key: string;
   date: Date;
   inMonth: boolean;
+  key: string;
 }
 
 interface TaskCalendarViewProps {

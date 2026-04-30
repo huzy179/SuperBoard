@@ -14,16 +14,15 @@ interface ProjectViewManagerProps {
   visibleTasks: ProjectTaskItemDTO[];
   boardData: Map<string, ProjectTaskItemDTO[]>;
   dynamicColumns: { key: string; label: string }[];
-  workflow?: WorkflowStatusTemplateDTO;
+  workflow?: WorkflowStatusTemplateDTO | undefined;
   atRiskTaskIds: Set<string>;
 
   // Calendar specific
   calendarMonthLabel: string;
   calendarCells: {
     date: Date;
-    isCurrentMonth: boolean;
-    isToday: boolean;
-    dateKey: string;
+    inMonth: boolean;
+    key: string;
   }[];
   dueTasksByDate: Map<string, ProjectTaskItemDTO[]>;
   tasksWithoutDueDate: ProjectTaskItemDTO[];

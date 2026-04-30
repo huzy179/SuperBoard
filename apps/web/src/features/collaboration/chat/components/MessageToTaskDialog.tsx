@@ -30,7 +30,10 @@ export function MessageToTaskDialog({ message, isOpen, onClose }: MessageToTaskD
     getProjects()
       .then((data: ProjectItemDTO[]) => {
         setProjects(data);
-        if (data.length > 0) setSelectedProjectId(data[0].id);
+        if (data && data.length > 0) {
+          const firstId = data[0]?.id;
+          if (firstId) setSelectedProjectId(firstId);
+        }
       })
       .catch(() => toast.error('Không thể tải danh sách dự án'))
       .finally(() => setIsLoadingProjects(false));

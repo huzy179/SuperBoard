@@ -10,6 +10,7 @@ import {
   Search,
   User,
   X,
+  Clock,
 } from 'lucide-react';
 import type { ProjectTaskItemDTO } from '@superboard/shared';
 
@@ -38,6 +39,8 @@ const STATUS_LABELS: Record<string, { label: string; icon: React.ElementType; to
     tone: 'border-emerald-200 bg-emerald-50 text-emerald-800',
   },
 };
+
+const STATUS_CONFIG = STATUS_LABELS;
 
 export function QuickSearchDialog({ tasks, onClose, onSelectTask }: QuickSearchDialogProps) {
   const [query, setQuery] = useState('');
@@ -132,9 +135,8 @@ export function QuickSearchDialog({ tasks, onClose, onSelectTask }: QuickSearchD
             <ul ref={listRef} className="py-2">
               {results.map((task, idx) => {
                 const isSelected = idx === selectedIndex;
-                const statusConfig =
-                  STATUS_LABELS[String(task.status || '').toLowerCase()] ?? STATUS_LABELS.todo;
-                const StatusIcon = statusConfig.icon;
+                const statusConfig = STATUS_CONFIG[task.status as keyof typeof STATUS_CONFIG];
+                const StatusIcon = statusConfig?.icon || Clock;
 
                 return (
                   <li key={task.id}>
@@ -155,10 +157,10 @@ export function QuickSearchDialog({ tasks, onClose, onSelectTask }: QuickSearchD
                               #{task.number ?? '—'}
                             </span>
                             <span
-                              className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-medium ${statusConfig.tone}`}
+                              className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-medium ${statusConfig?.tone || 'bg-slate-50 text-slate-600 border-slate-200'}`}
                             >
-                              <StatusIcon size={12} />
-                              {statusConfig.label}
+                              <StatusIcon size={10} />
+                              {statusConfig?.label || task.status}
                             </span>
                             {task.assigneeId ? (
                               <span className="inline-flex items-center gap-1.5 rounded-full border border-surface-border bg-black/[0.02] px-2 py-0.5 text-[11px] font-medium text-[color:var(--color-muted)]">

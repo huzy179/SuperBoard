@@ -636,13 +636,13 @@ export class SearchService {
   }
 
   // Re-implementing text extraction to avoid service dependency for now
-  private extractTextFromJSON(node: Record<string, unknown>): string {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  private extractTextFromJSON(node: any): string {
     if (!node) return '';
-    if (node.type === 'text') return (node.text as string) || '';
+    if (node.type === 'text') return node.text || '';
     if (Array.isArray(node.content)) {
-      return node.content
-        .map((child: Record<string, unknown>) => this.extractTextFromJSON(child))
-        .join(' ');
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      return node.content.map((child: any) => this.extractTextFromJSON(child)).join(' ');
     }
     if (node.content) {
       return this.extractTextFromJSON(node.content);

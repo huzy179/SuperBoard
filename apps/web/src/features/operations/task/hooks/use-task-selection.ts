@@ -31,10 +31,10 @@ export function useTaskSelection(
 
   function handleSelectTask(
     taskId: string,
-    event: React.MouseEvent | React.KeyboardEvent | React.ChangeEvent,
+    event?: React.MouseEvent | React.KeyboardEvent | React.ChangeEvent,
   ) {
-    const isModifierPressed = 'metaKey' in event ? event.metaKey || event.ctrlKey : false;
-    const isShiftPressed = 'shiftKey' in event ? event.shiftKey : false;
+    const isModifierPressed = event && 'metaKey' in event ? event.metaKey || event.ctrlKey : false;
+    const isShiftPressed = event && 'shiftKey' in event ? event.shiftKey : false;
 
     setSelectedTaskIds((previous) => {
       const next = new Set(previous);

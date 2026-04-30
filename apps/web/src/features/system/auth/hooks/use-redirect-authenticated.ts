@@ -11,7 +11,7 @@ export function useRedirectAuthenticated(): boolean {
     const token = getAccessToken();
 
     if (!token) {
-      setCheckingAuth(false);
+      Promise.resolve().then(() => setCheckingAuth(false));
       return;
     }
 

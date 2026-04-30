@@ -226,11 +226,11 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
       {sidebarOpen && (
         <div className="fixed inset-0 z-[110] lg:hidden">
           <div
-            className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/20"
             onClick={() => setSidebarOpen(false)}
             aria-hidden
           />
-          <aside id="mobile-sidebar" className="relative z-[120] h-full w-80 shadow-glass">
+          <aside id="mobile-sidebar" className="relative z-[120] h-full w-80 shadow-luxe">
             {sidebar}
           </aside>
         </div>

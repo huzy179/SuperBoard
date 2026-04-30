@@ -1,10 +1,11 @@
 'use client';
 
+import React from 'react';
 import { TaskBoardView } from '@/features/operations/task/components/task-board-view';
 import { TaskListView } from '@/features/operations/task/components/task-list-view';
 import { TaskCalendarView } from '@/features/operations/task/components/task-calendar-view';
 import { NeuralBriefing } from '@/features/operations/dashboard/components/NeuralBriefing';
-import type { ProjectTaskItemDTO } from '@superboard/shared';
+import type { ProjectTaskItemDTO, WorkflowStatusTemplateDTO } from '@superboard/shared';
 import { useProjectDetailContext } from '../context/ProjectDetailContext';
 
 interface ProjectViewManagerProps {
@@ -13,12 +14,17 @@ interface ProjectViewManagerProps {
   visibleTasks: ProjectTaskItemDTO[];
   boardData: Map<string, ProjectTaskItemDTO[]>;
   dynamicColumns: { key: string; label: string }[];
-  workflow?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  workflow?: WorkflowStatusTemplateDTO;
   atRiskTaskIds: Set<string>;
 
   // Calendar specific
   calendarMonthLabel: string;
-  calendarCells: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
+  calendarCells: {
+    date: Date;
+    isCurrentMonth: boolean;
+    isToday: boolean;
+    dateKey: string;
+  }[];
   dueTasksByDate: Map<string, ProjectTaskItemDTO[]>;
   tasksWithoutDueDate: ProjectTaskItemDTO[];
   onPrevMonth: () => void;
@@ -33,7 +39,10 @@ interface ProjectViewManagerProps {
   // Selection
   selectedTaskIds: Set<string>;
   selectedVisibleCount: number;
-  onSelectTask: (taskId: string, event?: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+  onSelectTask: (
+    taskId: string,
+    event?: React.MouseEvent | React.KeyboardEvent | React.ChangeEvent,
+  ) => void;
   toggleSelectAllVisible: () => void;
 
   // Board DnD
@@ -41,10 +50,14 @@ interface ProjectViewManagerProps {
   dragOverColumn: string | null;
   setDragOverColumn: (col: string | null) => void;
   draggedTaskId: string | null;
-  handleDragStart: (event: any, taskId: string) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
-  handleDragOver: (event: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
-  handleDrop: (event: any, status: string) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
-  handleDropByPosition: (event: any, status: string, targetTaskId?: string) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+  handleDragStart: (event: React.DragEvent<HTMLElement>, taskId: string) => void;
+  handleDragOver: (event: React.DragEvent<HTMLElement>) => void;
+  handleDrop: (event: React.DragEvent<HTMLElement>, status: string) => void;
+  handleDropByPosition: (
+    event: React.DragEvent<HTMLElement>,
+    status: string,
+    targetTaskId?: string,
+  ) => void;
   isUpdatePending: boolean;
   updatingTaskId?: string | undefined;
   statusSelectLockReason?: string | undefined;

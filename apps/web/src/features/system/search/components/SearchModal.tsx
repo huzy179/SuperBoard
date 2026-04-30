@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSearch } from '@/features/system/search/hooks/use-search';
 import { getSearchAnswer } from '@/features/system/search/api/search-service';
@@ -72,19 +72,10 @@ export function SearchModal({ onClose }: SearchModalProps) {
   }, []);
 
   useEffect(() => {
-    setSelectedIndex(0);
+    Promise.resolve().then(() => setSelectedIndex(0));
   }, [query]);
 
-  useEffect(() => {
-    if (query.length > 5) {
-      const timer = setTimeout(() => fetchAnswer(), 1000);
-      return () => clearTimeout(timer);
-    } else {
-      setAnswer(null);
-    }
-  }, [query]);
-
-  async function fetchAnswer() {
+  const fetchAnswer = useCallback(async () => {
     setIsAnswering(true);
     try {
       setAnswer(await getSearchAnswer(query));
@@ -93,27 +84,33 @@ export function SearchModal({ onClose }: SearchModalProps) {
     } finally {
       setIsAnswering(false);
     }
-  }
+  }, [query]);
+
+  useEffect(() => {
+    if (query.length > 5) {
+      const timer = setTimeout(() => fetchAnswer(), 1000);
+      return () => clearTimeout(timer);
+    } else {
+      Promise.resolve().then(() => setAnswer(null));
+    }
+  }, [query, fetchAnswer]);
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-slate-900/60 backdrop-blur-md pt-24 animate-in fade-in duration-300"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black/20 pt-24"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-2xl overflow-hidden rounded-[2.5rem] bg-white border border-white/20 shadow-glass-xl ring-1 ring-black/5 animate-in zoom-in-95 duration-500 relative"
+        className="w-full max-w-2xl overflow-hidden rounded-xl bg-surface-card border border-surface-border shadow-luxe relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Rim Light */}
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/40 to-transparent" />
-
         <div className="flex items-center px-8 py-6 relative">
           <span className="text-2xl drop-shadow-md mr-4">🔍</span>
           <input
             ref={inputRef}
             type="text"
-            className="flex-1 text-xl font-bold text-slate-900 outline-none placeholder:text-slate-400 tracking-tight"
-            placeholder="Search missions, cross-platform signals..."
+            className="flex-1 text-base font-medium text-[color:var(--color-ink)] outline-none placeholder:text-[color:var(--color-faint)] tracking-tight bg-transparent"
+            placeholder="Tìm project, task…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -127,26 +124,18 @@ export function SearchModal({ onClose }: SearchModalProps) {
           {/* Neural Answer Section */}
           {(isAnswering || answer) && (
             <div className="px-6 pb-6">
-              <div
-                className={`p-8 rounded-xl border transition-all duration-700 ${
-                  isAnswering
-                    ? 'bg-brand-500/5 border-brand-500/10 animate-pulse'
-                    : 'bg-brand-500/5 border-brand-500/20 shadow-glow-brand'
-                }`}
-              >
+              <div className="p-6 rounded-xl border border-surface-border bg-[color:var(--color-surface-alt)]/35">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-8 h-8 rounded-xl bg-brand-500 flex items-center justify-center text-white shadow-glow-brand">
-                    <span className="text-xs font-black">AI</span>
+                  <div className="w-8 h-8 rounded-md bg-brand-500 flex items-center justify-center text-white">
+                    <span className="text-xs font-semibold">AI</span>
                   </div>
-                  <span className="text-[10px] font-black text-brand-600 uppercase tracking-[0.3em]">
-                    Neural Synthesis
-                  </span>
+                  <span className="text-sm font-semibold text-[color:var(--color-ink)]">Gợi ý</span>
                 </div>
 
                 {isAnswering ? (
                   <div className="space-y-3">
-                    <div className="h-3 w-3/4 bg-brand-500/10 rounded-full" />
-                    <div className="h-3 w-1/2 bg-brand-500/10 rounded-full" />
+                    <div className="h-3 w-3/4 bg-black/[0.06] rounded-full" />
+                    <div className="h-3 w-1/2 bg-black/[0.06] rounded-full" />
                   </div>
                 ) : (
                   <div className="space-y-6">
@@ -165,7 +154,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
                           }
                           className="px-3 py-1.5 rounded-xl bg-white/60 border border-brand-500/10 text-[10px] font-bold text-brand-600 hover:bg-brand-500/10 transition-colors flex items-center gap-2"
                         >
-                          <span className="opacity-40 uppercase">{citation.type}</span>
+                          <span className="opacity-60">{citation.type}</span>
                           {citation.title}
                         </button>
                       ))}
@@ -178,11 +167,11 @@ export function SearchModal({ onClose }: SearchModalProps) {
 
           {query.length < 2 ? (
             <div className="px-4 py-20 text-center flex flex-col items-center gap-4">
-              <div className="h-20 w-20 bg-slate-50 rounded-xl flex items-center justify-center text-4xl opacity-50 shadow-inner">
+              <div className="h-20 w-20 bg-black/[0.03] rounded-xl flex items-center justify-center text-4xl opacity-60 border border-surface-border">
                 🔍
               </div>
-              <p className="text-xs font-black text-slate-400 uppercase tracking-[0.4em]">
-                Initialize Neural Search
+              <p className="text-sm font-medium text-[color:var(--color-muted)]">
+                Nhập từ khóa để tìm kiếm.
               </p>
             </div>
           ) : totalResults > 0 ? (

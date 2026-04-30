@@ -94,15 +94,15 @@ export function WorkspaceCreateModal({ onClose, onSuccess }: WorkspaceCreateModa
           />
         </FormField>
 
-        <FormField label="Workspace_Protocol_Slug (Optional)" error={errors.slug?.message}>
-          <div className="flex items-center rounded-lg border border-white/10 bg-white/[0.01] overflow-hidden focus-within:border-brand-500/40 transition-all shadow-inner h-14">
-            <span className="px-4 text-white/20 text-[10px] font-mono select-none border-r border-white/10 h-full flex items-center bg-white/[0.02]">
-              UPLINK://
+        <FormField label="Slug (tuỳ chọn)" error={errors.slug?.message}>
+          <div className="flex items-center rounded-md border border-surface-border bg-surface-bg overflow-hidden focus-within:border-brand-500/40 transition-colors shadow-sm h-12">
+            <span className="px-3 text-[11px] font-mono select-none border-r border-surface-border h-full flex items-center text-[color:var(--color-muted)] bg-black/[0.02]">
+              workspace/
             </span>
             <input
               {...register('slug')}
               placeholder="alpha-sector-01"
-              className="flex-1 bg-transparent px-4 py-3 text-sm font-bold text-white placeholder:text-white/10 focus:outline-none"
+              className="flex-1 bg-transparent px-3 py-2 text-sm font-medium text-[color:var(--color-ink)] placeholder:text-[color:var(--color-faint)] focus:outline-none"
               onChange={(e) => {
                 const value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
                 form.setValue('slug', value);

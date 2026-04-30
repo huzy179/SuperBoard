@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Share2,
   Plus,
@@ -21,18 +21,18 @@ export function ConnectHub({ workspaceId }: { workspaceId: string }) {
   const [integrations, setIntegrations] = useState<IntegrationItem[]>([]);
   const [activeTab, setActiveTab] = useState<'connections' | 'monitor'>('connections');
 
-  useEffect(() => {
-    fetchIntegrations();
-  }, [workspaceId]);
-
-  const fetchIntegrations = async () => {
+  const fetchIntegrations = useCallback(async () => {
     try {
       const body = await getIntegrations(workspaceId);
       setIntegrations(body.integrations);
     } catch {
       toast.error('Failed to fetch integrations');
     }
-  };
+  }, [workspaceId]);
+
+  useEffect(() => {
+    Promise.resolve().then(() => fetchIntegrations());
+  }, [fetchIntegrations]);
 
   const deleteIntegration = async (id: string) => {
     try {

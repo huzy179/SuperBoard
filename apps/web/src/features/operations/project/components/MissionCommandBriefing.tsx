@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Activity, Clock, Cpu, Eye, ShieldAlert, Telescope, TrendingUp, Zap } from 'lucide-react';
 import { QuantumModal } from '@superboard/ui';
 import { AppButton } from '@/components/ui/app-button';
@@ -51,19 +51,23 @@ export function MissionCommandBriefing({
   useEffect(() => {
     if (!isOpen) return;
 
-    setGeneratedAt(new Date().toLocaleTimeString());
-    getProjectBriefing(projectId).then((res) => setData(res));
-    getProjectForecast(projectId).then((res) => setForecast(res));
+    Promise.resolve().then(() => {
+      setGeneratedAt(new Date().toLocaleTimeString());
+      getProjectBriefing(projectId).then((res) => setData(res));
+      getProjectForecast(projectId).then((res) => setForecast(res));
+    });
   }, [isOpen, projectId]);
 
   useEffect(() => {
     if (!isOpen) {
-      setData(null);
-      setForecast(null);
-      setSimulatedForecast(null);
-      setShowSandbox(false);
-      setTab('sitrep');
-      setGeneratedAt('');
+      Promise.resolve().then(() => {
+        setData(null);
+        setForecast(null);
+        setSimulatedForecast(null);
+        setShowSandbox(false);
+        setTab('sitrep');
+        setGeneratedAt('');
+      });
     }
   }, [isOpen]);
 

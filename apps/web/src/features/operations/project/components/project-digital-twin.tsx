@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Activity,
   Monitor,
@@ -44,11 +44,7 @@ export function ProjectDigitalTwin({ projectId }: { projectId: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSimulating, setIsSimulating] = useState(false);
 
-  useEffect(() => {
-    fetchBaseline();
-  }, [projectId]);
-
-  const fetchBaseline = async () => {
+  const fetchBaseline = useCallback(async () => {
     setIsLoading(true);
     try {
       const data = await getExecutiveProjectBriefing(projectId);
@@ -59,7 +55,11 @@ export function ProjectDigitalTwin({ projectId }: { projectId: string }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [projectId]);
+
+  useEffect(() => {
+    Promise.resolve().then(() => fetchBaseline());
+  }, [fetchBaseline]);
 
   const handleSimulate = async () => {
     setIsSimulating(true);

@@ -1,16 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  ShieldAlert,
-  Zap,
   ArrowRightLeft,
-  Link as LinkIcon,
-  RefreshCcw,
+  Briefcase,
   CheckCircle2,
   FileText,
-  Briefcase,
+  Link as LinkIcon,
+  RefreshCcw,
+  ShieldAlert,
 } from 'lucide-react';
 import { getKnowledgeDivergence, type StrategicCollision } from '../api/knowledge-service';
 
@@ -28,6 +26,11 @@ export function ConflictResolver() {
       .catch(() => setIsLoading(false));
   }, []);
 
+  const remaining = useMemo(
+    () => collisions.filter((c) => !resolvedIds.has(c.id)),
+    [collisions, resolvedIds],
+  );
+
   const handleResolve = (id: string) => {
     setResolvedIds((prev) => new Set([...prev, id]));
   };
@@ -35,144 +38,121 @@ export function ConflictResolver() {
   if (isLoading) return <ResolverSkeleton />;
 
   return (
-    <div className="space-y-12 py-10">
-      <div className="flex items-center justify-between px-6">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-red-500/10 rounded-lg border border-red-500/20 shadow-glow-red/10">
-            <ShieldAlert className="h-5 w-5 text-red-400" />
+    <div className="space-y-8">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-md border border-rose-200 bg-rose-50 text-rose-700">
+            <ShieldAlert size={18} />
           </div>
-          <div className="space-y-1">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
+          <div>
+            <h2 className="text-lg font-semibold text-[color:var(--color-ink)]">
               Kiểm tra xung đột
             </h2>
-            <p className="text-sm font-bold text-white uppercase tracking-tight italic">
-              Phát hiện trùng lặp ngữ nghĩa
+            <p className="mt-1 text-sm text-[color:var(--color-muted)] leading-relaxed">
+              Phát hiện trùng lặp ngữ nghĩa giữa các task/tài liệu để đồng bộ tri thức.
             </p>
           </div>
         </div>
 
-        <div className="px-5 py-2.5 bg-white/5 border border-white/10 rounded-full flex items-center gap-2">
-          <RefreshCcw size={14} className="text-white/40 animate-spin-slow" />
-          <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">
-            {collisions.length} xung đột đang hoạt động
+        <div className="inline-flex items-center gap-2 rounded-full border border-surface-border bg-surface-card px-3 py-1.5 text-sm text-[color:var(--color-muted)]">
+          <RefreshCcw size={14} className="text-[color:var(--color-faint)]" />
+          <span>
+            {remaining.length} / {collisions.length} xung đột
           </span>
         </div>
-      </div>
+      </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 px-6">
-        <AnimatePresence mode="popLayout">
-          {collisions.map((collision, idx) => {
-            if (resolvedIds.has(collision.id)) return null;
-
-            return (
-              <motion.div
-                key={collision.id}
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ delay: idx * 0.1 }}
-                className="group relative h-full flex flex-col p-8 rounded-[3rem] border border-white/10 bg-slate-900/50 backdrop-blur-3xl hover:border-brand-500/40 transition-all duration-700 overflow-hidden"
-              >
-                {/* Collision Glow */}
-                <div className="absolute -right-20 -top-20 w-40 h-40 bg-red-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-
-                <div className="flex items-center justify-between mb-8">
-                  <div className="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-full flex items-center gap-2">
-                    <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">
-                      Mức độ xung đột: {(collision.intensity * 100).toFixed(0)}%
-                    </span>
-                  </div>
-                  <Zap className="text-brand-500 h-4 w-4" />
+      {remaining.length === 0 ? (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-8 text-center">
+          <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-white">
+            <CheckCircle2 className="h-7 w-7 text-emerald-600" />
+          </div>
+          <h3 className="mt-4 text-lg font-semibold text-emerald-900">Đã đồng bộ</h3>
+          <p className="mt-1 text-sm text-emerald-800/90">
+            Không còn xung đột ngữ nghĩa cần xử lý.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {remaining.map((collision) => (
+            <section
+              key={collision.id}
+              className="rounded-xl border border-surface-border bg-surface-card p-6 shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-medium text-rose-800">
+                  Mức độ: {(collision.intensity * 100).toFixed(0)}%
                 </div>
+              </div>
 
-                <div className="flex items-center gap-4 mb-10">
-                  {collision.nodes[0] && <CollisionNodeCard node={collision.nodes[0]} />}
-                  <div className="flex-shrink-0 p-3 bg-white/5 rounded-full border border-white/10 relative">
-                    <ArrowRightLeft className="text-white/40 h-4 w-4" />
-                    <div className="absolute inset-0 animate-ping rounded-full border border-red-500/20 opacity-20" />
-                  </div>
-                  {collision.nodes[1] && <CollisionNodeCard node={collision.nodes[1]} />}
+              <div className="mt-4 flex items-center gap-3">
+                {collision.nodes[0] ? <CollisionNodeCard node={collision.nodes[0]} /> : null}
+                <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-surface-border bg-surface-bg text-[color:var(--color-muted)]">
+                  <ArrowRightLeft size={18} />
                 </div>
+                {collision.nodes[1] ? <CollisionNodeCard node={collision.nodes[1]} /> : null}
+              </div>
 
-                <div className="flex-1 space-y-4">
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
-                      Giao thức giải quyết AI
-                    </span>
-                    <p className="text-sm font-bold text-white uppercase tracking-tight leading-relaxed italic border-l-4 border-brand-500 pl-6 py-2">
-                      "{collision.protocol}"
-                    </p>
-                  </div>
+              <div className="mt-5 rounded-lg border border-surface-border bg-[color:var(--color-surface-alt)]/35 p-4">
+                <div className="text-xs font-medium text-[color:var(--color-muted)]">
+                  Gợi ý xử lý (AI)
                 </div>
-
-                <div className="mt-10 flex gap-3">
-                  <button
-                    onClick={() => handleResolve(collision.id)}
-                    className="flex-1 px-6 py-4 bg-brand-500 rounded-lg text-[10px] font-black text-white uppercase tracking-widest shadow-glow-brand hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
-                  >
-                    <LinkIcon size={14} /> Liên kết
-                  </button>
-                  <button
-                    onClick={() => handleResolve(collision.id)}
-                    className="px-6 py-4 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black text-white/40 uppercase tracking-widest hover:bg-white/10 transition-all"
-                  >
-                    Bỏ qua
-                  </button>
+                <div className="mt-1 text-sm text-[color:var(--color-ink)] leading-relaxed">
+                  {collision.protocol}
                 </div>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
+              </div>
 
-        {collisions.length > 0 && resolvedIds.size === collisions.length && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="lg:col-span-2 flex flex-col items-center justify-center py-20 text-center space-y-6"
-          >
-            <div className="p-6 bg-emerald-500/10 rounded-full border border-emerald-500/20 shadow-glow-emerald/10">
-              <CheckCircle2 className="h-12 w-12 text-emerald-400" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-2xl font-black text-white uppercase tracking-tighter">
-                Workspace đã đồng bộ
-              </h3>
-              <p className="text-sm text-white/40 italic font-medium">
-                Mọi xung đột ngữ nghĩa đã được giải quyết.
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </div>
+              <div className="mt-5 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleResolve(collision.id)}
+                  className="btn btn-primary flex-1"
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <LinkIcon size={16} />
+                    Liên kết
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleResolve(collision.id)}
+                  className="btn btn-secondary"
+                >
+                  Bỏ qua
+                </button>
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 function CollisionNodeCard({ node }: { node: StrategicCollision['nodes'][number] }) {
+  const isTask = node.type === 'task';
   return (
-    <div className="flex-1 p-5 bg-white/[0.03] border border-white/5 rounded-xl space-y-3 hover:bg-white/[0.06] transition-all">
-      <div className="flex items-center gap-3">
-        <div className="p-2 bg-brand-500/10 rounded-lg text-brand-400">
-          {node.type === 'task' ? <Briefcase size={14} /> : <FileText size={14} />}
-        </div>
-        <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-          {node.projectName}
+    <div className="flex-1 min-w-0 rounded-lg border border-surface-border bg-surface-bg p-4">
+      <div className="flex items-center gap-2 text-xs text-[color:var(--color-muted)]">
+        <span className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-surface-border bg-white text-[color:var(--color-muted)]">
+          {isTask ? <Briefcase size={14} /> : <FileText size={14} />}
         </span>
+        <span className="truncate">{node.projectName}</span>
       </div>
-      <p className="text-[11px] font-bold text-white uppercase tracking-tight text-wrap line-clamp-2 leading-tight">
+      <div className="mt-2 line-clamp-2 text-sm font-semibold text-[color:var(--color-ink)] leading-snug">
         {node.title}
-      </p>
+      </div>
     </div>
   );
 }
 
 function ResolverSkeleton() {
   return (
-    <div className="space-y-12 py-10 px-6 animate-pulse">
-      <div className="h-12 w-64 bg-white/5 rounded-lg" />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="h-96 bg-white/5 rounded-[3.5rem]" />
-        <div className="h-96 bg-white/5 rounded-[3.5rem]" />
+    <div className="space-y-6">
+      <div className="h-10 w-64 rounded-lg bg-black/[0.06]" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="h-72 rounded-xl border border-surface-border bg-surface-card" />
+        <div className="h-72 rounded-xl border border-surface-border bg-surface-card" />
       </div>
     </div>
   );

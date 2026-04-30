@@ -14,11 +14,27 @@ export function TwinPulseVisualizer({ data }: { data: PulseData }) {
 
   // Generate orbital paths for "Missions"
   const orbits = useMemo(() => {
+    const random = (seed: number) => {
+      const x = Math.sin(seed) * 10000;
+      return x - Math.floor(x);
+    };
+
     return Array.from({ length: 8 }).map((_, i) => ({
       radius: 60 + i * 25,
-      duration: 10 + Math.random() * 20,
+      duration: 10 + random(i + 1) * 20,
       delay: -i * 2,
       opacity: 0.1 + (1 - i / 8) * 0.2,
+    }));
+  }, []);
+
+  const nodes = useMemo(() => {
+    const random = (seed: number) => {
+      const x = Math.sin(seed + 100) * 10000;
+      return x - Math.floor(x);
+    };
+
+    return Array.from({ length: 12 }).map((_, i) => ({
+      size: 3 + random(i) * 3,
     }));
   }, []);
 
@@ -88,7 +104,7 @@ export function TwinPulseVisualizer({ data }: { data: PulseData }) {
               <circle
                 cx={200 + orbit.radius}
                 cy="200"
-                r={3 + Math.random() * 3}
+                r={nodes[i]?.size || 3}
                 fill={i < data.atRiskCount ? '#ef4444' : 'white'}
                 fillOpacity={0.6}
               />

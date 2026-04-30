@@ -1,6 +1,5 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
 import { TaskEditSlideOver } from '@/features/operations/task/components/task-edit-slide-over';
 import { QuickSearchDialog } from './quick-search-dialog';
 import dynamic from 'next/dynamic';
@@ -148,140 +147,106 @@ export function ProjectOverlayManager({
   const onCloseKnowledgeMap = () => setShowKnowledgeMap(false);
   return (
     <>
-      <AnimatePresence mode="wait">
-        {editingTask && (
-          <motion.div
-            key="edit-panel"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.4, ease: [0.175, 0.885, 0.32, 1.275] }}
-            className="fixed inset-0 z-50 pointer-events-none"
-          >
-            <div className="pointer-events-auto contents">
-              <TaskEditSlideOver
-                editingTask={editingTask}
-                projectKey={project?.key ?? null}
-                projectId={projectId}
-                currentUserId={currentUser?.id ?? ''}
-                members={members}
-                editTitle={editTitle}
-                setEditTitle={setEditTitle}
-                editDescription={editDescription}
-                setEditDescription={setEditDescription}
-                editType={editType}
-                setEditType={setEditType}
-                editStatus={editStatus}
-                setEditStatus={setEditStatus}
-                editPriority={editPriority}
-                setEditPriority={setEditPriority}
-                editStoryPoints={editStoryPoints}
-                setEditStoryPoints={setEditStoryPoints}
-                editDueDate={editDueDate}
-                setEditDueDate={setEditDueDate}
-                editAssigneeId={editAssigneeId}
-                setEditAssigneeId={setEditAssigneeId}
-                editingTaskSubtasks={editingTaskSubtasks}
-                subtaskTitle={subtaskTitle}
-                setSubtaskTitle={setSubtaskTitle}
-                subtaskError={subtaskError}
-                subtaskPendingTaskId={subtaskPendingTaskId}
-                handleCreateSubtask={handleCreateSubtask}
-                handleToggleSubtaskDone={handleToggleSubtaskDone}
-                handleDeleteSubtask={handleDeleteSubtask}
-                editingParentTask={editingParentTask}
-                onClose={onCloseEdit}
-                onSave={handleUpdateTask}
-                onDelete={handleDeleteTask}
-                onRestore={handleRestoreTask}
-                isSaving={isSaving}
-                isDeleting={isDeleting}
-                isRestoring={isRestoring}
-                taskUpdateError={taskUpdateError}
-                handleOpenEdit={onOpenEdit}
-                dialogRef={dialogRef}
-                handleDialogKeyDown={handleDialogKeyDown}
-                workflow={workflow}
-                predictiveHealth={predictiveHealth}
-                workspaceId={project?.workspaceId ?? ''}
-                tasks={tasks}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {showQuickSearch && (
-          <motion.div
-            key="quick-search"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
-          >
-            <div className="pointer-events-auto w-full max-w-2xl">
-              <QuickSearchDialog
-                tasks={tasks}
-                projectId={projectId}
-                onClose={onCloseQuickSearch}
-                onSelectTask={(taskId) => {
-                  onCloseQuickSearch();
-                  const task = tasks.find((t) => t.id === taskId);
-                  if (task) onOpenEdit(task);
-                }}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {showAutomationPanel && (
-          <motion.div
-            key="automation"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            className="fixed inset-y-0 right-0 z-50 pointer-events-none"
-          >
-            <div className="pointer-events-auto h-full">
-              <AutomationSlideOver
-                workspaceId={project?.workspaceId ?? ''}
-                projectId={projectId}
-                onClose={onCloseAutomation}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {showKnowledgeMap && (
-          <motion.div
-            key="knowledge-map"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60]"
-          >
-            <KnowledgeMap
+      {editingTask ? (
+        <div className="fixed inset-0 z-50 pointer-events-none">
+          <div className="pointer-events-auto contents">
+            <TaskEditSlideOver
+              editingTask={editingTask}
+              projectKey={project?.key ?? null}
               projectId={projectId}
-              onClose={onCloseKnowledgeMap}
-              onSelectNode={(nodeId, type) => {
-                if (type === 'task') {
-                  const task = tasks.find((t) => t.id === nodeId);
-                  if (task) {
-                    onCloseKnowledgeMap();
-                    onOpenEdit(task);
-                  }
-                }
+              currentUserId={currentUser?.id ?? ''}
+              members={members}
+              editTitle={editTitle}
+              setEditTitle={setEditTitle}
+              editDescription={editDescription}
+              setEditDescription={setEditDescription}
+              editType={editType}
+              setEditType={setEditType}
+              editStatus={editStatus}
+              setEditStatus={setEditStatus}
+              editPriority={editPriority}
+              setEditPriority={setEditPriority}
+              editStoryPoints={editStoryPoints}
+              setEditStoryPoints={setEditStoryPoints}
+              editDueDate={editDueDate}
+              setEditDueDate={setEditDueDate}
+              editAssigneeId={editAssigneeId}
+              setEditAssigneeId={setEditAssigneeId}
+              editingTaskSubtasks={editingTaskSubtasks}
+              subtaskTitle={subtaskTitle}
+              setSubtaskTitle={setSubtaskTitle}
+              subtaskError={subtaskError}
+              subtaskPendingTaskId={subtaskPendingTaskId}
+              handleCreateSubtask={handleCreateSubtask}
+              handleToggleSubtaskDone={handleToggleSubtaskDone}
+              handleDeleteSubtask={handleDeleteSubtask}
+              editingParentTask={editingParentTask}
+              onClose={onCloseEdit}
+              onSave={handleUpdateTask}
+              onDelete={handleDeleteTask}
+              onRestore={handleRestoreTask}
+              isSaving={isSaving}
+              isDeleting={isDeleting}
+              isRestoring={isRestoring}
+              taskUpdateError={taskUpdateError}
+              handleOpenEdit={onOpenEdit}
+              dialogRef={dialogRef}
+              handleDialogKeyDown={handleDialogKeyDown}
+              workflow={workflow}
+              predictiveHealth={predictiveHealth}
+              workspaceId={project?.workspaceId ?? ''}
+              tasks={tasks}
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {showQuickSearch ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+          <div className="pointer-events-auto w-full max-w-2xl">
+            <QuickSearchDialog
+              tasks={tasks}
+              projectId={projectId}
+              onClose={onCloseQuickSearch}
+              onSelectTask={(taskId) => {
+                onCloseQuickSearch();
+                const task = tasks.find((t) => t.id === taskId);
+                if (task) onOpenEdit(task);
               }}
             />
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      ) : null}
+
+      {showAutomationPanel ? (
+        <div className="fixed inset-y-0 right-0 z-50 pointer-events-none">
+          <div className="pointer-events-auto h-full">
+            <AutomationSlideOver
+              workspaceId={project?.workspaceId ?? ''}
+              projectId={projectId}
+              onClose={onCloseAutomation}
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {showKnowledgeMap ? (
+        <div className="fixed inset-0 z-[60]">
+          <KnowledgeMap
+            projectId={projectId}
+            onClose={onCloseKnowledgeMap}
+            onSelectNode={(nodeId, type) => {
+              if (type === 'task') {
+                const task = tasks.find((t) => t.id === nodeId);
+                if (task) {
+                  onCloseKnowledgeMap();
+                  onOpenEdit(task);
+                }
+              }
+            }}
+          />
+        </div>
+      ) : null}
 
       <ProjectCopilot projectId={projectId} />
     </>

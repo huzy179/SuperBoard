@@ -243,7 +243,7 @@ function ProjectDetailPageContent() {
         .map((s) => ({ key: s.key, label: s.name }));
     }
     return BOARD_COLUMNS;
-  }, [workflow?.statuses]);
+  }, [workflow]);
 
   useKeyboardShortcuts([
     { key: 'k', metaKey: true, handler: () => setShowQuickSearch(true) },

@@ -1,70 +1,49 @@
 'use client';
 
-import { VectorAtlas } from '@/features/intelligence/knowledge/components/VectorAtlas';
-import { BrainCircuit, ChevronLeft, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
+import { BrainCircuit, ChevronLeft, LayoutGrid } from 'lucide-react';
+import { VectorAtlas } from '@/features/intelligence/knowledge/components/VectorAtlas';
 
 export default function DocsAtlasPage() {
   return (
-    <div className="space-y-10 animate-in fade-in duration-700">
-      {/* Strategic Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="space-y-8">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-500/10 rounded-xl border border-indigo-500/20 shadow-glow-indigo/10">
-              <BrainCircuit className="h-5 w-5 text-indigo-400" />
+            <div className="h-10 w-10 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-700">
+              <BrainCircuit className="h-5 w-5" />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
-              Intelligence Sector
+            <span className="text-sm font-semibold text-[color:var(--color-ink)]">
+              Vector Atlas
             </span>
           </div>
-          <h1 className="text-4xl font-black tracking-tight text-white uppercase leading-none">
-            Vector <span className="text-indigo-400">Atlas</span>
-          </h1>
+          <p className="text-sm text-[color:var(--color-muted)] max-w-2xl">
+            Bản đồ tri thức: xem các node (docs/tasks) và mức liên kết theo ngữ nghĩa.
+          </p>
         </div>
 
-        <div className="flex items-center gap-4">
-          <Link
-            href="/docs"
-            className="flex items-center gap-3 px-6 py-3 bg-white/[0.03] border border-white/10 rounded-lg text-[10px] font-black text-white/40 uppercase tracking-widest hover:text-white hover:border-white/20 hover:bg-white/[0.05] transition-all group"
-          >
-            <ChevronLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            Back to Registry
-          </Link>
-          <div className="h-10 w-px bg-white/10 hidden md:block" />
-          <div className="flex flex-col items-end">
-            <span className="text-[9px] font-black uppercase tracking-widest text-white/20">
-              Mode
-            </span>
-            <div className="flex items-center gap-2">
-              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse shadow-glow-indigo" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">
-                Semantic_Scan
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+        <Link
+          href="/docs"
+          className="inline-flex items-center gap-2 rounded-sm border border-surface-border bg-surface-card px-4 py-2 text-sm font-semibold text-[color:var(--color-ink)] hover:bg-black/[0.03] transition-colors w-fit"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Back
+        </Link>
+      </header>
 
-      {/* Vector Atlas Map & Strategic Insight */}
       <VectorAtlas />
 
-      {/* Narrative Footer */}
-      <div className="p-8 rounded-[2.5rem] border border-white/5 bg-white/[0.01] flex items-center justify-between gap-8 backdrop-blur-3xl">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-white/5 rounded-lg border border-white/10">
-            <LayoutGrid className="h-5 w-5 text-white/20" />
-          </div>
-          <div className="space-y-1">
-            <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">
-              Cognitive Mapping Active
-            </p>
-            <p className="text-[13px] font-bold text-white uppercase tracking-wider">
-              Semantic adjacency is analyzed across all Mission Protocols.
-            </p>
-          </div>
+      <footer className="rounded-lg border border-surface-border bg-surface-card shadow-luxe p-6 flex items-center gap-4">
+        <div className="h-10 w-10 rounded-lg bg-black/[0.03] border border-surface-border flex items-center justify-center text-[color:var(--color-muted)]">
+          <LayoutGrid className="h-5 w-5" />
         </div>
-      </div>
+        <div>
+          <p className="text-sm font-semibold text-[color:var(--color-ink)]">Gợi ý</p>
+          <p className="text-sm text-[color:var(--color-muted)]">
+            Click vào node để xem chi tiết. (Màn này sẽ được đồng bộ tiếp về tone Notion.)
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

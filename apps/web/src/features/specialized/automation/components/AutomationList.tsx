@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Power, Zap, Activity, Cpu, Trash } from 'lucide-react';
+import { Activity, Cpu, Power, Sparkles, Trash, Zap } from 'lucide-react';
 import {
   useAutomationRules,
   useDeleteAutomationRule,
@@ -16,138 +16,121 @@ export function AutomationList({ workspaceId, projectId }: AutomationListProps) 
   const toggleMutation = useToggleAutomationRule(workspaceId, projectId);
   const deleteMutation = useDeleteAutomationRule(workspaceId, projectId);
 
-  if (isLoading)
+  if (isLoading) {
     return (
-      <div className="p-20 flex flex-col items-center justify-center gap-4">
-        <Activity className="h-8 w-8 text-brand-500/40 animate-pulse" />
-        <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
-          Đang tải rule...
-        </span>
+      <div className="flex flex-col items-center justify-center gap-3 py-16">
+        <div className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-surface-border bg-surface-bg">
+          <Activity className="h-5 w-5 text-brand-600" />
+        </div>
+        <div className="text-sm text-[color:var(--color-muted)]">Đang tải rule…</div>
       </div>
     );
+  }
+
+  if (!rules || rules.length === 0) {
+    return (
+      <div className="rounded-xl border-2 border-dashed border-surface-border bg-surface-bg p-12 text-center">
+        <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-md border border-surface-border bg-surface-card text-brand-600">
+          <Sparkles size={18} />
+        </div>
+        <h3 className="mt-4 text-lg font-semibold text-[color:var(--color-ink)]">
+          Chưa có automation
+        </h3>
+        <p className="mt-1 text-sm text-[color:var(--color-muted)] leading-relaxed">
+          Tạo rule để tự động hóa workflow cho dự án.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      {rules?.length === 0 ? (
-        <div className="p-20 border-2 border-dashed border-white/5 rounded-[3rem] text-center bg-white/[0.01] group hover:border-brand-500/20 transition-all duration-700">
-          <Sparkles className="mx-auto h-16 w-16 text-white/5 mb-6 group-hover:text-brand-500/20 group-hover:scale-110 transition-all" />
-          <h3 className="text-xl font-black text-white uppercase tracking-tight">
-            Không có automation nào
-          </h3>
-          <p className="text-[12px] text-white/20 mt-4 max-w-sm mx-auto font-medium leading-relaxed uppercase tracking-widest">
-            Deploy AI Agents or synthesize manual rule-sets to optimize operational efficiency.
-          </p>
-        </div>
-      ) : (
-        rules?.map((rule) => {
-          const actions = rule.actions as unknown as Array<{ type: string }>;
-          return (
-            <div
-              key={rule.id}
-              className={`relative overflow-hidden p-8 rounded-[2.5rem] border transition-all duration-500 flex items-center gap-10 group ${
-                rule.isActive
-                  ? 'bg-slate-900/60 border-brand-500/20 shadow-glow-brand/5'
-                  : 'bg-white/[0.02] border-white/5 opacity-60 grayscale'
-              }`}
-            >
-              {/* Luxury Background Detail */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/[0.02] blur-3xl rounded-full" />
+    <div className="space-y-3">
+      {rules.map((rule) => {
+        const actions = rule.actions as unknown as Array<{ type: string }>;
+        const primaryAction = actions[0]?.type || 'EXECUTE';
 
-              {/* Execution Flow Path */}
-              <div className="absolute top-1/2 left-[120px] right-[120px] h-px bg-gradient-to-r from-brand-500/30 via-white/5 to-indigo-500/30 -translate-y-1/2" />
-
-              {/* Trigger Hub */}
-              <div className="relative z-10 flex flex-col items-center gap-4 min-w-[140px]">
-                <div
-                  className={`p-5 rounded-lg border transition-all ${
-                    rule.isActive
-                      ? 'bg-brand-500/10 border-brand-500/30 text-brand-400 shadow-glow-brand/10'
-                      : 'bg-white/5 border-white/10 text-white/20'
-                  }`}
-                >
-                  <Zap size={28} className={rule.isActive ? 'animate-pulse' : ''} />
-                </div>
-                <div className="text-center space-y-1">
-                  <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
-                    Kích hoạt
-                  </span>
-                  <p className="text-[11px] font-black text-white uppercase tracking-wider">
-                    {rule.trigger.type}
-                  </p>
-                </div>
-              </div>
-
-              {/* Neural Transmission Bridge */}
-              <div className="flex-1 flex flex-col items-center justify-center gap-2 opacity-20 group-hover:opacity-60 transition-opacity">
-                <div className="flex gap-1.5">
-                  <div className="h-1 w-1 rounded-full bg-brand-500 animate-ping" />
-                  <div className="h-1 w-1 rounded-full bg-indigo-500 animate-pulse [animation-delay:0.2s]" />
-                </div>
-                <span className="text-[8px] font-black text-white uppercase tracking-[0.4em] font-mono">
-                  Luồng hoạt động
-                </span>
-              </div>
-
-              {/* Central Identity */}
-              <div className="relative z-10 flex-1 max-w-[400px]">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="h-px w-6 bg-brand-500/30" />
-                  <h4 className="font-black text-lg text-white tracking-widest uppercase">
+        return (
+          <div
+            key={rule.id}
+            className={`rounded-xl border p-5 shadow-sm transition-colors ${
+              rule.isActive
+                ? 'border-brand-200 bg-brand-50'
+                : 'border-surface-border bg-surface-card'
+            }`}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-semibold text-[color:var(--color-ink)] truncate">
                     {rule.name}
-                  </h4>
-                </div>
-                <p className="text-[12px] text-white/40 font-medium line-clamp-2 uppercase tracking-tight italic">
-                  {rule.description || 'Tự động hóa đang hoạt động'}
-                </p>
-              </div>
-
-              {/* Action Node */}
-              <div className="relative z-10 flex flex-col items-center gap-4 min-w-[140px] ml-auto">
-                <div
-                  className={`p-5 rounded-lg border transition-all ${
-                    rule.isActive
-                      ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400 shadow-glow-indigo/10'
-                      : 'bg-white/5 border-white/10 text-white/20'
-                  }`}
-                >
-                  <Cpu size={28} />
-                </div>
-                <div className="text-center space-y-1">
-                  <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
-                    Hành động
                   </span>
-                  <p className="text-[11px] font-black text-white uppercase tracking-wider">
-                    {actions[0]?.type || 'EXECUTE'}
+                  <span
+                    className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${
+                      rule.isActive
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                        : 'border-surface-border bg-black/[0.02] text-[color:var(--color-muted)]'
+                    }`}
+                  >
+                    {rule.isActive ? 'Đang bật' : 'Đang tắt'}
+                  </span>
+                </div>
+                {rule.description ? (
+                  <p className="mt-1 text-sm text-[color:var(--color-muted)] line-clamp-2 leading-relaxed">
+                    {rule.description}
                   </p>
+                ) : null}
+
+                <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-[color:var(--color-muted)]">
+                  <span className="inline-flex items-center gap-2">
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-surface-border bg-surface-bg text-brand-600">
+                      <Zap size={14} />
+                    </span>
+                    Trigger:{' '}
+                    <span className="font-medium text-[color:var(--color-ink)]">
+                      {rule.trigger.type}
+                    </span>
+                  </span>
+                  <span className="h-4 w-px bg-surface-border" aria-hidden />
+                  <span className="inline-flex items-center gap-2">
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-surface-border bg-surface-bg text-indigo-700">
+                      <Cpu size={14} />
+                    </span>
+                    Action:{' '}
+                    <span className="font-medium text-[color:var(--color-ink)]">
+                      {primaryAction}
+                    </span>
+                  </span>
                 </div>
               </div>
 
-              {/* Command Controls */}
-              <div className="flex flex-col gap-3 relative z-10 p-2 bg-black/40 rounded-lg border border-white/5 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+              <div className="flex items-center gap-2">
                 <button
+                  type="button"
                   onClick={() => toggleMutation.mutate(rule)}
-                  className={`p-3 rounded-xl transition-all relative group/icon ${
+                  className={`inline-flex h-9 w-9 items-center justify-center rounded-md border transition-colors ${
                     rule.isActive
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                      : 'bg-white/5 text-white/20 border border-white/10 hover:text-white'
+                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                      : 'border-surface-border bg-surface-bg text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
                   }`}
-                  title={rule.isActive ? 'Deactivate' : 'Activate'}
+                  title={rule.isActive ? 'Tắt rule' : 'Bật rule'}
+                  aria-label={rule.isActive ? 'Deactivate rule' : 'Activate rule'}
                 >
                   <Power size={16} />
                 </button>
-                <div className="h-px w-full bg-white/5" />
                 <button
+                  type="button"
                   onClick={() => deleteMutation.mutate(rule.id)}
-                  className="p-3 bg-white/5 text-white/20 hover:text-rose-500 border border-white/5 hover:border-rose-500/30 rounded-xl transition-all"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-surface-border bg-surface-bg text-[color:var(--color-muted)] hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition-colors"
                   title="Xóa rule"
+                  aria-label="Delete rule"
                 >
                   <Trash size={16} />
                 </button>
               </div>
             </div>
-          );
-        })
-      )}
+          </div>
+        );
+      })}
     </div>
   );
 }

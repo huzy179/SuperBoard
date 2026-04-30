@@ -126,7 +126,7 @@ export default function DashboardPage() {
 
   const statusChartData = safeStats.tasksByStatus.map((item, index) => ({
     key: item.status,
-    label: (STATUS_LABELS[item.status] ?? item.status).toUpperCase(),
+    label: STATUS_LABELS[item.status] ?? item.status,
     value: item.count,
     colorClass: CHART_COLOR_CLASSES[index % CHART_COLOR_CLASSES.length] ?? 'text-slate-500',
   }));
@@ -253,32 +253,32 @@ export default function DashboardPage() {
                       <div className="space-y-8">
                         <div className="space-y-3">
                           <div className="flex justify-between items-end px-2">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-white/40">
-                              Sync Completion
+                            <span className="text-xs font-medium text-[color:var(--color-muted)]">
+                              Hoàn thành
                             </span>
-                            <span className="text-2xl font-black text-emerald-400">
+                            <span className="text-2xl font-semibold text-emerald-700">
                               {completionRatio}%
                             </span>
                           </div>
-                          <div className="h-3 w-full bg-slate-950 rounded-full border border-white/5 p-0.5 shadow-inner">
+                          <div className="h-2 w-full bg-black/[0.06] rounded-full border border-surface-border overflow-hidden">
                             <div
-                              className="h-full bg-gradient-to-r from-brand-500 to-emerald-500 rounded-full shadow-glow-emerald/30 transition-all duration-1000"
+                              className="h-full bg-emerald-500 rounded-full"
                               style={{ width: `${completionRatio}%` }}
                             />
                           </div>
                         </div>
                         <div className="space-y-3">
                           <div className="flex justify-between items-end px-2">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-white/40">
-                              Stalled Latency
+                            <span className="text-xs font-medium text-[color:var(--color-muted)]">
+                              Quá hạn
                             </span>
-                            <span className="text-2xl font-black text-rose-500">
+                            <span className="text-2xl font-semibold text-rose-700">
                               {overdueRatio}%
                             </span>
                           </div>
-                          <div className="h-3 w-full bg-slate-950 rounded-full border border-white/5 p-0.5 shadow-inner">
+                          <div className="h-2 w-full bg-black/[0.06] rounded-full border border-surface-border overflow-hidden">
                             <div
-                              className="h-full bg-gradient-to-r from-rose-600 to-rose-400 rounded-full shadow-glow-rose/30 transition-all duration-1000"
+                              className="h-full bg-rose-500 rounded-full"
                               style={{ width: `${overdueRatio}%` }}
                             />
                           </div>
@@ -293,17 +293,15 @@ export default function DashboardPage() {
             if (module.id === 'SIGNALS')
               return (
                 <AdaptiveWidget key="SIGNALS" order={module.order} focus={module.focus}>
-                  <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.01] p-8 backdrop-blur-3xl">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 px-2">
-                      <div className="flex items-center gap-3">
-                        <Activity className="h-4 w-4 text-brand-400" />
-                        <h2 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
-                          Active Signal Stream
-                        </h2>
-                      </div>
+                  <div className="rounded-xl border border-surface-border bg-surface-card p-8 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6">
+                      <Activity className="h-4 w-4 text-[color:var(--color-muted)]" />
+                      <h2 className="text-sm font-semibold text-[color:var(--color-muted)]">
+                        Signals
+                      </h2>
                     </div>
-                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest text-center py-10 italic">
-                      Signals dynamically prioritized by AI Intelligence
+                    <p className="text-sm text-[color:var(--color-muted)] text-center py-10">
+                      Tính năng signals đang được hoàn thiện.
                     </p>
                   </div>
                 </AdaptiveWidget>
@@ -312,17 +310,15 @@ export default function DashboardPage() {
             if (module.id === 'VECTORS')
               return (
                 <AdaptiveWidget key="VECTORS" order={module.order} focus={module.focus}>
-                  <div className="rounded-[2.5rem] border border-white/5 bg-rose-500/[0.01] p-8 backdrop-blur-3xl border-rose-500/10 h-full">
-                    <div className="flex items-center justify-between mb-8">
-                      <div className="flex items-center gap-3">
-                        <AlertCircle className="h-4 w-4 text-rose-400" />
-                        <h2 className="text-[10px] font-black text-rose-500/40 uppercase tracking-[0.3em]">
-                          Critical Vectors
-                        </h2>
-                      </div>
+                  <div className="rounded-xl border border-surface-border bg-surface-card p-8 shadow-sm h-full">
+                    <div className="flex items-center gap-3 mb-6">
+                      <AlertCircle className="h-4 w-4 text-rose-600" />
+                      <h2 className="text-sm font-semibold text-[color:var(--color-muted)]">
+                        Vectors
+                      </h2>
                     </div>
-                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest text-center py-6 italic">
-                      Threat vectors synthesized via Neural Simulation
+                    <p className="text-sm text-[color:var(--color-muted)] text-center py-6">
+                      Tính năng vectors đang được hoàn thiện.
                     </p>
                   </div>
                 </AdaptiveWidget>

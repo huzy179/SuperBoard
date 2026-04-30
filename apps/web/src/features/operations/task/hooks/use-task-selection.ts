@@ -10,14 +10,16 @@ export function useTaskSelection(
 
   useEffect(() => {
     const currentTaskIds = new Set((projectTasks ?? []).map((task) => task.id));
-    setSelectedTaskIds((previous) => {
-      const next = new Set<string>();
-      previous.forEach((id) => {
-        if (currentTaskIds.has(id)) {
-          next.add(id);
-        }
+    Promise.resolve().then(() => {
+      setSelectedTaskIds((previous) => {
+        const next = new Set<string>();
+        previous.forEach((id) => {
+          if (currentTaskIds.has(id)) {
+            next.add(id);
+          }
+        });
+        return next;
       });
-      return next;
     });
   }, [projectTasks]);
 

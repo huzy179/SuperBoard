@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
   Box,
@@ -53,123 +52,112 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
   const pendingCount = proposals.filter((p) => p.metadata.status === 'PENDING').length;
 
   return (
-    <div className="space-y-12 py-10">
-      <div className="flex items-center justify-between px-6">
+    <div className="space-y-8 py-8">
+      <div className="flex items-start justify-between gap-6 px-6">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-brand-500/10 rounded-lg border border-brand-500/20 shadow-glow-brand/10">
-            <Layers className="h-5 w-5 text-brand-400" />
+          <div className="p-3 bg-brand-50 rounded-lg border border-brand-200">
+            <Layers className="h-5 w-5 text-brand-600" />
           </div>
           <div className="space-y-1">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
-              Bảng điều khiển tích hợp
+            <h2 className="text-base font-semibold text-[color:var(--color-ink)]">
+              Gợi ý tự động hoá
             </h2>
-            <p className="text-sm font-bold text-white uppercase tracking-tight italic">
-              Gợi ý workspace từ AI
+            <p className="text-sm text-[color:var(--color-muted)]">
+              Các đề xuất gộp/điều chỉnh workspace dựa trên tín hiệu hoạt động.
             </p>
           </div>
         </div>
 
-        <div className="px-5 py-2.5 bg-white/5 border border-white/10 rounded-full flex items-center gap-2">
-          <Activity size={14} className="text-brand-400" />
-          <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">
-            {pendingCount} chỉ đang chờ
+        <div className="px-4 py-2 bg-black/[0.02] border border-surface-border rounded-full flex items-center gap-2">
+          <Activity size={14} className="text-[color:var(--color-muted)]" />
+          <span className="text-sm font-medium text-[color:var(--color-ink)]">
+            {pendingCount} đang chờ
           </span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 px-6">
-        <AnimatePresence mode="popLayout">
-          {proposals.map((proposal, idx) => (
-            <motion.div
-              key={proposal.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
-              className={`relative p-8 rounded-[3rem] border backdrop-blur-3xl transition-all duration-700 overflow-hidden ${
-                proposal.metadata.status === 'APPROVED'
-                  ? 'bg-emerald-500/5 border-emerald-500/20'
-                  : 'bg-slate-900/50 border-white/10 hover:border-brand-500/40'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                      proposal.metadata.status === 'APPROVED'
-                        ? 'bg-emerald-500/20 text-emerald-400'
-                        : 'bg-brand-500/20 text-brand-400'
-                    }`}
-                  >
-                    {proposal.actionType.replace('_', ' ')}
-                  </div>
-                  {proposal.metadata.status === 'APPROVED' && (
-                    <CheckCircle2 size={14} className="text-emerald-400" />
-                  )}
+        {proposals.map((proposal) => (
+          <section
+            key={proposal.id}
+            className={`relative p-6 rounded-card border overflow-hidden ${
+              proposal.metadata.status === 'APPROVED'
+                ? 'bg-emerald-50 border-emerald-200'
+                : 'bg-surface-card border-surface-border hover:bg-black/[0.02]'
+            } transition-colors`}
+          >
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    proposal.metadata.status === 'APPROVED'
+                      ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                      : 'bg-brand-50 text-brand-700 border border-brand-200'
+                  }`}
+                >
+                  {proposal.actionType.replace('_', ' ')}
                 </div>
-                <AlertTriangle size={14} className="text-white/20" />
+                {proposal.metadata.status === 'APPROVED' && (
+                  <CheckCircle2 size={16} className="text-emerald-700" />
+                )}
               </div>
+              <AlertTriangle size={16} className="text-[color:var(--color-faint)]" />
+            </div>
 
-              <div className="space-y-6 mb-10">
-                <div className="flex items-center gap-6">
-                  <div className="flex-1 p-5 bg-white/5 rounded-lg border border-white/5 space-y-2">
-                    <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">
-                      Nguồn
-                    </span>
-                    <p className="text-[11px] font-bold text-white truncate uppercase tracking-tight">
-                      {proposal.metadata.sourceProjectName}
-                    </p>
-                  </div>
-                  <ArrowRight className="text-white/20" />
-                  <div className="flex-1 p-5 bg-brand-500/5 rounded-lg border border-brand-500/10 space-y-2">
-                    <span className="text-[8px] font-black text-brand-400/40 uppercase tracking-widest">
-                      Đích
-                    </span>
-                    <p className="text-[11px] font-bold text-white truncate uppercase tracking-tight">
-                      {proposal.metadata.targetProjectName}
-                    </p>
-                  </div>
+            <div className="space-y-6 mb-10">
+              <div className="flex items-center gap-6">
+                <div className="flex-1 p-4 bg-black/[0.02] rounded-lg border border-surface-border space-y-2">
+                  <span className="text-xs font-medium text-[color:var(--color-muted)]">Nguồn</span>
+                  <p className="text-sm font-semibold text-[color:var(--color-ink)] truncate">
+                    {proposal.metadata.sourceProjectName}
+                  </p>
                 </div>
-
-                <div className="space-y-2">
-                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
-                    Cơ sở đề xuất
-                  </span>
-                  <p className="text-sm font-bold text-white/60 italic leading-relaxed">
-                    "{proposal.reason}"
+                <ArrowRight className="text-[color:var(--color-faint)]" size={16} />
+                <div className="flex-1 p-4 bg-brand-50 rounded-lg border border-brand-200 space-y-2">
+                  <span className="text-xs font-medium text-brand-700">Đích</span>
+                  <p className="text-sm font-semibold text-[color:var(--color-ink)] truncate">
+                    {proposal.metadata.targetProjectName}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-auto pt-6 border-t border-white/5">
-                {proposal.metadata.status === 'PENDING' ? (
-                  <button
-                    onClick={() => handleApprove(proposal.id)}
-                    disabled={!!isApproving}
-                    className="w-full flex items-center justify-center gap-3 px-8 py-5 bg-brand-500 rounded-lg text-[10px] font-black text-white uppercase tracking-[0.3em] shadow-glow-brand hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
-                  >
-                    {isApproving === proposal.id ? (
-                      <div className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <>
-                        <Fingerprint size={16} /> Áp dụng
-                      </>
-                    )}
-                  </button>
-                ) : (
-                  <div className="w-full py-5 text-center text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em]">
-                    Đã áp dụng chiến lược
-                  </div>
-                )}
+              <div className="space-y-2">
+                <span className="text-xs font-medium text-[color:var(--color-muted)]">Lý do</span>
+                <p className="text-sm text-[color:var(--color-ink)] leading-relaxed">
+                  "{proposal.reason}"
+                </p>
               </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+            </div>
+
+            <div className="mt-auto pt-4 border-t border-surface-border">
+              {proposal.metadata.status === 'PENDING' ? (
+                <button
+                  onClick={() => handleApprove(proposal.id)}
+                  disabled={!!isApproving}
+                  className="btn btn-primary w-full"
+                >
+                  {isApproving === proposal.id ? (
+                    <div className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Fingerprint size={16} /> Áp dụng
+                    </>
+                  )}
+                </button>
+              ) : (
+                <div className="w-full py-2 text-center text-sm font-medium text-emerald-800">
+                  Đã áp dụng
+                </div>
+              )}
+            </div>
+          </section>
+        ))}
 
         {proposals.length === 0 && (
           <div className="lg:col-span-2 py-40 flex flex-col items-center justify-center text-center space-y-4">
-            <Box size={40} className="text-white/10" />
-            <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-              Chưa có đề xuất nào
+            <Box size={40} className="text-[color:var(--color-faint)]" />
+            <p className="text-sm font-medium text-[color:var(--color-muted)]">
+              Chưa có đề xuất nào.
             </p>
           </div>
         )}
@@ -180,11 +168,11 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
 
 function ConsoleSkeleton() {
   return (
-    <div className="space-y-12 py-10 px-6 animate-pulse">
-      <div className="h-12 w-64 bg-white/5 rounded-lg" />
+    <div className="space-y-8 py-8 px-6 animate-pulse">
+      <div className="h-10 w-64 bg-black/[0.03] rounded-lg" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="h-96 bg-white/5 rounded-[3.5rem]" />
-        <div className="h-96 bg-white/5 rounded-[3.5rem]" />
+        <div className="h-80 bg-black/[0.03] rounded-card" />
+        <div className="h-80 bg-black/[0.03] rounded-card" />
       </div>
     </div>
   );

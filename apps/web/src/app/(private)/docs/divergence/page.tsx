@@ -8,14 +8,14 @@ export default function DivergencePage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white">
-      <div className="max-w-7xl mx-auto py-12 px-6">
+    <div className="min-h-screen bg-surface-bg text-[color:var(--color-ink)]">
+      <div className="max-w-7xl mx-auto py-10 px-6 space-y-6">
         <button
           onClick={() => router.back()}
-          className="mb-8 flex items-center gap-2 text-white/40 hover:text-white transition-colors group"
+          className="flex items-center gap-2 text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)] transition-colors"
         >
-          <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-          <span className="text-[10px] font-black uppercase tracking-widest">Return to Nexus</span>
+          <ChevronLeft size={16} />
+          <span className="text-sm font-semibold">Back</span>
         </button>
 
         <ConflictResolver />

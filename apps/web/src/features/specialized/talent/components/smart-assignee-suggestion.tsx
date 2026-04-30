@@ -48,11 +48,11 @@ export function SmartAssigneeSuggestion({
 
   if (isLoading) {
     return (
-      <div className="space-y-3 animate-pulse">
-        <div className="h-4 w-32 bg-white/5 rounded" />
+      <div className="space-y-3">
+        <div className="h-4 w-32 bg-black/[0.06] rounded" />
         <div className="flex gap-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="w-8 h-8 rounded-full bg-white/5" />
+            <div key={i} className="w-8 h-8 rounded-full bg-black/[0.06]" />
           ))}
         </div>
       </div>
@@ -64,9 +64,9 @@ export function SmartAssigneeSuggestion({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest flex items-center gap-2">
-          <Sparkles size={12} className="animate-pulse" />
-          AI Recommended
+        <label className="text-xs font-medium text-[color:var(--color-muted)] flex items-center gap-2">
+          <Sparkles size={14} className="text-brand-600" />
+          Gợi ý từ AI
         </label>
       </div>
 
@@ -76,48 +76,50 @@ export function SmartAssigneeSuggestion({
             key={user.id}
             onClick={() => onAssign(user.id)}
             className={`
-              group relative p-3 rounded-lg border transition-all cursor-pointer
+              group relative p-3 rounded-lg border transition-colors cursor-pointer
               ${
                 currentAssigneeId === user.id
-                  ? 'bg-emerald-500/10 border-emerald-500/30'
-                  : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
+                  ? 'bg-emerald-50 border-emerald-200'
+                  : 'bg-surface-card border-surface-border hover:bg-black/[0.02]'
               }
             `}
           >
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-8 h-8 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-[10px] font-black text-white uppercase italic">
+                <div className="w-8 h-8 rounded-full bg-black/[0.04] border border-surface-border flex items-center justify-center text-[11px] font-semibold text-[color:var(--color-ink)]">
                   {getInitials(user.fullName)}
                 </div>
                 {user.score > 20 && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-indigo-500 border-2 border-slate-900 flex items-center justify-center">
-                    <Zap size={6} className="text-white" />
+                  <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-brand-500 border-2 border-surface-card flex items-center justify-center">
+                    <Sparkles size={8} className="text-white" />
                   </div>
                 )}
               </div>
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-black text-white uppercase tracking-tight truncate">
+                  <span className="text-sm font-semibold text-[color:var(--color-ink)] truncate">
                     {user.fullName}
                   </span>
                   <span
-                    className={`text-[9px] font-black uppercase tracking-widest ${user.score > 10 ? 'text-indigo-400' : 'text-white/20'}`}
+                    className={`text-xs font-medium ${
+                      user.score > 10 ? 'text-indigo-700' : 'text-[color:var(--color-muted)]'
+                    }`}
                   >
-                    {Math.max(0, user.score)}% Match
+                    {Math.max(0, user.score)}% match
                   </span>
                 </div>
 
                 <div className="flex flex-wrap gap-1 mt-1">
                   {user.workload > 5 && (
-                    <span className="px-1.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 text-[8px] font-black uppercase tracking-tighter flex items-center gap-1">
-                      <Activity size={8} /> Busy
+                    <span className="px-2 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-rose-800 text-[11px] font-medium flex items-center gap-1">
+                      <Activity size={12} /> Bận
                     </span>
                   )}
                   {user.skills.slice(0, 2).map((skill) => (
                     <span
                       key={skill}
-                      className="px-1.5 py-0.5 rounded-full bg-white/5 text-white/30 text-[8px] font-black uppercase tracking-tighter"
+                      className="px-2 py-0.5 rounded-full bg-black/[0.02] border border-surface-border text-[color:var(--color-muted)] text-[11px] font-medium"
                     >
                       {skill}
                     </span>
@@ -127,9 +129,9 @@ export function SmartAssigneeSuggestion({
 
               <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                 {currentAssigneeId === user.id ? (
-                  <Check size={14} className="text-emerald-400" />
+                  <Check size={16} className="text-emerald-700" />
                 ) : (
-                  <UserPlus size={14} className="text-white/40" />
+                  <UserPlus size={16} className="text-[color:var(--color-muted)]" />
                 )}
               </div>
             </div>
@@ -138,8 +140,4 @@ export function SmartAssigneeSuggestion({
       </div>
     </div>
   );
-}
-
-function Zap({ size, className }: { size: number; className?: string }) {
-  return <Sparkles size={size} className={className} />;
 }

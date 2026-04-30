@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { ExternalLink, User, Layout } from 'lucide-react';
 import { NodeViewWrapper, type NodeViewProps } from '@tiptap/react';
 
@@ -12,65 +11,73 @@ export function TaskNodeEmbed(
   const status = isTiptap ? props.node.attrs.status : props.status;
   const assignee = isTiptap ? props.node.attrs.assignee : props.assignee;
 
-  const content = (
-    <motion.div
-      whileHover={{ x: 4 }}
-      className="my-[var(--space-8)] p-[var(--space-6)] bg-slate-900/20 border border-white/10 rounded-md shadow-inner relative group cursor-pointer overflow-hidden"
-    >
-      <div className="absolute inset-0 bg-gradient-to-r from-brand-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+  const statusTone = (() => {
+    const normalized = String(status || '').toLowerCase();
+    if (normalized.includes('done') || normalized.includes('complete')) {
+      return {
+        dot: 'bg-emerald-500',
+        pill: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      };
+    }
+    if (normalized.includes('review')) {
+      return { dot: 'bg-violet-500', pill: 'bg-violet-50 text-violet-700 border-violet-200' };
+    }
+    if (normalized.includes('progress') || normalized.includes('doing')) {
+      return { dot: 'bg-sky-500', pill: 'bg-sky-50 text-sky-700 border-sky-200' };
+    }
+    return { dot: 'bg-amber-500', pill: 'bg-amber-50 text-amber-800 border-amber-200' };
+  })();
 
-      <div className="flex items-start justify-between relative z-10">
-        <div className="flex gap-6 items-start">
-          {/* Neural Node Icon */}
-          <div className="h-12 w-12 rounded-sm bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 shadow-inner">
-            <Layout size={20} />
+  const content = (
+    <div
+      className="my-[var(--space-6)] rounded-lg border border-surface-border bg-surface-card p-[var(--space-5)] shadow-sm transition-colors hover:bg-[color:var(--color-surface-alt)]/45"
+      contentEditable={false}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 items-start gap-4">
+          <div className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-surface-border bg-brand-50 text-brand-700">
+            <Layout size={18} />
           </div>
 
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <span className="text-[9px] font-bold text-brand-400 uppercase tracking-widest">
-                Jira_Task_Node
-              </span>
-              <div className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded-xs text-[8px] font-bold text-white/20 font-mono">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold text-[color:var(--color-ink)]">Task</span>
+              <span className="rounded-full border border-surface-border bg-black/[0.02] px-2 py-0.5 text-[11px] font-medium text-[color:var(--color-muted)]">
                 {taskId}
-              </div>
+              </span>
             </div>
-            <h3 className="text-[15px] font-black text-white uppercase tracking-tight mb-3 group-hover:text-brand-400 transition-colors">
-              {title}
-            </h3>
 
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse shadow-glow-amber" />
-                <span className="text-[9px] font-bold text-white/20 uppercase tracking-widest">
+            <div className="mt-1 truncate text-sm font-semibold text-[color:var(--color-ink)]">
+              {title}
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-[color:var(--color-muted)]">
+              <span className="inline-flex items-center gap-2">
+                <span className={`h-2 w-2 rounded-full ${statusTone.dot}`} aria-hidden />
+                <span
+                  className={`inline-flex items-center rounded-full border px-2 py-0.5 font-medium ${statusTone.pill}`}
+                >
                   {status}
                 </span>
-              </div>
-              <div className="w-px h-2 bg-white/10" />
-              <div className="flex items-center gap-2">
-                <User size={10} className="text-white/20" />
-                <span className="text-[9px] font-bold text-white/20 uppercase tracking-widest">
-                  {assignee || 'Unassigned'}
-                </span>
-              </div>
+              </span>
+              <span className="h-3 w-px bg-surface-border" aria-hidden />
+              <span className="inline-flex items-center gap-2">
+                <User size={12} className="text-[color:var(--color-faint)]" />
+                {assignee || 'Unassigned'}
+              </span>
             </div>
           </div>
         </div>
 
-        <button className="p-2 bg-white/5 border border-white/5 text-white/20 rounded-sm hover:bg-brand-500 hover:text-white hover:border-brand-500 transition-all group/btn">
-          <ExternalLink size={14} className="group-hover/btn:scale-110 transition-transform" />
+        <button
+          type="button"
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-surface-border bg-surface-bg text-[color:var(--color-muted)] transition-colors hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]"
+          aria-label="Open task"
+        >
+          <ExternalLink size={16} />
         </button>
       </div>
-
-      {/* Decorative Neural Line */}
-      <div className="absolute bottom-0 left-0 h-1 w-full bg-white/5 overflow-hidden">
-        <motion.div
-          animate={{ x: ['-100%', '100%'] }}
-          transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}
-          className="h-full w-1/3 bg-gradient-to-r from-transparent via-brand-500/40 to-transparent"
-        />
-      </div>
-    </motion.div>
+    </div>
   );
 
   if (isTiptap) {

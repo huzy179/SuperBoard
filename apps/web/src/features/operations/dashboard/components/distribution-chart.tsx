@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Cpu } from 'lucide-react';
 
 interface ChartItem {
@@ -23,6 +24,22 @@ export function DonutDistributionChart({
   const radius = 38;
   const circumference = 2 * Math.PI * radius;
 
+  const segments = useMemo(() => {
+    const result: (ChartItem & { segmentLength: number; dashOffset: number })[] = [];
+    let offset = 0;
+    items.forEach((item) => {
+      const segmentLength = (item.value / total) * circumference;
+      const dashOffset = -offset;
+      result.push({
+        ...item,
+        segmentLength,
+        dashOffset,
+      });
+      offset += segmentLength;
+    });
+    return result;
+  }, [items, total, circumference]);
+
   if (items.length === 0 || total === 0) {
     return (
       <div className="py-[var(--space-12)] flex flex-col items-center justify-center border border-dashed border-white/10 rounded-md bg-white/[0.01]">
@@ -33,8 +50,6 @@ export function DonutDistributionChart({
       </div>
     );
   }
-
-  let currentOffset = 0;
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-[var(--space-10)] items-center">
@@ -52,11 +67,7 @@ export function DonutDistributionChart({
             strokeWidth="8"
             className="text-white/[0.03]"
           />
-          {items.map((item) => {
-            const segmentLength = (item.value / total) * circumference;
-            const dashOffset = -currentOffset;
-            currentOffset += segmentLength;
-
+          {segments.map((item) => {
             return (
               <circle
                 key={item.key}
@@ -67,12 +78,12 @@ export function DonutDistributionChart({
                 stroke="currentColor"
                 strokeWidth="8"
                 strokeLinecap="butt"
-                strokeDasharray={`${segmentLength} ${circumference}`}
-                strokeDashoffset={dashOffset}
+                strokeDasharray={`${item.segmentLength} ${circumference}`}
+                strokeDashoffset={item.dashOffset}
                 className={`${item.colorClass} transition-all duration-1000 ease-out opacity-80 hover:opacity-100`}
                 style={{
                   filter: `drop-shadow(0 0 4px currentColor)`,
-                  strokeDashoffset: dashOffset,
+                  strokeDashoffset: item.dashOffset,
                 }}
               />
             );

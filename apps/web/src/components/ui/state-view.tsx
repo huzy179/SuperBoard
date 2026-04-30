@@ -1,6 +1,7 @@
 'use client';
 
 import { Loader2, AlertCircle, Inbox, RefreshCw } from 'lucide-react';
+import { AppButton } from '@/components/ui/app-button';
 
 interface StateViewProps {
   state: 'loading' | 'error' | 'empty' | 'content';
@@ -26,69 +27,65 @@ export function StateView({
   if (state === 'content') return <>{children}</>;
 
   return (
-    <div
-      className={`flex flex-col items-center justify-center p-12 text-center animate-in fade-in zoom-in-95 duration-500 ${className}`}
-    >
+    <div className={`flex flex-col items-center justify-center p-10 text-center ${className}`}>
       {state === 'loading' && (
-        <div className="space-y-6">
-          <div className="relative">
-            <div className="absolute inset-0 bg-brand-500/20 blur-2xl rounded-full" />
-            <Loader2 className="h-12 w-12 text-brand-500 animate-spin relative z-10 mx-auto" />
+        <div className="w-full max-w-md rounded-lg border border-surface-border bg-surface-card p-8 shadow-sm">
+          <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full border border-surface-border bg-surface-bg">
+            <Loader2 className="h-5 w-5 animate-spin text-brand-600" />
           </div>
-          <div className="space-y-2">
-            <h3 className="text-sm font-black text-white uppercase tracking-[0.3em]">
-              Synchronizing Nodes...
-            </h3>
-            <p className="text-[10px] text-white/20 uppercase tracking-widest font-bold">
-              Accessing neural workspace protocols
-            </p>
-          </div>
+          <h3 className="mt-4 text-base font-semibold text-[color:var(--color-ink)]">
+            Đang tải dữ liệu…
+          </h3>
+          <p className="mt-1 text-sm text-[color:var(--color-muted)]">
+            Vui lòng chờ trong giây lát.
+          </p>
         </div>
       )}
 
       {state === 'error' && (
-        <div className="space-y-6 max-w-md">
-          <div className="w-16 h-16 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center justify-center mx-auto shadow-glow-rose/5">
-            <AlertCircle className="h-8 w-8 text-rose-500" />
+        <div className="w-full max-w-md rounded-lg border border-rose-200 bg-rose-50 p-8 shadow-sm">
+          <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-white">
+            <AlertCircle className="h-6 w-6 text-rose-600" />
           </div>
-          <div className="space-y-2">
-            <h3 className="text-xl font-black text-white uppercase tracking-tighter text-glow">
-              {title || 'Protocol Breach Detected'}
-            </h3>
-            <p className="text-sm text-white/40 leading-relaxed font-bold">
-              {error || message || 'An unexpected error occurred during data synchronization.'}
-            </p>
-          </div>
-          {onAction && (
-            <button
-              onClick={onAction}
-              className="btn-primary px-8 shadow-glow-brand inline-flex items-center gap-3"
-            >
-              <RefreshCw size={14} />
-              {actionLabel || 'Retry Connection'}
-            </button>
-          )}
+          <h3 className="mt-4 text-base font-semibold text-[color:var(--color-ink)]">
+            {title || 'Có lỗi xảy ra'}
+          </h3>
+          <p className="mt-1 text-sm text-rose-700/90 leading-relaxed">
+            {error || message || 'Không thể tải dữ liệu. Vui lòng thử lại.'}
+          </p>
+          {onAction ? (
+            <div className="mt-5 flex justify-center">
+              <AppButton
+                onClick={onAction}
+                variant="primary"
+                size="md"
+                leftIcon={<RefreshCw size={14} />}
+              >
+                {actionLabel || 'Thử lại'}
+              </AppButton>
+            </div>
+          ) : null}
         </div>
       )}
 
       {state === 'empty' && (
-        <div className="space-y-6 max-w-md">
-          <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
-            <Inbox className="h-8 w-8 text-white/20" />
+        <div className="w-full max-w-md rounded-lg border border-surface-border bg-surface-card p-8 shadow-sm">
+          <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full border border-surface-border bg-surface-bg">
+            <Inbox className="h-6 w-6 text-[color:var(--color-muted)]" />
           </div>
-          <div className="space-y-2">
-            <h3 className="text-xl font-black text-white uppercase tracking-tighter">
-              {title || 'Zero Nodes Detected'}
-            </h3>
-            <p className="text-sm text-white/20 uppercase tracking-widest font-bold">
-              {message || 'The current operational vector is empty.'}
-            </p>
-          </div>
-          {onAction && (
-            <button onClick={onAction} className="btn-ghost px-8 inline-flex items-center gap-3">
-              {actionLabel || 'Initialize First Node'}
-            </button>
-          )}
+          <h3 className="mt-4 text-base font-semibold text-[color:var(--color-ink)]">
+            {title || 'Chưa có dữ liệu'}
+          </h3>
+          <p className="mt-1 text-sm text-[color:var(--color-muted)] leading-relaxed">
+            {message || 'Chưa có nội dung để hiển thị.'}
+          </p>
+          {onAction ? (
+            <div className="mt-5 flex justify-center">
+              <AppButton onClick={onAction} variant="secondary" size="md">
+                {actionLabel || 'Tạo mới'}
+              </AppButton>
+            </div>
+          ) : null}
         </div>
       )}
     </div>

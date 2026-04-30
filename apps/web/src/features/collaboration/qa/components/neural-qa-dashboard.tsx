@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Terminal,
   ShieldAlert,
@@ -30,23 +30,26 @@ export function NeuralQaDashboard() {
   const [selectedError, setSelectedError] = useState<ErrorEvent | null>(null);
 
   // Mock data for demo
-  const errors: ErrorEvent[] = [
-    {
-      id: '1',
-      message: 'Cannot read property "id" of null',
-      url: '/api/v1/projects/undefined/stats',
-      timestamp: new Date().toISOString(),
-      severity: 'critical',
-      stack: 'TypeError: Cannot read property "id" of null at ProjectService.getStats...',
-    },
-    {
-      id: '2',
-      message: 'ECONNREFUSED 127.0.0.1:6379',
-      url: '/api/v1/auth/login',
-      timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-      severity: 'warning',
-    },
-  ];
+  const errors: ErrorEvent[] = useMemo(
+    () => [
+      {
+        id: '1',
+        message: 'Cannot read property "id" of null',
+        url: '/api/v1/projects/undefined/stats',
+        timestamp: '2026-04-28T14:24:02Z',
+        severity: 'critical',
+        stack: 'TypeError: Cannot read property "id" of null at ProjectService.getStats...',
+      },
+      {
+        id: '2',
+        message: 'ECONNREFUSED 127.0.0.1:6379',
+        url: '/api/v1/auth/login',
+        timestamp: '2026-04-28T14:19:02Z',
+        severity: 'warning',
+      },
+    ],
+    [],
+  );
 
   const handleDiagnose = async (error: ErrorEvent) => {
     setIsDiagnosing(error.id);

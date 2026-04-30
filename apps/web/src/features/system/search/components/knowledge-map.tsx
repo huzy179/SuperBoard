@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Activity, BookOpen, RefreshCw, Sparkles, Zap } from 'lucide-react';
+import { X, Activity, BookOpen, RefreshCw, Zap } from 'lucide-react';
 import { KnowledgeGraphView } from '@/features/intelligence/knowledge/components/knowledge-graph-view';
 import { toast } from 'sonner';
 import { generateKnowledgeDiary } from '@/features/intelligence/knowledge/api/knowledge-service';
@@ -28,26 +28,18 @@ export function KnowledgeMap({ projectId, onClose, onSelectNode }: KnowledgeMapP
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-950/95 z-[200] flex flex-col animate-in fade-in zoom-in-95 duration-500 font-sans backdrop-blur-3xl">
+    <div className="fixed inset-0 z-[200] flex flex-col bg-surface-bg font-sans">
       {/* Header */}
-      <div className="p-8 border-b border-white/5 flex items-center justify-between bg-black/40">
-        <div className="flex items-center gap-6">
-          <div className="w-14 h-14 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 shadow-glow-brand ring-1 ring-white/10">
-            <Activity size={28} className="animate-pulse" />
+      <div className="px-6 py-4 border-b border-surface-border bg-surface-card flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-md bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-700">
+            <Activity size={18} />
           </div>
           <div className="flex flex-col">
-            <h2 className="text-3xl font-black text-white uppercase tracking-tighter italic">
-              Kiến trúc tri thức
-            </h2>
-            <div className="flex items-center gap-3">
-              <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
-                Web ngữ nghĩa AI
-              </span>
-              <div className="h-1.5 w-1.5 bg-brand-500 rounded-full animate-ping" />
-              <span className="text-[10px] font-bold text-brand-500/80 uppercase tracking-widest leading-none">
-                V5.0 NEURAL_GRAPH_RUNTIME
-              </span>
-            </div>
+            <h2 className="text-lg font-semibold text-[color:var(--color-ink)]">Bản đồ tri thức</h2>
+            <p className="text-sm text-[color:var(--color-muted)]">
+              Xem tương quan giữa task, tài liệu và thành viên.
+            </p>
           </div>
         </div>
 
@@ -56,26 +48,24 @@ export function KnowledgeMap({ projectId, onClose, onSelectNode }: KnowledgeMapP
           <button
             onClick={handleGenerateDiary}
             disabled={isGeneratingDiary}
-            className="group relative flex items-center gap-3 px-8 py-3.5 rounded-lg bg-white/5 border border-indigo-500/20 text-indigo-400 font-black text-[10px] uppercase tracking-widest hover:bg-white/10 hover:border-indigo-500/40 transition-all disabled:opacity-50"
+            className="btn btn-secondary"
           >
             {isGeneratingDiary ? (
-              <RefreshCw className="animate-spin" size={14} />
+              <RefreshCw className="animate-spin" size={16} />
             ) : (
-              <BookOpen size={14} className="group-hover:rotate-12 transition-transform" />
+              <BookOpen size={16} />
             )}
-            {isGeneratingDiary ? 'Đang tạo...' : 'Tạo nhật ký dev'}
-            <div className="absolute -top-1 -right-1">
-              <Sparkles size={10} className="text-white animate-pulse" />
-            </div>
+            {isGeneratingDiary ? 'Đang tạo…' : 'Tạo nhật ký'}
           </button>
 
-          <div className="w-px h-10 bg-white/10" />
+          <div className="w-px h-8 bg-surface-border" />
 
           <button
             onClick={onClose}
-            className="w-14 h-14 rounded-lg bg-white/5 text-white/40 hover:bg-white/10 hover:text-white transition-all flex items-center justify-center border border-white/5 hover:border-white/10 hover:rotate-90"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-surface-border bg-surface-bg text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)] transition-colors"
+            aria-label="Close"
           >
-            <X size={24} />
+            <X size={18} />
           </button>
         </div>
       </div>
@@ -85,30 +75,15 @@ export function KnowledgeMap({ projectId, onClose, onSelectNode }: KnowledgeMapP
         <KnowledgeGraphView projectId={projectId} onSelectNode={onSelectNode} />
 
         {/* Semantic Sidebar / Overlay Hint */}
-        <div className="absolute bottom-20 right-20 max-w-sm p-8 rounded-[2.5rem] bg-black/60 border border-white/5 backdrop-blur-2xl space-y-4">
-          <div className="flex items-center gap-3">
-            <Zap size={14} className="text-brand-400" />
-            <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">
-              Giao thức liên kết
-            </span>
+        <div className="absolute bottom-10 right-10 max-w-sm p-6 rounded-xl bg-surface-card border border-surface-border shadow-sm space-y-3">
+          <div className="flex items-center gap-2">
+            <Zap size={14} className="text-brand-600" />
+            <span className="text-sm font-semibold text-[color:var(--color-ink)]">Gợi ý</span>
           </div>
-          <p className="text-[11px] font-medium text-white/30 leading-relaxed italic">
-            Relationships are established by intersecting vector embeddings and manual task-doc
-            mappings. Distance represents mission-knowledge cohesion.
+          <p className="text-sm text-[color:var(--color-muted)] leading-relaxed">
+            Click vào node để xem tên. Bạn có thể chọn node để mở chi tiết (nếu được hỗ trợ ở màn
+            hiện tại).
           </p>
-        </div>
-      </div>
-
-      {/* Footer / Status */}
-      <div className="p-6 border-t border-white/5 bg-slate-950/50 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/10">
-            Architecture: FORCE_DIRECTED_2D_PHYSICS
-          </span>
-          <div className="h-1 w-1 bg-white/10 rounded-full" />
-          <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/10">
-            Integrity: VERIFIED_BLOCKCHAIN_STATE
-          </span>
         </div>
       </div>
     </div>

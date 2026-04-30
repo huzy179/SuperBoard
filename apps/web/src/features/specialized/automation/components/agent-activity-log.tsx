@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Bot,
   History,
@@ -24,11 +24,7 @@ export function AgentActivityLog({ workspaceId, projectId }: AgentActivityLogPro
   const [logs, setLogs] = useState<AgentLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchLogs();
-  }, [workspaceId, projectId]);
-
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     setIsLoading(true);
     try {
       const body = await getAgentLogs(workspaceId, projectId);
@@ -38,7 +34,11 @@ export function AgentActivityLog({ workspaceId, projectId }: AgentActivityLogPro
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [workspaceId, projectId]);
+
+  useEffect(() => {
+    Promise.resolve().then(() => fetchLogs());
+  }, [fetchLogs]);
 
   const getIcon = (type: string) => {
     switch (type) {

@@ -386,7 +386,7 @@ export class SearchService {
   }
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  private toProjectDTO(p: any): ProjectItemDTO {
+  private toProjectDTO(p: Record<string, any>): ProjectItemDTO {
     return {
       id: p.id,
       workspaceId: p.workspaceId,
@@ -403,7 +403,7 @@ export class SearchService {
   }
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  private toDocDTO(d: any): DocItemDTO {
+  private toDocDTO(d: Record<string, any>): DocItemDTO {
     return {
       id: d.id,
       workspaceId: d.workspaceId,
@@ -418,7 +418,7 @@ export class SearchService {
   }
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  private toTaskDTO(task: any): ProjectTaskItemDTO {
+  private toTaskDTO(task: Record<string, any>): ProjectTaskItemDTO {
     const t = task as {
       id: string;
       projectId: string;
@@ -636,13 +636,13 @@ export class SearchService {
   }
 
   // Re-implementing text extraction to avoid service dependency for now
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  private extractTextFromJSON(node: any): string {
+  private extractTextFromJSON(node: Record<string, unknown>): string {
     if (!node) return '';
-    if (node.type === 'text') return node.text || '';
+    if (node.type === 'text') return (node.text as string) || '';
     if (Array.isArray(node.content)) {
-      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      return node.content.map((child: any) => this.extractTextFromJSON(child)).join(' ');
+      return node.content
+        .map((child: Record<string, unknown>) => this.extractTextFromJSON(child))
+        .join(' ');
     }
     if (node.content) {
       return this.extractTextFromJSON(node.content);

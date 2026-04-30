@@ -145,7 +145,7 @@ export function JiraDashboard() {
 
         {/* Mission Specification Form */}
         {showCreatePanel && (
-          <div className="animate-in fade-in slide-in-from-top-6 duration-500">
+          <div>
             <ProjectForm
               mode="create"
               isPending={createProjectPending}
@@ -156,7 +156,7 @@ export function JiraDashboard() {
         )}
 
         {editingProject && (
-          <div className="animate-in fade-in zoom-in-95 duration-500">
+          <div>
             <ProjectForm
               mode="edit"
               initialValues={{
@@ -191,9 +191,9 @@ export function JiraDashboard() {
             <SectionSkeleton rows={6} />
           ) : projectsError ? (
             <SectionError
-              title="MISSION GRID FAILURE"
+              title="Không thể tải danh sách project"
               message={projectsError}
-              actionLabel="RETRY CONNECT"
+              actionLabel="Thử lại"
               onAction={reloadProjects}
             />
           ) : filteredProjects.length === 0 ? (

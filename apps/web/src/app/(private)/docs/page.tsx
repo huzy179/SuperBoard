@@ -26,9 +26,9 @@ export default function DocHomePage() {
   });
 
   return (
-    <div className="flex h-full flex-col bg-slate-50/20">
+    <div className="flex h-full flex-col bg-surface-bg">
       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-        <div className="w-20 h-20 mb-6 rounded-xl bg-white shadow-xl shadow-brand-500/10 flex items-center justify-center border border-brand-100 animate-pulse">
+        <div className="w-20 h-20 mb-6 rounded-xl bg-surface-card shadow-luxe flex items-center justify-center border border-surface-border">
           <BookOpen size={32} className="text-brand-600" />
         </div>
 
@@ -71,7 +71,7 @@ export default function DocHomePage() {
         </div>
       </div>
 
-      <div className="p-8 border-t border-slate-100 bg-white/50">
+      <div className="p-8 border-t border-surface-border bg-[color:var(--color-surface-alt)]/35">
         <div className="max-w-4xl mx-auto flex items-center justify-between text-[13px] text-slate-400 font-medium">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
@@ -111,7 +111,7 @@ function FeatureCard({
     <button
       onClick={onClick}
       disabled={disabled || isPending}
-      className={`flex flex-col items-start p-6 rounded-lg border transition-all text-left group ${
+      className={`flex flex-col items-start p-6 rounded-lg border transition-colors text-left group ${
         disabled
           ? 'bg-slate-50 border-slate-100 cursor-not-allowed opacity-60'
           : variant === 'indigo'
@@ -120,7 +120,7 @@ function FeatureCard({
       }`}
     >
       <div
-        className={`p-2 rounded-lg mb-3 group-hover:scale-110 transition-transform ${variant === 'indigo' ? 'bg-indigo-500/10' : 'bg-brand-50'}`}
+        className={`p-2 rounded-lg mb-3 ${variant === 'indigo' ? 'bg-indigo-500/10' : 'bg-brand-50'}`}
       >
         {icon}
       </div>

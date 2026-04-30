@@ -52,22 +52,22 @@ export default function ProjectReportsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-8 p-10 animate-pulse bg-slate-950 min-h-screen">
+      <div className="flex min-h-screen flex-col gap-8 bg-surface-bg p-10">
         <div className="flex justify-between items-center mb-4">
           <div className="space-y-3">
-            <div className="h-4 w-32 bg-white/5 rounded-full" />
-            <div className="h-10 w-64 bg-white/10 rounded-lg" />
+            <div className="h-4 w-32 rounded-full bg-black/[0.06]" />
+            <div className="h-10 w-64 rounded-lg bg-black/[0.08]" />
           </div>
-          <div className="h-12 w-40 bg-white/5 rounded-lg" />
+          <div className="h-10 w-36 rounded-lg bg-black/[0.06]" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-32 bg-white/5 rounded-xl border border-white/5" />
+            <div key={i} className="h-32 rounded-xl border border-surface-border bg-surface-card" />
           ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="h-96 bg-white/5 rounded-[3rem] border border-white/5" />
-          <div className="h-96 bg-white/5 rounded-[3rem] border border-white/5" />
+          <div className="h-96 rounded-xl border border-surface-border bg-surface-card" />
+          <div className="h-96 rounded-xl border border-surface-border bg-surface-card" />
         </div>
       </div>
     );
@@ -87,63 +87,59 @@ export default function ProjectReportsPage() {
   const getStatusColor = (status: string) => STATUS_COLORS[status.toLowerCase()] || '#94a3b8';
 
   return (
-    <div className="relative min-h-screen bg-slate-950 overflow-x-hidden pt-10 pb-24 px-8 md:px-12 font-sans">
-      {/* Mesh Gradients Backgrounds */}
-      <div className="fixed -top-40 -right-40 w-[600px] h-[600px] bg-brand-500/10 rounded-full blur-[140px] pointer-events-none opacity-50" />
-      <div className="fixed -bottom-40 -left-10 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none opacity-40" />
-
+    <div className="relative min-h-screen bg-surface-bg overflow-x-hidden pt-8 pb-16 px-6 md:px-10 font-sans">
       <div className="relative z-10 max-w-7xl mx-auto space-y-12">
         {/* Header Section */}
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <div className="h-1 w-6 bg-brand-500 rounded-full shadow-glow-brand" />
-              <span className="text-[10px] font-black text-brand-400 uppercase tracking-[0.4em]">
-                Operational Analytics
+              <div className="h-1 w-6 bg-brand-500 rounded-full" />
+              <span className="text-sm font-medium text-[color:var(--color-muted)]">
+                Báo cáo dự án
               </span>
             </div>
-            <h1 className="text-5xl font-black text-white tracking-tighter uppercase leading-none">
-              Mission Intelligence
+            <h1 className="text-3xl md:text-4xl font-semibold text-[color:var(--color-ink)] tracking-tight leading-tight">
+              Tổng quan tiến độ & hiệu suất
             </h1>
-            <p className="text-sm font-medium text-white/40 tracking-wide max-w-lg">
-              High-fidelity performance metrics, velocity vectors, and project health diagnostics.
+            <p className="text-sm text-[color:var(--color-muted)] max-w-2xl leading-relaxed">
+              Theo dõi hoàn thành, tốc độ, cycle time và các cảnh báo sức khỏe của dự án.
             </p>
           </div>
 
           <div className="relative">
             <button
               onClick={() => setIsExportOpen(!isExportOpen)}
-              className="group flex items-center gap-3 bg-white/5 border border-white/10 text-white px-6 py-4 rounded-[1.5rem] font-black text-[10px] uppercase tracking-widest hover:bg-white/10 hover:border-brand-500/30 transition-all shadow-glass"
+              className="group inline-flex items-center gap-2 rounded-md border border-surface-border bg-surface-card px-4 py-2.5 text-sm font-medium text-[color:var(--color-ink)] transition-colors hover:bg-black/[0.03]"
             >
-              <DownloadIcon className="w-4 h-4 text-brand-400" />
-              Manifest Deployment
+              <DownloadIcon className="w-4 h-4 text-brand-600" />
+              Xuất dữ liệu
               <ChevronDownIcon
-                className={`w-3 h-3 text-white/20 transition-transform ${isExportOpen ? 'rotate-180' : ''}`}
+                className={`w-4 h-4 text-[color:var(--color-faint)] transition-transform ${isExportOpen ? 'rotate-180' : ''}`}
               />
             </button>
 
             {isExportOpen && (
-              <div className="absolute right-0 mt-3 w-64 bg-slate-900 shadow-glass border border-white/10 rounded-xl overflow-hidden py-2 z-50 animate-in fade-in zoom-in-95 duration-300 backdrop-blur-3xl">
+              <div className="absolute right-0 mt-2 w-64 rounded-lg border border-surface-border bg-surface-card shadow-luxe p-1 z-50">
                 <button
                   onClick={() => {
                     reportService.exportTasksCsv(projectId);
                     setIsExportOpen(false);
                   }}
-                  className="w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 flex items-center gap-3 transition-colors"
+                  className="w-full rounded-md text-left px-3 py-2 text-sm font-medium text-[color:var(--color-ink)] hover:bg-black/[0.03] flex items-center gap-2 transition-colors"
                 >
-                  <Cpu className="w-4 h-4 text-brand-400" />
-                  Satellite CSV (.csv)
+                  <Cpu className="w-4 h-4 text-brand-600" />
+                  CSV (.csv)
                 </button>
-                <div className="h-px bg-white/5 mx-6" />
+                <div className="h-px bg-surface-border mx-1" />
                 <button
                   onClick={() => {
                     reportService.exportTasksJson(projectId);
                     setIsExportOpen(false);
                   }}
-                  className="w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 flex items-center gap-3 transition-colors"
+                  className="w-full rounded-md text-left px-3 py-2 text-sm font-medium text-[color:var(--color-ink)] hover:bg-black/[0.03] flex items-center gap-2 transition-colors"
                 >
-                  <Zap className="w-4 h-4 text-indigo-400" />
-                  Core JSON (.json)
+                  <Zap className="w-4 h-4 text-indigo-600" />
+                  JSON (.json)
                 </button>
               </div>
             )}
@@ -151,45 +147,33 @@ export default function ProjectReportsPage() {
         </header>
 
         {/* Intelligence Pulse Briefing */}
-        <section className="relative group overflow-hidden rounded-[3rem] border border-brand-500/20 bg-brand-500/5 p-10 animate-in slide-in-from-top-6 duration-700">
-          {/* Glow Line */}
-          <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-brand-500/50 to-transparent" />
-
-          <div className="flex flex-col md:flex-row gap-10 items-start md:items-center">
-            <div className="p-6 bg-brand-500/10 rounded-xl border border-brand-500/20">
-              <Sparkles size={32} className="text-brand-400 animate-pulse" />
-            </div>
-            <div className="space-y-3 flex-1">
-              <div className="flex items-center gap-3">
-                <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-400">
-                  Mission Intelligence Pulse
+        <section className="rounded-xl border border-surface-border bg-surface-card p-6 shadow-sm">
+          <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-md border border-surface-border bg-brand-50 text-brand-700">
+                <Sparkles size={18} />
+              </div>
+              <div className="space-y-1">
+                <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
+                  Nhận định nhanh
                 </h2>
-                <div className="px-2 py-0.5 bg-emerald-500/10 rounded-full border border-emerald-500/20">
-                  <span className="text-[8px] font-black text-emerald-400 uppercase tracking-widest">
-                    System Online
-                  </span>
-                </div>
+                <p className="text-sm text-[color:var(--color-muted)] leading-relaxed max-w-2xl">
+                  Tỷ lệ hoàn thành hiện tại khoảng {Math.round(report.metrics.completionRate)}%. Có{' '}
+                  {report.health.overdueCount} công việc quá hạn và {report.health.staleCount} công
+                  việc bị “stale”.
+                </p>
               </div>
-              <p className="text-xl font-bold text-white tracking-tight leading-relaxed italic">
-                "Phase completion vectors are tracking at{' '}
-                {Math.round(report.metrics.completionRate)}%. Operational friction detected in{' '}
-                {report.health.overdueCount} overdue protocols. Recommend high-priority allocation
-                to stale nodes."
-              </p>
-              <div className="flex gap-6 pt-2">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck size={14} className="text-emerald-400" />
-                  <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">
-                    Health Level: Optimal
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Target size={14} className="text-indigo-400" />
-                  <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">
-                    Strategy: Velocity Acceleration
-                  </span>
-                </div>
-              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-800">
+                <ShieldCheck size={14} className="text-emerald-600" />
+                Tình trạng: ổn
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-surface-border bg-black/[0.02] px-3 py-1.5 text-xs font-medium text-[color:var(--color-muted)]">
+                <Target size={14} className="text-brand-600" />
+                Ưu tiên: giảm tồn đọng
+              </span>
             </div>
           </div>
         </section>
@@ -225,11 +209,11 @@ export default function ProjectReportsPage() {
         {/* Critical Health Diagnostics */}
         <section className="space-y-6">
           <div className="flex items-center gap-4">
-            <h2 className="text-[10px] font-black text-white uppercase tracking-[0.5em] flex items-center gap-3">
-              <ActivityIcon className="w-4 h-4 text-brand-400" />
-              Health Diagnostics
+            <h2 className="text-sm font-semibold text-[color:var(--color-ink)] flex items-center gap-2">
+              <ActivityIcon className="w-4 h-4 text-[color:var(--color-muted)]" />
+              Cảnh báo
             </h2>
-            <div className="h-px flex-1 bg-white/5" />
+            <div className="h-px flex-1 bg-surface-border" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -296,7 +280,7 @@ export default function ProjectReportsPage() {
                   type="monotone"
                   dataKey="idealPoints"
                   name="Perfect Trajectory"
-                  stroke="rgba(255,255,255,0.1)"
+                  stroke="rgba(0,0,0,0.12)"
                   strokeDasharray="8 8"
                   strokeWidth={2}
                   dot={false}
@@ -358,15 +342,14 @@ export default function ProjectReportsPage() {
                 />
                 <YAxis axisLine={false} tickLine={false} tick={REPORT_AXIS_TICK} />
                 <Tooltip
-                  cursor={{ fill: 'rgba(255,255,255,0.02)' }}
+                  cursor={{ fill: 'rgba(0,0,0,0.03)' }}
                   contentStyle={REPORT_TOOLTIP_STYLE}
                 />
                 <Bar dataKey="points" name="Throughput" radius={[12, 12, 0, 0]}>
                   {report.velocity.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
-                      fill={index === report.velocity.length - 1 ? '#3b82f6' : '#1e293b'}
-                      className="transition-all duration-700"
+                      fill={index === report.velocity.length - 1 ? '#0075de' : '#cbd5e1'}
                     />
                   ))}
                 </Bar>
@@ -390,27 +373,25 @@ export default function ProjectReportsPage() {
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-3">
                         <div
-                          className="w-2 h-2 rounded-full shadow-glow"
+                          className="w-2 h-2 rounded-full"
                           style={{
                             backgroundColor: statusColor,
-                            boxShadow: `0 0 10px ${statusColor}`,
                           }}
                         />
-                        <span className="text-[10px] font-black text-white/60 uppercase tracking-widest group-hover:text-white transition-colors">
+                        <span className="text-xs font-medium text-[color:var(--color-ink)]">
                           {d.status}
                         </span>
                       </div>
-                      <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">
-                        {d.count} Units // {Math.round(percent)}%
+                      <span className="text-xs font-medium text-[color:var(--color-muted)]">
+                        {d.count} • {Math.round(percent)}%
                       </span>
                     </div>
-                    <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-white/5">
+                    <div className="w-full bg-black/[0.06] h-2 rounded-full overflow-hidden border border-surface-border">
                       <div
-                        className="h-full rounded-full transition-all duration-1000 shadow-glow"
+                        className="h-full rounded-full"
                         style={{
                           width: `${percent}%`,
                           backgroundColor: statusColor,
-                          boxShadow: `0 0 15px ${statusColor}40`,
                         }}
                       />
                     </div>
@@ -437,22 +418,17 @@ function StatCard({
   icon: React.ReactNode;
 }) {
   return (
-    <div className="group relative bg-white/5 p-8 rounded-[2.5rem] border border-white/5 shadow-glass backdrop-blur-3xl overflow-hidden transition-all hover:scale-[1.02] hover:bg-white/[0.07] hover:border-white/10">
-      <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
-      <div className="relative z-10 flex flex-col h-full justify-between">
-        <div className="flex items-center gap-4 mb-8">
-          <div className="p-3 bg-slate-900 rounded-lg border border-white/5 shadow-luxe group-hover:border-brand-500/30 transition-all">
-            {icon}
-          </div>
-          <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">
-            {label}
-          </span>
+    <div className="rounded-xl border border-surface-border bg-surface-card p-6 shadow-sm transition-colors hover:bg-[color:var(--color-surface-alt)]/40">
+      <div className="flex items-start gap-4">
+        <div className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-surface-border bg-surface-bg">
+          {icon}
         </div>
-        <div>
-          <div className="text-4xl font-black text-white tracking-tighter leading-none mb-2">
+        <div className="min-w-0">
+          <div className="text-xs font-medium text-[color:var(--color-muted)]">{label}</div>
+          <div className="mt-2 text-2xl font-semibold text-[color:var(--color-ink)] tracking-tight">
             {value}
           </div>
-          <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest leading-relaxed">
+          <div className="mt-1 text-xs text-[color:var(--color-muted)] leading-relaxed">
             {subText}
           </div>
         </div>
@@ -473,21 +449,19 @@ function HealthCard({
   icon: React.ReactNode;
 }) {
   const variants = {
-    rose: 'text-rose-400 bg-rose-500/10 border-rose-500/20 shadow-glow-rose',
-    amber: 'text-amber-400 bg-amber-500/10 border-amber-500/20 shadow-glow-amber',
-    slate: 'text-white/40 bg-white/5 border-white/5 shadow-none',
+    rose: 'bg-rose-50 border-rose-200 text-rose-800',
+    amber: 'bg-amber-50 border-amber-200 text-amber-900',
+    slate: 'bg-surface-card border-surface-border text-[color:var(--color-ink)]',
   };
 
   return (
-    <div
-      className={`p-8 rounded-xl border transition-all hover:scale-[1.02] flex items-center gap-6 ${variants[color]}`}
-    >
-      <div className="p-4 bg-slate-950/80 rounded-lg border border-white/5">{icon}</div>
+    <div className={`p-6 rounded-xl border flex items-center gap-4 shadow-sm ${variants[color]}`}>
+      <div className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-surface-border bg-white">
+        {icon}
+      </div>
       <div>
-        <div className="text-3xl font-black tracking-tighter leading-none">{value}</div>
-        <div className="text-[9px] font-black uppercase tracking-widest mt-1 opacity-60">
-          {label}
-        </div>
+        <div className="text-2xl font-semibold tracking-tight leading-none">{value}</div>
+        <div className="mt-1 text-xs font-medium opacity-80">{label}</div>
       </div>
     </div>
   );

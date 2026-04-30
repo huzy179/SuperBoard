@@ -64,8 +64,10 @@ export function WorkflowEditor({
       data.transitions.forEach((t) => {
         set.add(`${t.fromStatusId}_${t.toStatusId}`);
       });
-      setLocalTransitions(set);
-      setIsMatrixDirty(false);
+      Promise.resolve().then(() => {
+        setLocalTransitions(set);
+        setIsMatrixDirty(false);
+      });
     }
   }, [data?.transitions]);
 

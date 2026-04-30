@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Sparkles, RefreshCw, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { getWorkspaceDigest } from '../api/ai-service';
@@ -15,24 +15,27 @@ export function NeuralWorkspaceDigest({ workspaceId }: NeuralWorkspaceDigestProp
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const fetchDigest = async (silent = false) => {
-    if (!silent) setIsLoading(true);
-    else setIsRefreshing(true);
+  const fetchDigest = useCallback(
+    async (silent = false) => {
+      if (!silent) setIsLoading(true);
+      else setIsRefreshing(true);
 
-    try {
-      const data = await getWorkspaceDigest(workspaceId);
-      setDigest(data.digest);
-    } catch {
-      toast.error('Không thể đồng bộ AI');
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  };
+      try {
+        const data = await getWorkspaceDigest(workspaceId);
+        setDigest(data.digest);
+      } catch {
+        toast.error('Không thể đồng bộ AI');
+      } finally {
+        setIsLoading(false);
+        setIsRefreshing(false);
+      }
+    },
+    [workspaceId],
+  );
 
   useEffect(() => {
-    fetchDigest();
-  }, [workspaceId]);
+    Promise.resolve().then(() => fetchDigest());
+  }, [fetchDigest]);
 
   if (isLoading) {
     return (

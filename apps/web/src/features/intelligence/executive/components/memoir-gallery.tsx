@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Book, History, Sparkles, User, ArrowRight, X, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -15,17 +15,18 @@ export function ProjectMemoirGallery({ projectId }: { projectId: string }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activePersona, setActivePersona] = useState('executive');
 
-  useEffect(() => {
-    fetchMemoirs();
-  }, [projectId]);
-
-  const fetchMemoirs = async () => {
+  const fetchMemoirs = useCallback(async () => {
     try {
-      setMemoirs(await getProjectMemoirs(projectId));
+      const data = await getProjectMemoirs(projectId);
+      setMemoirs(data);
     } catch {
       toast.error('Không tải được memoir');
     }
-  };
+  }, [projectId]);
+
+  useEffect(() => {
+    Promise.resolve().then(() => fetchMemoirs());
+  }, [fetchMemoirs]);
 
   const generateMemoir = async () => {
     setIsGenerating(true);

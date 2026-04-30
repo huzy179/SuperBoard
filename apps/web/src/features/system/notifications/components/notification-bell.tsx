@@ -27,7 +27,7 @@ export function NotificationBell() {
   const markAllRead = useMarkAllNotificationsRead();
 
   const unreadCount = data?.unreadCount ?? 0;
-  const notifications = data?.notifications ?? [];
+  const notifications = useMemo(() => data?.notifications ?? [], [data?.notifications]);
 
   const filteredNotifications = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -130,36 +130,37 @@ export function NotificationBell() {
                   onClick={() => {
                     if (!n.readAt) markRead.mutate(n.id);
                   }}
-                  className={`relative w-full px-4 py-3 text-left transition-all border-b border-white/5 hover:bg-white/[0.03] ${!n.readAt ? 'bg-brand-500/[0.02]' : ''}`}
+                  className={`relative w-full px-4 py-3 text-left transition-colors border-b border-surface-border hover:bg-black/[0.02] ${
+                    !n.readAt ? 'bg-brand-50' : ''
+                  }`}
                 >
-                  {/* Neural Pulse Indicator for Strategic Pings */}
-                  {n.neuralPriority === 'STRATEGIC' && !n.readAt && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-500 shadow-glow-brand animate-pulse" />
-                  )}
-
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1">
                       <p
-                        className={`text-[11px] font-bold tracking-tight uppercase ${!n.readAt ? 'text-white' : 'text-white/40'}`}
+                        className={`text-sm font-medium tracking-tight ${
+                          !n.readAt
+                            ? 'text-[color:var(--color-ink)]'
+                            : 'text-[color:var(--color-muted)]'
+                        }`}
                       >
                         {(n.payload as Record<string, string>).message ?? n.type}
                       </p>
 
                       {n.aiSummary && (
-                        <p className="text-[10px] font-medium text-brand-400 italic leading-snug">
+                        <p className="text-xs text-[color:var(--color-muted)] leading-snug">
                           {n.aiSummary}
                         </p>
                       )}
 
-                      <p className="text-[9px] font-black text-white/20 uppercase tracking-widest">
+                      <p className="text-xs text-[color:var(--color-faint)]">
                         {formatRelativeTime(n.createdAt)}
                       </p>
                     </div>
 
                     {n.neuralPriority === 'STRATEGIC' && (
-                      <div className="p-1.5 bg-brand-500/10 rounded-lg">
-                        <div className="h-1.5 w-1.5 rounded-full bg-brand-500 shadow-glow-brand" />
-                      </div>
+                      <span className="shrink-0 rounded-full border border-brand-200 bg-brand-50 px-2 py-1 text-[11px] font-medium text-brand-700">
+                        Strategic
+                      </span>
                     )}
                   </div>
                 </button>

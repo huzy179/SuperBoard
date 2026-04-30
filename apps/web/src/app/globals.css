@@ -136,17 +136,16 @@ h6 {
    Overlay và panel dùng chung cho tất cả dialog/modal.
    ============================================================ */
 
-.modal-overlay {
-  @apply fixed inset-0 z-50 flex items-center justify-center
-         bg-black/30 backdrop-blur-sm
-         animate-fade-in;
-}
-
-.modal-panel {
-  @apply relative w-full rounded-lg border border-surface-border
-         bg-surface-card shadow-luxe
-         animate-slide-up overflow-hidden;
-}
+	.modal-overlay {
+	  @apply fixed inset-0 z-50 flex items-center justify-center
+	         bg-black/20;
+	}
+	
+	.modal-panel {
+	  @apply relative w-full rounded-lg border border-surface-border
+	         bg-surface-card shadow-luxe
+	         overflow-hidden;
+	}
 
 .modal-header {
   @apply flex items-center justify-between px-[var(--space-6)] py-[var(--space-4)] border-b border-surface-border;
@@ -170,9 +169,9 @@ h6 {
   @apply p-[var(--space-6)];
 }
 
-.modal-footer {
-  @apply flex items-center gap-[var(--space-3)] pt-[var(--space-4)] border-t border-white/5 mt-[var(--space-4)];
-}
+	.modal-footer {
+	  @apply flex items-center gap-[var(--space-3)] pt-[var(--space-4)] border-t border-surface-border mt-[var(--space-4)];
+	}
 
 /* ============================================================
    BUTTON PRIMITIVES
@@ -211,51 +210,24 @@ h6 {
   @apply flex items-center gap-4 my-8;
 }
 
-.form-section-divider::before,
-.form-section-divider::after {
-  content: '';
-  @apply flex-1 h-px bg-white/5;
-}
+	.form-section-divider::before,
+	.form-section-divider::after {
+	  content: '';
+	  @apply flex-1 h-px bg-surface-border;
+	}
 
 .form-section-label {
-  @apply text-xs font-medium text-white/40 whitespace-nowrap;
+  @apply text-xs font-medium text-[color:var(--color-muted)] whitespace-nowrap;
 }
 
 .glass-panel {
-  @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-glass;
+  /* Distilled: no blur/glass. Keep a simple Notion-like surface. */
+  @apply bg-surface-card border border-surface-border shadow-luxe rounded-lg;
 }
 
 .premium-card {
-  @apply bg-surface-card border border-surface-border shadow-luxe hover:shadow-2xl transition-all duration-500 rounded-card;
-}
-
-/* Dark glass utility classes — used for unified dark aesthetic across all components */
-.dark-glass-panel {
-  @apply bg-surface-card border border-surface-border shadow-glass rounded-lg;
-}
-
-.dark-glass-card {
-  @apply bg-white/[0.01] border border-white/5 shadow-sm rounded-md;
-}
-
-.dark-glass-input {
-  @apply bg-white/[0.02] border border-white/5 text-white placeholder:text-white/20 rounded-sm;
-}
-
-.dark-glass-badge {
-  @apply bg-white/[0.04] border border-white/10 text-white/70 rounded-sm text-xs font-medium px-2 py-0.5;
-}
-
-.dark-glass-chip {
-  @apply bg-slate-800 text-white/40 hover:bg-slate-700 hover:text-white rounded-lg px-2 py-1 text-[11px] font-medium transition-colors;
-}
-
-.dark-glass-chip-active {
-  @apply bg-brand-500/10 text-brand-400 border border-brand-500/30;
-}
-
-.dark-glass-skeleton {
-  @apply animate-pulse rounded-[2.5rem] bg-white/[0.02] border border-white/5;
+  /* Distilled: reduce hover drama */
+  @apply bg-surface-card border border-surface-border shadow-luxe hover:shadow-glass transition-shadow duration-150 rounded-card;
 }
 
 .mesh-bg {

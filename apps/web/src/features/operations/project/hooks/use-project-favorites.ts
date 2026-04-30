@@ -19,10 +19,11 @@ export function useProjectFavorites(projects: ProjectItemDTO[]) {
     try {
       const parsed = JSON.parse(raw) as string[];
       if (Array.isArray(parsed)) {
-        setFavoriteProjectIds(new Set(parsed.filter((item) => typeof item === 'string')));
+        const set = new Set(parsed.filter((item) => typeof item === 'string'));
+        Promise.resolve().then(() => setFavoriteProjectIds(set));
       }
     } catch {
-      setFavoriteProjectIds(new Set());
+      Promise.resolve().then(() => setFavoriteProjectIds(new Set()));
     }
   }, []);
 

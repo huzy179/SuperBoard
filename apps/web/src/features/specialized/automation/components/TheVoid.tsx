@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Cpu, Activity, Zap, Globe, ShieldCheck, BrainCircuit, Terminal } from 'lucide-react';
+import { Cpu, Terminal } from 'lucide-react';
 import { getConsciousnessStream } from '../api/automation-service';
+import { AppOverlay } from '@/components/ui/app-overlay';
 
 interface Thought {
   id: string;
@@ -13,24 +13,40 @@ interface Thought {
   };
 }
 
-export function TheVoid({ onClose }: { onClose: () => void }) {
+export function TheVoid({
+  isOpen,
+  onClose,
+  workspaceId,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  workspaceId: string | null;
+}) {
   const [thoughts, setThoughts] = useState<Thought[]>([]);
   const [activeThought, setActiveThought] = useState<string>('Đang khởi tạo ngữ cảnh AI...');
+  const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchConsciousness = async () => {
-      const data = await getConsciousnessStream('default-workspace');
-      setThoughts(data);
-      if (data.length > 0) {
-        setActiveThought(data[0]?.metadata.thoughts[0] ?? 'Đang khởi tạo ngữ cảnh AI...');
+      if (!workspaceId) return;
+      setIsLoading(true);
+      try {
+        const data = await getConsciousnessStream(workspaceId);
+        setThoughts(data);
+        if (data.length > 0) {
+          setActiveThought(data[0]?.metadata.thoughts[0] ?? 'Đang khởi tạo ngữ cảnh AI...');
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
+    if (!isOpen) return;
     fetchConsciousness();
-    const interval = setInterval(fetchConsciousness, 5000);
+    const interval = setInterval(fetchConsciousness, 15000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isOpen, workspaceId]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -39,166 +55,86 @@ export function TheVoid({ onClose }: { onClose: () => void }) {
   }, [thoughts]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[200] bg-[#020617] text-white overflow-hidden flex flex-col"
-    >
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,#3b82f6_0%,transparent_100%)] animate-pulse" />
-        <GridBackground />
-      </div>
-
-      <header className="relative z-10 flex items-center justify-between p-10 border-b border-white/5 backdrop-blur-md">
-        <div className="flex items-center gap-6">
-          <div className="h-12 w-12 bg-brand-500 rounded-lg flex items-center justify-center shadow-glow-brand animate-pulse">
-            <BrainCircuit size={24} />
+    <AppOverlay
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Automation activity"
+      subtitle="Nhật ký xử lý và các “thoughts” mà hệ thống ghi lại."
+      variant="modal"
+      maxWidth="4xl"
+      footer={
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs text-[color:var(--color-muted)]">
+            <Terminal size={14} />
+            <span>{isLoading ? 'Đang tải…' : 'Cập nhật mỗi 15s'}</span>
           </div>
-          <div>
-            <h1 className="text-xl font-black uppercase tracking-[0.5em]">AI Workspace</h1>
-            <p className="text-[10px] font-bold text-brand-400 uppercase tracking-widest">
-              Hệ thống tự trị cấp 5
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2 group">
-            <ShieldCheck size={16} className="text-emerald-400" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-white/40">
-              Toàn bộ hệ thống ổn định
-            </span>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-3 bg-white/5 rounded-full hover:bg-white/10 transition-all"
-          >
-            <X size={20} />
+          <button type="button" className="btn btn-secondary" onClick={onClose}>
+            Đóng
           </button>
         </div>
-      </header>
-
-      <main className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-3 overflow-hidden">
-        <div className="col-span-1 border-r border-white/5 flex flex-col overflow-hidden bg-slate-950/50">
-          <div className="p-8 border-b border-white/5 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Terminal className="text-brand-500" size={16} />
-              <h2 className="text-[12px] font-black uppercase tracking-widest">Luồng suy nghĩ</h2>
+      }
+    >
+      {!workspaceId ? (
+        <div className="rounded-lg border border-surface-border bg-black/[0.02] p-6 text-sm text-[color:var(--color-muted)]">
+          Chưa xác định workspace.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <section className="lg:col-span-1">
+            <div className="flex items-center gap-2 text-sm font-semibold text-[color:var(--color-ink)]">
+              <Cpu size={16} className="text-[color:var(--color-muted)]" />
+              Luồng sự kiện
             </div>
-            <div className="flex items-center gap-2">
-              <div className="h-1.5 w-1.5 rounded-full bg-brand-500 animate-ping" />
-              <span className="text-[8px] font-black text-brand-500 uppercase">
-                Luồng trực tiếp
-              </span>
+            <div
+              ref={scrollRef}
+              className="mt-3 max-h-[60vh] overflow-y-auto rounded-lg border border-surface-border bg-surface-card"
+            >
+              {thoughts.length === 0 ? (
+                <div className="p-4 text-sm text-[color:var(--color-muted)]">Chưa có dữ liệu.</div>
+              ) : (
+                <div className="divide-y divide-[color:var(--color-surface-border)]">
+                  {thoughts.map((pulse) => {
+                    const first = pulse.metadata.thoughts[0] ?? '';
+                    const ts = new Date(pulse.metadata.timestamp);
+                    return (
+                      <button
+                        key={pulse.id}
+                        type="button"
+                        onClick={() => setActiveThought(first || activeThought)}
+                        className="w-full text-left px-4 py-3 hover:bg-black/[0.02] transition-colors"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-xs font-medium text-[color:var(--color-muted)]">
+                            {ts.toLocaleTimeString()}
+                          </span>
+                          <span className="text-xs text-[color:var(--color-faint)]">
+                            {ts.toLocaleDateString()}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-sm text-[color:var(--color-ink)] line-clamp-2">
+                          {first || '—'}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          </div>
+          </section>
 
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide">
-            <AnimatePresence mode="popLayout">
-              {thoughts.map((pulse) => (
-                <motion.div
-                  key={pulse.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="space-y-4"
-                >
-                  <div className="flex items-center gap-3 opacity-20">
-                    <div className="h-[1px] flex-1 bg-white" />
-                    <span className="text-[8px] font-black uppercase">
-                      {new Date(pulse.metadata.timestamp).toLocaleTimeString()}
-                    </span>
-                  </div>
-                  {pulse.metadata.thoughts.map((thought, tidx) => (
-                    <p
-                      key={tidx}
-                      className="text-[11px] font-bold text-white/60 leading-relaxed italic border-l-2 border-brand-500/20 pl-4"
-                    >
-                      {thought}
-                    </p>
-                  ))}
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
+          <section className="lg:col-span-2">
+            <div className="text-sm font-semibold text-[color:var(--color-ink)]">Chi tiết</div>
+            <div className="mt-3 rounded-lg border border-surface-border bg-surface-card p-4 shadow-glass">
+              <p className="text-sm leading-relaxed text-[color:var(--color-ink)]">
+                {activeThought}
+              </p>
+            </div>
+            <p className="mt-3 text-xs text-[color:var(--color-muted)] leading-relaxed">
+              Giao diện này được giản lược để dễ đọc, không dùng nền tối/glow/blur.
+            </p>
+          </section>
         </div>
-
-        <div className="col-span-2 relative flex items-center justify-center p-20 overflow-hidden">
-          <div className="relative w-full max-w-4xl aspect-video flex items-center justify-center">
-            <Visualizer activeThought={activeThought} />
-          </div>
-
-          <div className="absolute bottom-10 inset-x-10 grid grid-cols-4 gap-6">
-            <StatCard icon={<Cpu size={14} />} label="Tải Neural" value="12.4 TFLOPS" />
-            <StatCard icon={<Activity size={14} />} label="Độ trễ Synaptic" value="2ms" />
-            <StatCard icon={<Zap size={14} />} label="Năng lượng" value="Cao" />
-            <StatCard icon={<Globe size={14} />} label="Phạm vi" value="Toàn cục" />
-          </div>
-        </div>
-      </main>
-    </motion.div>
-  );
-}
-
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="p-6 bg-white/5 border border-white/10 rounded-xl space-y-2 backdrop-blur-xl">
-      <div className="flex items-center gap-2 text-white/20">
-        {icon}
-        <span className="text-[8px] font-black uppercase tracking-widest">{label}</span>
-      </div>
-      <p className="text-sm font-black text-white">{value}</p>
-    </div>
-  );
-}
-
-function Visualizer({ activeThought }: { activeThought: string }) {
-  return (
-    <div className="relative flex flex-col items-center justify-center space-y-12">
-      <div className="relative h-64 w-64">
-        <motion.div
-          animate={{ scale: [1, 1.1, 1], rotate: 360 }}
-          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-          className="absolute inset-0 rounded-full border-2 border-brand-500/20 border-t-brand-500 shadow-glow-brand"
-        />
-        <motion.div
-          animate={{ scale: [1.1, 1, 1.1], rotate: -360 }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-          className="absolute inset-4 rounded-full border-2 border-brand-300/10 border-b-brand-300"
-        />
-        <div className="absolute inset-8 rounded-full bg-brand-500/5 backdrop-blur-md flex items-center justify-center">
-          <BrainCircuit size={64} className="text-brand-500 animate-pulse" />
-        </div>
-      </div>
-
-      <div className="text-center space-y-4 max-w-xl">
-        <motion.p
-          key={activeThought}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-2xl font-black text-white uppercase tracking-tighter leading-tight italic"
-        >
-          "{activeThought}"
-        </motion.p>
-        <div className="flex items-center justify-center gap-2">
-          <div className="h-1 w-12 bg-brand-500" />
-          <span className="text-[10px] font-black text-brand-400 uppercase tracking-[1em] pl-4">
-            Đang xử lý
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function GridBackground() {
-  return (
-    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="0.5" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#grid)" />
-    </svg>
+      )}
+    </AppOverlay>
   );
 }

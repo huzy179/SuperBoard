@@ -49,61 +49,67 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setRecentSearches(parsed);
+        Promise.resolve().then(() => setRecentSearches(parsed));
       } catch (err) {
         console.error('Failed to parse recent searches', err);
       }
     }
   }, []);
 
-  const saveToRecent = (item: CommandItem) => {
-    const updated = [item, ...recentSearches.filter((r) => r.id !== item.id)].slice(0, 5);
-    setRecentSearches(updated);
-    localStorage.setItem('superboard_recent_searches', JSON.stringify(updated));
-  };
+  const saveToRecent = useCallback(
+    (item: CommandItem) => {
+      const updated = [item, ...recentSearches.filter((r) => r.id !== item.id)].slice(0, 5);
+      setRecentSearches(updated);
+      localStorage.setItem('superboard_recent_searches', JSON.stringify(updated));
+    },
+    [recentSearches],
+  );
 
-  const tasks = data?.tasks ?? [];
-  const projects = data?.projects ?? [];
-  const docs = data?.docs ?? [];
+  const tasks = useMemo(() => data?.tasks ?? [], [data?.tasks]);
+  const projects = useMemo(() => data?.projects ?? [], [data?.projects]);
+  const docs = useMemo(() => data?.docs ?? [], [data?.docs]);
 
-  const actions: CommandItem[] = [
-    {
-      id: 'action-create-task',
-      type: 'action',
-      title: 'Initialize New Mission',
-      subtitle: 'Spawn a new task vector in the active workspace',
-      icon: <Plus size={16} />,
-      handler: () => {
-        router.push('/jira?create=true');
-        onClose();
+  const actions: CommandItem[] = useMemo(
+    () => [
+      {
+        id: 'action-create-task',
+        type: 'action',
+        title: 'Initialize New Mission',
+        subtitle: 'Spawn a new task vector in the active workspace',
+        icon: <Plus size={16} />,
+        handler: () => {
+          router.push('/jira?create=true');
+          onClose();
+        },
+        category: 'System Protocols',
       },
-      category: 'System Protocols',
-    },
-    {
-      id: 'action-invite',
-      type: 'action',
-      title: 'Authorize Operator',
-      subtitle: 'Provision new access credentials for a team member',
-      icon: <UserPlus size={16} />,
-      handler: () => {
-        router.push('/settings?tab=workspace&invite=true');
-        onClose();
+      {
+        id: 'action-invite',
+        type: 'action',
+        title: 'Authorize Operator',
+        subtitle: 'Provision new access credentials for a team member',
+        icon: <UserPlus size={16} />,
+        handler: () => {
+          router.push('/settings?tab=workspace&invite=true');
+          onClose();
+        },
+        category: 'System Protocols',
       },
-      category: 'System Protocols',
-    },
-    {
-      id: 'action-settings',
-      type: 'action',
-      title: 'Secure Control Center',
-      subtitle: 'Access core platform configurations and security',
-      icon: <Settings size={16} />,
-      handler: () => {
-        router.push('/settings');
-        onClose();
+      {
+        id: 'action-settings',
+        type: 'action',
+        title: 'Secure Control Center',
+        subtitle: 'Access core platform configurations and security',
+        icon: <Settings size={16} />,
+        handler: () => {
+          router.push('/settings');
+          onClose();
+        },
+        category: 'Core Infrastructure',
       },
-      category: 'Core Infrastructure',
-    },
-  ];
+    ],
+    [router, onClose],
+  );
 
   const results = useMemo(() => {
     const list: CommandItem[] = [];
@@ -174,7 +180,7 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
                   {t.recentCollaborators.slice(0, 2).map((c, i) => (
                     <div
                       key={i}
-                      className="w-2.5 h-2.5 rounded-full border border-slate-900 bg-brand-500 shadow-glow-brand"
+                      className="w-2.5 h-2.5 rounded-full border border-surface-border bg-brand-500"
                       title={`Collaborator: ${c}`}
                     />
                   ))}
@@ -222,10 +228,10 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
     });
 
     return list;
-  }, [query, tasks, projects]);
+  }, [query, tasks, projects, actions, docs, onClose, recentSearches, router, saveToRecent]);
 
   useEffect(() => {
-    setSelectedIndex(0);
+    Promise.resolve().then(() => setSelectedIndex(0));
   }, [query, results.length]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -255,48 +261,35 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-start justify-center pt-[12vh] px-4 animate-in fade-in duration-500 font-sans"
+      className="fixed inset-0 z-[200] flex items-start justify-center pt-[12vh] px-4 font-sans"
       onKeyDown={handleKeyDown}
     >
-      {/* Neural Backdrop */}
-      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-2xl" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/20" onClick={onClose} />
 
-      <div className="relative w-full max-w-2xl overflow-hidden rounded-md border border-white/10 bg-slate-950/80 shadow-inner animate-in zoom-in-95 duration-500 backdrop-blur-3xl">
-        {/* Rim Light */}
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent" />
-
+      <div className="relative w-full max-w-2xl overflow-hidden rounded-xl border border-surface-border bg-surface-card shadow-luxe">
         <div className="flex flex-col max-h-[75vh]">
-          {/* Neural Search Header */}
-          <div className="p-8 border-b border-white/5 flex items-center gap-6 relative group">
+          <div className="px-6 py-4 border-b border-surface-border flex items-center gap-4">
             <div
-              className={`w-12 h-12 rounded-sm flex items-center justify-center border transition-all duration-700 ${
+              className={`w-10 h-10 rounded-md flex items-center justify-center border ${
                 query
-                  ? 'bg-brand-500/20 border-brand-500/40 text-brand-400 shadow-glow-brand'
-                  : 'bg-white/5 border-white/5 text-white/20'
+                  ? 'bg-brand-50 border-brand-200 text-brand-700'
+                  : 'bg-surface-bg border-surface-border text-[color:var(--color-muted)]'
               }`}
             >
-              {query ? <Zap size={20} className="animate-pulse" /> : <Terminal size={20} />}
+              {query ? <Zap size={18} /> : <Terminal size={18} />}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em]">
-                  Core Intelligence
-                </span>
-                {query && (
-                  <div className="h-1 w-1 rounded-full bg-brand-500 shadow-glow-brand animate-ping" />
-                )}
-              </div>
               <input
                 ref={inputRef}
                 type="text"
-                placeholder="TRANSMIT_COMMAND_OR_QUERY_VECTORS..."
-                className="w-full bg-transparent border-none outline-none text-xl font-black text-white placeholder:text-white/5 uppercase tracking-tighter"
+                placeholder="Tìm nhanh hoặc gõ lệnh…"
+                className="w-full bg-transparent border-none outline-none text-base font-medium text-[color:var(--color-ink)] placeholder:text-[color:var(--color-faint)]"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-2">
-              <kbd className="hidden sm:flex h-8 px-2 items-center justify-center bg-slate-950 text-white/20 rounded-sm text-[9px] font-bold uppercase tracking-widest border border-white/10 group-hover:text-brand-400 transition-colors">
+              <kbd className="hidden sm:flex h-8 px-2 items-center justify-center bg-surface-bg text-[color:var(--color-muted)] rounded-md text-[11px] font-medium border border-surface-border">
                 ESC
               </kbd>
             </div>
@@ -308,11 +301,11 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
               Object.entries(categories).map(([category, items]) => (
                 <div key={category} className="space-y-3">
                   <div className="flex items-center gap-3 px-4">
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white/5" />
-                    <h3 className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">
+                    <div className="h-px flex-1 bg-surface-border" />
+                    <h3 className="text-xs font-semibold text-[color:var(--color-muted)]">
                       {category}
                     </h3>
-                    <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/5" />
+                    <div className="h-px flex-1 bg-surface-border" />
                   </div>
                   <div className="space-y-1">
                     {items.map((item) => {
@@ -322,44 +315,55 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
                         <button
                           key={item.id}
                           onClick={item.handler}
-                          className={`w-full flex items-center gap-6 px-4 py-3 rounded-sm transition-all duration-500 text-left relative group ${
+                          className={`group relative w-full flex items-center gap-4 px-4 py-3 rounded-md transition-colors text-left ${
                             isSelected
-                              ? 'bg-white/[0.04] text-white'
-                              : 'hover:bg-white/[0.01] text-white/40'
+                              ? 'bg-black/[0.04] text-[color:var(--color-ink)]'
+                              : 'hover:bg-black/[0.02] text-[color:var(--color-ink)]'
                           }`}
                         >
                           {isSelected && (
-                            <div className="absolute inset-y-2 left-0 w-1 bg-brand-500 rounded-full shadow-glow-brand animate-pulse" />
+                            <div
+                              className="absolute inset-y-2 left-0 w-1 bg-brand-500 rounded-full"
+                              aria-hidden
+                            />
                           )}
                           <div
-                            className={`w-10 h-10 rounded-sm flex items-center justify-center transition-all duration-500 border ${
+                            className={`w-10 h-10 rounded-md flex items-center justify-center transition-colors border ${
                               isSelected
-                                ? 'bg-brand-500/20 border-brand-500/30 text-brand-400 shadow-glow-brand'
-                                : 'bg-white/5 border-white/5 group-hover:bg-white/10'
+                                ? 'bg-brand-50 border-brand-200 text-brand-700'
+                                : 'bg-black/[0.02] border-surface-border text-[color:var(--color-muted)] group-hover:bg-black/[0.04]'
                             }`}
                           >
                             {item.icon}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p
-                              className={`font-black text-xs uppercase tracking-widest transition-colors ${isSelected ? 'text-white' : 'group-hover:text-white/70'}`}
+                              className={`truncate text-sm font-medium transition-colors ${
+                                isSelected
+                                  ? 'text-[color:var(--color-ink)]'
+                                  : 'text-[color:var(--color-ink)] group-hover:text-[color:var(--color-ink)]'
+                              }`}
                             >
                               {item.title}
                             </p>
                             {item.subtitle && (
                               <p
-                                className={`text-[10px] font-bold uppercase tracking-tight truncate mt-1 ${isSelected ? 'text-white/40' : 'text-white/10 italic'}`}
+                                className={`truncate mt-1 text-xs ${
+                                  isSelected
+                                    ? 'text-[color:var(--color-muted)]'
+                                    : 'text-[color:var(--color-faint)]'
+                                }`}
                               >
                                 {item.subtitle}
                               </p>
                             )}
                           </div>
                           {isSelected && (
-                            <div className="flex items-center gap-3 pr-2 animate-in slide-in-from-right-4 duration-500">
-                              <span className="text-[8px] font-bold uppercase tracking-widest text-white/20">
-                                EXECUTE
+                            <div className="flex items-center gap-3 pr-2">
+                              <span className="text-xs font-medium text-[color:var(--color-muted)]">
+                                Enter
                               </span>
-                              <div className="p-1.5 bg-brand-500 rounded-sm text-slate-950 shadow-glow-brand">
+                              <div className="p-1.5 bg-brand-500 rounded-md text-white">
                                 <ArrowRight size={12} />
                               </div>
                             </div>
@@ -372,16 +376,15 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
               ))
             ) : (
               <div className="py-24 text-center space-y-6">
-                <div className="w-16 h-16 bg-slate-950 text-white/5 rounded-sm flex items-center justify-center mx-auto border border-white/10 shadow-inner transition-transform hover:scale-110 duration-700">
+                <div className="w-16 h-16 bg-black/[0.02] text-[color:var(--color-faint)] rounded-md flex items-center justify-center mx-auto border border-surface-border shadow-glass">
                   <Cpu size={32} />
                 </div>
                 <div className="space-y-2 px-12">
-                  <p className="font-black text-white/40 uppercase tracking-[0.3em]">
-                    Vector Not Resolved
+                  <p className="text-sm font-semibold text-[color:var(--color-ink)]">
+                    Không có kết quả
                   </p>
-                  <p className="text-[10px] font-medium text-white/10 uppercase tracking-widest leading-relaxed">
-                    No matching protocols found in the current subspace. Try transmitting an
-                    alternative command sequence.
+                  <p className="text-sm text-[color:var(--color-muted)] leading-relaxed">
+                    Thử từ khóa khác hoặc gõ lệnh ngắn hơn.
                   </p>
                 </div>
               </div>
@@ -389,50 +392,37 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
           </div>
 
           {/* Dynamic Control Footer */}
-          <div className="p-6 border-t border-white/5 bg-slate-950/50 flex items-center justify-between">
+          <div className="p-6 border-t border-surface-border bg-surface-bg flex items-center justify-between">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl text-brand-400 shadow-glow-brand relative">
+                <div className="w-8 h-8 flex items-center justify-center bg-black/[0.02] border border-surface-border rounded-md text-brand-600 relative">
                   <ShieldCheck size={14} />
                   {!syncStatus?.isFullySynced && (
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-brand-500 rounded-full border-2 border-slate-950 animate-pulse shadow-glow-brand" />
+                    <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-brand-500 rounded-full border-2 border-surface-bg" />
                   )}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">
-                    Neural Index status
+                  <span className="text-xs font-medium text-[color:var(--color-ink)]">
+                    Search index
                   </span>
                   {!syncStatus?.isFullySynced && (
-                    <span className="text-[7px] font-bold text-brand-500/60 uppercase tracking-widest animate-pulse">
-                      Synchronizing Vectors...
-                    </span>
+                    <span className="text-xs text-[color:var(--color-muted)]">Đang đồng bộ…</span>
                   )}
                 </div>
               </div>
-              <div className="h-4 w-px bg-white/5" />
-              <div className="flex flex-col">
-                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">
-                  Recent Neural Activity
-                </span>
-                <div className="flex gap-1.5 mt-0.5">
-                  <div className="h-1 w-4 bg-brand-500/40 rounded-full" title="Task Sync" />
-                  <div className="h-1 w-2 bg-emerald-500/40 rounded-full" title="Doc Index" />
-                  <div className="h-1 w-3 bg-cyan-500/40 rounded-full" title="Embedding Vector" />
-                </div>
-              </div>
             </div>
-            <div className="flex items-center gap-6 text-[9px] font-bold uppercase tracking-widest text-white/20">
+            <div className="flex items-center gap-6 text-xs text-[color:var(--color-muted)]">
               <div className="flex items-center gap-2">
-                <kbd className="px-2 py-1 bg-slate-900 border border-white/10 rounded-sm text-white/40 group-hover:text-brand-400 transition-colors">
+                <kbd className="px-2 py-1 bg-black/[0.02] border border-surface-border rounded-md text-[color:var(--color-muted)]">
                   ↑↓
                 </kbd>
                 <span>Navigate</span>
               </div>
               <div className="flex items-center gap-2">
-                <kbd className="px-2 py-1 bg-slate-900 border border-white/10 rounded-sm text-white/40">
+                <kbd className="px-2 py-1 bg-black/[0.02] border border-surface-border rounded-md text-[color:var(--color-muted)]">
                   ↵
                 </kbd>
-                <span>Initialize</span>
+                <span>Open</span>
               </div>
             </div>
           </div>

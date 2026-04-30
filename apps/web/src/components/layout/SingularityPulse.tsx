@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
 import { Sparkles, Activity, Zap, ExternalLink, Globe } from 'lucide-react';
 import { useWorkspaces } from '@/features/system/workspace/hooks/use-workspaces';
 import Link from 'next/link';
@@ -59,7 +58,7 @@ export function SingularityPulse() {
     cycle();
     checkProposals();
     return () => clearInterval(interval);
-  }, [activeWorkspace?.id]);
+  }, [activeWorkspace, activeWorkspace?.id]);
 
   return (
     <>
@@ -138,7 +137,7 @@ export function SingularityPulse() {
               onClick={() => setShowVoid(true)}
               className="w-full flex items-center justify-center gap-2 py-3 bg-black/[0.05] text-[color:var(--color-ink)] border border-surface-border rounded-lg text-sm font-medium hover:bg-black/[0.07] transition-colors"
             >
-              <BrainCircuit size={14} /> Final Ascension
+              <BrainCircuit size={14} /> Activity log
             </button>
 
             <p className="text-xs text-[color:var(--color-muted)] text-center leading-relaxed">
@@ -148,9 +147,11 @@ export function SingularityPulse() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {showVoid && <TheVoid onClose={() => setShowVoid(false)} />}
-      </AnimatePresence>
+      <TheVoid
+        isOpen={showVoid}
+        workspaceId={activeWorkspace?.id ?? null}
+        onClose={() => setShowVoid(false)}
+      />
     </>
   );
 }

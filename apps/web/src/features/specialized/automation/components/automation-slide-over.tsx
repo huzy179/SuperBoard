@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   X,
   Zap,
@@ -34,11 +34,7 @@ export function AutomationSlideOver({ workspaceId, projectId, onClose }: Automat
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchRules();
-  }, [workspaceId, projectId]);
-
-  const fetchRules = async () => {
+  const fetchRules = useCallback(async () => {
     try {
       setIsLoading(true);
       setRules(await getAutomationRules(workspaceId, projectId));
@@ -47,7 +43,11 @@ export function AutomationSlideOver({ workspaceId, projectId, onClose }: Automat
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [workspaceId, projectId]);
+
+  useEffect(() => {
+    Promise.resolve().then(() => fetchRules());
+  }, [fetchRules]);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;

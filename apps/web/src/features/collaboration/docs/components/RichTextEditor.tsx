@@ -67,81 +67,6 @@ export function RichTextEditor({
 
   const ydoc = useMemo(() => new Y.Doc(), []);
 
-  useEffect(() => {
-    if (!editor || !editable) return;
-
-    const handleSelection = () => {
-      const { from, to } = editor.state.selection;
-      if (from === to) {
-        setMenuPos((prev) => ({ ...prev, show: false }));
-        return;
-      }
-
-      const { view } = editor;
-      const start = view.coordsAtPos(from);
-      const end = view.coordsAtPos(to);
-
-      const top = Math.min(start.top, end.top) - 50;
-      const left = (start.left + end.left) / 2;
-
-      setMenuPos({ top: top + window.scrollY, left, show: true });
-    };
-
-    editor.on('selectionUpdate', handleSelection);
-    return () => {
-      editor.off('selectionUpdate', handleSelection);
-    };
-  }, [editable]);
-
-  const handleAiAction = async (mode: string) => {
-    if (!editor) return;
-    const { from, to } = editor.state.selection;
-    const selectedText = editor.state.doc.textBetween(from, to);
-
-    if (!selectedText.trim()) return;
-
-    setIsAiProcessing(true);
-    try {
-      const { result } = await processText(selectedText, mode);
-      editor.chain().focus().insertContentAt({ from, to }, result).run();
-      toast.success('Đã xử lý xong');
-    } catch {
-      // Error handled by hook
-    } finally {
-      setIsAiProcessing(false);
-      setMenuPos((prev) => ({ ...prev, show: false }));
-    }
-  };
-
-  const handleTemplateInject = (type: 'briefing' | 'rfc') => {
-    if (!editor) return;
-    const items =
-      type === 'briefing'
-        ? '<h1>MISSION BRIEFING</h1><p>Operation status: Active</p><ul><li>Target Objectives</li><li>Tactical Constraints</li></ul>'
-        : '<h1>STRATEGIC RFC</h1><p>Proposed by: Analysis Node</p><blockquote>Core Hypothesis</blockquote>';
-
-    editor.chain().focus().insertContent(items).run();
-    setSlashMenu((prev) => ({ ...prev, show: false }));
-    toast.success(`Đã tiêm mẫu ${type.toUpperCase()}`);
-  };
-
-  useEffect(() => {
-    if (!docId || !user) return;
-
-    const newProvider = new HocuspocusProvider({
-      url: process.env.NEXT_PUBLIC_COLLAB_WS_URL || 'ws://localhost:1234',
-      name: docId,
-      document: ydoc,
-      token: localStorage.getItem('access_token') || '',
-    });
-
-    setProvider(newProvider);
-
-    return () => {
-      newProvider.destroy();
-    };
-  }, [docId, user, ydoc]);
-
   const editor = useEditor(
     {
       extensions: [
@@ -149,7 +74,7 @@ export function RichTextEditor({
           heading: {
             levels: [1, 2, 3],
             HTMLAttributes: {
-              class: 'scroll-mt-20 font-black tracking-tight text-white mb-6 uppercase',
+              class: 'scroll-mt-24 font-semibold tracking-tight text-[color:var(--color-ink)] mb-4',
             },
           },
         }),
@@ -193,12 +118,87 @@ export function RichTextEditor({
       editorProps: {
         attributes: {
           class:
-            'prose prose-invert max-w-none focus:outline-none min-h-[500px] prose-slate prose-headings:text-white prose-p:text-white/70 prose-strong:text-brand-400 prose-code:text-emerald-400 prose-pre:bg-black/40 prose-pre:border prose-pre:border-white/5 prose-headings:uppercase prose-headings:tracking-widest prose-headings:italic',
+            'prose prose-slate max-w-none focus:outline-none min-h-[500px] prose-headings:text-[color:var(--color-ink)] prose-p:text-[color:var(--color-ink)] prose-strong:text-[color:var(--color-ink)] prose-a:text-brand-500 prose-code:text-emerald-700 prose-pre:bg-[color:var(--color-surface-alt)] prose-pre:border prose-pre:border-surface-border',
         },
       },
     },
     [provider],
   );
+
+  useEffect(() => {
+    if (!editor || !editable) return;
+
+    const handleSelection = () => {
+      const { from, to } = editor.state.selection;
+      if (from === to) {
+        setMenuPos((prev) => ({ ...prev, show: false }));
+        return;
+      }
+
+      const { view } = editor;
+      const start = view.coordsAtPos(from);
+      const end = view.coordsAtPos(to);
+
+      const top = Math.min(start.top, end.top) - 50;
+      const left = (start.left + end.left) / 2;
+
+      setMenuPos({ top: top + window.scrollY, left, show: true });
+    };
+
+    editor.on('selectionUpdate', handleSelection);
+    return () => {
+      editor.off('selectionUpdate', handleSelection);
+    };
+  }, [editable, editor]);
+
+  const handleAiAction = async (mode: string) => {
+    if (!editor) return;
+    const { from, to } = editor.state.selection;
+    const selectedText = editor.state.doc.textBetween(from, to);
+
+    if (!selectedText.trim()) return;
+
+    setIsAiProcessing(true);
+    try {
+      const { result } = await processText(selectedText, mode);
+      editor.chain().focus().insertContentAt({ from, to }, result).run();
+      toast.success('Đã xử lý xong');
+    } catch {
+      // Error handled by hook
+    } finally {
+      setIsAiProcessing(false);
+      setMenuPos((prev) => ({ ...prev, show: false }));
+    }
+  };
+
+  const handleTemplateInject = (type: 'briefing' | 'rfc') => {
+    if (!editor) return;
+    const items =
+      type === 'briefing'
+        ? '<h1>MISSION BRIEFING</h1><p>Operation status: Active</p><ul><li>Target Objectives</li><li>Tactical Constraints</li></ul>'
+        : '<h1>STRATEGIC RFC</h1><p>Proposed by: Analysis Node</p><blockquote>Core Hypothesis</blockquote>';
+
+    editor.chain().focus().insertContent(items).run();
+    setSlashMenu((prev) => ({ ...prev, show: false }));
+    toast.success(`Đã tiêm mẫu ${type.toUpperCase()}`);
+  };
+
+  useEffect(() => {
+    if (!docId || !user) return;
+
+    const newProvider = new HocuspocusProvider({
+      url: process.env.NEXT_PUBLIC_COLLAB_WS_URL || 'ws://localhost:1234',
+      name: docId,
+      document: ydoc,
+      token: localStorage.getItem('access_token') || '',
+    });
+
+    Promise.resolve().then(() => setProvider(newProvider));
+
+    return () => {
+      newProvider.destroy();
+    };
+  }, [docId, user, ydoc]);
 
   useEffect(() => {
     if (editor && content && JSON.stringify(content) !== JSON.stringify(editor.getJSON())) {
@@ -208,7 +208,7 @@ export function RichTextEditor({
 
   if (!editor) {
     return (
-      <div className="animate-pulse bg-white/[0.01] h-[500px] rounded-md border border-white/5" />
+      <div className="animate-pulse bg-black/[0.03] h-[500px] rounded-md border border-surface-border" />
     );
   }
 
@@ -218,7 +218,7 @@ export function RichTextEditor({
       {menuPos.show && editable && (
         <div
           ref={menuRef}
-          className="fixed z-50 flex items-center gap-1 p-1 bg-slate-950/95 border border-white/10 rounded-sm shadow-2xl backdrop-blur-2xl animate-in zoom-in-95 duration-200"
+          className="fixed z-50 flex items-center gap-1 p-1 bg-surface-card border border-surface-border rounded-sm shadow-glass"
           style={{
             top: `${menuPos.top}px`,
             left: `${menuPos.left}px`,
@@ -226,7 +226,7 @@ export function RichTextEditor({
           }}
         >
           {isAiProcessing ? (
-            <div className="flex items-center gap-2 px-4 py-2 text-[10px] font-black text-brand-400 uppercase tracking-widest">
+            <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[color:var(--color-muted)]">
               <Activity size={14} className="animate-spin" />
               <span>Synthesizing...</span>
             </div>
@@ -258,10 +258,10 @@ export function RichTextEditor({
       {/* Slash Command Menu */}
       {slashMenu.show && editable && (
         <div
-          className="fixed z-50 w-64 bg-slate-950/95 border border-white/10 rounded-md shadow-2xl p-2 animate-in fade-in slide-in-from-top-2 duration-300 backdrop-blur-3xl"
+          className="fixed z-50 w-64 bg-surface-card border border-surface-border rounded-md shadow-glass p-2"
           style={{ top: `${slashMenu.top}px`, left: `${slashMenu.left}px` }}
         >
-          <div className="px-4 py-3 text-[9px] font-black text-white/20 uppercase tracking-[0.3em] border-b border-white/5 mb-2">
+          <div className="px-3 py-2 text-xs font-semibold text-[color:var(--color-muted)] border-b border-surface-border mb-2">
             LỆNH AI
           </div>
           <SlashMenuItem
@@ -282,11 +282,11 @@ export function RichTextEditor({
             desc="Tối ưu độ dài"
             onClick={() => handleAiAction('shorten')}
           />
-          <div className="px-4 py-3 text-[9px] font-black text-white/20 uppercase tracking-[0.3em] border-t border-white/5 my-2">
+          <div className="px-3 py-2 text-xs font-semibold text-[color:var(--color-muted)] border-t border-surface-border my-2">
             ĐỊNH DẠNG CƠ BẢN
           </div>
           <SlashMenuItem
-            icon={<Type size={14} className="text-white" />}
+            icon={<Type size={14} className="text-[color:var(--color-ink)]" />}
             title="Tiêu đề 1"
             desc="Tiêu đề chính cỡ lớn"
             onClick={() => {
@@ -303,7 +303,7 @@ export function RichTextEditor({
             }}
           />
           <SlashMenuItem
-            icon={<Type size={12} className="text-white/80" />}
+            icon={<Type size={12} className="text-[color:var(--color-muted)]" />}
             title="Tiêu đề 2"
             desc="Tiêu đề phụ cỡ vừa"
             onClick={() => {
@@ -320,7 +320,7 @@ export function RichTextEditor({
             }}
           />
           <SlashMenuItem
-            icon={<ListIcon size={14} className="text-white/60" />}
+            icon={<ListIcon size={14} className="text-[color:var(--color-muted)]" />}
             title="Danh sách dấu chấm"
             desc="Tạo danh sách liệt kê"
             onClick={() => {
@@ -353,7 +353,7 @@ export function RichTextEditor({
               setSlashMenu((prev) => ({ ...prev, show: false }));
             }}
           />
-          <div className="px-4 py-3 text-[9px] font-black text-white/20 uppercase tracking-[0.3em] border-t border-white/5 my-2">
+          <div className="px-3 py-2 text-xs font-semibold text-[color:var(--color-muted)] border-t border-surface-border my-2">
             MẪU TÀI LIỆU
           </div>
           <SlashMenuItem
@@ -389,7 +389,7 @@ export function RichTextEditor({
             }}
           />
 
-          <div className="px-4 py-3 text-[9px] font-black text-white/20 uppercase tracking-[0.3em] border-t border-white/5 my-2">
+          <div className="px-3 py-2 text-xs font-semibold text-[color:var(--color-muted)] border-t border-surface-border my-2">
             CROSS-PLATFORM
           </div>
           <SlashMenuItem
@@ -406,7 +406,7 @@ export function RichTextEditor({
       {/* Task Search Mode */}
       {slashMenu.show && slashMenu.mode === 'task_search' && (
         <div
-          className="fixed z-50 w-72 bg-slate-950/98 border border-white/10 rounded-md shadow-2xl p-4 animate-in fade-in slide-in-from-top-2 duration-300 backdrop-blur-3xl overflow-hidden"
+          className="fixed z-50 w-72 bg-surface-card border border-surface-border rounded-md shadow-glass p-4 overflow-hidden"
           style={{ top: `${slashMenu.top}px`, left: `${slashMenu.left}px` }}
         >
           <div className="flex items-center gap-3 mb-4 px-2">
@@ -416,7 +416,7 @@ export function RichTextEditor({
               value={taskQuery}
               onChange={(e) => setTaskQuery(e.target.value)}
               placeholder="Search Jira Tasks..."
-              className="bg-transparent border-none outline-none text-sm text-white placeholder:text-white/10 w-full"
+              className="bg-transparent border-none outline-none text-sm text-[color:var(--color-ink)] placeholder:text-[color:var(--color-faint)] w-full"
             />
           </div>
 
@@ -424,8 +424,8 @@ export function RichTextEditor({
             {isSearching && (
               <div className="py-8 text-center">
                 <Activity size={20} className="animate-spin text-brand-500 mx-auto mb-2" />
-                <span className="text-[9px] font-black text-brand-400 uppercase tracking-widest">
-                  Searching...
+                <span className="text-xs font-semibold text-[color:var(--color-muted)]">
+                  Searching…
                 </span>
               </div>
             )}
@@ -451,38 +451,36 @@ export function RichTextEditor({
                   setSlashMenu((prev) => ({ ...prev, show: false, mode: 'default' }));
                   setTaskQuery('');
                 }}
-                className="w-full p-[var(--space-3)] hover:bg-white/[0.03] rounded-sm transition-all text-left border border-transparent hover:border-white/5 group"
+                className="w-full p-[var(--space-3)] hover:bg-black/[0.03] rounded-sm transition-colors text-left border border-transparent"
               >
-                <div className="text-[11px] font-black text-white uppercase tracking-tight truncate group-hover:text-brand-400">
+                <div className="text-sm font-semibold text-[color:var(--color-ink)] truncate">
                   {task.title}
                 </div>
                 <div className="flex items-center gap-3 mt-1">
-                  <span className="text-[10px] text-white/20 uppercase font-mono">
+                  <span className="text-xs text-[color:var(--color-muted)] font-mono">
                     {task.projectName?.substring(0, 3)}-{task.number}
                   </span>
-                  <div className="h-1 w-1 rounded-full bg-white/5" />
-                  <span className="text-[9px] text-white/10 uppercase tracking-widest italic">
-                    {task.status}
-                  </span>
+                  <div className="h-1 w-1 rounded-full bg-surface-border" />
+                  <span className="text-xs text-[color:var(--color-faint)]">{task.status}</span>
                 </div>
               </button>
             ))}
 
             {!isSearching && (!searchResults?.tasks || searchResults.tasks.length === 0) && (
-              <div className="py-8 text-center text-[10px] text-white/10 uppercase tracking-widest italic">
+              <div className="py-8 text-center text-sm text-[color:var(--color-faint)]">
                 No tactical matches
               </div>
             )}
           </div>
 
-          <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between px-2">
+          <div className="mt-4 pt-4 border-t border-surface-border flex items-center justify-between px-2">
             <button
               onClick={() => setSlashMenu((prev) => ({ ...prev, mode: 'default' }))}
-              className="text-[9px] font-black text-white/20 uppercase tracking-widest hover:text-white transition-colors"
+              className="text-xs font-semibold text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)] transition-colors"
             >
               Back
             </button>
-            <span className="text-[9px] font-black text-brand-500/40 uppercase tracking-[0.2em]">
+            <span className="text-xs font-semibold text-[color:var(--color-faint)]">
               Neural Sync Active
             </span>
           </div>
@@ -490,7 +488,7 @@ export function RichTextEditor({
       )}
 
       {editable && (
-        <div className="sticky top-20 z-40 flex flex-wrap items-center gap-1 border border-white/10 bg-slate-950/80 p-2 backdrop-blur-2xl mb-[var(--space-12)] shadow-inner rounded-md">
+        <div className="sticky top-20 z-40 flex flex-wrap items-center gap-1 border border-surface-border bg-surface-card p-2 mb-[var(--space-12)] shadow-luxe rounded-md">
           <MenuButton
             onClick={() => editor.chain().focus().toggleBold().run()}
             active={editor.isActive('bold')}
@@ -501,7 +499,7 @@ export function RichTextEditor({
             active={editor.isActive('italic')}
             icon={<Italic size={16} />}
           />
-          <div className="w-px h-6 bg-white/5 mx-2" />
+          <div className="w-px h-6 bg-surface-border mx-2" />
           <MenuButton
             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
             active={editor.isActive('heading', { level: 1 })}
@@ -517,19 +515,16 @@ export function RichTextEditor({
             active={editor.isActive('bulletList')}
             icon={<ListIcon size={16} />}
           />
-          <div className="w-px h-6 bg-white/5 mx-2" />
+          <div className="w-px h-6 bg-surface-border mx-2" />
           <MenuButton
             onClick={() => editor.chain().focus().toggleCodeBlock().run()}
             active={editor.isActive('codeBlock')}
             icon={<Code size={16} />}
           />
           <div className="flex-1" />
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-sm text-emerald-400 font-bold text-[8px] uppercase tracking-widest">
-            <div className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500 shadow-glow-emerald"></span>
-            </div>
-            AI_Synapse_Active
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-sm text-emerald-700 font-semibold text-xs">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
+            AI active
           </div>
         </div>
       )}
@@ -539,9 +534,7 @@ export function RichTextEditor({
           {/* Notion-style Header */}
           <div className="relative group mb-20">
             {/* Cover Image */}
-            <div className="h-48 md:h-56 w-full rounded-md overflow-hidden relative border border-white/10 mb-[-3rem] shadow-inner group/cover bg-gradient-to-br from-brand-500/20 via-slate-900/90 to-slate-950">
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
-            </div>
+            <div className="h-48 md:h-56 w-full rounded-md overflow-hidden relative border border-surface-border mb-[-3rem] shadow-luxe bg-[color:var(--color-surface-alt)]" />
 
             <div className="px-12 relative z-10 flex items-end gap-8">
               {/* Icon */}
@@ -552,17 +545,19 @@ export function RichTextEditor({
                   const nextIcon = ICONS[(ICONS.indexOf(currentIcon) + 1) % ICONS.length]!;
                   setIcon(nextIcon);
                 }}
-                className="w-24 h-24 bg-slate-950 rounded-sm shadow-inner flex items-center justify-center text-5xl border border-white/10 transform transition hover:scale-105 cursor-pointer active:scale-95 group/icon"
+                className="w-24 h-24 bg-surface-card rounded-sm shadow-luxe flex items-center justify-center text-5xl border border-surface-border transition-colors hover:bg-black/[0.02] cursor-pointer active:scale-[0.98] group/icon"
               >
                 <span className="group-hover/icon:scale-110 transition-transform">{icon}</span>
               </div>
 
               <div className="mb-4">
-                <div className="flex items-center gap-2 text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[color:var(--color-muted)]">
                   <Command size={12} />
                   <span>Tài liệu</span>
                   <span>/</span>
-                  <span className="text-brand-500/60 font-mono">ID_{docId?.substring(0, 8)}</span>
+                  <span className="text-[color:var(--color-faint)] font-mono">
+                    ID_{docId?.substring(0, 8)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -579,11 +574,11 @@ export function RichTextEditor({
             {/* Entity Embed Demo */}
             <div className="mt-20">
               <div className="flex items-center gap-4 mb-8">
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-                <span className="text-[10px] font-black text-white/10 uppercase tracking-[0.5em]">
+                <div className="h-px flex-1 bg-surface-border" />
+                <span className="text-xs font-semibold text-[color:var(--color-muted)]">
                   Cross-Platform Asset Embed
                 </span>
-                <div className="h-px flex-1 bg-gradient-to-l from-transparent via-white/5 to-transparent" />
+                <div className="h-px flex-1 bg-surface-border" />
               </div>
               <TaskNodeEmbed
                 taskId="JIRA-402"
@@ -613,7 +608,7 @@ function BubbleItem({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 px-2.5 py-1.5 rounded-sm transition-all text-[9px] font-bold uppercase tracking-widest ${className}`}
+      className={`flex items-center gap-2 px-2.5 py-1.5 rounded-sm transition-colors text-xs font-semibold ${className}`}
     >
       {icon}
       <span>{label}</span>
@@ -637,10 +632,10 @@ function MenuButton({
   return (
     <button
       onClick={onClick}
-      className={`h-9 flex items-center justify-center rounded-sm transition-all font-bold text-[10px] border ${
+      className={`h-9 flex items-center justify-center rounded-sm transition-colors font-semibold text-xs border ${
         active
-          ? 'bg-white text-slate-950 border-white'
-          : 'text-white/30 border-transparent hover:bg-white/5 hover:text-white'
+          ? 'bg-brand-50 text-brand-700 border-brand-500/25'
+          : 'text-[color:var(--color-muted)] border-transparent hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
       } ${label ? 'px-3' : 'w-9'} ${className}`}
     >
       {icon || label}
@@ -662,18 +657,14 @@ function SlashMenuItem({
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3 p-2 hover:bg-white/[0.03] rounded-sm transition-all group text-left border border-transparent hover:border-white/5"
+      className="w-full flex items-center gap-3 p-2 hover:bg-black/[0.03] rounded-sm transition-colors group text-left border border-transparent"
     >
-      <div className="w-10 h-10 rounded-sm bg-white/[0.02] border border-white/5 flex items-center justify-center group-hover:bg-brand-500/10 group-hover:border-brand-500/20 transition-all">
+      <div className="w-10 h-10 rounded-sm bg-black/[0.03] border border-surface-border flex items-center justify-center">
         {icon}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-[11px] font-bold text-white uppercase tracking-tight group-hover:text-brand-400 transition-colors">
-          {title}
-        </div>
-        <div className="text-[9px] text-white/20 group-hover:text-white/40 truncate font-bold">
-          {desc}
-        </div>
+        <div className="text-sm font-semibold text-[color:var(--color-ink)]">{title}</div>
+        <div className="text-xs text-[color:var(--color-muted)] truncate">{desc}</div>
       </div>
     </button>
   );

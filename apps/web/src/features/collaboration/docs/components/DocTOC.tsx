@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { List } from 'lucide-react';
+
+import { JSONContent } from '@tiptap/react';
 
 interface TOCItem {
   id: string;
@@ -8,27 +10,24 @@ interface TOCItem {
 }
 
 interface DocTOCProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  content: any; // TipTap JSON
+  content: JSONContent; // TipTap JSON
 }
 
 export function DocTOC({ content }: DocTOCProps) {
   const [items, setItems] = useState<TOCItem[]>([]);
 
-  useEffect(() => {
-    const headings: TOCItem[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const extractHeadings = (nodes: any[]) => {
+  const headings = useMemo(() => {
+    const extracted: TOCItem[] = [];
+    const extractHeadings = (nodes: JSONContent[]) => {
       if (!nodes) return;
       nodes.forEach((node) => {
         if (node.type === 'heading' && node.content) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const text = node.content.map((c: any) => c.text).join('');
+          const text = node.content.map((c) => c.text).join('');
           const id = text
             .toLowerCase()
             .replace(/\s+/g, '-')
             .replace(/[^\w-]/g, '');
-          headings.push({
+          extracted.push({
             id,
             text,
             level: node.attrs?.level || 1,
@@ -39,8 +38,12 @@ export function DocTOC({ content }: DocTOCProps) {
     };
 
     if (content?.content) extractHeadings(content.content);
-    setItems(headings);
+    return extracted;
   }, [content]);
+
+  useEffect(() => {
+    Promise.resolve().then(() => setItems(headings));
+  }, [headings]);
 
   if (items.length === 0) return null;
 

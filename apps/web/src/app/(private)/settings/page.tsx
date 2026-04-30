@@ -242,16 +242,15 @@ export default function SettingsPage() {
                     <button
                       type="submit"
                       disabled={updateProfile.isPending || profileName === user?.fullName}
-                      className="group relative flex items-center gap-4 bg-white px-12 py-5 rounded-full text-slate-950 font-black text-[11px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-luxe overflow-hidden disabled:opacity-30"
+                      className="btn btn-primary disabled:opacity-40"
                     >
-                      <div className="absolute inset-0 bg-brand-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                      <span className="relative z-10 flex items-center gap-3 group-hover:text-white transition-colors">
+                      <span className="inline-flex items-center gap-2">
                         {updateProfile.isPending ? (
                           <Cpu className="animate-spin" size={16} />
                         ) : (
                           <Check size={16} />
                         )}
-                        {updateProfile.isPending ? 'Đang lưu...' : 'Lưu thông tin'}
+                        {updateProfile.isPending ? 'Đang lưu…' : 'Lưu thông tin'}
                       </span>
                     </button>
                   </div>
@@ -262,151 +261,158 @@ export default function SettingsPage() {
         )}
 
         {activeTab === 'workspace' && workspaceId && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <section className="relative rounded-[3rem] border border-white/5 bg-slate-900/40 p-4 shadow-glass backdrop-blur-3xl overflow-hidden group">
-              <WorkspaceMemberSettings workspaceId={workspaceId} currentUserId={user?.id || ''} />
-            </section>
-          </div>
+          <section className="rounded-xl border border-surface-border bg-surface-card p-4 shadow-sm">
+            <WorkspaceMemberSettings workspaceId={workspaceId} currentUserId={user?.id || ''} />
+          </section>
         )}
 
         {activeTab === 'notifications' && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <section className="relative rounded-[3rem] border border-white/5 bg-slate-900/40 p-12 shadow-glass backdrop-blur-3xl overflow-hidden group">
-              <div className="absolute inset-0 bg-noise opacity-[0.02] pointer-events-none" />
-              <div className="relative z-10 space-y-12">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-cyan-500/10 rounded-lg border border-cyan-500/20 text-cyan-400">
-                      <Zap size={20} />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-                        Cài đặt thông báo
-                      </h2>
-                      <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mt-1">
-                        Chọn loại sự kiện bạn muốn nhận qua email.
-                      </p>
-                    </div>
+          <section className="rounded-xl border border-surface-border bg-surface-card p-8 shadow-sm">
+            <div className="space-y-10">
+              <div className="flex items-start justify-between gap-6">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-brand-50 rounded-lg border border-brand-500/15 text-brand-700">
+                    <Zap size={20} />
                   </div>
-
-                  <button
-                    onClick={() => updatePrefs.mutate({ emailEnabled: !preferences?.emailEnabled })}
-                    className={`relative w-16 h-8 rounded-full transition-all duration-500 p-1 ${
-                      preferences?.emailEnabled ? 'bg-brand-500 shadow-glow-brand' : 'bg-white/10'
-                    }`}
-                  >
-                    <div
-                      className={`h-6 w-6 rounded-full bg-white transition-all duration-500 shadow-luxe ${
-                        preferences?.emailEnabled ? 'translate-x-8' : 'translate-x-0'
-                      }`}
-                    />
-                  </button>
+                  <div>
+                    <h2 className="text-xl font-semibold text-[color:var(--color-ink)]">
+                      Thông báo
+                    </h2>
+                    <p className="text-sm text-[color:var(--color-muted)] leading-relaxed mt-1">
+                      Chọn loại sự kiện bạn muốn nhận qua email.
+                    </p>
+                  </div>
                 </div>
 
-                <div className="space-y-4 pt-10 border-t border-white/5">
-                  <label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/10 pl-4">
-                    Loại sự kiện
-                  </label>
-                  <div className="grid gap-4">
-                    {NOTIFICATION_TOGGLE_ITEMS.map((item) => (
-                      <div
+                <button
+                  type="button"
+                  onClick={() => updatePrefs.mutate({ emailEnabled: !preferences?.emailEnabled })}
+                  className={`relative h-8 w-14 rounded-full border transition-colors ${
+                    preferences?.emailEnabled
+                      ? 'bg-brand-500 border-brand-500'
+                      : 'bg-black/[0.06] border-surface-border'
+                  }`}
+                  aria-pressed={!!preferences?.emailEnabled}
+                >
+                  <span
+                    className={`absolute top-1 left-1 h-6 w-6 rounded-full bg-white shadow-sm transition-transform ${
+                      preferences?.emailEnabled ? 'translate-x-6' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <div className="space-y-3 pt-8 border-t border-surface-border">
+                <div className="text-xs font-medium text-[color:var(--color-muted)] px-1">
+                  Loại sự kiện
+                </div>
+
+                <div className="grid gap-3">
+                  {NOTIFICATION_TOGGLE_ITEMS.map((item) => {
+                    const enabled = isNotificationToggleEnabled(preferences, item.id);
+                    const locked = !preferences?.emailEnabled;
+
+                    return (
+                      <button
                         key={item.id}
+                        type="button"
+                        disabled={locked}
                         onClick={() => {
-                          if (preferences?.emailEnabled) {
+                          if (!locked) {
                             updatePrefs.mutate({
-                              [item.id]: !isNotificationToggleEnabled(preferences, item.id),
+                              [item.id]: !enabled,
                             });
                           }
                         }}
-                        className={`flex items-center justify-between p-6 rounded-xl border transition-all cursor-pointer group ${
-                          isNotificationToggleEnabled(preferences, item.id)
-                            ? 'bg-white/[0.04] border-white/10'
-                            : 'bg-transparent border-white/5 opacity-40 grayscale'
+                        className={`flex items-center justify-between gap-4 rounded-lg border p-5 text-left transition-colors disabled:opacity-40 ${
+                          enabled
+                            ? 'bg-brand-50 border-brand-200'
+                            : 'bg-surface-card border-surface-border hover:bg-black/[0.02]'
                         }`}
                       >
-                        <div className="flex items-center gap-6">
+                        <div className="flex items-start gap-4">
                           <div
-                            className={`p-4 rounded-lg transition-all ${
-                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                              (preferences as any)?.[item.id]
-                                ? 'bg-brand-500 text-slate-950 shadow-glow-brand'
-                                : 'bg-white/5 text-white/20'
+                            className={`mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-md border ${
+                              enabled
+                                ? 'bg-white border-brand-200 text-brand-700'
+                                : 'bg-surface-bg border-surface-border text-[color:var(--color-muted)]'
                             }`}
                           >
                             {item.icon}
                           </div>
-                          <div>
-                            <p className="text-sm font-black text-white uppercase tracking-wider">
+                          <div className="min-w-0">
+                            <div className="text-sm font-semibold text-[color:var(--color-ink)]">
                               {item.label}
-                            </p>
-                            <p className="text-[10px] font-medium text-white/20 uppercase tracking-widest leading-none mt-1">
+                            </div>
+                            <div className="mt-1 text-sm text-[color:var(--color-muted)] leading-relaxed">
                               {item.desc}
-                            </p>
+                            </div>
                           </div>
                         </div>
+
                         <div
-                          className={`h-5 w-5 rounded-lg border-2 transition-all flex items-center justify-center ${
-                            isNotificationToggleEnabled(preferences, item.id)
-                              ? 'border-brand-500 bg-brand-500 text-slate-950'
-                              : 'border-white/10'
+                          className={`inline-flex h-6 w-6 items-center justify-center rounded-md border ${
+                            enabled
+                              ? 'border-brand-500 bg-brand-500 text-white'
+                              : 'border-surface-border bg-surface-bg text-transparent'
                           }`}
+                          aria-hidden
                         >
-                          {isNotificationToggleEnabled(preferences, item.id) && <Check size={14} />}
+                          <Check size={14} />
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
-            </section>
-          </div>
+            </div>
+          </section>
         )}
 
         {activeTab === 'workflows' && canChangeRoles && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <section className="relative rounded-[3rem] border border-white/5 bg-slate-900/40 shadow-glass backdrop-blur-3xl overflow-hidden group">
-              <WorkflowEditor
-                {...(workflow ? { data: workflow } : {})}
-                isLoading={isWorkflowLoading}
-                title="Quy trình mặc định của workspace"
-                description="Thiết lập trạng thái và luồng chuyển trạng thái cho tất cả dự án trong workspace."
-                onAddStatus={async (data) => {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  await createWorkspaceStatus.mutateAsync(data as any);
-                }}
-                onUpdateStatus={async (statusId, data) => {
-                  await updateWorkspaceStatus.mutateAsync({ statusId, data });
-                }}
-                onDeleteStatus={async (statusId) => {
-                  if (confirm('Bạn có chắc muốn xóa trạng thái này?')) {
-                    await deleteWorkspaceStatus.mutateAsync({ statusId });
+          <section className="rounded-xl border border-surface-border bg-surface-card shadow-sm">
+            <WorkflowEditor
+              {...(workflow ? { data: workflow } : {})}
+              isLoading={isWorkflowLoading}
+              title="Quy trình mặc định của workspace"
+              description="Thiết lập trạng thái và luồng chuyển trạng thái cho tất cả dự án trong workspace."
+              onAddStatus={async (data) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                await createWorkspaceStatus.mutateAsync(data as any);
+              }}
+              onUpdateStatus={async (statusId, data) => {
+                await updateWorkspaceStatus.mutateAsync({ statusId, data });
+              }}
+              onDeleteStatus={async (statusId) => {
+                if (confirm('Bạn có chắc muốn xóa trạng thái này?')) {
+                  await deleteWorkspaceStatus.mutateAsync({ statusId });
+                }
+              }}
+              onSaveTransitions={async (transitions) => {
+                await updateWorkspaceTransitions.mutateAsync({ transitions });
+              }}
+              isPending={
+                createWorkspaceStatus.isPending ||
+                updateWorkspaceStatus.isPending ||
+                deleteWorkspaceStatus.isPending ||
+                updateWorkspaceTransitions.isPending ||
+                syncWorkflow.isPending
+              }
+              extraActions={
+                <button
+                  type="button"
+                  onClick={() =>
+                    confirm('Áp dụng quy trình này cho toàn bộ dự án trong workspace?') &&
+                    syncWorkflow.mutate()
                   }
-                }}
-                onSaveTransitions={async (transitions) => {
-                  await updateWorkspaceTransitions.mutateAsync({ transitions });
-                }}
-                isPending={
-                  createWorkspaceStatus.isPending ||
-                  updateWorkspaceStatus.isPending ||
-                  deleteWorkspaceStatus.isPending ||
-                  updateWorkspaceTransitions.isPending ||
-                  syncWorkflow.isPending
-                }
-                extraActions={
-                  <button
-                    onClick={() =>
-                      confirm('Áp dụng quy trình này cho toàn bộ dự án trong workspace?') &&
-                      syncWorkflow.mutate()
-                    }
-                    disabled={syncWorkflow.isPending}
-                    className="px-8 py-3 bg-white/[0.03] border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-brand-500 hover:text-slate-950 hover:border-brand-500 transition-all shadow-luxe"
-                  >
-                    {syncWorkflow.isPending ? 'Đang đồng bộ...' : 'Đồng bộ cho toàn workspace'}
-                  </button>
-                }
-              />
-            </section>
-          </div>
+                  disabled={syncWorkflow.isPending}
+                  className="btn btn-secondary"
+                >
+                  {syncWorkflow.isPending ? 'Đang đồng bộ…' : 'Đồng bộ cho toàn workspace'}
+                </button>
+              }
+            />
+          </section>
         )}
       </div>
 

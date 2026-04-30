@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react';
-import { MessageList } from './MessageList';
-import { MessageInput } from './MessageInput';
-import { ThreadPanel } from './ThreadPanel';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Hash, Lock, MoreVertical, Phone, Search, Users } from 'lucide-react';
+import type { Channel, Message } from '@superboard/shared';
+import { chatSocket } from '@/lib/realtime/chat-socket';
 import { ChannelSidebar } from './ChannelSidebar';
 import { DirectTransmissionHub } from './DirectTransmissionHub';
-import { chatSocket } from '@/lib/realtime/chat-socket';
-import { Hash, Lock, Users, Search, MoreVertical, Phone } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
-import type { Channel, Message } from '@superboard/shared';
+import { MessageInput } from './MessageInput';
+import { MessageList } from './MessageList';
+import { ThreadPanel } from './ThreadPanel';
 
 interface ChatShellProps {
   channel: Channel;
@@ -20,143 +21,107 @@ export function ChatShell({ channel }: ChatShellProps) {
 
   useEffect(() => {
     const unsubscribe = chatSocket.onTyping((data) => {
-      if (data.channelId === channel.id) {
-        setTypingUsers((prev) => {
-          if (data.isTyping) {
-            return prev.includes(data.userId) ? prev : [...prev, data.userId];
-          } else {
-            return prev.filter((id) => id !== data.userId);
-          }
-        });
-      }
+      if (data.channelId !== channel.id) return;
+      setTypingUsers((prev) => {
+        if (data.isTyping) return prev.includes(data.userId) ? prev : [...prev, data.userId];
+        return prev.filter((id) => id !== data.userId);
+      });
     });
 
     return () => unsubscribe();
   }, [channel.id]);
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-slate-950 animate-in fade-in duration-700">
+    <div className="flex h-full w-full overflow-hidden bg-surface-bg">
       <ChannelSidebar />
 
-      <main className="flex-1 flex flex-col min-w-0 h-full relative">
-        {/* Elite Protocol Header */}
-        <header className="flex h-16 shrink-0 items-center justify-between px-8 bg-slate-950/80 backdrop-blur-3xl border-b border-white/5 sticky top-0 z-40">
-          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-brand-500/20 to-transparent" />
-
-          <div className="flex items-center gap-3">
-            <div
-              className={`p-1.5 rounded-sm border ${channel.type === 'PUBLIC' ? 'bg-brand-500/10 border-brand-500/20 shadow-inner' : 'bg-amber-500/10 border-amber-500/20 shadow-inner'}`}
-            >
-              {channel.type === 'PUBLIC' ? (
-                <Hash className="h-3.5 w-3.5 text-brand-400" />
-              ) : (
-                <Lock className="h-3.5 w-3.5 text-amber-400" />
-              )}
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-[12px] font-black text-white uppercase tracking-tight">
+      <main className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-40 border-b border-surface-border bg-surface-card">
+          <div className="flex h-14 items-center justify-between gap-4 px-6">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-surface-border bg-surface-bg text-[color:var(--color-muted)]">
+                {channel.type === 'PUBLIC' ? <Hash size={16} /> : <Lock size={16} />}
+              </span>
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold text-[color:var(--color-ink)]">
                   {channel.name}
-                </h1>
-                <div className="h-1 w-1 rounded-full bg-emerald-500 animate-pulse shadow-glow-emerald" />
-              </div>
-              {channel.description && (
-                <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest truncate max-w-md mt-0.5">
-                  {channel.description}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-6">
-            <div className="flex -space-x-1.5">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="h-6 w-6 rounded-full border border-slate-950 bg-slate-800 flex items-center justify-center text-[8px] font-bold text-white/30"
-                >
-                  U{i}
                 </div>
-              ))}
-              <div className="h-6 w-6 rounded-full border border-slate-950 bg-brand-500/10 flex items-center justify-center text-[8px] font-bold text-brand-400">
-                +9
+                {channel.description ? (
+                  <div className="truncate text-xs text-[color:var(--color-muted)]">
+                    {channel.description}
+                  </div>
+                ) : null}
               </div>
             </div>
 
-            <div className="h-4 w-px bg-white/5" />
-
-            <div className="flex items-center gap-3 text-white/20">
-              <button
-                onClick={() => setShowTransmission(true)}
-                className="p-1.5 hover:text-emerald-400 transition-all group relative"
-              >
-                <Phone size={14} />
-                <div className="absolute inset-0 bg-emerald-400/10 rounded-sm scale-0 group-hover:scale-100 transition-transform" />
-              </button>
-              <button className="p-1.5 hover:text-white transition-all group relative">
-                <Search size={14} />
-                <div className="absolute inset-0 bg-brand-500/10 rounded-sm scale-0 group-hover:scale-100 transition-transform" />
-              </button>
-              <button className="p-1.5 hover:text-white transition-all group relative">
-                <Users size={14} />
-                <div className="absolute inset-0 bg-brand-500/10 rounded-sm scale-0 group-hover:scale-100 transition-transform" />
-              </button>
-              <button className="p-1.5 hover:text-white transition-all group relative">
-                <MoreVertical size={14} />
-                <div className="absolute inset-0 bg-brand-500/10 rounded-sm scale-0 group-hover:scale-100 transition-transform" />
-              </button>
+            <div className="flex items-center gap-2">
+              <IconBtn onClick={() => setShowTransmission(true)} label="Call">
+                <Phone size={16} />
+              </IconBtn>
+              <IconBtn onClick={() => {}} label="Search">
+                <Search size={16} />
+              </IconBtn>
+              <IconBtn onClick={() => {}} label="Members">
+                <Users size={16} />
+              </IconBtn>
+              <IconBtn onClick={() => {}} label="More">
+                <MoreVertical size={16} />
+              </IconBtn>
             </div>
           </div>
         </header>
 
-        {/* Transmission Interface */}
-        <div className="flex flex-1 min-h-0 overflow-hidden relative">
-          <div className="flex-1 flex flex-col min-h-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(var(--brand-500-rgb),0.03),transparent_40%)]">
+        <div className="flex flex-1 min-h-0 overflow-hidden">
+          <div className="flex min-h-0 flex-1 flex-col">
             <MessageList channelId={channel.id} onOpenThread={setActiveThread} />
 
-            {/* Neural Load Indicator */}
-            <div className="px-8 flex items-center gap-3 h-8 bg-slate-950/20 backdrop-blur-sm">
-              {typingUsers.length > 0 && (
-                <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
-                  <div className="flex gap-1">
-                    <div className="h-1 w-1 rounded-full bg-brand-500 animate-bounce" />
-                    <div className="h-1 w-1 rounded-full bg-brand-500 animate-bounce [animation-delay:0.2s]" />
-                    <div className="h-1 w-1 rounded-full bg-brand-500 animate-bounce [animation-delay:0.4s]" />
-                  </div>
-                  <span className="text-[9px] font-black text-brand-400/60 uppercase tracking-widest italic">
-                    {channel.name} đang nhập...
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div className="px-8 pb-8 pt-2">
-              <MessageInput channelId={channel.id} />
-              <div className="mt-4 flex items-center justify-center gap-6 opacity-20 group">
-                <span className="text-[9px] font-black text-white uppercase tracking-widest italic">
-                  v4.2.0
-                </span>
+            {typingUsers.length > 0 ? (
+              <div className="px-6 py-2 text-xs text-[color:var(--color-muted)] border-t border-surface-border bg-surface-card">
+                Đang nhập…
               </div>
+            ) : null}
+
+            <div className="px-6 pb-6 pt-3 bg-surface-bg">
+              <MessageInput channelId={channel.id} />
             </div>
           </div>
 
-          {activeThread && (
-            <div className="w-[450px] border-l border-white/5 bg-slate-950/50 backdrop-blur-3xl animate-in slide-in-from-right-8 fade-in duration-500 shadow-2xl relative z-50">
-              <div className="absolute inset-0 bg-gradient-to-b from-brand-500/5 to-transparent pointer-events-none" />
+          {activeThread ? (
+            <aside className="w-[420px] shrink-0 border-l border-surface-border bg-surface-card shadow-luxe">
               <ThreadPanel parentMessage={activeThread} onClose={() => setActiveThread(null)} />
-            </div>
-          )}
+            </aside>
+          ) : null}
         </div>
 
-        <AnimatePresence>
-          {showTransmission && (
-            <DirectTransmissionHub
-              channelName={channel.name}
-              onClose={() => setShowTransmission(false)}
-            />
-          )}
-        </AnimatePresence>
+        {showTransmission ? (
+          <DirectTransmissionHub
+            channelName={channel.name}
+            onClose={() => setShowTransmission(false)}
+          />
+        ) : null}
       </main>
     </div>
+  );
+}
+
+function IconBtn({
+  children,
+  onClick,
+  label,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-surface-border bg-surface-bg text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)] transition-colors"
+      aria-label={label}
+      title={label}
+    >
+      {children}
+    </button>
   );
 }

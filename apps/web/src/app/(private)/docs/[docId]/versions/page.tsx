@@ -28,21 +28,21 @@ export default function VersionHistoryPage() {
   const isViewingHistory = !!selectedVersion;
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-white">
+    <div className="flex h-full flex-col overflow-hidden bg-surface-bg">
       {/* Header */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-surface-border px-6 bg-white/80 backdrop-blur-md sticky top-0 z-10">
+      <header className="flex h-14 shrink-0 items-center justify-between border-b border-surface-border px-6 bg-surface-card sticky top-0 z-10">
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.back()}
-            className="p-2 -ml-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-all"
+            className="p-2 -ml-2 text-[color:var(--color-muted)] hover:bg-black/[0.03] rounded-md transition-colors"
           >
             <ChevronLeft size={20} />
           </button>
           <div className="flex flex-col">
-            <h1 className="text-sm font-bold text-slate-900 leading-none mb-1">
+            <h1 className="text-sm font-semibold text-[color:var(--color-ink)] leading-none mb-1">
               Lịch sử phiên bản
             </h1>
-            <span className="text-[11px] text-slate-500 font-medium truncate max-w-[200px]">
+            <span className="text-[11px] text-[color:var(--color-muted)] font-medium truncate max-w-[240px]">
               {doc?.title}
             </span>
           </div>
@@ -54,7 +54,7 @@ export default function VersionHistoryPage() {
               // Logic to restore would go here via a mutation
               alert('Tính năng khôi phục đang được phê duyệt...');
             }}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-600 text-white text-[12px] font-bold shadow-md hover:bg-brand-700 transition-all"
+            className="flex items-center gap-2 px-3 py-2 rounded-md bg-brand-500 text-white text-[12px] font-semibold hover:bg-brand-600 transition-colors"
           >
             <RotateCcw size={14} />
             Khôi phục bản này
@@ -64,16 +64,16 @@ export default function VersionHistoryPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Main Preview Area */}
-        <div className="flex-1 overflow-y-auto bg-slate-200/20 p-8 sm:p-12 lg:p-20">
-          <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-lg border border-slate-200 min-h-full overflow-hidden p-12">
+        <div className="flex-1 overflow-y-auto bg-surface-bg p-6 sm:p-10 lg:p-14">
+          <div className="max-w-4xl mx-auto bg-surface-card shadow-luxe rounded-xl border border-surface-border min-h-full overflow-hidden p-8 sm:p-10">
             <div className="mb-8">
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight mb-4">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-[color:var(--color-ink)] tracking-tight leading-tight mb-4">
                 {doc?.title}
               </h2>
               {isViewingHistory && (
-                <div className="flex items-center gap-2 px-3 py-1 bg-amber-50 rounded-full border border-amber-200 w-fit">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 rounded-full border border-amber-200 w-fit">
                   <Clock size={12} className="text-amber-600" />
-                  <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider">
+                  <span className="text-[11px] font-semibold text-amber-800">
                     Đang xem bản lưu:{' '}
                     {format(new Date(selectedVersion!.savedAt), 'HH:mm dd/MM/yyyy', { locale: vi })}
                   </span>
@@ -85,12 +85,14 @@ export default function VersionHistoryPage() {
         </div>
 
         {/* Versions List Sidebar */}
-        <aside className="w-80 shrink-0 border-l border-surface-border bg-slate-50 flex flex-col overflow-hidden shadow-sm">
-          <div className="px-4 py-4 border-b border-surface-border bg-white/50">
-            <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">
+        <aside className="w-80 shrink-0 border-l border-surface-border bg-surface-card flex flex-col overflow-hidden shadow-sm">
+          <div className="px-4 py-4 border-b border-surface-border bg-surface-card">
+            <h3 className="text-xs font-semibold text-[color:var(--color-ink)] mb-1">
               Lịch sử chỉnh sửa
             </h3>
-            <p className="text-[12px] text-slate-500">Chọn một phiên bản để xem lại nội dung.</p>
+            <p className="text-[12px] text-[color:var(--color-muted)]">
+              Chọn một phiên bản để xem lại nội dung.
+            </p>
           </div>
 
           <div className="flex-1 overflow-y-auto p-2 space-y-1">
@@ -99,26 +101,30 @@ export default function VersionHistoryPage() {
               onClick={() => setSelectedVersion(null)}
               className={`w-full flex items-start gap-3 p-3 rounded-xl transition-all border text-left ${
                 !selectedVersion
-                  ? 'bg-white border-brand-200 shadow-sm'
-                  : 'border-transparent hover:bg-white/50'
+                  ? 'bg-[color:var(--color-surface-alt)]/35 border-brand-200'
+                  : 'border-transparent hover:bg-black/[0.02]'
               }`}
             >
               <div
-                className={`mt-0.5 h-6 w-6 rounded-full flex items-center justify-center shrink-0 ${!selectedVersion ? 'bg-brand-600' : 'bg-slate-200'}`}
+                className={`mt-0.5 h-6 w-6 rounded-full flex items-center justify-center shrink-0 ${!selectedVersion ? 'bg-brand-600' : 'bg-black/[0.06]'}`}
               >
                 <FileText
                   size={12}
-                  className={!selectedVersion ? 'text-white' : 'text-slate-500'}
+                  className={!selectedVersion ? 'text-white' : 'text-[color:var(--color-muted)]'}
                 />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-[13px] font-bold text-slate-900">Hiện tại</span>
-                  <span className="text-[10px] text-brand-600 font-bold bg-brand-50 px-1 rounded uppercase tracking-tighter">
-                    Active
+                  <span className="text-[13px] font-semibold text-[color:var(--color-ink)]">
+                    Hiện tại
+                  </span>
+                  <span className="text-[10px] text-brand-700 font-semibold bg-brand-50 px-2 py-0.5 rounded-full border border-brand-200">
+                    Đang chỉnh sửa
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-0.5">Tài liệu đang được chỉnh sửa</p>
+                <p className="text-[11px] text-[color:var(--color-muted)] mt-1">
+                  Phiên bản mới nhất của tài liệu.
+                </p>
               </div>
             </button>
 
@@ -129,20 +135,20 @@ export default function VersionHistoryPage() {
                 onClick={() => setSelectedVersion(v)}
                 className={`w-full flex items-start gap-3 p-3 rounded-xl transition-all border text-left ${
                   selectedVersion?.id === v.id
-                    ? 'bg-white border-brand-200 shadow-sm'
-                    : 'border-transparent hover:bg-white/50'
+                    ? 'bg-[color:var(--color-surface-alt)]/35 border-brand-200'
+                    : 'border-transparent hover:bg-black/[0.02]'
                 }`}
               >
                 <div
-                  className={`mt-0.5 h-6 w-6 rounded-full flex items-center justify-center shrink-0 ${selectedVersion?.id === v.id ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-400'}`}
+                  className={`mt-0.5 h-6 w-6 rounded-full flex items-center justify-center shrink-0 ${selectedVersion?.id === v.id ? 'bg-brand-600 text-white' : 'bg-black/[0.04] text-[color:var(--color-faint)]'}`}
                 >
                   {selectedVersion?.id === v.id ? <Check size={12} /> : <Clock size={12} />}
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[13px] font-bold text-slate-900 block truncate leading-none mb-1">
+                  <span className="text-[13px] font-semibold text-[color:var(--color-ink)] block truncate leading-none mb-1">
                     Bản lưu {versions.length - i}
                   </span>
-                  <p className="text-[11px] text-slate-500 uppercase font-black tracking-widest leading-none">
+                  <p className="text-[11px] text-[color:var(--color-muted)] font-medium leading-none">
                     {format(new Date(v.savedAt), 'HH:mm dd/MM', { locale: vi })}
                   </p>
                 </div>

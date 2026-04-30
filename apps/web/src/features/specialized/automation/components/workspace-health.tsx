@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Heart,
   ShieldCheck,
@@ -18,18 +18,18 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
   const [actions, setActions] = useState<HealthAction[]>([]);
   const [isHealing, setIsHealing] = useState(false);
 
-  useEffect(() => {
-    fetchHealth();
-  }, [workspaceId]);
-
-  const fetchHealth = async () => {
+  const fetchHealth = useCallback(async () => {
     try {
       const body = await getAutomationHealth(workspaceId);
       setActions(body.actions);
     } catch {
       toast.error('Failed to sync Workspace Health');
     }
-  };
+  }, [workspaceId]);
+
+  useEffect(() => {
+    Promise.resolve().then(() => fetchHealth());
+  }, [fetchHealth]);
 
   const handleHeal = async () => {
     setIsHealing(true);

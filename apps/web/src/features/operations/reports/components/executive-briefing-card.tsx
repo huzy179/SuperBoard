@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
-  Sparkles,
-  TrendingUp,
   Activity,
   AlertTriangle,
+  Layers,
   RefreshCw,
   ShieldCheck,
+  Sparkles,
   Target,
-  Layers,
+  TrendingUp,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getExecutiveProjectBriefing } from '@/features/intelligence/executive/api/executive-service';
@@ -31,25 +31,28 @@ export function ExecutiveBriefingCard({ projectId }: ExecutiveBriefingCardProps)
   const [data, setData] = useState<ExecutiveData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchBriefing = async () => {
+  const fetchBriefing = useCallback(async () => {
     setIsLoading(true);
     try {
       setData(await getExecutiveProjectBriefing(projectId));
     } catch {
-      toast.error('Không thể tải Strategic Briefing');
+      toast.error('Không thể tải báo cáo tổng quan');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [projectId]);
 
   useEffect(() => {
-    fetchBriefing();
-  }, [projectId]);
+    Promise.resolve().then(() => fetchBriefing());
+  }, [fetchBriefing]);
 
   if (isLoading) {
     return (
-      <div className="w-full h-64 bg-white/5 rounded-[2.5rem] border border-white/5 animate-pulse flex items-center justify-center">
-        <RefreshCw className="animate-spin text-white/10" size={32} />
+      <div className="w-full rounded-xl border border-surface-border bg-surface-card p-8 shadow-sm flex items-center justify-center">
+        <div className="flex items-center gap-3 text-sm text-[color:var(--color-muted)]">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-brand-600 border-t-transparent" />
+          Đang tải briefing…
+        </div>
       </div>
     );
   }
@@ -57,129 +60,140 @@ export function ExecutiveBriefingCard({ projectId }: ExecutiveBriefingCardProps)
   if (!data) return null;
 
   return (
-    <div className="relative group overflow-hidden rounded-[2.5rem] border border-white/5 bg-slate-950 p-1 bg-gradient-to-br from-indigo-500/10 via-transparent to-emerald-500/10 shadow-glass">
-      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
-
-      <div className="relative z-10 p-10 flex flex-col lg:flex-row gap-12">
-        {/* Health Radial */}
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="relative w-40 h-40">
-            <svg className="w-full h-full transform -rotate-90">
-              <circle
-                cx="80"
-                cy="80"
-                r="70"
-                stroke="currentColor"
-                strokeWidth="12"
-                fill="transparent"
-                className="text-white/5"
-              />
-              <circle
-                cx="80"
-                cy="80"
-                r="70"
-                stroke="currentColor"
-                strokeWidth="12"
-                fill="transparent"
-                strokeDasharray={440}
-                strokeDashoffset={440 - (440 * data.healthScore) / 100}
-                className={`transition-all duration-1000 ${
-                  data.healthScore > 80
-                    ? 'text-emerald-500'
-                    : data.healthScore > 50
-                      ? 'text-amber-500'
-                      : 'text-rose-500'
-                }`}
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-4xl font-black text-white tracking-tighter italic">
-                {data.healthScore}%
-              </span>
-              <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">
-                Tình trạng dự án
-              </span>
+    <section className="w-full rounded-xl border border-surface-border bg-surface-card p-8 shadow-luxe">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-md border border-surface-border bg-brand-50 text-brand-700">
+            <Sparkles size={18} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-sm font-semibold text-[color:var(--color-ink)]">
+              Báo cáo tổng quan
+            </div>
+            <div className="mt-1 text-sm text-[color:var(--color-muted)] leading-relaxed">
+              Tóm tắt nhanh sức khỏe dự án và một vài dự báo.
             </div>
           </div>
+        </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Badge
-              icon={<TrendingUp size={10} />}
-              label={`${data.forecast.velocityPerDay.toFixed(1)} VEL`}
-              color="emerald"
+        <button type="button" onClick={fetchBriefing} className="btn btn-secondary">
+          <span className="inline-flex items-center gap-2">
+            <RefreshCw size={16} />
+            Làm mới
+          </span>
+        </button>
+      </header>
+
+      <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">
+        <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-surface-border bg-surface-bg p-6">
+          <HealthRing score={data.healthScore} />
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <Pill
+              tone="emerald"
+              icon={<TrendingUp size={14} />}
+              label={`${data.forecast.velocityPerDay.toFixed(1)} vel/ngày`}
             />
-            <Badge
-              icon={<AlertTriangle size={10} />}
-              label={`${data.forecast.atRiskCount} RISKS`}
-              color={data.forecast.atRiskCount > 0 ? 'rose' : 'white/10'}
+            <Pill
+              tone={data.forecast.atRiskCount > 0 ? 'rose' : 'neutral'}
+              icon={<AlertTriangle size={14} />}
+              label={`${data.forecast.atRiskCount} rủi ro`}
             />
           </div>
         </div>
 
-        {/* AI Briefing */}
-        <div className="flex-1 space-y-6">
-          <header className="flex items-center justify-between">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <Sparkles size={14} className="text-indigo-400 animate-pulse" />
-                <h3 className="text-[10px] font-black text-white uppercase tracking-[0.4em]">
-                  Strategic Briefing
-                </h3>
-              </div>
-              <h4 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">
-                Báo cáo tổng quan
-              </h4>
-            </div>
-            <button
-              onClick={fetchBriefing}
-              className="p-3 rounded-full bg-white/5 text-white/30 hover:bg-white/10 hover:text-white transition-all"
-            >
-              <RefreshCw size={16} />
-            </button>
-          </header>
-
-          <div className="prose prose-invert max-w-none">
-            <div className="text-sm text-white/70 leading-relaxed font-bold italic whitespace-pre-wrap">
+        <div className="space-y-6">
+          <div className="rounded-xl border border-surface-border bg-[color:var(--color-surface-alt)]/35 p-6">
+            <div className="text-sm text-[color:var(--color-ink)] leading-relaxed whitespace-pre-wrap">
               {data.executiveBrief}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8 pt-8 border-t border-white/5">
-            <Stat icon={<ShieldCheck size={14} />} label="Ổn định" value="Cao" />
-            <Stat icon={<Target size={14} />} label="Độ chính xác" value="92%" />
-            <Stat icon={<Activity size={14} />} label="Tiến độ" value="Tăng tốc" />
-            <Stat icon={<Layers size={14} />} label="Toàn vẹn" value="Đã kiểm tra" />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <MiniStat icon={<ShieldCheck size={16} />} label="Ổn định" value="Cao" />
+            <MiniStat icon={<Target size={16} />} label="Độ chính xác" value="92%" />
+            <MiniStat icon={<Activity size={16} />} label="Tiến độ" value="Tăng tốc" />
+            <MiniStat icon={<Layers size={16} />} label="Toàn vẹn" value="Đã kiểm tra" />
           </div>
         </div>
       </div>
+    </section>
+  );
+}
+
+function HealthRing({ score }: { score: number }) {
+  const clamped = Math.max(0, Math.min(100, score));
+  const strokeDasharray = 440;
+  const dashOffset = strokeDasharray - (strokeDasharray * clamped) / 100;
+  const tone =
+    clamped > 80 ? 'text-emerald-600' : clamped > 50 ? 'text-amber-600' : 'text-rose-600';
+
+  return (
+    <div className="relative h-40 w-40">
+      <svg className="h-full w-full -rotate-90">
+        <circle
+          cx="80"
+          cy="80"
+          r="70"
+          stroke="currentColor"
+          strokeWidth="12"
+          fill="transparent"
+          className="text-black/[0.06]"
+        />
+        <circle
+          cx="80"
+          cy="80"
+          r="70"
+          stroke="currentColor"
+          strokeWidth="12"
+          fill="transparent"
+          strokeDasharray={strokeDasharray}
+          strokeDashoffset={dashOffset}
+          className={`transition-[stroke-dashoffset] duration-500 ${tone}`}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <div className="text-3xl font-semibold text-[color:var(--color-ink)] tracking-tight">
+          {clamped}%
+        </div>
+        <div className="mt-1 text-xs text-[color:var(--color-muted)]">Sức khỏe dự án</div>
+      </div>
     </div>
   );
 }
 
-function Badge({ icon, label, color }: { icon: React.ReactNode; label: string; color: string }) {
-  const colorClasses: Record<string, string> = {
-    emerald: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    rose: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
-    'white/10': 'bg-white/5 text-white/30 border-white/5',
-  };
+function Pill({
+  icon,
+  label,
+  tone,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  tone: 'emerald' | 'rose' | 'neutral';
+}) {
+  const tones = {
+    emerald: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+    rose: 'border-rose-200 bg-rose-50 text-rose-800',
+    neutral: 'border-surface-border bg-black/[0.02] text-[color:var(--color-muted)]',
+  } as const;
+
   return (
-    <div
-      className={`px-4 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-widest flex items-center gap-2 ${colorClasses[color] || colorClasses['white/10']}`}
+    <span
+      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium ${tones[tone]}`}
     >
       {icon}
       {label}
-    </div>
+    </span>
   );
 }
 
-function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-2 text-[8px] font-black text-white/20 uppercase tracking-widest">
-        {icon}
+    <div className="rounded-lg border border-surface-border bg-surface-bg p-4">
+      <div className="flex items-center gap-2 text-xs text-[color:var(--color-muted)]">
+        <span className="text-[color:var(--color-faint)]">{icon}</span>
         {label}
       </div>
-      <div className="text-[10px] font-black text-white uppercase">{value}</div>
+      <div className="mt-2 text-sm font-semibold text-[color:var(--color-ink)]">{value}</div>
     </div>
   );
 }

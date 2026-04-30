@@ -64,7 +64,7 @@ export function ProjectForm({
         color: initialValues.color || '#6366f1',
       });
     }
-  }, [initialValues]);
+  }, [initialValues, form]);
 
   return (
     <form

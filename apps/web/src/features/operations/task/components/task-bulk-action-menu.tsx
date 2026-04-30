@@ -1,6 +1,5 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
 import type { ReactNode } from 'react';
 
 type TaskBulkActionMenuProps = {
@@ -18,7 +17,6 @@ export function TaskBulkActionMenu({
   label,
   icon,
   widthClass,
-  accentClass,
   onToggle,
   children,
 }: TaskBulkActionMenuProps) {
@@ -26,31 +24,24 @@ export function TaskBulkActionMenu({
     <div className="relative">
       <button
         onClick={onToggle}
-        className={`h-12 px-6 rounded-[1.5rem] flex items-center gap-4 transition-all duration-500 border ${
+        className={`h-10 px-4 rounded-md flex items-center gap-3 transition-colors border ${
           isOpen
-            ? 'bg-white border-white text-slate-950 shadow-luxe scale-105'
-            : 'bg-white/[0.02] border-white/5 text-white/40 hover:text-white hover:bg-white/5'
+            ? 'bg-black/[0.04] border-surface-border text-[color:var(--color-ink)]'
+            : 'bg-surface-card border-surface-border text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.03]'
         }`}
       >
         {icon}
-        <span className="text-[10px] font-black uppercase tracking-[0.3em] italic">{label}</span>
+        <span className="text-xs font-medium">{label}</span>
       </button>
 
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -20 }}
-            animate={{ opacity: 1, scale: 1, y: -12 }}
-            exit={{ opacity: 0, scale: 0.95, y: -10 }}
-            className={`absolute bottom-full left-0 mb-6 rounded-[2.5rem] border border-white/10 bg-slate-950/90 p-3 ${widthClass} backdrop-blur-3xl shadow-luxe z-50 overflow-hidden`}
-          >
-            <div
-              className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent ${accentClass} to-transparent`}
-            />
-            <div className="space-y-1.5 p-1">{children}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {isOpen ? (
+        <div
+          className={`absolute bottom-full left-0 mb-2 rounded-lg border border-surface-border bg-surface-card p-2 ${widthClass} shadow-luxe z-50`}
+          role="menu"
+        >
+          <div className="space-y-1">{children}</div>
+        </div>
+      ) : null}
     </div>
   );
 }

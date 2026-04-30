@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Sunrise,
   Target,
@@ -31,11 +31,7 @@ export function MorningBriefing({
   const [data, setData] = useState<BriefingData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchBriefing();
-  }, [workspaceId]);
-
-  const fetchBriefing = async () => {
+  const fetchBriefing = useCallback(async () => {
     setIsLoading(true);
     try {
       setData(await getDailyBriefing(workspaceId));
@@ -44,7 +40,11 @@ export function MorningBriefing({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [workspaceId]);
+
+  useEffect(() => {
+    Promise.resolve().then(() => fetchBriefing());
+  }, [fetchBriefing]);
 
   if (isLoading) {
     return (

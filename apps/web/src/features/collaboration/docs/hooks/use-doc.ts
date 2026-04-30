@@ -54,8 +54,10 @@ export function useDoc(docId: string | undefined) {
   // Sync initial data from query to local state
   useEffect(() => {
     if (query.data) {
-      setLocalTitle(query.data.title);
-      setLocalContent(query.data.content);
+      Promise.resolve().then(() => {
+        setLocalTitle(query.data.title);
+        setLocalContent(query.data.content);
+      });
       lastSavedRef.current = JSON.stringify({
         title: query.data.title,
         content: query.data.content,
@@ -73,7 +75,7 @@ export function useDoc(docId: string | undefined) {
     if (currentSerialized !== lastSavedRef.current) {
       updateMutation.mutate(debouncedData);
     }
-  }, [debouncedData, docId, query.data]);
+  }, [debouncedData, docId, query.data, updateMutation]);
 
   return {
     ...query,

@@ -38,7 +38,7 @@ export function StrategicSandbox({
 
     const delay = setTimeout(simulate, 300);
     return () => clearTimeout(delay);
-  }, [params, projectId]);
+  }, [params, projectId, onResultUpdate]);
 
   return (
     <div className="flex flex-col h-full bg-surface-card border-l border-surface-border p-10 space-y-10 overflow-y-auto elite-scrollbar shadow-glass">

@@ -9,8 +9,8 @@ export default function SymbiosisPage() {
 
   if (!workspaceId) {
     return (
-      <div className="flex items-center justify-center min-h-[50vh] text-white/20 font-black uppercase tracking-widest">
-        No Active Strategic Workspace Context
+      <div className="flex items-center justify-center min-h-[50vh] text-[color:var(--color-muted)] text-sm font-medium">
+        Chưa chọn workspace để hiển thị automation console.
       </div>
     );
   }

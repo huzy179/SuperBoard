@@ -52,7 +52,9 @@ export function InviteMemberModal({ workspaceId, onClose }: InviteMemberModalPro
 
   useEffect(() => {
     if (successToken && typeof window !== 'undefined') {
-      setInvitationUrl(`${window.location.origin}/invite/${successToken}`);
+      Promise.resolve().then(() =>
+        setInvitationUrl(`${window.location.origin}/invite/${successToken}`),
+      );
     }
   }, [successToken]);
 

@@ -19,10 +19,10 @@ export function useProjectContextMemory() {
     try {
       const parsed = JSON.parse(raw) as Record<string, ViewMode>;
       if (parsed && typeof parsed === 'object') {
-        setProjectLastViews(parsed);
+        Promise.resolve().then(() => setProjectLastViews(parsed));
       }
     } catch {
-      setProjectLastViews({});
+      Promise.resolve().then(() => setProjectLastViews({}));
     }
   }, []);
 
@@ -39,10 +39,10 @@ export function useProjectContextMemory() {
     try {
       const parsed = JSON.parse(raw) as Record<string, string>;
       if (parsed && typeof parsed === 'object') {
-        setProjectLastQueries(parsed);
+        Promise.resolve().then(() => setProjectLastQueries(parsed));
       }
     } catch {
-      setProjectLastQueries({});
+      Promise.resolve().then(() => setProjectLastQueries({}));
     }
   }, []);
 

@@ -95,8 +95,8 @@ export function TaskFilterBar({ members, workflow }: TaskFilterBarProps) {
       </div>
 
       <div className="mt-4 flex flex-col gap-4">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center">
-          <div className="relative w-full md:max-w-sm">
+        <div className="grid gap-3 md:grid-cols-[minmax(280px,1fr)_minmax(220px,320px)_auto] md:items-center">
+          <div className="relative w-full">
             <Search
               size={14}
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--color-faint)]"
@@ -114,7 +114,7 @@ export function TaskFilterBar({ members, workflow }: TaskFilterBarProps) {
           <select
             value={filterAssignee}
             onChange={(event) => setFilterAssignee(event.target.value)}
-            className="form-select md:max-w-xs"
+            className="form-select w-full"
             aria-label="Assignee"
           >
             <option value="">Assignee (all)</option>
@@ -125,7 +125,7 @@ export function TaskFilterBar({ members, workflow }: TaskFilterBarProps) {
             ))}
           </select>
 
-          <div className="flex items-center gap-2 md:ml-auto">
+          <div className="flex items-center gap-2 justify-start md:justify-end">
             <select
               value={sortBy}
               onChange={(event) => setSortBy(event.target.value as TaskSortBy)}

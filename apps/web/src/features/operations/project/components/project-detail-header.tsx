@@ -30,6 +30,7 @@ interface ProjectDetailHeaderProps {
   viewerCount: number;
   isCopyLinkSuccess: boolean;
   onCopyFilterLink: () => void;
+  rightActions?: React.ReactNode;
   onPlanExecuted?: () => void;
 }
 
@@ -39,6 +40,7 @@ export function ProjectDetailHeader({
   viewerCount,
   isCopyLinkSuccess,
   onCopyFilterLink,
+  rightActions,
   onPlanExecuted,
 }: ProjectDetailHeaderProps) {
   const pathname = usePathname();
@@ -187,6 +189,7 @@ export function ProjectDetailHeader({
             >
               Sitrep
             </AppButton>
+            {rightActions}
           </div>
         </div>
 

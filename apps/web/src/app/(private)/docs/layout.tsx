@@ -59,9 +59,9 @@ export default function DocLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex h-full overflow-hidden rounded-xl border border-surface-border bg-surface-card shadow-sm">
+    <div className="flex h-full overflow-hidden rounded-xl border border-surface-border bg-surface-bg shadow-sm">
       {/* Secondary Sidebar: Doc Tree */}
-      <aside className="flex w-64 shrink-0 flex-col border-r border-surface-border bg-black/[0.02]">
+      <aside className="flex w-72 shrink-0 flex-col border-r border-surface-border bg-surface-card">
         <div className="flex h-14 items-center justify-between px-4 border-b border-surface-border bg-surface-card">
           <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">Tài liệu</h2>
           <button
@@ -80,7 +80,7 @@ export default function DocLayout({ children }: { children: ReactNode }) {
           <div className="px-3 mb-4 mt-2">
             <button
               type="button"
-              className="flex w-full items-center gap-2 px-2 py-1.5 rounded-md bg-surface-card border border-surface-border text-[12px] text-[color:var(--color-muted)] hover:bg-black/[0.02] hover:text-[color:var(--color-ink)] transition-colors"
+              className="flex w-full items-center gap-2 px-3 py-2 rounded-md bg-black/[0.02] border border-surface-border text-[12px] text-[color:var(--color-muted)] hover:bg-black/[0.04] hover:text-[color:var(--color-ink)] transition-colors"
             >
               <Search size={12} />
               <span>Tìm nhanh…</span>
@@ -167,7 +167,9 @@ function DocTreeItem({
           <div key={doc.id}>
             <div
               className={`flex items-center group rounded-md transition-colors ${
-                isActive ? 'bg-black/[0.04]' : 'hover:bg-black/[0.03]'
+                isActive
+                  ? 'bg-brand-50 border border-brand-500/15'
+                  : 'border border-transparent hover:bg-black/[0.03]'
               }`}
             >
               <button

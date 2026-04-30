@@ -28,19 +28,19 @@ export default function DocHomePage() {
   return (
     <div className="flex h-full flex-col bg-surface-bg">
       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-        <div className="w-20 h-20 mb-6 rounded-xl bg-surface-card shadow-luxe flex items-center justify-center border border-surface-border">
+        <div className="w-16 h-16 mb-6 rounded-xl bg-surface-card shadow-sm flex items-center justify-center border border-surface-border">
           <BookOpen size={32} className="text-brand-600" />
         </div>
 
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="text-3xl md:text-4xl font-semibold text-[color:var(--color-ink)] tracking-tight">
           Trung tâm Tài liệu
         </h1>
-        <p className="mt-4 text-slate-500 max-w-lg text-lg leading-relaxed">
+        <p className="mt-3 text-[color:var(--color-muted)] max-w-2xl text-base md:text-lg leading-relaxed">
           Nơi lưu trữ tất cả kiến thức, quy trình và biên bản cuộc họp của nhóm bạn. Bắt đầu ghi
           chép ngay hôm nay.
         </p>
 
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl w-full">
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl w-full">
           <FeatureCard
             icon={<Plus className="text-brand-600" />}
             title="Tạo Trang mới"
@@ -111,21 +111,27 @@ function FeatureCard({
     <button
       onClick={onClick}
       disabled={disabled || isPending}
-      className={`flex flex-col items-start p-6 rounded-lg border transition-colors text-left group ${
+      className={`flex flex-col items-start p-6 rounded-xl border transition-colors text-left group ${
         disabled
-          ? 'bg-slate-50 border-slate-100 cursor-not-allowed opacity-60'
+          ? 'bg-black/[0.02] border-surface-border cursor-not-allowed opacity-60'
           : variant === 'indigo'
-            ? 'bg-indigo-50/10 border-indigo-500/20 hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/10 cursor-pointer'
-            : 'bg-white border-slate-200 hover:border-brand-500 hover:shadow-lg hover:shadow-brand-500/5 cursor-pointer'
+            ? 'bg-surface-card border-indigo-500/20 hover:border-indigo-500/50 hover:bg-black/[0.02] hover:shadow-glass cursor-pointer'
+            : 'bg-surface-card border-surface-border hover:border-brand-500/35 hover:bg-black/[0.02] hover:shadow-glass cursor-pointer'
       }`}
     >
       <div
-        className={`p-2 rounded-lg mb-3 ${variant === 'indigo' ? 'bg-indigo-500/10' : 'bg-brand-50'}`}
+        className={`p-2 rounded-lg mb-3 border ${
+          variant === 'indigo'
+            ? 'bg-indigo-500/10 border-indigo-500/15'
+            : variant === 'brand'
+              ? 'bg-brand-50 border-brand-500/15'
+              : 'bg-black/[0.02] border-surface-border'
+        }`}
       >
         {icon}
       </div>
-      <h3 className="font-bold text-slate-900">{title}</h3>
-      <p className="mt-2 text-sm text-slate-500 leading-normal">{description}</p>
+      <h3 className="font-semibold text-[color:var(--color-ink)]">{title}</h3>
+      <p className="mt-2 text-sm text-[color:var(--color-muted)] leading-relaxed">{description}</p>
       {isPending && (
         <div className="mt-4 h-1 w-full bg-slate-100 rounded-full overflow-hidden">
           <div className="h-full bg-brand-600 animate-progress w-1/3" />

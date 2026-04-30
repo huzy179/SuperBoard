@@ -35,6 +35,7 @@ interface RichTextEditorProps {
   content: JSONContent | null;
   onChange: (content: JSONContent) => void;
   editable?: boolean;
+  variant?: 'minimal' | 'showcase';
   user?:
     | {
         id: string;
@@ -49,6 +50,7 @@ export function RichTextEditor({
   content,
   onChange,
   editable = true,
+  variant = 'minimal',
   user,
 }: RichTextEditorProps) {
   const [provider, setProvider] = useState<HocuspocusProvider | null>(null);
@@ -102,7 +104,7 @@ export function RichTextEditor({
           const coords = view.coordsAtPos(selection.from);
           setSlashMenu({
             show: true,
-            top: coords.top + window.scrollY + 20,
+            top: coords.top + 20,
             left: coords.left,
             mode: 'default',
           });
@@ -117,8 +119,9 @@ export function RichTextEditor({
       },
       editorProps: {
         attributes: {
-          class:
-            'prose prose-slate max-w-none focus:outline-none min-h-[500px] prose-headings:text-[color:var(--color-ink)] prose-p:text-[color:var(--color-ink)] prose-strong:text-[color:var(--color-ink)] prose-a:text-brand-500 prose-code:text-emerald-700 prose-pre:bg-[color:var(--color-surface-alt)] prose-pre:border prose-pre:border-surface-border',
+          class: `prose prose-slate max-w-none focus:outline-none ${
+            editable ? 'min-h-[500px]' : ''
+          } prose-headings:text-[color:var(--color-ink)] prose-p:text-[color:var(--color-ink)] prose-strong:text-[color:var(--color-ink)] prose-a:text-brand-500 prose-code:text-emerald-700 prose-pre:bg-[color:var(--color-surface-alt)] prose-pre:border prose-pre:border-surface-border`,
         },
       },
     },
@@ -142,7 +145,7 @@ export function RichTextEditor({
       const top = Math.min(start.top, end.top) - 50;
       const left = (start.left + end.left) / 2;
 
-      setMenuPos({ top: top + window.scrollY, left, show: true });
+      setMenuPos({ top, left, show: true });
     };
 
     editor.on('selectionUpdate', handleSelection);
@@ -211,6 +214,8 @@ export function RichTextEditor({
       <div className="animate-pulse bg-black/[0.03] h-[500px] rounded-md border border-surface-border" />
     );
   }
+
+  const isShowcase = variant === 'showcase';
 
   return (
     <div className="relative">
@@ -488,7 +493,7 @@ export function RichTextEditor({
       )}
 
       {editable && (
-        <div className="sticky top-20 z-40 flex flex-wrap items-center gap-1 border border-surface-border bg-surface-card p-2 mb-[var(--space-12)] shadow-luxe rounded-md">
+        <div className="sticky top-4 z-40 flex flex-wrap items-center gap-1 border border-surface-border bg-surface-card p-2 mb-6 shadow-sm rounded-md">
           <MenuButton
             onClick={() => editor.chain().focus().toggleBold().run()}
             active={editor.isActive('bold')}
@@ -521,75 +526,74 @@ export function RichTextEditor({
             active={editor.isActive('codeBlock')}
             icon={<Code size={16} />}
           />
-          <div className="flex-1" />
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-sm text-emerald-700 font-semibold text-xs">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
-            AI active
-          </div>
         </div>
       )}
 
-      <div className="max-w-5xl mx-auto pb-48 flex gap-12">
-        <div className="flex-1 min-w-0">
-          {/* Notion-style Header */}
-          <div className="relative group mb-20">
-            {/* Cover Image */}
-            <div className="h-48 md:h-56 w-full rounded-md overflow-hidden relative border border-surface-border mb-[-3rem] shadow-luxe bg-[color:var(--color-surface-alt)]" />
+      {isShowcase ? (
+        <div className="max-w-5xl mx-auto pb-48 flex gap-12">
+          <div className="flex-1 min-w-0">
+            {/* Notion-style Header */}
+            <div className="relative group mb-20">
+              {/* Cover Image */}
+              <div className="h-48 md:h-56 w-full rounded-md overflow-hidden relative border border-surface-border mb-[-3rem] shadow-luxe bg-[color:var(--color-surface-alt)]" />
 
-            <div className="px-12 relative z-10 flex items-end gap-8">
-              {/* Icon */}
-              <div
-                onClick={() => {
-                  const ICONS = ['📑', '💾', '🛡️', '⚡', '📊', '🏛️', '🎯'] as const;
-                  const currentIcon = icon as (typeof ICONS)[number];
-                  const nextIcon = ICONS[(ICONS.indexOf(currentIcon) + 1) % ICONS.length]!;
-                  setIcon(nextIcon);
-                }}
-                className="w-24 h-24 bg-surface-card rounded-sm shadow-luxe flex items-center justify-center text-5xl border border-surface-border transition-colors hover:bg-black/[0.02] cursor-pointer active:scale-[0.98] group/icon"
-              >
-                <span className="group-hover/icon:scale-110 transition-transform">{icon}</span>
-              </div>
+              <div className="px-12 relative z-10 flex items-end gap-8">
+                {/* Icon */}
+                <div
+                  onClick={() => {
+                    const ICONS = ['📑', '💾', '🛡️', '⚡', '📊', '🏛️', '🎯'] as const;
+                    const currentIcon = icon as (typeof ICONS)[number];
+                    const nextIcon = ICONS[(ICONS.indexOf(currentIcon) + 1) % ICONS.length]!;
+                    setIcon(nextIcon);
+                  }}
+                  className="w-24 h-24 bg-surface-card rounded-sm shadow-luxe flex items-center justify-center text-5xl border border-surface-border transition-colors hover:bg-black/[0.02] cursor-pointer active:scale-[0.98] group/icon"
+                >
+                  <span className="group-hover/icon:scale-110 transition-transform">{icon}</span>
+                </div>
 
-              <div className="mb-4">
-                <div className="flex items-center gap-2 text-xs font-semibold text-[color:var(--color-muted)]">
-                  <Command size={12} />
-                  <span>Tài liệu</span>
-                  <span>/</span>
-                  <span className="text-[color:var(--color-faint)] font-mono">
-                    ID_{docId?.substring(0, 8)}
-                  </span>
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-[color:var(--color-muted)]">
+                    <Command size={12} />
+                    <span>Tài liệu</span>
+                    <span>/</span>
+                    <span className="text-[color:var(--color-faint)] font-mono">
+                      ID_{docId?.substring(0, 8)}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="px-12">
-            <DocPropertyBar
-              classification="TOP_SECRET"
-              status="DRAFT"
-              ownerName={user?.fullName || 'Protocol Agent'}
-            />
-            <EditorContent editor={editor} className="relative group/editor" />
-
-            {/* Entity Embed Demo */}
-            <div className="mt-20">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="h-px flex-1 bg-surface-border" />
-                <span className="text-xs font-semibold text-[color:var(--color-muted)]">
-                  Cross-Platform Asset Embed
-                </span>
-                <div className="h-px flex-1 bg-surface-border" />
-              </div>
-              <TaskNodeEmbed
-                taskId="JIRA-402"
-                title="Finalize Neural Singularity UI/UX Purge"
-                status="In Development"
-                assignee="Protocol Agent"
+            <div className="px-12">
+              <DocPropertyBar
+                classification="TOP_SECRET"
+                status="DRAFT"
+                ownerName={user?.fullName || 'Protocol Agent'}
               />
+              <EditorContent editor={editor} className="relative group/editor" />
+
+              {/* Entity Embed Demo */}
+              <div className="mt-20">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="h-px flex-1 bg-surface-border" />
+                  <span className="text-xs font-semibold text-[color:var(--color-muted)]">
+                    Cross-Platform Asset Embed
+                  </span>
+                  <div className="h-px flex-1 bg-surface-border" />
+                </div>
+                <TaskNodeEmbed
+                  taskId="JIRA-402"
+                  title="Finalize Neural Singularity UI/UX Purge"
+                  status="In Development"
+                  assignee="Protocol Agent"
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <EditorContent editor={editor} className="relative group/editor" />
+      )}
     </div>
   );
 }

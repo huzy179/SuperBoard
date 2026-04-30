@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Settings2, Trash2, ChevronDown, Cpu } from 'lucide-react';
 import type { WorkflowStatusCategory } from '@superboard/shared';
+import { AppButton } from '@/components/ui/app-button';
 
 interface WorkflowData {
   statuses: {
@@ -112,15 +112,15 @@ export function WorkflowEditor({
   const statuses = data?.statuses || [];
 
   return (
-    <div className="flex flex-col gap-16 pb-32 animate-in fade-in duration-1000">
+    <div className="flex flex-col gap-10 pb-20">
       <header className="flex items-center justify-between px-8">
         <div>
-          <h1 className="text-6xl font-black text-white tracking-tighter uppercase mb-4">
+          <h1 className="text-3xl md:text-4xl font-semibold text-[color:var(--color-ink)] tracking-tight mb-2">
             {title || 'Workflow Core'}
           </h1>
           <div className="flex items-center gap-4">
-            <div className="h-2 w-2 rounded-full bg-brand-500 shadow-glow-brand animate-pulse" />
-            <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">
+            <div className="h-2 w-2 rounded-full bg-brand-500" />
+            <p className="text-sm text-[color:var(--color-muted)]">
               {description || 'Neural configuration for project logic pathways.'}
             </p>
           </div>
@@ -129,58 +129,57 @@ export function WorkflowEditor({
       </header>
 
       {/* STATUSES SECTION */}
-      <section className="relative group overflow-hidden rounded-[3.5rem] border border-white/5 bg-white/[0.01] shadow-luxe backdrop-blur-3xl transition-all">
-        {/* Rim Light */}
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-        <div className="px-12 py-8 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
-          <h2 className="text-[11px] font-black text-white/40 uppercase tracking-[0.4em] flex items-center gap-3">
-            <div className="h-1.5 w-1.5 rounded-full bg-brand-500 shadow-glow-brand" />
-            Logic States Configuration
+      <section className="rounded-2xl border border-surface-border bg-surface-card shadow-luxe">
+        <div className="px-8 py-6 border-b border-surface-border flex justify-between items-center">
+          <h2 className="text-sm font-semibold text-[color:var(--color-ink)] flex items-center gap-3">
+            <div className="h-1.5 w-1.5 rounded-full bg-brand-500" />
+            Logic states
           </h2>
-          <span className="text-[10px] font-black text-brand-400 bg-brand-500/5 border border-brand-500/20 px-6 py-2 rounded-full uppercase tracking-widest shadow-glow-brand/5">
-            {statuses.length} ACTIVE_NODES_DETACHED
+          <span className="inline-flex items-center rounded-full border border-brand-500/20 bg-brand-50 px-3 py-1 text-xs font-semibold tracking-[0.125px] text-[color:var(--color-focus)]">
+            {statuses.length} statuses
           </span>
         </div>
-        <div className="p-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {statuses.map((status) => (
               <div
                 key={status.id}
-                className={`group/item relative flex flex-col gap-6 p-8 rounded-[2.5rem] border transition-all duration-500 shadow-inner ${
+                className={`group/item relative flex flex-col gap-5 p-6 rounded-xl border transition-colors shadow-inner ${
                   status.category === 'done'
-                    ? 'border-emerald-500/10 bg-emerald-500/[0.01] hover:bg-emerald-500/[0.03] hover:border-emerald-500/30'
+                    ? 'border-emerald-500/20 bg-emerald-50'
                     : status.category === 'todo'
-                      ? 'border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/20'
-                      : 'border-brand-500/10 bg-brand-500/[0.01] hover:bg-brand-500/[0.03] hover:border-brand-500/30'
+                      ? 'border-surface-border bg-surface-card'
+                      : 'border-brand-500/15 bg-brand-50/60'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div
-                    className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border ${
+                    className={`px-3 py-1 rounded-full text-xs font-semibold tracking-[0.125px] border ${
                       status.category === 'done'
-                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-glow-emerald/5'
+                        ? 'bg-white text-emerald-700 border-emerald-200'
                         : status.category === 'todo'
-                          ? 'bg-white/5 text-white/40 border-white/10'
-                          : 'bg-brand-500/10 text-brand-400 border-brand-500/20 shadow-glow-brand/5'
+                          ? 'bg-black/[0.02] text-[color:var(--color-muted)] border-surface-border'
+                          : 'bg-white text-[color:var(--color-focus)] border-brand-500/20'
                     }`}
                   >
                     {status.category}
                   </div>
                   {!status.isSystem && (
-                    <div className="flex gap-2 opacity-0 group-hover/item:opacity-100 transition-all translate-y-1 group-hover:translate-y-0">
+                    <div className="flex gap-2 opacity-0 group-hover/item:opacity-100 transition-opacity">
                       <button
                         onClick={() => {
                           setEditingStatusId(status.id);
                           setEditName(status.name);
                         }}
-                        className="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl text-white/40 hover:text-brand-400 transition-all border border-transparent hover:border-white/10"
+                        className="w-9 h-9 flex items-center justify-center bg-black/[0.02] hover:bg-black/[0.04] rounded-lg text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)] transition-colors border border-surface-border"
+                        aria-label="Edit status"
                       >
                         <Settings2 size={16} />
                       </button>
                       <button
                         onClick={() => onDeleteStatus(status.id)}
-                        className="w-9 h-9 flex items-center justify-center bg-rose-500/5 hover:bg-rose-500/10 rounded-xl text-rose-500/40 hover:text-rose-400 transition-all border border-transparent hover:border-rose-500/10"
+                        className="w-9 h-9 flex items-center justify-center bg-rose-50 hover:bg-rose-100 rounded-lg text-rose-700 transition-colors border border-rose-200"
+                        aria-label="Delete status"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -196,49 +195,38 @@ export function WorkflowEditor({
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSaveStatusName(status.id)}
-                        className="w-full px-6 py-4 bg-slate-950/80 border border-brand-500/30 rounded-lg text-base font-black text-white shadow-luxe outline-none focus:border-brand-500 transition-all uppercase"
+                        className="form-input-lg"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[8px] font-black text-brand-500/50 uppercase tracking-widest">
-                        COMMIT_READY
-                      </span>
                     </div>
                   ) : (
-                    <h4 className="text-2xl font-black text-white tracking-tighter uppercase leading-none italic group-hover/item:text-brand-400 transition-colors">
+                    <h4 className="text-xl font-semibold text-[color:var(--color-ink)] tracking-tight leading-tight">
                       {status.name}
                     </h4>
                   )}
-                  <p className="text-[10px] font-black text-white/10 uppercase tracking-widest transition-colors group-hover/item:text-white/20">
-                    ID: {status.key}
-                  </p>
+                  <p className="text-xs text-[color:var(--color-faint)]">ID: {status.key}</p>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-20 pt-16 border-t border-white/5 relative">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-950 px-8 py-2 border border-white/5 rounded-full text-[9px] font-black text-white/10 uppercase tracking-[0.3em]">
-              Neural Growth Sector
-            </div>
-
-            <h3 className="text-[11px] font-black text-white/20 uppercase tracking-[0.4em] mb-10 px-4 text-center">
-              Initialize New Logic Node
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 px-4">
-              <div className="md:col-span-2 relative group-within/input">
+          <div className="mt-10 pt-8 border-t border-surface-border">
+            <h3 className="text-sm font-semibold text-[color:var(--color-ink)] mb-4">Add status</h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div className="md:col-span-2">
                 <input
                   type="text"
-                  placeholder="NODE_DESIGNATION (E.G. QUALITY_ASSURANCE)"
+                  placeholder="Tên trạng thái (VD: QA, Review...)"
                   value={newStatusName}
                   onChange={(e) => setNewStatusName(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddStatus()}
-                  className="w-full px-10 py-6 bg-white/[0.01] border border-white/5 rounded-xl focus:bg-white/[0.02] focus:border-brand-500/40 outline-none transition-all font-black text-xl text-white shadow-inner uppercase placeholder:text-white/5"
+                  onKeyDown={(e) => e.key === 'Enter' && void handleAddStatus()}
+                  className="form-input-lg"
                 />
               </div>
               <div className="relative">
                 <select
                   value={newStatusCategory}
                   onChange={(e) => setNewStatusCategory(e.target.value as WorkflowStatusCategory)}
-                  className="w-full appearance-none px-10 py-6 rounded-xl border border-white/5 bg-white/[0.01] focus:bg-white/[0.02] focus:border-brand-500/40 outline-none transition-all font-black uppercase text-xs tracking-[0.2em] text-white/60 shadow-inner"
+                  className="form-select h-[52px] px-4"
                 >
                   <option value="todo">Chưa thực hiện</option>
                   <option value="in_progress">Đang thực hiện</option>
@@ -247,68 +235,58 @@ export function WorkflowEditor({
                   <option value="blocked">Bị chặn</option>
                 </select>
                 <ChevronDown
-                  className="absolute right-6 top-1/2 -translate-y-1/2 text-white/10 pointer-events-none"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[color:var(--color-faint)] pointer-events-none"
                   size={16}
                 />
               </div>
-              <button
-                onClick={handleAddStatus}
+              <AppButton
+                type="button"
+                onClick={() => void handleAddStatus()}
                 disabled={isPending || !newStatusName.trim()}
-                className="relative overflow-hidden px-10 py-6 bg-brand-500 hover:scale-105 disabled:bg-white/5 disabled:scale-100 text-white font-black rounded-xl shadow-glow-brand/20 transition-all active:scale-95 uppercase text-[11px] tracking-[0.3em] group/btn"
+                isLoading={isPending}
+                variant="primary"
               >
-                <div className="absolute inset-x-0 top-0 h-px bg-white/40" />
-                {isPending ? 'Propagating...' : 'Register Node'}
-              </button>
+                Add
+              </AppButton>
             </div>
           </div>
         </div>
       </section>
 
       {/* TRANSITION MATRIX SECTION */}
-      <section className="relative overflow-hidden rounded-[3.5rem] border border-white/5 bg-white/[0.01] shadow-luxe backdrop-blur-3xl transition-all">
-        <div className="px-12 py-10 border-b border-white/5 bg-white/[0.02] flex justify-between items-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-emerald-500/[0.01] pointer-events-none" />
-          <div className="relative z-10">
-            <h2 className="text-[11px] font-black text-white/40 uppercase tracking-[0.4em] flex items-center gap-3">
-              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-glow-emerald animate-pulse" />
-              Transition Logic Matrix
+      <section className="rounded-2xl border border-surface-border bg-surface-card shadow-luxe">
+        <div className="px-8 py-6 border-b border-surface-border flex justify-between items-center">
+          <div>
+            <h2 className="text-sm font-semibold text-[color:var(--color-ink)] flex items-center gap-3">
+              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              Transition matrix
             </h2>
-            <p className="text-[9px] font-black text-white/10 mt-2 uppercase tracking-[0.3em]">
-              Mapping neural migration pathways
+            <p className="text-sm text-[color:var(--color-muted)] mt-1">
+              Cho phép chuyển trạng thái từ A → B.
             </p>
           </div>
           {isMatrixDirty && (
-            <button
+            <AppButton
+              type="button"
               onClick={handleSaveTransitions}
               disabled={isPending}
-              className="relative overflow-hidden px-12 py-4 bg-emerald-500 hover:scale-105 text-white text-[10px] font-black rounded-lg shadow-glow-emerald/20 transition-all active:scale-95 uppercase tracking-[0.3em]"
+              isLoading={isPending}
+              variant="primary"
             >
-              <div className="absolute inset-x-0 top-0 h-px bg-white/40" />
-              {isPending ? 'Syncing...' : 'Commit Matrix'}
-            </button>
+              Save
+            </AppButton>
           )}
         </div>
-        <div className="p-12 overflow-x-auto elite-scrollbar">
-          <table className="w-full border-separate border-spacing-4">
+        <div className="p-8 overflow-x-auto elite-scrollbar">
+          <table className="w-full border-separate border-spacing-3">
             <thead>
               <tr>
-                <th className="p-6 border-b border-white/5">
-                  <div className="flex flex-col items-start gap-1">
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/10">
-                      ORIGIN
-                    </span>
-                    <span className="text-white/40 px-3 py-1 bg-white/5 rounded-lg">↘</span>
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/10 ml-8 text-right">
-                      TARGET
-                    </span>
-                  </div>
+                <th className="p-4 border-b border-surface-border text-left text-xs font-semibold text-[color:var(--color-muted)]">
+                  From \\ To
                 </th>
                 {statuses.map((s) => (
-                  <th
-                    key={s.id}
-                    className="p-6 border-b border-white/5 group/th transition-all hover:bg-white/[0.02] rounded-xl"
-                  >
-                    <span className="text-xs font-black text-white/40 group-hover/th:text-white uppercase tracking-widest transition-colors block">
+                  <th key={s.id} className="p-4 border-b border-surface-border text-left">
+                    <span className="text-xs font-semibold text-[color:var(--color-muted)] block">
                       {s.name}
                     </span>
                   </th>
@@ -318,8 +296,8 @@ export function WorkflowEditor({
             <tbody>
               {statuses.map((from) => (
                 <tr key={from.id}>
-                  <td className="p-6 border-r border-white/5 bg-white/[0.02] rounded-[1.5rem] shadow-inner">
-                    <span className="text-xs font-black text-white/60 uppercase tracking-widest">
+                  <td className="p-4 border-r border-surface-border bg-[color:var(--color-surface-alt)]/40 rounded-xl shadow-inner">
+                    <span className="text-sm font-medium text-[color:var(--color-ink)]">
                       {from.name}
                     </span>
                   </td>
@@ -328,33 +306,26 @@ export function WorkflowEditor({
                     const isSelf = from.id === to.id;
 
                     return (
-                      <td key={to.id} className="p-3">
+                      <td key={to.id} className="p-2">
                         {isSelf ? (
-                          <div className="h-10 w-full bg-white/[0.02] rounded-lg flex items-center justify-center opacity-10">
-                            <span className="text-[8px] font-black">X</span>
+                          <div className="h-10 w-full bg-black/[0.02] rounded-lg flex items-center justify-center opacity-60 border border-surface-border">
+                            <span className="text-xs text-[color:var(--color-faint)]">—</span>
                           </div>
                         ) : (
                           <button
                             onClick={() => toggleTransition(from.id, to.id)}
-                            className={`group h-12 w-full rounded-lg flex items-center justify-center transition-all duration-500 border shadow-inner ${
+                            className={`h-10 w-full rounded-lg flex items-center justify-center transition-colors border shadow-inner ${
                               isAllowed
-                                ? 'bg-white/10 border-white/20 text-emerald-400 shadow-glow-emerald/10 scale-105 z-10'
-                                : 'bg-white/[0.01] border-white/5 text-white/5 hover:border-brand-500/30'
+                                ? 'bg-emerald-50 border-emerald-200'
+                                : 'bg-surface-card border-surface-border hover:bg-black/[0.02]'
                             }`}
+                            aria-pressed={isAllowed}
                           >
                             <div
-                              className={`h-2.5 w-2.5 rounded-full transition-all duration-500 ${
-                                isAllowed
-                                  ? 'bg-emerald-500 shadow-glow-emerald'
-                                  : 'bg-white/5 group-hover:bg-brand-500/50'
+                              className={`h-2.5 w-2.5 rounded-full ${
+                                isAllowed ? 'bg-emerald-500' : 'bg-black/10'
                               }`}
                             />
-                            {isAllowed && (
-                              <motion.div
-                                layoutId={`trans-${from.id}-${to.id}`}
-                                className="absolute inset-0 border-2 border-emerald-500/40 rounded-lg animate-pulse pointer-events-none"
-                              />
-                            )}
                           </button>
                         )}
                       </td>
@@ -365,24 +336,18 @@ export function WorkflowEditor({
             </tbody>
           </table>
 
-          <div className="mt-16 flex items-center gap-12 px-10 py-6 bg-white/[0.01] rounded-[2.5rem] border border-white/5 shadow-inner">
-            <div className="flex items-center gap-4">
-              <div className="h-4 w-4 rounded-full bg-emerald-500 shadow-glow-emerald" />
-              <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">
-                Authorized Pathway
-              </span>
+          <div className="mt-8 flex flex-wrap items-center gap-6 px-6 py-4 bg-[color:var(--color-surface-alt)]/40 rounded-xl border border-surface-border shadow-inner">
+            <div className="flex items-center gap-3">
+              <div className="h-3 w-3 rounded-full bg-emerald-500" />
+              <span className="text-sm text-[color:var(--color-muted)]">Allowed</span>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="h-4 w-4 rounded-full bg-white/5 border border-white/10" />
-              <span className="text-[10px] font-black text-white/10 uppercase tracking-[0.3em]">
-                Restricted Pathway
-              </span>
+            <div className="flex items-center gap-3">
+              <div className="h-3 w-3 rounded-full bg-black/10 border border-surface-border" />
+              <span className="text-sm text-[color:var(--color-muted)]">Not allowed</span>
             </div>
-            <div className="ml-auto flex items-center gap-3">
-              <Cpu size={14} className="text-white/10" />
-              <span className="text-[9px] font-black text-white/5 uppercase tracking-[0.5em]">
-                LOGIC_LAYER_4_ACTIVE
-              </span>
+            <div className="ml-auto flex items-center gap-2 text-xs text-[color:var(--color-faint)]">
+              <Cpu size={14} className="text-[color:var(--color-faint)]" />
+              Matrix editable
             </div>
           </div>
         </div>

@@ -4,14 +4,14 @@ import { describe, it } from 'node:test';
 import { WorkflowService } from '../../src/modules/workflow/workflow.service';
 import { ProjectService } from '../../src/modules/project/project.service';
 
-type PrismaMock = Record<string, any>;
+type PrismaMock = Record<string, unknown>;
 
 describe('Workflow Status Policy', () => {
   describe('WorkflowService', () => {
     it('validateTransition allows valid transition', async () => {
       const prisma = {
         projectWorkflowStatus: {
-          findFirst: async ({ where }: any) => {
+          findFirst: async ({ where }: { where: Record<string, unknown> }) => {
             if (where.key === 'todo') return { id: 's1', name: 'Todo' };
             if (where.key === 'in_progress') return { id: 's2', name: 'In Progress' };
             return null;
@@ -22,14 +22,14 @@ describe('Workflow Status Policy', () => {
         },
       } satisfies PrismaMock;
 
-      const service = new WorkflowService(prisma as any);
+      const service = new WorkflowService(prisma as never);
       await assert.doesNotReject(() => service.validateTransition('p1', 'todo', 'in_progress'));
     });
 
     it('validateTransition throws BadRequest for invalid transition', async () => {
       const prisma = {
         projectWorkflowStatus: {
-          findFirst: async ({ where }: any) => {
+          findFirst: async ({ where }: { where: Record<string, unknown> }) => {
             if (where.key === 'todo') return { id: 's1', name: 'Todo' };
             if (where.key === 'done') return { id: 's3', name: 'Done' };
             return null;
@@ -40,10 +40,10 @@ describe('Workflow Status Policy', () => {
         },
       } satisfies PrismaMock;
 
-      const service = new WorkflowService(prisma as any);
+      const service = new WorkflowService(prisma as never);
       await assert.rejects(
         () => service.validateTransition('p1', 'todo', 'done'),
-        (error: any) => {
+        (error: unknown) => {
           assert.ok(error instanceof BadRequestException);
           assert.match(error.message, /không cho phép chuyển đổi từ "Todo" sang "Done"/);
           return true;
@@ -56,6 +56,7 @@ describe('Workflow Status Policy', () => {
     it('createProject triggers template cloning', async () => {
       let cloneCalled = false;
       const prisma = {
+        $executeRaw: async () => undefined,
         project: {
           create: async () => ({
             id: 'p-new',
@@ -74,7 +75,7 @@ describe('Workflow Status Policy', () => {
         cloneWorkspaceTemplateToProject: async () => {
           cloneCalled = true;
         },
-      } satisfies Record<string, any>;
+      } satisfies Record<string, unknown>;
 
       const noopRedisService = {
         del: async () => undefined,
@@ -85,12 +86,12 @@ describe('Workflow Status Policy', () => {
       const noopAutomationService = { handleTaskEvent: async () => undefined };
 
       const service = new ProjectService(
-        prisma as any,
-        {} as any,
-        workflowService as any,
-        noopAiService as any,
-        noopRedisService as any,
-        noopAutomationService as any,
+        prisma as never,
+        {} as never,
+        workflowService as never,
+        noopAiService as never,
+        noopRedisService as never,
+        noopAutomationService as never,
       );
 
       await service.createProject('w1', { name: 'New Project' });

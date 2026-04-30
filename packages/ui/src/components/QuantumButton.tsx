@@ -40,7 +40,6 @@ export function QuantumButton({
 
   return (
     <motion.button
-      whileTap={{ scale: 0.98 }}
       className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className} ${
         loading ? 'cursor-wait' : ''
       }`}

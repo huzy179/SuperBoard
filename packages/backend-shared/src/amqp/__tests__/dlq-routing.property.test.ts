@@ -12,6 +12,15 @@ import type { ConsumeMessage } from 'amqplib';
 import { BaseAMQPConsumer } from '../base-consumer';
 import type { AMQPConfig, DeadLetterQueueConfig } from '../types';
 
+type ExposedConsumer = {
+  channel: {
+    publish: (ex: string, rk: string, buf: Buffer, options: Record<string, unknown>) => boolean;
+    ack: () => void;
+    nack: () => void;
+  };
+  onMessage: (msg: ConsumeMessage) => Promise<void>;
+};
+
 class FailingConsumer extends BaseAMQPConsumer<Record<string, unknown>> {
   protected async processMessage(): Promise<void> {
     throw new Error('boom');
@@ -31,13 +40,12 @@ function buildConsumeMessage(params: {
       redelivered: false,
       exchange: params.exchange,
       routingKey: params.routingKey,
-       
-    } as any,
+    } as unknown as ConsumeMessage['fields'],
     properties: {
       correlationId: params.correlationId,
       headers: {},
     },
-  } as ConsumeMessage;
+  } as unknown as ConsumeMessage;
 }
 
 describe('Property 8: Dead Letter Queue Routing Consistency', () => {
@@ -68,7 +76,7 @@ describe('Property 8: Dead Letter Queue Routing Consistency', () => {
             exchange: string;
             routingKey: string;
             content: string;
-            options: any;
+            options: Record<string, unknown>;
           } | null = null;
           let acked = false;
           let nacked = false;
@@ -87,9 +95,8 @@ describe('Property 8: Dead Letter Queue Routing Consistency', () => {
           });
 
           // Inject stub channel
-           
-          (consumer as any).channel = {
-            publish: (ex: string, rk: string, buf: Buffer, options: any) => {
+          (consumer as unknown as ExposedConsumer).channel = {
+            publish: (ex: string, rk: string, buf: Buffer, options: Record<string, unknown>) => {
               published = { exchange: ex, routingKey: rk, content: buf.toString('utf8'), options };
               return true;
             },
@@ -108,8 +115,7 @@ describe('Property 8: Dead Letter Queue Routing Consistency', () => {
             exchange,
           });
 
-           
-          await (consumer as any).onMessage(msg);
+          await (consumer as unknown as ExposedConsumer).onMessage(msg);
 
           expect(acked).toBe(true);
           expect(nacked).toBe(false);
@@ -117,7 +123,9 @@ describe('Property 8: Dead Letter Queue Routing Consistency', () => {
           expect(published!.exchange).toBe(deadLetter.exchange);
           expect(published!.routingKey).toBe(deadLetter.routingKey);
           expect(published!.options.correlationId).toBe(correlationId);
-          expect(published!.options.headers['x-original-queue']).toBe(queue);
+          expect((published!.options.headers as Record<string, unknown>)['x-original-queue']).toBe(
+            queue,
+          );
 
           const parsed = JSON.parse(published!.content) as {
             error: { message: string };
@@ -159,8 +167,7 @@ describe('Property 8: Dead Letter Queue Routing Consistency', () => {
     let acked = false;
     let nacked = false;
 
-     
-    (consumer as any).channel = {
+    (consumer as unknown as ExposedConsumer).channel = {
       publish: () => {
         throw new Error('publish failed');
       },
@@ -179,8 +186,7 @@ describe('Property 8: Dead Letter Queue Routing Consistency', () => {
       exchange: 'ex',
     });
 
-     
-    await (consumer as any).onMessage(msg);
+    await (consumer as unknown as ExposedConsumer).onMessage(msg);
 
     expect(acked).toBe(false);
     expect(nacked).toBe(true);

@@ -9,31 +9,31 @@ import { GlobalExceptionFilter } from '../filters';
 import { ValidationError } from '../error-types';
 
 function makeHost() {
-  const res: any = {
+  const res = {
     statusCode: 200,
-    body: null as any,
+    body: null as unknown,
     status(code: number) {
       this.statusCode = code;
       return this;
     },
-    json(body: any) {
+    json(body: unknown) {
       this.body = body;
       return this;
     },
   };
 
-  const req: any = {
+  const req = {
     method: 'GET',
     url: '/test',
     headers: {},
   };
 
-  const host: any = {
+  const host = {
     switchToHttp: () => ({
       getResponse: () => res,
       getRequest: () => req,
     }),
-  };
+  } as unknown as import('@nestjs/common').ArgumentsHost;
 
   return { host, req, res };
 }
@@ -51,12 +51,13 @@ describe('Property 10: Error Response Standardization', () => {
           filter.catch(new ValidationError(message, correlationId), host);
 
           expect(res.statusCode).toBeGreaterThanOrEqual(400);
-          expect(res.body).toHaveProperty('error');
-          expect(res.body.error).toHaveProperty('message', message);
-          expect(res.body.error).toHaveProperty('correlationId', correlationId);
-          expect(res.body.error).toHaveProperty('timestamp');
-          expect(res.body.error).toHaveProperty('type');
-          expect(res.body.error).toHaveProperty('severity');
+          const body = res.body as { error: Record<string, unknown> };
+          expect(body).toHaveProperty('error');
+          expect(body.error).toHaveProperty('message', message);
+          expect(body.error).toHaveProperty('correlationId', correlationId);
+          expect(body.error).toHaveProperty('timestamp');
+          expect(body.error).toHaveProperty('type');
+          expect(body.error).toHaveProperty('severity');
         },
       ),
       { numRuns: 100 },

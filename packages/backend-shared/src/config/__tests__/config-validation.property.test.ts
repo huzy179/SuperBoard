@@ -13,9 +13,6 @@ import { z } from 'zod';
 import { ConfigService, ConfigurationValidationError } from '../config.service';
 import { AMQPConfigSchema, RedisConfigSchema } from '../validators';
 
-// Use global Jest types with local assignments to help IDE discovery
-const { describe, it, expect } = global as any;
-
 describe('Property 4: Configuration Validation Completeness', () => {
   /**
    * Test generators for various configuration types
@@ -89,7 +86,7 @@ describe('Property 4: Configuration Validation Completeness', () => {
         // Create ConfigService with AMQP schema
         const configService = new ConfigService({
           schema: AMQPConfigSchema,
-          envOverrides: config as any,
+          envOverrides: config as Record<string, unknown>,
           validateOnLoad: true,
         });
 
@@ -128,18 +125,19 @@ describe('Property 4: Configuration Validation Completeness', () => {
           });
         } catch (error: unknown) {
           expect(error).toBeInstanceOf(ConfigurationValidationError);
-          expect((error as any).message).toContain('Configuration validation failed');
-          expect((error as any).validationErrors).toBeDefined();
-          expect(Array.isArray((error as any).validationErrors)).toBe(true);
-          expect((error as any).validationErrors.length).toBeGreaterThan(0);
+          const validationError = error as ConfigurationValidationError;
+          expect(validationError.message).toContain('Configuration validation failed');
+          expect(validationError.validationErrors).toBeDefined();
+          expect(Array.isArray(validationError.validationErrors)).toBe(true);
+          expect(validationError.validationErrors.length).toBeGreaterThan(0);
 
           // Each validation error should have descriptive information
-          (error as ConfigurationValidationError).validationErrors.forEach(
-            (validationError: any) => {
-              expect(validationError).toHaveProperty('path');
-              expect(validationError).toHaveProperty('message');
-              expect(typeof validationError.message).toBe('string');
-              expect((validationError.message as string).length).toBeGreaterThan(0);
+          validationError.validationErrors.forEach(
+            (err: { path: (string | number)[]; message: string }) => {
+              expect(err).toHaveProperty('path');
+              expect(err).toHaveProperty('message');
+              expect(typeof err.message).toBe('string');
+              expect(err.message.length).toBeGreaterThan(0);
             },
           );
         }
@@ -170,8 +168,8 @@ describe('Property 4: Configuration Validation Completeness', () => {
           expect(configService.getAll()).toBeDefined();
 
           // All required fields should be accessible
-          Object.keys(config as any).forEach((key) => {
-            if ((config as any)[key] !== undefined) {
+          Object.keys(config as Record<string, unknown>).forEach((key) => {
+            if ((config as Record<string, unknown>)[key] !== undefined) {
               expect(configService.has(key as never)).toBe(true);
             }
           });
@@ -211,20 +209,23 @@ describe('Property 4: Configuration Validation Completeness', () => {
         } catch (error: unknown) {
           // Error should contain complete validation information
           expect(error).toBeInstanceOf(ConfigurationValidationError);
-          expect((error as any).message).toMatch(/Configuration validation failed:/);
+          const validationError = error as ConfigurationValidationError;
+          expect(validationError.message).toMatch(/Configuration validation failed:/);
 
           // Should have validation errors array
-          expect((error as any).validationErrors).toBeDefined();
-          expect(Array.isArray((error as any).validationErrors)).toBe(true);
+          expect(validationError.validationErrors).toBeDefined();
+          expect(Array.isArray(validationError.validationErrors)).toBe(true);
 
           // Each error should have path and message
-          (error as ConfigurationValidationError).validationErrors.forEach((err: any) => {
-            expect(err).toHaveProperty('path');
-            expect(err).toHaveProperty('message');
-            expect(Array.isArray(err.path)).toBe(true);
-            expect(typeof err.message).toBe('string');
-            expect((err.message as string).length).toBeGreaterThan(0);
-          });
+          validationError.validationErrors.forEach(
+            (err: { path: (string | number)[]; message: string }) => {
+              expect(err).toHaveProperty('path');
+              expect(err).toHaveProperty('message');
+              expect(Array.isArray(err.path)).toBe(true);
+              expect(typeof err.message).toBe('string');
+              expect(err.message.length).toBeGreaterThan(0);
+            },
+          );
         }
       }),
       { numRuns: 100 },
@@ -262,7 +263,7 @@ describe('Property 4: Configuration Validation Completeness', () => {
 
           // Should have type-specific error messages
           const errorMessages = (error as ConfigurationValidationError).validationErrors.map(
-            (err: any) => err.message as string,
+            (err: { message: string }) => err.message,
           );
           expect(
             errorMessages.some(

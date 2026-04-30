@@ -31,8 +31,7 @@ describe('SharedConfigService integration', () => {
       // Restore env
       for (const key of Object.keys(process.env)) {
         if (!(key in original)) {
-           
-          delete (process.env as any)[key];
+          delete process.env[key];
         }
       }
       Object.assign(process.env, original);

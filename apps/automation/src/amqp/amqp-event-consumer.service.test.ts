@@ -11,6 +11,12 @@ import { MetricsService } from '@superboard/backend-shared/metrics';
 import type { DomainEvent } from '@superboard/shared';
 import { AutomationAmqpConsumerService } from './automation-amqp-consumer.service';
 
+type ExposedConsumer = {
+  evaluateRules: () => Promise<void>;
+  channel: { ack: () => void; nack: () => void; publish: () => boolean };
+  onMessage: (msg: ConsumeMessage) => Promise<void>;
+};
+
 function makeConfigService(values: Record<string, string>) {
   return {
     get: (key: string) => values[key],
@@ -27,7 +33,7 @@ function buildEvent(eventType: string): DomainEvent {
     idempotencyKey: 'idem-1',
     occurredAt: new Date().toISOString(),
     payload: { taskId: 't1', projectId: 'p1', oldStatus: 'todo', newStatus: 'done' },
-  };
+  } as unknown as DomainEvent;
 }
 
 function buildConsumeMessage(body: unknown, correlationId: string = 'corr-1'): ConsumeMessage {
@@ -38,10 +44,9 @@ function buildConsumeMessage(body: unknown, correlationId: string = 'corr-1'): C
       redelivered: false,
       exchange: 'ex',
       routingKey: 'task.created',
-       
-    } as any,
+    } as unknown as ConsumeMessage['fields'],
     properties: { correlationId, headers: {} },
-  } as ConsumeMessage;
+  } as unknown as ConsumeMessage;
 }
 
 describe('AutomationAmqpConsumerService', () => {
@@ -61,13 +66,11 @@ describe('AutomationAmqpConsumerService', () => {
     let acked = false;
     let processed = false;
 
-     
-    (consumer as any).evaluateRules = async () => {
+    (consumer as unknown as ExposedConsumer).evaluateRules = async () => {
       processed = true;
     };
 
-     
-    (consumer as any).channel = {
+    (consumer as unknown as ExposedConsumer).channel = {
       ack: () => {
         acked = true;
       },
@@ -78,8 +81,7 @@ describe('AutomationAmqpConsumerService', () => {
     };
 
     const msg = buildConsumeMessage(buildEvent('task.created'));
-     
-    await (consumer as any).onMessage(msg);
+    await (consumer as unknown as ExposedConsumer).onMessage(msg);
 
     assert.equal(processed, true);
     assert.equal(acked, true);
@@ -101,13 +103,11 @@ describe('AutomationAmqpConsumerService', () => {
     let acked = false;
     let processed = false;
 
-     
-    (consumer as any).evaluateRules = async () => {
+    (consumer as unknown as ExposedConsumer).evaluateRules = async () => {
       processed = true;
     };
 
-     
-    (consumer as any).channel = {
+    (consumer as unknown as ExposedConsumer).channel = {
       ack: () => {
         acked = true;
       },
@@ -118,8 +118,7 @@ describe('AutomationAmqpConsumerService', () => {
     };
 
     const msg = buildConsumeMessage(buildEvent('unsupported.event'));
-     
-    await (consumer as any).onMessage(msg);
+    await (consumer as unknown as ExposedConsumer).onMessage(msg);
 
     assert.equal(processed, false);
     assert.equal(acked, true);
@@ -141,13 +140,11 @@ describe('AutomationAmqpConsumerService', () => {
     let acked = false;
     let published = false;
 
-     
-    (consumer as any).evaluateRules = async () => {
+    (consumer as unknown as ExposedConsumer).evaluateRules = async () => {
       throw new Error('fail');
     };
 
-     
-    (consumer as any).channel = {
+    (consumer as unknown as ExposedConsumer).channel = {
       ack: () => {
         acked = true;
       },
@@ -161,8 +158,7 @@ describe('AutomationAmqpConsumerService', () => {
     };
 
     const msg = buildConsumeMessage(buildEvent('task.created'));
-     
-    await (consumer as any).onMessage(msg);
+    await (consumer as unknown as ExposedConsumer).onMessage(msg);
 
     assert.equal(published, true);
     assert.equal(acked, true);

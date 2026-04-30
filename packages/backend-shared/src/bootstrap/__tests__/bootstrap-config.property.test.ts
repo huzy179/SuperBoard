@@ -14,7 +14,10 @@ describe('Property 11: Bootstrap Configuration Consistency', () => {
         fc.oneof(fc.constant(undefined), fc.integer({ min: -1000, max: 70000 })),
         fc.oneof(fc.constant(undefined), fc.string({ minLength: 0, maxLength: 6 })),
         async (configPort, envPort) => {
-          const port = resolveListenPort(configPort as any, envPort as any);
+          const port = resolveListenPort(
+            configPort as number | undefined,
+            envPort as string | undefined,
+          );
           expect(typeof port).toBe('number');
           expect(Number.isFinite(port)).toBe(true);
           expect(port).toBeGreaterThan(0);

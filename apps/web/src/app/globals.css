@@ -296,8 +296,7 @@ textarea {
     background-color 160ms var(--ease-in-out),
     border-color 160ms var(--ease-in-out),
     color 160ms var(--ease-in-out),
-    box-shadow 200ms var(--ease-in-out),
-    transform 200ms var(--ease-in-out);
+    box-shadow 200ms var(--ease-in-out);
 }
 
 /* Tabular nums for dashboard numbers */

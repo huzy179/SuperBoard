@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import type { ReactNode } from 'react';
 
 interface QuantumCardProps {
@@ -25,14 +24,13 @@ export function QuantumCard({
   };
 
   return (
-    <motion.div
-      whileHover={hoverEffect ? { transition: { duration: 0.15, ease: [0.2, 0, 0, 1] } } : {}}
+    <div
       className={`group relative rounded-card border border-surface-border bg-surface-card shadow-luxe transition-shadow duration-150 ${
         hoverEffect ? 'hover:shadow-glass' : ''
       } ${glows[glowColor]} ${className}`}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 

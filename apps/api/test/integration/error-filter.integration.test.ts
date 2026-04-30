@@ -11,7 +11,7 @@ function makeHost(params: { correlationId?: string } = {}) {
   let statusCode = 200;
   let body: unknown;
 
-  const res: any = {
+  const res = {
     status(code: number) {
       statusCode = code;
       return res;
@@ -24,7 +24,7 @@ function makeHost(params: { correlationId?: string } = {}) {
     getBody: () => body,
   };
 
-  const req: any = {
+  const req = {
     method: 'GET',
     url: '/test',
     headers: {
@@ -33,12 +33,12 @@ function makeHost(params: { correlationId?: string } = {}) {
     body: {},
   };
 
-  const host: any = {
+  const host = {
     switchToHttp: () => ({
       getRequest: () => req,
       getResponse: () => res,
     }),
-  };
+  } as unknown as import('@nestjs/common').ArgumentsHost;
 
   return { host, res };
 }
@@ -51,7 +51,12 @@ describe('ApiGlobalExceptionFilter integration', () => {
     filter.catch(new BadRequestException('bad'), host);
 
     assert.equal(res.getStatusCode(), 400);
-    const body = res.getBody() as any;
+    const body = res.getBody() as {
+      success: boolean;
+      data: unknown;
+      error: { code: string; message: string };
+      meta: { correlationId: string; timestamp: string };
+    };
     assert.equal(body.success, false);
     assert.equal(body.data, null);
     assert.equal(body.error.code, 'VALIDATION_FAILED');

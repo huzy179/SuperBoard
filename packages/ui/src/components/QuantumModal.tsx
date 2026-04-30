@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
@@ -30,6 +30,7 @@ export function QuantumModal({
   size = 'md',
   showCloseButton = true,
 }: QuantumModalProps) {
+  const shouldReduceMotion = useReducedMotion();
   // Prevent body scroll
   useEffect(() => {
     if (isOpen) {
@@ -57,10 +58,12 @@ export function QuantumModal({
 
           {/* Modal Container */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.98, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: 10 }}
-            transition={{ duration: 0.18, ease: [0.2, 0, 0, 1] }}
+            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: 10 }}
+            animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: 10 }}
+            transition={
+              shouldReduceMotion ? { duration: 0.01 } : { duration: 0.18, ease: [0.2, 0, 0, 1] }
+            }
             className={`relative w-full ${sizeClasses[size]} overflow-hidden rounded-lg border border-surface-border bg-surface-card shadow-glass`}
           >
             {/* Interior Content */}

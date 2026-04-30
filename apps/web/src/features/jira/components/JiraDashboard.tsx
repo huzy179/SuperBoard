@@ -75,9 +75,7 @@ export function JiraDashboard() {
 
         {/* Global Neural Digest */}
         {user?.defaultWorkspaceId && (
-          <div className="animate-in fade-in zoom-in-95 duration-700">
-            <NeuralWorkspaceDigest workspaceId={user.defaultWorkspaceId} />
-          </div>
+          <NeuralWorkspaceDigest workspaceId={user.defaultWorkspaceId} />
         )}
 
         {/* Command Gateway - Search & Filters */}
@@ -111,7 +109,7 @@ export function JiraDashboard() {
               <div className="relative">
                 <SortAsc
                   size={12}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-[color:var(--color-faint)] pointer-events-none"
                 />
                 <select
                   value={sortKey}

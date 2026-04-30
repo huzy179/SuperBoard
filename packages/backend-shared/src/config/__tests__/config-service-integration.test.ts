@@ -400,7 +400,7 @@ describe('ConfigService Integration with File Loaders', () => {
       });
 
       expect(configService.has('url')).toBe(true);
-      expect(configService.has('nonexistent' as any)).toBe(false);
+      expect(configService.has('nonexistent' as never)).toBe(false);
     });
   });
 

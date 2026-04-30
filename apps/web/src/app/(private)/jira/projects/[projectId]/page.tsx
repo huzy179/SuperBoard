@@ -304,12 +304,8 @@ function ProjectDetailPageContent() {
     );
 
   return (
-    <section className="flex flex-col gap-6 p-6 min-h-screen relative overflow-hidden bg-slate-950">
-      {/* Neural Aura Backgrounds */}
-      <div className="absolute top-0 left-1/4 w-[800px] h-[800px] bg-brand-500/5 blur-[160px] rounded-full pointer-events-none -translate-y-1/2" />
-      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-indigo-500/5 blur-[140px] rounded-full pointer-events-none translate-y-1/2" />
-
-      <div className="relative z-10 flex flex-col gap-8">
+    <section className="flex flex-col gap-6 p-6 min-h-screen bg-surface-bg">
+      <div className="flex flex-col gap-8">
         <div className="flex items-center justify-between gap-4">
           <ProjectDetailHeader
             project={project!}

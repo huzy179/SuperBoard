@@ -191,8 +191,8 @@ describe('Property 2: Configuration Round-trip Consistency', () => {
     }
 
     // Compare object keys
-    const originalKeys = Object.keys(original as any).sort();
-    const deserializedKeys = Object.keys(deserialized as any).sort();
+    const originalKeys = Object.keys(original as Record<string, unknown>).sort();
+    const deserializedKeys = Object.keys(deserialized as Record<string, unknown>).sort();
 
     if (originalKeys.length !== deserializedKeys.length) {
       return false;
@@ -358,12 +358,14 @@ describe('Property 2: Configuration Round-trip Consistency', () => {
 
         // Verify all required fields are preserved
         expect(deserialized).toHaveProperty('endpoints');
-        expect((deserialized as any).endpoints).toHaveProperty('health');
-        expect((deserialized as any).endpoints).toHaveProperty('ready');
+        const typedDeserialized = deserialized as { endpoints: { health: string; ready: string } };
+        const typedConfig = config as { endpoints: { health: string; ready: string } };
+        expect(typedDeserialized.endpoints).toHaveProperty('health');
+        expect(typedDeserialized.endpoints).toHaveProperty('ready');
 
         // Verify values match
-        expect((deserialized as any).endpoints.health).toBe((config as any).endpoints.health);
-        expect((deserialized as any).endpoints.ready).toBe((config as any).endpoints.ready);
+        expect(typedDeserialized.endpoints.health).toBe(typedConfig.endpoints.health);
+        expect(typedDeserialized.endpoints.ready).toBe(typedConfig.endpoints.ready);
       }),
       { numRuns: 100 },
     );
@@ -552,14 +554,15 @@ describe('Property 2: Configuration Round-trip Consistency', () => {
           // Deserialize from JSON
           const deserialized = deserializeConfig(serialized);
 
-          // Verify array preservation
-          expect(Array.isArray((deserialized as any).routingKeys)).toBe(true);
-          expect((deserialized as any).routingKeys.length).toBe((config as any).routingKeys.length);
-          expect((deserialized as any).routingKeys).toEqual((config as any).routingKeys);
+          const typedDeserialized = deserialized as { routingKeys: string[] };
+          const typedConfig = config as { routingKeys: string[] };
+          expect(Array.isArray(typedDeserialized.routingKeys)).toBe(true);
+          expect(typedDeserialized.routingKeys.length).toBe(typedConfig.routingKeys.length);
+          expect(typedDeserialized.routingKeys).toEqual(typedConfig.routingKeys);
 
           // Verify each element
-          (deserialized as any).routingKeys.forEach((key: string, index: number) => {
-            expect(key).toBe((config as any).routingKeys[index]);
+          typedDeserialized.routingKeys.forEach((key: string, index: number) => {
+            expect(key).toBe(typedConfig.routingKeys[index]);
           });
         },
       ),

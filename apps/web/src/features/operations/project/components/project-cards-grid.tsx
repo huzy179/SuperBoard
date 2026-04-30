@@ -35,12 +35,11 @@ export function ProjectCardsGrid({
   const router = useRouter();
 
   return (
-    <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
-      {projects.map((project, index) => (
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {projects.map((project) => (
         <ProjectCard
           key={project.id}
           project={project}
-          index={index}
           onOpen={(href) => router.push(href)}
           onOpenEdit={onOpenEdit}
           onArchive={onArchive}
@@ -57,23 +56,17 @@ export function ProjectCardsGrid({
         <button
           type="button"
           onClick={onOpenCreate}
-          className="group relative flex flex-col items-center justify-center gap-6 rounded-[2.5rem] border-2 border-dashed border-white/5 bg-white/[0.02] p-10 transition-all duration-500 hover:border-brand-500/50 hover:bg-white/[0.05] hover:scale-[1.02] active:scale-[0.98] min-h-[380px]"
+          className="group relative flex min-h-[320px] flex-col items-center justify-center gap-4 rounded-card border-2 border-dashed border-surface-border bg-surface-card p-10 transition-colors hover:bg-[color:var(--color-surface-alt)]/55"
         >
-          <div className="relative p-6 bg-slate-900 rounded-xl border border-white/5 group-hover:bg-brand-500/10 group-hover:border-brand-500/20 transition-all duration-500 group-hover:shadow-glow-brand">
-            <Plus
-              size={32}
-              className="text-white/20 group-hover:text-brand-400 group-hover:scale-110 transition-all duration-500"
-            />
+          <div className="relative p-4 bg-brand-50 rounded-xl border border-brand-500/15 transition-colors group-hover:bg-brand-100">
+            <Plus size={24} className="text-brand-500" />
           </div>
           <div className="text-center space-y-2">
-            <p className="text-sm font-black text-white/40 uppercase tracking-[0.2em] group-hover:text-white transition-colors">
-              Initialize New Node
-            </p>
-            <p className="text-[10px] font-medium text-white/20 uppercase tracking-widest italic leading-relaxed px-6">
-              Establish a new operational vector within the workspace.
+            <p className="text-base font-semibold text-[color:var(--color-ink)]">New project</p>
+            <p className="text-sm text-[color:var(--color-muted)] leading-relaxed px-6">
+              Tạo project mới để bắt đầu quản lý công việc.
             </p>
           </div>
-          <div className="absolute inset-0 bg-brand-500/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-[2.5rem] blur-2xl" />
         </button>
       )}
     </div>

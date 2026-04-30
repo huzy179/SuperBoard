@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
-  Share2,
-  Plus,
-  Trash2,
+  Construction,
   ExternalLink,
   Globe,
   MessageCircle,
-  Construction,
+  Plus,
+  Share2,
+  Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -26,7 +26,7 @@ export function ConnectHub({ workspaceId }: { workspaceId: string }) {
       const body = await getIntegrations(workspaceId);
       setIntegrations(body.integrations);
     } catch {
-      toast.error('Failed to fetch integrations');
+      toast.error('Không tải được danh sách kết nối');
     }
   }, [workspaceId]);
 
@@ -37,142 +37,147 @@ export function ConnectHub({ workspaceId }: { workspaceId: string }) {
   const deleteIntegration = async (id: string) => {
     try {
       await disconnectIntegration(workspaceId, id);
-      toast.success('Integration disconnected');
+      toast.success('Đã ngắt kết nối');
       fetchIntegrations();
     } catch {
-      toast.error('Failed to disconnect');
+      toast.error('Không thể ngắt kết nối');
     }
   };
 
   const getProviderIcon = (provider: string) => {
     switch (provider) {
       case 'SLACK':
-        return <MessageCircle className="text-[#4A154B]" />;
+        return <MessageCircle className="text-[#4A154B]" size={18} />;
       case 'GITHUB':
-        return <Globe className="text-white" />;
+        return <Globe className="text-[color:var(--color-ink)]" size={18} />;
       case 'DISCORD':
-        return <MessageCircle className="text-[#5865F2]" />;
+        return <MessageCircle className="text-[#5865F2]" size={18} />;
       default:
-        return <Globe />;
+        return <Globe className="text-[color:var(--color-muted)]" size={18} />;
     }
   };
 
   return (
-    <div className="flex flex-col gap-10 p-10 bg-black/40 rounded-[3rem] border border-white/5 font-sans min-h-[800px]">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-6">
-          <div className="w-16 h-16 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-glow-indigo">
-            <Share2 size={32} />
+    <section className="rounded-xl border border-surface-border bg-surface-card shadow-luxe p-6 space-y-6">
+      <header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-lg bg-brand-50 border border-brand-200 text-brand-700 flex items-center justify-center">
+            <Share2 size={22} />
           </div>
           <div>
-            <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter italic">
-              SuperBoard Kết nối
+            <h2 className="text-xl font-semibold text-[color:var(--color-ink)] tracking-tight">
+              Kết nối
             </h2>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
-                Giao diện kết nối dịch vụ
-              </span>
-              <div className="h-1 w-1 bg-indigo-500 rounded-full animate-pulse" />
-              <span className="text-[9px] font-bold text-indigo-400/60 uppercase">Đã kết nối</span>
-            </div>
+            <p className="mt-1 text-sm text-[color:var(--color-muted)] leading-relaxed">
+              Quản lý các tích hợp (Slack, GitHub, Discord…) cho workspace.
+            </p>
           </div>
         </div>
 
-        <div className="flex gap-2 p-1.5 rounded-lg bg-white/5 border border-white/5">
+        <div className="inline-flex items-center gap-1 rounded-lg border border-surface-border bg-black/[0.02] p-1">
           <button
+            type="button"
             onClick={() => setActiveTab('connections')}
-            className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'connections' ? 'bg-white/10 text-white border border-white/10' : 'text-white/40 hover:text-white'}`}
+            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'connections'
+                ? 'bg-surface-card border border-surface-border shadow-glass text-[color:var(--color-ink)]'
+                : 'text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)]'
+            }`}
           >
             Kết nối
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab('monitor')}
-            className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'monitor' ? 'bg-white/10 text-white border border-white/10' : 'text-white/40 hover:text-white'}`}
+            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'monitor'
+                ? 'bg-surface-card border border-surface-border shadow-glass text-[color:var(--color-ink)]'
+                : 'text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)]'
+            }`}
           >
             Giám sát
           </button>
         </div>
-      </div>
+      </header>
 
       {activeTab === 'connections' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Add New Hook */}
-          <div className="group cursor-pointer p-8 rounded-[2.5rem] bg-indigo-500/5 border border-indigo-500/10 hover:border-indigo-500/40 transition-all flex flex-col items-center justify-center gap-4 text-center border-dashed">
-            <div className="w-14 h-14 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
-              <Plus size={24} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <button
+            type="button"
+            className="group rounded-xl border border-dashed border-surface-border bg-black/[0.02] p-6 text-left hover:bg-black/[0.03] transition-colors"
+            onClick={() => toast.info('Tính năng thêm kết nối sẽ được bổ sung.')}
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-surface-card border border-surface-border flex items-center justify-center text-brand-700">
+                <Plus size={18} />
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-[color:var(--color-ink)]">
+                  Thêm kết nối
+                </div>
+                <div className="mt-1 text-sm text-[color:var(--color-muted)]">
+                  Kết nối dịch vụ mới vào workspace.
+                </div>
+              </div>
             </div>
-            <div>
-              <span className="text-sm font-black text-white uppercase tracking-tighter">
-                Thêm kết nối
-              </span>
-              <p className="text-[10px] font-medium text-white/20 uppercase tracking-widest mt-1 leading-relaxed">
-                Kết nối dịch vụ mới vào workspace
-              </p>
-            </div>
-          </div>
+          </button>
 
           {integrations.map((integration) => (
             <div
               key={integration.id}
-              className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all flex flex-col gap-6 group relative overflow-hidden"
+              className="rounded-xl border border-surface-border bg-surface-card p-6 shadow-glass flex flex-col gap-5"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl -mr-16 -mt-16 group-hover:bg-indigo-500/10 transition-colors" />
-
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center">
+              <div className="flex items-center justify-between gap-3">
+                <div className="w-10 h-10 rounded-lg bg-black/[0.02] border border-surface-border flex items-center justify-center">
                   {getProviderIcon(integration.provider)}
                 </div>
-                <div
-                  className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                <span
+                  className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold ${
                     integration.status === 'active'
-                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                      : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                      : 'bg-rose-50 text-rose-800 border-rose-200'
                   }`}
                 >
                   {integration.status}
+                </span>
+              </div>
+
+              <div className="min-w-0">
+                <div className="text-base font-semibold text-[color:var(--color-ink)] truncate">
+                  {integration.name}
+                </div>
+                <div className="mt-1 text-sm text-[color:var(--color-muted)]">
+                  {integration.type}
                 </div>
               </div>
 
-              <div className="flex flex-col">
-                <span className="text-lg font-black text-white uppercase italic tracking-tighter">
-                  {integration.name}
-                </span>
-                <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] mt-1">
-                  {integration.type}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between mt-4">
-                <button className="flex items-center gap-2 text-[10px] font-black text-white/40 uppercase tracking-widest hover:text-white transition-colors">
-                  Cấu hình <ExternalLink size={12} />
+              <div className="mt-auto flex items-center justify-between gap-3">
+                <button type="button" className="btn btn-secondary">
+                  Cấu hình <ExternalLink size={16} />
                 </button>
                 <button
+                  type="button"
                   onClick={() => deleteIntegration(integration.id)}
-                  className="p-2.5 rounded-xl bg-rose-500/5 text-rose-400 opacity-0 group-hover:opacity-100 transition-all hover:bg-rose-500/20"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-transparent text-rose-700 hover:bg-rose-50 hover:border-rose-200 transition-colors"
+                  aria-label="Disconnect"
                 >
-                  <Trash2 size={14} />
+                  <Trash2 size={16} />
                 </button>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        /* Neural Monitor / Giám sát — empty state */
-        <div className="flex-1 flex flex-col items-center justify-center gap-6 p-20">
-          <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/20">
-            <Construction size={40} />
-          </div>
-          <div className="text-center">
-            <h3 className="text-white font-black text-xl uppercase tracking-widest mb-2">
-              Tính năng đang phát triển
-            </h3>
-            <p className="text-white/30 text-sm font-medium">
-              Chức năng giám sát sẽ sớm được cập nhật
-            </p>
-          </div>
+        <div className="rounded-xl border border-surface-border bg-black/[0.02] p-10 text-center">
+          <Construction size={36} className="mx-auto text-[color:var(--color-faint)]" />
+          <h3 className="mt-3 text-base font-semibold text-[color:var(--color-ink)]">
+            Tính năng đang phát triển
+          </h3>
+          <p className="mt-1 text-sm text-[color:var(--color-muted)]">
+            Chức năng giám sát sẽ sớm được cập nhật.
+          </p>
         </div>
       )}
-    </div>
+    </section>
   );
 }

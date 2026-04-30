@@ -69,32 +69,28 @@ export function NeuralQaDashboard() {
   };
 
   return (
-    <div className="flex flex-col gap-10 p-10 bg-slate-950 font-sans min-h-screen">
+    <div className="flex flex-col gap-8 p-8 bg-surface-bg font-sans min-h-screen text-[color:var(--color-ink)]">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <div className="w-16 h-16 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shadow-glow-rose">
+          <div className="w-12 h-12 rounded-lg bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-700">
             <ShieldAlert size={32} />
           </div>
           <div className="flex flex-col">
-            <h1 className="text-4xl font-black text-white uppercase tracking-tighter italic">
-              Trung tâm QA
-            </h1>
-            <div className="flex items-center gap-3">
-              <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
-                Kiểm tra chất lượng tự động
-              </span>
-              <div className="h-1.5 w-1.5 bg-rose-500 rounded-full animate-ping" />
-              <span className="text-[10px] font-bold text-rose-500/80 uppercase tracking-widest leading-none">
-                HỆ THỐNG ĐANG HOẠT ĐỘNG
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Trung tâm QA</h1>
+            <div className="mt-1 flex items-center gap-3 text-sm text-[color:var(--color-muted)]">
+              <span>Kiểm tra chất lượng và chẩn đoán lỗi</span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" aria-hidden />
+                Đang hoạt động
               </span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-4 px-6 py-4 rounded-xl bg-white/5 border border-white/10 group">
-          <Activity size={16} className="text-emerald-400 animate-pulse" />
-          <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">
+        <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-black/[0.02] border border-surface-border">
+          <Activity size={16} className="text-[color:var(--color-muted)]" />
+          <span className="text-sm font-medium text-[color:var(--color-ink)]">
             Tình trạng hệ thống: 98.4%
           </span>
         </div>
@@ -104,11 +100,10 @@ export function NeuralQaDashboard() {
         {/* Error Feed */}
         <div className="space-y-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[11px] font-black text-white/30 uppercase tracking-[0.3em]">
-              Luồng sự cố trực tiếp
-            </h3>
-            <button className="text-[10px] font-bold text-rose-400 uppercase tracking-widest flex items-center gap-2 hover:text-rose-300 transition-colors">
-              Xóa bộ đệm <Terminal size={12} />
+            <h3 className="text-base font-semibold text-[color:var(--color-ink)]">Luồng sự cố</h3>
+            <button type="button" className="btn btn-secondary">
+              <Terminal size={16} />
+              Xóa bộ đệm
             </button>
           </div>
 
@@ -117,29 +112,31 @@ export function NeuralQaDashboard() {
               <div
                 key={error.id}
                 onClick={() => setSelectedError(error)}
-                className={`p-6 rounded-xl border transition-all cursor-pointer group select-none ${
+                className={`p-5 rounded-xl border transition-colors cursor-pointer select-none ${
                   selectedError?.id === error.id
-                    ? 'bg-rose-500/10 border-rose-500/30 shadow-glow-rose'
-                    : 'bg-white/5 border-white/5 hover:border-white/10'
+                    ? 'bg-rose-50 border-rose-200'
+                    : 'bg-surface-card border-surface-border hover:bg-black/[0.02]'
                 }`}
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <Bug
                       size={16}
-                      className={error.severity === 'critical' ? 'text-rose-400' : 'text-amber-400'}
+                      className={error.severity === 'critical' ? 'text-rose-700' : 'text-amber-700'}
                     />
-                    <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">
-                      {error.severity} incident
+                    <span className="text-xs font-medium text-[color:var(--color-muted)]">
+                      {error.severity === 'critical' ? 'Critical' : 'Warning'}
                     </span>
                   </div>
-                  <span className="text-[9px] font-medium text-white/20 uppercase tabular-nums">
+                  <span className="text-xs text-[color:var(--color-faint)] tabular-nums">
                     14:24:02 UTC
                   </span>
                 </div>
-                <h4 className="text-lg font-bold text-white mb-2 leading-tight">{error.message}</h4>
-                <div className="flex items-center gap-2 text-[10px] font-medium text-white/30 font-mono italic">
-                  <ChevronRight size={10} /> {error.url}
+                <h4 className="text-base font-semibold text-[color:var(--color-ink)] mb-2 leading-tight">
+                  {error.message}
+                </h4>
+                <div className="flex items-center gap-2 text-xs font-mono text-[color:var(--color-muted)]">
+                  <ChevronRight size={12} /> {error.url}
                 </div>
               </div>
             ))}
@@ -149,25 +146,25 @@ export function NeuralQaDashboard() {
         {/* Diagnostic Panel */}
         <div className="relative">
           {selectedError ? (
-            <div className="p-10 rounded-[3rem] bg-white/5 border border-white/10 backdrop-blur-3xl space-y-8 animate-in slide-in-from-right duration-500">
+            <div className="p-6 rounded-xl bg-surface-card border border-surface-border shadow-luxe space-y-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="p-4 rounded-lg bg-indigo-500/10 text-indigo-400">
+                  <div className="p-3 rounded-lg bg-brand-50 border border-brand-200 text-brand-700">
                     <FileSearch size={24} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-white uppercase italic tracking-tighter">
+                    <h3 className="text-lg font-semibold text-[color:var(--color-ink)] tracking-tight">
                       Chẩn đoán AI
                     </h3>
-                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-                      Quét logic Neural
+                    <p className="text-sm text-[color:var(--color-muted)]">
+                      Tạo gợi ý xử lý và tài liệu khắc phục
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => handleDiagnose(selectedError)}
                   disabled={!!isDiagnosing}
-                  className="flex items-center gap-3 px-6 py-3 rounded-lg bg-indigo-500/20 text-indigo-400 font-black text-[10px] uppercase tracking-widest hover:bg-indigo-500/30 transition-all shadow-glow-indigo disabled:opacity-50"
+                  className="btn btn-primary"
                 >
                   {isDiagnosing ? (
                     <RefreshCw className="animate-spin" size={14} />
@@ -178,12 +175,10 @@ export function NeuralQaDashboard() {
                 </button>
               </div>
 
-              <div className="p-8 rounded-xl bg-black/40 border border-white/5 font-mono text-[11px] text-white/60 leading-relaxed max-h-[400px] overflow-auto scrollbar-hide">
+              <div className="p-4 rounded-xl bg-black/[0.02] border border-surface-border font-mono text-xs text-[color:var(--color-muted)] leading-relaxed max-h-[400px] overflow-auto scrollbar-hide">
                 {selectedError.stack ? (
                   <div className="space-y-4">
-                    <div className="text-rose-400/80 font-bold tracking-tight mb-4 uppercase">
-                      [[ TRACE_BEGIN ]]
-                    </div>
+                    <div className="text-rose-700 font-semibold tracking-tight">Trace</div>
                     {selectedError.stack.split('\n').map((line, i) => (
                       <div key={i} className="whitespace-pre-wrap">
                         {line}
@@ -192,43 +187,39 @@ export function NeuralQaDashboard() {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-40 gap-4">
-                    <Code size={32} className="text-white/10" />
-                    <span className="uppercase tracking-[0.3em] text-white/20">
-                      Chờ tín hiệu...
-                    </span>
+                    <Code size={28} className="text-[color:var(--color-faint)]" />
+                    <span className="text-sm text-[color:var(--color-muted)]">Chưa có stack</span>
                   </div>
                 )}
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="p-6 rounded-xl bg-emerald-500/5 border border-emerald-500/20 space-y-2">
-                  <div className="flex items-center gap-2 text-emerald-400 mb-2">
+                <div className="p-5 rounded-xl bg-emerald-50 border border-emerald-200 space-y-2">
+                  <div className="flex items-center gap-2 text-emerald-800 mb-2">
                     <CheckCircle2 size={14} />
-                    <span className="text-[10px] font-black uppercase tracking-widest">
-                      Đề xuất sửa lỗi
-                    </span>
+                    <span className="text-sm font-semibold">Đề xuất sửa lỗi</span>
                   </div>
-                  <p className="text-[10px] font-medium text-white/40 leading-relaxed italic">
+                  <p className="text-sm text-emerald-900 leading-relaxed">
                     Regression detected in ProjectService. Suggesting validation middleware
                     injection at line 142.
                   </p>
                 </div>
-                <div className="p-6 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-white/10 transition-all">
-                  <Code
-                    size={20}
-                    className="text-indigo-400 mb-2 group-hover:scale-110 transition-transform"
-                  />
-                  <span className="text-[10px] font-black text-white uppercase tracking-widest">
+                <button
+                  type="button"
+                  className="p-5 rounded-xl bg-surface-card border border-surface-border flex flex-col items-center justify-center text-center hover:bg-black/[0.02] transition-colors"
+                >
+                  <Code size={20} className="text-[color:var(--color-muted)] mb-2" />
+                  <span className="text-sm font-semibold text-[color:var(--color-ink)]">
                     Mở trong IDE
                   </span>
-                </div>
+                </button>
               </div>
             </div>
           ) : (
-            <div className="h-full flex flex-col items-center justify-center opacity-20 filter grayscale">
-              <ShieldAlert size={80} className="text-white/10 mb-6" />
-              <span className="text-[11px] font-black text-white uppercase tracking-[0.5em]">
-                Chế độ chờ
+            <div className="h-full flex flex-col items-center justify-center rounded-xl border border-surface-border bg-black/[0.02] p-10 text-center">
+              <ShieldAlert size={48} className="text-[color:var(--color-faint)] mb-4" />
+              <span className="text-sm font-medium text-[color:var(--color-muted)]">
+                Chọn một sự cố để xem chi tiết.
               </span>
             </div>
           )}

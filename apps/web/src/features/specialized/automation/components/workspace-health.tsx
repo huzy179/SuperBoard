@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  Heart,
-  ShieldCheck,
-  Trash2,
-  Zap,
-  RefreshCw,
   ChevronRight,
   Clock,
   GitMerge,
+  Heart,
+  RefreshCw,
+  ShieldCheck,
+  Trash2,
+  Zap,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getAutomationHealth, healWorkspace, type HealthAction } from '../api/automation-service';
@@ -23,7 +23,7 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
       const body = await getAutomationHealth(workspaceId);
       setActions(body.actions);
     } catch {
-      toast.error('Failed to sync Workspace Health');
+      toast.error('Không tải được trạng thái Workspace Health');
     }
   }, [workspaceId]);
 
@@ -35,174 +35,151 @@ export function WorkspaceHealth({ workspaceId }: { workspaceId: string }) {
     setIsHealing(true);
     try {
       const body = await healWorkspace(workspaceId);
-      toast.success(`Healing complete: ${body.archived} items archived.`);
-      fetchHealth();
+      toast.success(`Hoàn tất: ${body.archived} mục đã được lưu trữ.`);
+      await fetchHealth();
     } catch {
-      toast.error('Healing cycle failed');
+      toast.error('Chạy dọn dẹp thất bại');
     } finally {
       setIsHealing(false);
     }
   };
 
-  const redundancyActions = actions.filter((a) => a.actionType === 'SUGGEST_MERGE');
-  const archivalActions = actions.filter((a) => a.actionType === 'AUTO_ARCHIVE');
+  const redundancyActions = useMemo(
+    () => actions.filter((a) => a.actionType === 'SUGGEST_MERGE'),
+    [actions],
+  );
+  const archivalActions = useMemo(
+    () => actions.filter((a) => a.actionType === 'AUTO_ARCHIVE'),
+    [actions],
+  );
 
   return (
-    <div className="flex flex-col gap-10 p-10 bg-black/40 rounded-[3rem] border border-white/5 font-sans min-h-[800px]">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-6">
-          <div className="w-16 h-16 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shadow-glow-rose">
-            <Heart size={32} className="animate-pulse" />
+    <section className="rounded-xl border border-surface-border bg-surface-card shadow-luxe p-6 space-y-6 font-sans">
+      <header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 flex items-center justify-center">
+            <Heart size={22} />
           </div>
           <div>
-            <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter">
-              Tự tổ chức theo dõi
+            <h2 className="text-xl font-semibold text-[color:var(--color-ink)] tracking-tight">
+              Workspace health
             </h2>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
-                Tự động cải thiện workspace
-              </span>
-              <div className="h-1 w-1 bg-emerald-500 rounded-full animate-ping" />
-              <span className="text-[9px] font-bold text-emerald-500/60 uppercase">
-                Hệ thống sẵn sàng
-              </span>
-            </div>
+            <p className="mt-1 text-sm text-[color:var(--color-muted)] leading-relaxed">
+              Gợi ý dọn dẹp và các sự kiện tự động để workspace gọn gàng, dễ dùng.
+            </p>
           </div>
         </div>
 
-        <button
-          onClick={handleHeal}
-          disabled={isHealing}
-          className="px-8 py-4 rounded-lg bg-indigo-600 text-white font-black text-[11px] uppercase tracking-[0.3em] flex items-center gap-3 hover:bg-indigo-500 transition-all shadow-glow-indigo disabled:opacity-50"
-        >
+        <button type="button" onClick={handleHeal} disabled={isHealing} className="btn btn-primary">
           {isHealing ? <RefreshCw className="animate-spin" size={16} /> : <Zap size={16} />}
-          Chạy dọn dẹp
+          {isHealing ? 'Đang chạy…' : 'Chạy dọn dẹp'}
         </button>
-      </div>
+      </header>
 
-      <div className="grid grid-cols-12 gap-10">
-        {/* Left: suggestions */}
-        <div className="col-span-12 lg:col-span-7 space-y-8">
-          <div className="flex items-center justify-between px-2">
-            <h3 className="text-[11px] font-black text-white/30 uppercase tracking-[0.4em]">
-              Gợi ý từ AI
-            </h3>
-            <span className="text-[10px] font-bold text-emerald-500 lowercase opacity-60 italic">
-              {redundancyActions.length} trùng lặp được phát hiện
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <section className="lg:col-span-7 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-semibold text-[color:var(--color-ink)]">Gợi ý</h3>
+            <span className="text-sm text-[color:var(--color-muted)]">
+              {redundancyActions.length} mục có thể gộp
             </span>
           </div>
 
-          <div className="space-y-4">
-            {redundancyActions.length > 0 ? (
-              redundancyActions.map((action) => (
+          {redundancyActions.length > 0 ? (
+            <div className="space-y-3">
+              {redundancyActions.map((action) => (
                 <div
                   key={action.id}
-                  className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all flex flex-col gap-6 relative overflow-hidden group"
+                  className="rounded-xl border border-surface-border bg-surface-card p-5 shadow-glass space-y-3"
                 >
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-500/5 blur-3xl -mr-20 -mt-20 group-hover:bg-indigo-500/10 transition-colors" />
-
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-                        <GitMerge size={22} />
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-lg bg-brand-50 border border-brand-200 text-brand-700 flex items-center justify-center">
+                        <GitMerge size={18} />
                       </div>
-                      <div className="flex flex-col">
-                        <span className="text-lg font-black text-white uppercase italic tracking-tighter">
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-[color:var(--color-ink)]">
                           Khuyến nghị gộp
-                        </span>
-                        <span className="text-[9px] font-black text-white/20 uppercase tracking-widest mt-1">
+                        </div>
+                        <div className="mt-1 text-xs text-[color:var(--color-muted)] tabular-nums">
                           Ref: {action.targetId.slice(0, 8)}
-                        </span>
+                        </div>
                       </div>
                     </div>
-                    <button className="p-3 rounded-xl bg-white/5 text-white/40 hover:text-white transition-all">
-                      <ChevronRight size={18} />
+                    <button type="button" className="btn btn-secondary px-3" title="Xem chi tiết">
+                      <ChevronRight size={16} />
                     </button>
                   </div>
 
-                  <p className="text-sm font-medium text-white/60 leading-relaxed pr-10">
+                  <p className="text-sm text-[color:var(--color-muted)] leading-relaxed">
                     {action.reason}
                   </p>
 
-                  <div className="flex items-center gap-4 mt-2">
-                    <button className="px-6 py-2.5 rounded-xl bg-indigo-600 text-[10px] font-black text-white uppercase tracking-widest hover:bg-indigo-500 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <button type="button" className="btn btn-primary">
                       Thực hiện gộp
                     </button>
-                    <button className="px-6 py-2.5 rounded-xl bg-white/5 text-[10px] font-black text-white/40 uppercase tracking-widest hover:text-white transition-colors">
-                      Bỏ qua tín hiệu
+                    <button type="button" className="btn btn-secondary">
+                      Bỏ qua
                     </button>
                   </div>
                 </div>
-              ))
-            ) : (
-              <div className="p-20 flex flex-col items-center justify-center gap-6 rounded-[2.5rem] bg-white/[0.01] border border-white/5 border-dashed">
-                <ShieldCheck size={60} className="text-white/10" />
-                <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">
-                  Không có trùng lặp
-                </span>
-              </div>
-            )}
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-surface-border bg-black/[0.02] p-10 text-center">
+              <ShieldCheck size={36} className="mx-auto text-[color:var(--color-faint)]" />
+              <p className="mt-3 text-sm font-medium text-[color:var(--color-muted)]">
+                Không phát hiện trùng lặp.
+              </p>
+            </div>
+          )}
+        </section>
+
+        <section className="lg:col-span-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-semibold text-[color:var(--color-ink)]">Nhịp dọn dẹp</h3>
+            <span className="text-sm text-[color:var(--color-muted)] tabular-nums">
+              {actions.length} events
+            </span>
           </div>
-        </div>
 
-        {/* Right: Archival Log */}
-        <div className="col-span-12 lg:col-span-5 flex flex-col gap-8">
-          <h3 className="text-[11px] font-black text-white/30 uppercase tracking-[0.4em] px-2 truncate">
-            Nhịp dọn dẹp
-          </h3>
-
-          <div className="flex-1 rounded-[2.5rem] bg-black/60 border border-white/10 p-8 flex flex-col gap-6 overflow-hidden">
-            <div className="flex-1 overflow-auto scrollbar-hide space-y-6">
-              {archivalActions.map((action) => (
-                <div key={action.id} className="flex gap-4 group">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 group-hover:bg-rose-500/20 transition-all">
-                      <Clock size={14} />
-                    </div>
-                    <div className="w-px flex-1 bg-white/5" />
+          <div className="rounded-xl border border-surface-border bg-black/[0.02] p-5 max-h-[540px] overflow-auto scrollbar-hide space-y-4">
+            {archivalActions.length > 0 ? (
+              archivalActions.map((action) => (
+                <div key={action.id} className="flex items-start gap-3">
+                  <div className="mt-0.5 w-9 h-9 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 flex items-center justify-center shrink-0">
+                    <Clock size={16} />
                   </div>
-                  <div className="flex-1 pt-1 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black text-white/80 uppercase tracking-widest">
-                        Tự động dọn dẹp
+                  <div className="min-w-0">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-sm font-semibold text-[color:var(--color-ink)]">
+                        Auto archive
                       </span>
-                      <span className="text-[9px] font-black text-white/20 italic tabular-nums">
+                      <span className="text-xs text-[color:var(--color-faint)] tabular-nums">
                         {new Date(action.createdAt).toLocaleTimeString([], {
                           hour: '2-digit',
                           minute: '2-digit',
                         })}
                       </span>
                     </div>
-                    <p className="text-[11px] text-white/40 leading-relaxed italic">
-                      "{action.reason}"
+                    <p className="mt-1 text-sm text-[color:var(--color-muted)] leading-relaxed">
+                      “{action.reason}”
                     </p>
                   </div>
                 </div>
-              ))}
-              {archivalActions.length === 0 && (
-                <div className="flex flex-col items-center justify-center h-full gap-4 text-center opacity-20">
-                  <Trash2 size={40} />
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">
-                    Không có sự kiện dọn dẹp
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div className="pt-6 border-t border-white/5 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-                  Thao tác sức khỏe
-                </span>
-                <span className="text-[11px] font-black text-white/60 tabular-nums italic">
-                  {actions.length} Total
-                </span>
+              ))
+            ) : (
+              <div className="py-10 text-center">
+                <Trash2 size={32} className="mx-auto text-[color:var(--color-faint)]" />
+                <p className="mt-3 text-sm text-[color:var(--color-muted)]">
+                  Chưa có sự kiện dọn dẹp.
+                </p>
               </div>
-            </div>
+            )}
           </div>
-        </div>
+        </section>
       </div>
-    </div>
+    </section>
   );
 }

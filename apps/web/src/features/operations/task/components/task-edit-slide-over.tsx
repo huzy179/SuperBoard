@@ -188,7 +188,7 @@ export function TaskEditSlideOver({
     summarizeMutation.isPending || decomposeMutation.isPending || refineMutation.isPending;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/20 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/20">
       <div
         ref={dialogRef}
         role="dialog"

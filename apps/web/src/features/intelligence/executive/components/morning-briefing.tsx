@@ -1,18 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import {
-  Sunrise,
-  Target,
-  Activity,
-  Brain,
-  ArrowRight,
-  X,
-  Zap,
-  CheckCircle2,
-  Wind,
-} from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { Activity, CheckCircle2, RefreshCcw, Sunrise, Target, Zap } from 'lucide-react';
 import { toast } from 'sonner';
+import { AppOverlay } from '@/components/ui/app-overlay';
 import { getDailyBriefing } from '../api/executive-service';
 
 interface BriefingData {
@@ -46,154 +37,108 @@ export function MorningBriefing({
     Promise.resolve().then(() => fetchBriefing());
   }, [fetchBriefing]);
 
-  if (isLoading) {
-    return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 backdrop-blur-3xl">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-sm bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 animate-pulse">
-            <Sunrise size={24} />
-          </div>
-          <span className="text-[9px] font-bold text-brand-400 uppercase tracking-widest animate-pulse">
-            Syncing_Intelligence...
-          </span>
-        </div>
-      </div>
-    );
-  }
+  const today = new Date().toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center p-[var(--space-10)] bg-slate-950/80 backdrop-blur-3xl animate-in fade-in duration-500 overflow-y-auto scrollbar-hide">
-      <div className="w-full max-w-3xl bg-slate-950/90 backdrop-blur-3xl rounded-md shadow-inner border border-white/10 p-[var(--space-12)] relative my-10 animate-in slide-in-from-bottom-4 duration-700">
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-10 right-10 p-4 rounded-full bg-white/5 text-white/30 hover:text-white hover:bg-white/10 transition-all hover:rotate-90 duration-500"
-        >
-          <X size={24} />
-        </button>
-
-        <div className="flex flex-col items-center text-center mb-[var(--space-12)]">
-          <div className="flex items-center gap-4 mb-[var(--space-6)]">
-            <span className="h-px w-8 bg-white/10" />
-            <div className="w-10 h-10 rounded-sm bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center">
-              <Sunrise size={20} />
-            </div>
-            <span className="h-px w-8 bg-white/10" />
-          </div>
-          <h1 className="text-4xl font-black text-white tracking-tighter uppercase mb-4">
-            Daily_Briefing
-          </h1>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em]">
-              {new Date().toLocaleDateString(undefined, {
-                weekday: 'long',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </span>
-          </div>
+    <AppOverlay
+      isOpen
+      onClose={onClose}
+      title="Daily briefing"
+      subtitle={today}
+      variant="modal"
+      maxWidth="3xl"
+      footer={
+        <div className="flex items-center justify-end gap-3">
+          <button type="button" className="btn btn-secondary" onClick={() => fetchBriefing()}>
+            <RefreshCcw size={16} />
+            Làm mới
+          </button>
+          <button type="button" className="btn btn-primary" onClick={onClose}>
+            Đã hiểu
+          </button>
         </div>
-
-        <div className="space-y-[var(--space-12)]">
-          {/* Tình trạng hoạt động */}
-          <div className="relative p-[var(--space-10)] rounded-md bg-white/[0.01] border border-white/5 overflow-hidden group hover:border-brand-500/20 transition-all duration-500 shadow-inner">
-            <div className="absolute top-0 right-0 p-8 text-white/5 group-hover:text-white/10 transition-colors">
-              <Wind size={60} strokeWidth={1} />
+      }
+    >
+      {isLoading ? (
+        <div className="rounded-lg border border-surface-border bg-black/[0.02] p-6 flex items-center gap-3 text-sm text-[color:var(--color-muted)]">
+          <RefreshCcw size={16} className="animate-spin" />
+          Đang tải…
+        </div>
+      ) : !data ? (
+        <div className="rounded-lg border border-surface-border bg-black/[0.02] p-6 text-sm text-[color:var(--color-muted)]">
+          Không có dữ liệu.
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <section className="rounded-xl border border-surface-border bg-surface-card p-5 shadow-glass">
+            <div className="flex items-center gap-2 text-sm font-semibold text-[color:var(--color-ink)]">
+              <Sunrise size={16} className="text-brand-600" />
+              Tình trạng hoạt động
             </div>
-
-            <h3 className="text-[9px] font-bold text-brand-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-              <Activity size={12} className="animate-pulse" />
-              Operational_Status
-            </h3>
-
-            <p className="text-xl font-bold text-white/80 leading-snug tracking-tight">
-              "{data?.pulse}"
+            <p className="mt-3 text-sm text-[color:var(--color-ink)] leading-relaxed">
+              “{data.pulse}”
             </p>
-
-            <div className="mt-6 flex items-center gap-2">
-              <div className="px-[var(--space-3)] py-1 bg-white/[0.02] rounded-xs border border-white/5 text-[8px] font-bold text-white/30 uppercase tracking-widest">
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="inline-flex items-center rounded-full border border-brand-500/20 bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-700">
                 Stable
-              </div>
-              <div className="px-[var(--space-3)] py-1 bg-white/[0.02] rounded-xs border border-white/5 text-[8px] font-bold text-brand-400 uppercase tracking-widest">
-                Synergy_High
-              </div>
+              </span>
+              <span className="inline-flex items-center rounded-full border border-surface-border bg-black/[0.02] px-2 py-0.5 text-xs font-medium text-[color:var(--color-muted)]">
+                Sync active
+              </span>
             </div>
-          </div>
+          </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--space-10)]">
-            {/* Command Intent */}
-            <div className="space-y-[var(--space-6)]">
-              <h3 className="text-[9px] font-bold text-white/30 uppercase tracking-widest px-1 flex items-center gap-2">
-                <Target size={12} className="text-brand-400" />
-                Strategic_Goals
-              </h3>
-
-              <div className="space-y-3">
-                {data?.commandIntent.map((intent, i) => (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <section className="rounded-xl border border-surface-border bg-surface-card p-5 shadow-glass">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[color:var(--color-ink)]">
+                <Target size={16} className="text-brand-600" />
+                Mục tiêu hôm nay
+              </div>
+              <div className="mt-4 space-y-2">
+                {data.commandIntent.map((intent, index) => (
                   <div
-                    key={i}
-                    className="flex gap-4 p-[var(--space-4)] rounded-sm bg-white/[0.01] border border-white/5 group hover:border-brand-500/20 transition-all cursor-default"
+                    key={index}
+                    className="flex items-start gap-3 rounded-lg border border-surface-border bg-black/[0.02] px-3 py-2"
                   >
-                    <div className="text-lg font-black text-brand-500/10 tabular-nums opacity-50 group-hover:opacity-100 transition-opacity">
-                      0{i + 1}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-[11px] font-bold text-white/80 uppercase tracking-tight group-hover:text-white transition-colors">
-                        {intent}
-                      </p>
-                    </div>
+                    <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border border-surface-border bg-surface-card text-xs font-semibold text-[color:var(--color-muted)]">
+                      {index + 1}
+                    </span>
+                    <p className="text-sm text-[color:var(--color-ink)] leading-relaxed">
+                      {intent}
+                    </p>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
 
-            {/* Hoạt động gần đây */}
-            <div className="space-y-[var(--space-6)]">
-              <h3 className="text-[9px] font-bold text-white/30 uppercase tracking-widest px-1 flex items-center gap-2">
-                <Brain size={12} className="text-brand-400" />
-                Key_Highlights
-              </h3>
-
-              <div className="flex flex-col h-full bg-white/[0.01] rounded-md p-[var(--space-8)] text-white relative overflow-hidden group border border-white/5 shadow-inner">
-                <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 Transition-opacity">
-                  <Zap size={80} strokeWidth={1} />
-                </div>
-
-                <div className="relative z-10 space-y-4">
-                  {data?.highlights.map((h, i) => (
-                    <div key={i} className="flex gap-3 items-start">
-                      <div className="mt-1 w-3 h-3 rounded-full border border-white/10 flex items-center justify-center text-white/20">
-                        <CheckCircle2 size={8} />
-                      </div>
-                      <p className="text-[11px] font-medium text-white/60 leading-relaxed">{h}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-auto pt-8 flex items-center justify-between relative z-10 opacity-20">
-                  <span className="text-[8px] font-bold uppercase tracking-widest">
-                    System_Integrity
-                  </span>
-                  <span className="text-[8px] font-bold uppercase tracking-widest text-brand-400">
-                    Active_Sync
-                  </span>
-                </div>
+            <section className="rounded-xl border border-surface-border bg-surface-card p-5 shadow-glass">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[color:var(--color-ink)]">
+                <Zap size={16} className="text-brand-600" />
+                Điểm nổi bật
               </div>
-            </div>
+              <div className="mt-4 space-y-2">
+                {data.highlights.map((h, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full border border-surface-border bg-black/[0.02] text-[color:var(--color-muted)]">
+                      <CheckCircle2 size={12} />
+                    </span>
+                    <p className="text-sm text-[color:var(--color-muted)] leading-relaxed">{h}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
           </div>
 
-          {/* Footer Call to action */}
-          <div className="pt-10 flex flex-col items-center gap-6">
-            <button
-              onClick={onClose}
-              className="group flex items-center gap-4 text-[11px] font-black text-white/40 hover:text-brand-400 uppercase tracking-[0.4em] transition-all"
-            >
-              Đã hiểu
-              <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
-            </button>
+          <div className="flex items-center gap-2 text-xs text-[color:var(--color-muted)]">
+            <Activity size={14} />
+            Báo cáo được tối giản để dễ đọc, ít hiệu ứng.
           </div>
         </div>
-      </div>
-    </div>
+      )}
+    </AppOverlay>
   );
 }

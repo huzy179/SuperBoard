@@ -42,11 +42,9 @@ export function DonutDistributionChart({
 
   if (items.length === 0 || total === 0) {
     return (
-      <div className="py-[var(--space-12)] flex flex-col items-center justify-center border border-dashed border-white/10 rounded-md bg-white/[0.01]">
-        <Cpu size={24} className="mb-[var(--space-4)] text-white/10" />
-        <p className="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em]">
-          {emptyMessage}
-        </p>
+      <div className="py-[var(--space-12)] flex flex-col items-center justify-center border border-dashed border-surface-border rounded-lg bg-black/[0.02]">
+        <Cpu size={24} className="mb-[var(--space-4)] text-[color:var(--color-faint)]" />
+        <p className="text-sm font-medium text-[color:var(--color-muted)]">{emptyMessage}</p>
       </div>
     );
   }
@@ -54,10 +52,7 @@ export function DonutDistributionChart({
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-[var(--space-10)] items-center">
       <div className="relative flex justify-center">
-        <svg
-          viewBox="0 0 100 100"
-          className="h-40 w-40 -rotate-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.02)]"
-        >
+        <svg viewBox="0 0 100 100" className="h-40 w-40 -rotate-90">
           <circle
             cx="50"
             cy="50"
@@ -65,7 +60,7 @@ export function DonutDistributionChart({
             fill="none"
             stroke="currentColor"
             strokeWidth="8"
-            className="text-white/[0.03]"
+            className="text-black/[0.06]"
           />
           {segments.map((item) => {
             return (
@@ -80,9 +75,8 @@ export function DonutDistributionChart({
                 strokeLinecap="butt"
                 strokeDasharray={`${item.segmentLength} ${circumference}`}
                 strokeDashoffset={item.dashOffset}
-                className={`${item.colorClass} transition-all duration-1000 ease-out opacity-80 hover:opacity-100`}
+                className={`${item.colorClass} opacity-90`}
                 style={{
-                  filter: `drop-shadow(0 0 4px currentColor)`,
                   strokeDashoffset: item.dashOffset,
                 }}
               />
@@ -90,12 +84,10 @@ export function DonutDistributionChart({
           })}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-3xl font-black text-white tracking-tighter leading-none animate-in fade-in zoom-in duration-1000">
+          <span className="text-3xl font-semibold text-[color:var(--color-ink)] tracking-tight leading-none">
             {total}
           </span>
-          <span className="text-[8px] font-black text-white/10 uppercase tracking-[0.4em] mt-1">
-            Active Nodes
-          </span>
+          <span className="text-xs font-medium text-[color:var(--color-muted)] mt-1">Total</span>
         </div>
       </div>
 
@@ -105,22 +97,22 @@ export function DonutDistributionChart({
           return (
             <div
               key={item.key}
-              className="group/legend flex items-center justify-between px-[var(--space-4)] py-[var(--space-3)] bg-white/[0.01] border border-white/5 rounded-sm hover:border-white/20 transition-all hover:bg-white/[0.03]"
+              className="group/legend flex items-center justify-between px-[var(--space-4)] py-[var(--space-3)] bg-surface-card border border-surface-border rounded-lg hover:bg-black/[0.02] transition-colors"
             >
               <div className="flex items-center gap-3">
                 <div
-                  className={`h-1 w-3 rounded-full transition-all group-hover/legend:w-4 ${item.colorClass.replace('text-', 'bg-')} opacity-60 group-hover/legend:opacity-100`}
+                  className={`h-2 w-2 rounded-full ${item.colorClass.replace('text-', 'bg-')}`}
                 />
-                <span className="text-[9px] font-bold text-white/30 uppercase tracking-widest group-hover/legend:text-white transition-colors">
+                <span className="text-sm font-medium text-[color:var(--color-ink)]">
                   {item.label}
                 </span>
               </div>
               <div className="text-right">
-                <span className="block text-xs font-black text-white tracking-tight">
-                  {item.value} Units
+                <span className="block text-sm font-semibold text-[color:var(--color-ink)] tabular-nums">
+                  {item.value}
                 </span>
-                <span className="text-[7px] font-bold text-white/10 uppercase tracking-widest">
-                  {percent}% Weight
+                <span className="text-xs text-[color:var(--color-muted)] tabular-nums">
+                  {percent}%
                 </span>
               </div>
             </div>

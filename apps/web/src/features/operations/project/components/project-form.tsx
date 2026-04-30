@@ -69,22 +69,22 @@ export function ProjectForm({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="relative mb-10 rounded-xl border border-white/8 bg-white/[0.02] p-10 shadow-inner backdrop-blur-3xl overflow-hidden animate-in fade-in slide-in-from-top-6 duration-500"
+      className="relative mb-10 rounded-xl border border-surface-border bg-surface-card p-8 shadow-luxe overflow-hidden"
     >
-      {/* Color aura */}
       <div
-        className="absolute -right-20 -top-20 w-72 h-72 rounded-full blur-[100px] pointer-events-none opacity-15 transition-opacity duration-1000"
+        className="absolute -right-24 -top-24 h-64 w-64 rounded-full pointer-events-none opacity-[0.06]"
         style={{ backgroundColor: color }}
+        aria-hidden
       />
 
       <div className="relative z-10 flex flex-col gap-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-black text-white tracking-tight text-glow">
-              {isCreate ? 'Khởi tạo Node mới' : 'Cập nhật Operational Node'}
+            <h2 className="text-2xl font-semibold text-[color:var(--color-ink)] tracking-tight">
+              {isCreate ? 'Tạo dự án mới' : 'Cập nhật dự án'}
             </h2>
-            <p className="text-[11px] text-white/30 mt-1 uppercase tracking-widest font-bold">
+            <p className="text-sm text-[color:var(--color-muted)] mt-1 leading-relaxed">
               {isCreate
                 ? 'Thiết lập thông số cho dự án của bạn.'
                 : 'Điều chỉnh cấu hình mạng lưới dự án.'}
@@ -93,7 +93,7 @@ export function ProjectForm({
           <button
             type="button"
             onClick={onCancel}
-            className="p-3 rounded-lg bg-white/[0.03] border border-white/8 text-white/20 hover:text-white hover:bg-white/[0.08] transition-all"
+            className="p-2.5 rounded-md bg-black/[0.02] border border-surface-border text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
           >
             <X size={18} />
           </button>
@@ -104,7 +104,7 @@ export function ProjectForm({
           <div className="md:col-span-2">
             <FormField label="Tên dự án" error={errors.name?.message as string} required>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[color:var(--color-faint)]">
                   <Edit3 size={16} />
                 </div>
                 <FormInput
@@ -134,25 +134,28 @@ export function ProjectForm({
 
           {/* Color */}
           <FormField label="Màu sắc đại diện" error={errors.color?.message as string}>
-            <div className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.03] p-2 pl-4 shadow-inner focus-within:border-brand-500/40 transition-all">
+            <div className="flex items-center gap-3">
               <div
-                className="h-9 w-9 rounded-xl flex-shrink-0 shadow-glow-sm"
+                className="h-10 w-10 rounded-lg border border-surface-border bg-black/[0.02]"
                 style={{ backgroundColor: color }}
+                aria-hidden
               />
-              <input
+              <FormInput
                 {...register('color')}
-                placeholder="#6366F1"
-                className="flex-1 bg-transparent border-none text-sm font-mono font-black text-white placeholder:text-white/20 focus:ring-0 focus:outline-none uppercase"
+                placeholder="#0075de"
+                className="h-14 font-mono"
+                error={!!errors.color}
               />
-              <div className="relative h-10 w-10 overflow-hidden rounded-xl border border-white/10">
+              <div className="relative h-14 w-14 overflow-hidden rounded-lg border border-surface-border bg-black/[0.02]">
                 <input
                   type="color"
                   value={color}
                   onChange={(e) => setValue('color', e.target.value)}
-                  className="absolute -inset-2 h-16 w-16 cursor-pointer bg-transparent border-none opacity-0 z-10"
+                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  aria-label="Pick color"
                 />
-                <div className="absolute inset-0 flex items-center justify-center bg-white/5 hover:bg-white/10 transition-colors pointer-events-none">
-                  <Palette size={14} className="text-white/30" />
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none text-[color:var(--color-muted)]">
+                  <Palette size={16} />
                 </div>
               </div>
             </div>
@@ -162,7 +165,7 @@ export function ProjectForm({
           <div className="md:col-span-2">
             <FormField label="Mô tả chiến lược" error={errors.description?.message as string}>
               <div className="relative">
-                <div className="absolute left-4 top-4 text-white/20">
+                <div className="absolute left-4 top-4 text-[color:var(--color-faint)]">
                   <Files size={16} />
                 </div>
                 <FormTextArea

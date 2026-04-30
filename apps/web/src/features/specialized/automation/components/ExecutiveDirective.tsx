@@ -1,20 +1,25 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { ShieldAlert, ArrowDown, Settings2, Zap, Fingerprint, CheckCircle2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { CheckCircle2, Fingerprint, Loader2, ShieldAlert } from 'lucide-react';
 import { executeExecutiveDirective, getExecutiveDirective } from '../api/automation-service';
 
-interface Directive {
+type DirectiveStatus = 'PENDING' | 'EXECUTED';
+
+type DirectiveAction = { type: string; reason: string };
+
+type DirectiveMetadata = {
+  title?: string;
+  actions?: DirectiveAction[];
+  outcome?: string;
+  status?: DirectiveStatus;
+};
+
+type Directive = {
   id: string;
   reason: string;
-  metadata: {
-    title: string;
-    actions: Array<{ type: string; reason: string }>;
-    outcome: string;
-    status: 'PENDING' | 'EXECUTED';
-  };
-}
+  metadata: DirectiveMetadata;
+};
 
 export function ExecutiveDirective({ workspaceId }: { workspaceId: string }) {
   const [directive, setDirective] = useState<Directive | null>(null);
@@ -22,157 +27,153 @@ export function ExecutiveDirective({ workspaceId }: { workspaceId: string }) {
   const [isExecuting, setIsExecuting] = useState(false);
 
   useEffect(() => {
-    getExecutiveDirective(workspaceId).then((data) => {
-      setDirective(data as Directive);
-      setIsLoading(false);
-    });
+    getExecutiveDirective(workspaceId)
+      .then((data) => setDirective(data as unknown as Directive))
+      .finally(() => setIsLoading(false));
   }, [workspaceId]);
+
+  const isExecuted = directive?.metadata.status === 'EXECUTED';
+
+  const actions = useMemo(() => {
+    const list = directive?.metadata.actions ?? [];
+    return Array.isArray(list) ? list : [];
+  }, [directive]);
 
   const handleExecute = async () => {
     if (!directive) return;
     setIsExecuting(true);
-    await executeExecutiveDirective(directive.id);
-    setDirective((prev) =>
-      prev ? { ...prev, metadata: { ...prev.metadata, status: 'EXECUTED' } } : null,
-    );
-    setIsExecuting(false);
+    try {
+      await executeExecutiveDirective(directive.id);
+      setDirective((prev) =>
+        prev
+          ? {
+              ...prev,
+              metadata: { ...prev.metadata, status: 'EXECUTED' satisfies DirectiveStatus },
+            }
+          : null,
+      );
+    } finally {
+      setIsExecuting(false);
+    }
   };
 
   if (isLoading) return <DirectiveSkeleton />;
   if (!directive) return null;
 
-  const isExecuted = directive.metadata.status === 'EXECUTED';
-
   return (
-    <div className="space-y-10 py-8 px-6">
-      <div className="flex items-center gap-4">
-        <div className="p-3 bg-brand-500/10 rounded-lg border border-brand-500/20">
-          <ShieldAlert className="h-5 w-5 text-brand-400" />
+    <div className="space-y-6">
+      <header className="flex items-start gap-4">
+        <div className="h-10 w-10 rounded-md border border-brand-500/20 bg-brand-50 text-brand-700 flex items-center justify-center">
+          <ShieldAlert size={18} />
         </div>
-        <div className="space-y-1">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
-            Chỉ thị AI
-          </h2>
-          <p className="text-sm font-bold text-white uppercase tracking-tight italic">
-            Giao thức chỉ thị toàn cục
+        <div className="min-w-0">
+          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">Chỉ thị AI</h2>
+          <p className="mt-1 text-sm text-[color:var(--color-muted)] leading-relaxed">
+            Tóm tắt các hành động đề xuất ở cấp workspace. Xem lại trước khi thực thi.
           </p>
         </div>
-      </div>
+      </header>
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={`relative p-8 rounded-[3.5rem] border backdrop-blur-3xl overflow-hidden transition-all duration-1000 ${
-          isExecuted ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-slate-900/50 border-white/10'
-        }`}
-      >
-        {/* Cinematic Header */}
-        <div className="mb-12 space-y-4 text-center">
-          <div className="mx-auto w-12 h-1 bg-brand-500/20 rounded-full mb-6" />
-          <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic leading-none">
-            {directive.metadata.title}
-          </h3>
-          <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest max-w-lg mx-auto leading-relaxed">
+      <section className="rounded-xl border border-surface-border bg-surface-card p-6 space-y-6">
+        <div className="space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-lg font-semibold text-[color:var(--color-ink)] tracking-tight">
+              {directive.metadata.title || 'Chỉ thị mới'}
+            </h3>
+            <span
+              className={[
+                'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold',
+                isExecuted
+                  ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                  : 'border-amber-200 bg-amber-50 text-amber-700',
+              ].join(' ')}
+            >
+              {isExecuted ? 'Đã thực thi' : 'Chờ thực thi'}
+            </span>
+          </div>
+          <p className="text-sm text-[color:var(--color-muted)] leading-relaxed">
             {directive.reason}
           </p>
         </div>
 
-        {/* Chained Actions Loop */}
-        <div className="space-y-6 mb-12 relative">
-          <div className="absolute left-[39px] top-8 bottom-8 w-[2px] bg-brand-500/10" />
-
-          {directive.metadata.actions.map((action, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 + idx * 0.1 }}
-              className="relative flex items-start gap-6 group"
-            >
-              <div
-                className={`mt-1 h-20 w-20 rounded-lg flex items-center justify-center border z-10 transition-all ${
-                  isExecuted
-                    ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
-                    : 'bg-slate-900 border-white/10 text-brand-400 group-hover:border-brand-500/40'
-                }`}
-              >
-                <Settings2 size={20} />
-              </div>
-
-              <div className="flex-1 pt-2 space-y-2">
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-white/60">
-                    Action {idx + 1}
-                  </span>
-                  {isExecuted && <CheckCircle2 size={12} className="text-emerald-400" />}
-                </div>
-                <p className="text-[11px] font-bold text-white uppercase tracking-tight">
-                  {action.type.replace('_', ' ')}
-                </p>
-                <p className="text-[10px] font-bold text-white/20 italic max-w-md">
-                  "{action.reason}"
-                </p>
-              </div>
-
-              {idx < directive.metadata.actions.length - 1 && (
-                <div className="absolute left-[34px] bottom-[-24px] p-1 bg-slate-900 border border-white/10 rounded-full z-20">
-                  <ArrowDown size={10} className="text-white/20" />
-                </div>
-              )}
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Predicted Outcome */}
-        <div className="p-8 bg-brand-500/5 border border-brand-500/10 rounded-[2.5rem] mb-12 flex items-center gap-6">
-          <div className="h-12 w-12 bg-brand-500/10 rounded-full flex items-center justify-center border border-brand-500/20">
-            <Zap className="text-brand-400" size={20} />
+        <div className="space-y-3">
+          <div className="text-sm font-semibold text-[color:var(--color-ink)]">
+            Danh sách hành động
           </div>
-          <div className="space-y-1">
-            <p className="text-[9px] font-black text-white/20 uppercase tracking-widest">
-              Predicted Strategic Outcome
-            </p>
-            <p className="text-[11px] font-black text-brand-400 uppercase tracking-tight italic">
-              "{directive.metadata.outcome}"
-            </p>
-          </div>
-        </div>
-
-        {/* Executive Action */}
-        <div className="pt-6 border-t border-white/5 text-center">
-          {!isExecuted ? (
-            <button
-              onClick={handleExecute}
-              disabled={isExecuting}
-              className="w-full flex items-center justify-center gap-4 px-10 py-6 bg-brand-500 rounded-xl text-[11px] font-black text-white uppercase tracking-[0.4em] shadow-glow-brand hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
-            >
-              {isExecuting ? (
-                <div className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <Fingerprint size={18} /> Ký & gửi chỉ thị
-                </>
-              )}
-            </button>
+          {actions.length ? (
+            <ol className="space-y-2">
+              {actions.map((action, idx) => (
+                <li
+                  key={`${action.type}-${idx}`}
+                  className="rounded-lg border border-surface-border bg-black/[0.02] p-4"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="text-xs font-medium text-[color:var(--color-muted)]">
+                        Hành động {idx + 1}
+                      </div>
+                      <div className="mt-1 text-sm font-semibold text-[color:var(--color-ink)] break-words">
+                        {String(action.type || 'ACTION').replaceAll('_', ' ')}
+                      </div>
+                    </div>
+                    {isExecuted ? <CheckCircle2 size={18} className="text-emerald-600" /> : null}
+                  </div>
+                  {action.reason ? (
+                    <p className="mt-2 text-sm text-[color:var(--color-muted)] leading-relaxed">
+                      {action.reason}
+                    </p>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
           ) : (
-            <div className="flex items-center justify-center gap-3 py-6 text-emerald-400">
-              <CheckCircle2 size={24} />
-              <span className="text-[11px] font-black uppercase tracking-[0.4em]">
-                Chỉ thị đã được gửi
-              </span>
+            <div className="rounded-lg border border-surface-border bg-black/[0.02] p-6 text-sm text-[color:var(--color-muted)]">
+              Không có hành động nào trong chỉ thị này.
             </div>
           )}
         </div>
-      </motion.div>
+
+        {directive.metadata.outcome ? (
+          <div className="rounded-lg border border-surface-border bg-brand-50 p-4">
+            <div className="text-xs font-medium text-brand-700">Kết quả dự kiến</div>
+            <div className="mt-1 text-sm font-semibold text-[color:var(--color-ink)]">
+              {directive.metadata.outcome}
+            </div>
+          </div>
+        ) : null}
+
+        <div className="flex items-center justify-end gap-2 border-t border-surface-border pt-4">
+          {!isExecuted ? (
+            <button
+              type="button"
+              onClick={handleExecute}
+              disabled={isExecuting}
+              className="btn btn-primary"
+            >
+              {isExecuting ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Fingerprint size={16} />
+              )}
+              {isExecuting ? 'Đang thực thi…' : 'Thực thi chỉ thị'}
+            </button>
+          ) : (
+            <div className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700">
+              <CheckCircle2 size={18} className="text-emerald-600" />
+              Chỉ thị đã được thực thi
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }
 
 function DirectiveSkeleton() {
   return (
-    <div className="space-y-10 py-8 px-6 animate-pulse">
-      <div className="h-12 w-64 bg-white/5 rounded-lg" />
-      <div className="h-[500px] bg-white/5 rounded-[4rem]" />
+    <div className="space-y-6 animate-pulse">
+      <div className="h-10 w-64 rounded-md bg-black/[0.03] border border-surface-border" />
+      <div className="h-[420px] rounded-xl bg-black/[0.03] border border-surface-border" />
     </div>
   );
 }

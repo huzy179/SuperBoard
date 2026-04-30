@@ -113,10 +113,10 @@ export function InviteMemberModal({ workspaceId, onClose }: InviteMemberModalPro
                       key={id}
                       type="button"
                       onClick={() => setRole(id)}
-                      className={`flex flex-col items-center justify-center gap-2 h-20 rounded-sm border transition-all font-bold text-[10px] uppercase tracking-tight ${
+                      className={`flex flex-col items-center justify-center gap-2 h-20 rounded-md border transition-colors text-xs font-medium ${
                         role === id
-                          ? 'border-brand-500/50 bg-brand-500/10 text-brand-400 shadow-inner'
-                          : 'border-white/5 bg-white/[0.02] text-white/20 hover:border-white/10 hover:text-white/40'
+                          ? 'border-brand-200 bg-brand-50 text-brand-700'
+                          : 'border-surface-border bg-surface-card text-[color:var(--color-ink)] hover:bg-black/[0.02]'
                       }`}
                     >
                       <Icon size={14} />
@@ -128,7 +128,7 @@ export function InviteMemberModal({ workspaceId, onClose }: InviteMemberModalPro
 
               {/* Error */}
               {error && (
-                <div className="form-error animate-in fade-in duration-300">
+                <div className="form-error">
                   <X size={14} className="shrink-0" />
                   <p>{error}</p>
                 </div>
@@ -136,16 +136,16 @@ export function InviteMemberModal({ workspaceId, onClose }: InviteMemberModalPro
             </div>
           ) : (
             /* Success state */
-            <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="space-y-6">
               <div className="text-center space-y-2">
-                <div className="w-12 h-12 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-sm flex items-center justify-center mx-auto mb-4 shadow-inner">
+                <div className="w-12 h-12 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md flex items-center justify-center mx-auto mb-4">
                   <Check size={20} />
                 </div>
-                <h4 className="text-sm font-black text-white uppercase tracking-tight">
-                  Uplink_Generated_Successfully
+                <h4 className="text-base font-semibold text-[color:var(--color-ink)]">
+                  Liên kết mời đã sẵn sàng
                 </h4>
-                <p className="text-[11px] text-white/30 font-bold uppercase tracking-wide">
-                  Share this secure access node with your peer.
+                <p className="text-sm text-[color:var(--color-muted)] leading-relaxed">
+                  Sao chép và gửi liên kết này cho người bạn muốn mời.
                 </p>
               </div>
 
@@ -155,23 +155,23 @@ export function InviteMemberModal({ workspaceId, onClose }: InviteMemberModalPro
                 <button
                   type="button"
                   onClick={handleCopyLink}
-                  className={`absolute right-1.5 top-1/2 -translate-y-1/2 h-8 px-3 rounded-xs text-[9px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 ${
+                  className={`absolute right-1.5 top-1/2 -translate-y-1/2 h-8 px-3 rounded-md border flex items-center gap-2 text-xs font-medium transition-colors ${
                     isCopied
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-white/10 text-white/40 hover:bg-white/20 hover:text-white'
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                      : 'bg-black/[0.02] text-[color:var(--color-ink)] border-surface-border hover:bg-black/[0.04]'
                   }`}
                 >
                   {isCopied ? <Check size={11} /> : <Copy size={11} />}
-                  <span>{isCopied ? 'COPIED' : 'COPY_NODE'}</span>
+                  <span>{isCopied ? 'Đã copy' : 'Copy link'}</span>
                 </button>
               </div>
 
               {/* Note */}
-              <div className="flex gap-3 rounded-sm bg-amber-500/5 border border-amber-500/20 p-[var(--space-4)] text-[10px] font-bold text-amber-400/80 leading-relaxed uppercase tracking-tight">
+              <div className="flex gap-3 rounded-md bg-amber-50 border border-amber-200 p-[var(--space-4)] text-sm text-amber-900 leading-relaxed">
                 <Info size={12} className="shrink-0 mt-0.5" />
                 <p>
-                  <b>NOTICE:</b> Mail server integration is currently offline. Manual peer-to-peer
-                  transmission required.
+                  Mail server hiện chưa gửi tự động. Vui lòng gửi liên kết mời thủ công cho người
+                  nhận.
                 </p>
               </div>
             </div>
@@ -179,14 +179,14 @@ export function InviteMemberModal({ workspaceId, onClose }: InviteMemberModalPro
 
           {/* Footer actions */}
           <div className="modal-footer">
-            <button type="button" onClick={onClose} className="btn-secondary flex-1">
+            <button type="button" onClick={onClose} className="btn btn-secondary flex-1">
               {successToken ? 'Đóng' : 'Để sau'}
             </button>
             {!successToken && (
               <button
                 type="submit"
                 disabled={createInvitation.isPending}
-                className="btn-primary flex-[2]"
+                className="btn btn-primary flex-[2]"
               >
                 {createInvitation.isPending ? <Loader2 className="btn-spinner" /> : null}
                 {createInvitation.isPending ? 'Đang gửi...' : 'Gửi lời mời'}

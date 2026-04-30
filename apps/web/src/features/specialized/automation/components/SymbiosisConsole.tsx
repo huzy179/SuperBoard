@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   Fingerprint,
+  Loader2,
 } from 'lucide-react';
 import { approveAutomationProposal, getAutomationProposals } from '../api/automation-service';
 
@@ -137,7 +138,7 @@ export function SymbiosisConsole({ workspaceId }: { workspaceId: string }) {
                   className="btn btn-primary w-full"
                 >
                   {isApproving === proposal.id ? (
-                    <div className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    <Loader2 size={16} className="animate-spin" />
                   ) : (
                     <>
                       <Fingerprint size={16} /> Áp dụng

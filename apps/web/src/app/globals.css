@@ -384,23 +384,6 @@ textarea {
    MISSING UTILITY CLASSES
    ============================================================ */
 
-/* Glow shadows */
-.shadow-glow-brand {
-  box-shadow: none;
-}
-.shadow-glow-slate {
-  box-shadow: none;
-}
-.shadow-glow-indigo {
-  box-shadow: none;
-}
-.shadow-glow-emerald {
-  box-shadow: none;
-}
-.shadow-glow-rose {
-  box-shadow: none;
-}
-
 /* Scrollbar utilities */
 .elite-scrollbar::-webkit-scrollbar {
   width: 4px;
@@ -423,16 +406,6 @@ textarea {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
-}
-
-/* Text glow */
-.text-glow {
-  text-shadow: none;
-}
-
-/* Noise background */
-.bg-noise {
-  background-image: none;
 }
 
 }

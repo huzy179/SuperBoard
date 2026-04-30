@@ -40,26 +40,22 @@ export function CreateRuleModal({ workspaceId, projectId, onClose }: CreateRuleM
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles size={20} className="text-brand-500" />
-            <h3 className="font-black text-slate-800 uppercase tracking-tight">
-              Tạo quy tắc tự động hóa
-            </h3>
+    <div className="modal-overlay p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal-panel max-w-lg">
+        <div className="modal-header">
+          <div>
+            <h3 className="modal-title">Tạo quy tắc tự động hoá</h3>
+            <p className="modal-subtitle">Thiết lập trigger và hành động cơ bản.</p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors"
-          >
-            <X size={20} className="text-slate-400" />
+          <button onClick={onClose} className="modal-close-btn" aria-label="Close">
+            <X size={18} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="modal-body space-y-6">
           <div className="space-y-2">
-            <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
+            <label className="form-label">
+              <Sparkles size={11} />
               Tên quy tắc
             </label>
             <input
@@ -68,19 +64,17 @@ export function CreateRuleModal({ workspaceId, projectId, onClose }: CreateRuleM
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ví dụ: Thông báo khi có task mới"
-              className="w-full px-4 py-3 bg-slate-50 border-none rounded-lg focus:ring-2 focus:ring-brand-500 transition-all font-medium"
+              className="form-input"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
-                Khi (Trigger)
-              </label>
+              <label className="form-label">Khi (Trigger)</label>
               <select
                 value={triggerType}
                 onChange={(e) => setTriggerType(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-50 border-none rounded-lg focus:ring-2 focus:ring-brand-500 transition-all font-medium appearance-none"
+                className="form-select"
               >
                 <option value="TASK_CREATED">Task được tạo</option>
                 <option value="STATUS_CHANGED">Trạng thái thay đổi</option>
@@ -89,25 +83,21 @@ export function CreateRuleModal({ workspaceId, projectId, onClose }: CreateRuleM
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
-                Thì (Action)
-              </label>
-              <div className="w-full px-4 py-3 bg-slate-100/50 border-none rounded-lg font-black text-slate-400 text-sm">
+              <label className="form-label">Thì (Action)</label>
+              <div className="w-full px-4 py-3 bg-black/[0.02] border border-surface-border rounded-sm font-medium text-[color:var(--color-muted)] text-sm">
                 Gửi thông báo
               </div>
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
-              Nội dung thông báo
-            </label>
+            <label className="form-label">Nội dung thông báo</label>
             <textarea
               value={actionMessage}
               onChange={(e) => setActionMessage(e.target.value)}
-              className="w-full px-4 py-3 bg-slate-50 border-none rounded-lg focus:ring-2 focus:ring-brand-500 transition-all font-medium min-h-[100px]"
+              className="form-textarea min-h-[110px]"
             />
-            <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-medium px-1">
+            <div className="flex items-center gap-1.5 text-xs text-[color:var(--color-muted)] font-medium px-1">
               <AlertCircle size={12} />
               <span>
                 Dùng &#123;&#123;taskId&#125;&#125; hoặc &#123;&#123;type&#125;&#125; để chèn giá
@@ -116,18 +106,14 @@ export function CreateRuleModal({ workspaceId, projectId, onClose }: CreateRuleM
             </div>
           </div>
 
-          <div className="pt-4 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-3 font-bold text-slate-500 hover:bg-slate-50 rounded-lg transition-all"
-            >
+          <div className="modal-footer">
+            <button type="button" onClick={onClose} className="btn btn-secondary flex-1">
               Hủy
             </button>
             <button
               type="submit"
               disabled={createMutation.isPending}
-              className="px-8 py-3 bg-slate-900 hover:bg-black text-white rounded-lg font-bold shadow-lg shadow-slate-900/20 active:scale-95 transition-all flex items-center gap-2"
+              className="btn btn-primary flex-[2]"
             >
               {createMutation.isPending ? (
                 'Đang tạo...'

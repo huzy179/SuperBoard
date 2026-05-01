@@ -1,17 +1,23 @@
 import type { ReactNode } from 'react';
 import './globals.css';
-import { Inter } from 'next/font/google';
+import { Sora, Hanken_Grotesk } from 'next/font/google';
 import { Toaster } from 'sonner';
 
-const notionInter = Inter({
-  subsets: ['latin', 'latin-ext'],
-  variable: '--font-notion',
+const sora = Sora({
+  subsets: ['latin'],
+  variable: '--font-sora',
+  display: 'swap',
+});
+
+const hanken = Hanken_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-hanken',
   display: 'swap',
 });
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="vi" className={notionInter.variable}>
+    <html lang="vi" className={`${sora.variable} ${hanken.variable}`}>
       <body className="min-h-screen bg-surface-bg font-sans antialiased selection:bg-brand-500/15 selection:text-[color:var(--color-ink)]">
         {children}
         <Toaster

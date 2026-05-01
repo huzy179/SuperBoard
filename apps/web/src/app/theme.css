@@ -34,13 +34,13 @@
   /* Focus */
   --color-focus: #097fe8;
 
-  /* Radius scale */
-  --radius-xs: 4px;
+  /* Radius scale (Technical Minimalism) */
+  --radius-xs: 2px;
   --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-card: var(--radius-lg);
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-card: var(--radius-sm);
   --radius-button: var(--radius-sm);
 
   /* 4pt Spacing Scale */
@@ -53,14 +53,17 @@
   --space-12: 48px;
   --space-16: 64px;
 
-  /* Modular Typography Scale (1.25 Ratio) */
+  /* Modular Typography Scale (Technical) */
+  --font-sans: var(--font-hanken), "Inter", sans-serif;
+  --font-display: var(--font-sora), "Inter", sans-serif;
+  
   --text-xs: 0.75rem;     /* 12px */
-  --text-sm: 0.875rem;    /* 14px */
-  --text-base: 1rem;      /* 16px */
-  --text-lg: 1.25rem;     /* 20px */
-  --text-xl: 1.563rem;    /* 25px */
-  --text-2xl: 1.953rem;   /* 31px */
-  --text-3xl: 2.441rem;   /* 39px */
+  --text-sm: 0.8125rem;   /* 13px - slightly tighter */
+  --text-base: 0.9375rem; /* 15px - refined base */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.375rem;    /* 22px */
+  --text-2xl: 1.75rem;    /* 28px */
+  --text-3xl: 2.25rem;    /* 36px */
 
   /* Shadows (Notion-style, barely-there depth) */
   --shadow-luxe: rgba(0, 0, 0, 0.04) 0px 4px 18px,

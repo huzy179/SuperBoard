@@ -28,17 +28,19 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
   const privateChannels = channels?.filter((c) => c.type === 'PRIVATE') || [];
 
   return (
-    <div className="flex h-full overflow-hidden rounded-xl border border-surface-border bg-surface-card shadow-sm">
+    <div className="flex h-full overflow-hidden bg-surface-card">
       {/* Secondary Sidebar: Channels */}
-      <aside className="flex w-64 shrink-0 flex-col border-r border-surface-border bg-black/[0.02]">
-        <div className="flex h-14 items-center justify-between px-4 border-b border-surface-border bg-surface-card">
-          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">Kênh thảo luận</h2>
+      <aside className="flex w-64 shrink-0 flex-col border-r border-surface-border bg-white">
+        <div className="flex h-14 items-center justify-between px-6 border-b border-surface-border">
+          <h2 className="text-xs font-bold uppercase tracking-widest text-[color:var(--color-muted)]">
+            Kênh thảo luận
+          </h2>
           <button
             type="button"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-transparent text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)] transition-colors"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-sm border border-surface-border text-[color:var(--color-muted)] hover:bg-black/[0.04] hover:text-[color:var(--color-ink)] transition-colors"
             aria-label="Tạo kênh mới"
           >
-            <Plus size={16} />
+            <Plus size={14} />
           </button>
         </div>
 
@@ -55,17 +57,19 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
                   <Link
                     key={channel.id}
                     href={`/chat/${channel.id}`}
-                    className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] font-medium transition-colors ${
+                    className={`flex items-center gap-3 px-3 py-1.5 rounded-sm text-sm font-medium transition-colors ${
                       isActive
-                        ? 'bg-brand-600 text-white shadow-sm'
-                        : 'text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)]'
+                        ? 'bg-brand-500/[0.06] text-brand-600'
+                        : 'text-[color:var(--color-muted)] hover:bg-black/[0.02] hover:text-[color:var(--color-ink)]'
                     }`}
                   >
                     <Hash
                       size={14}
-                      className={isActive ? 'text-white' : 'text-[color:var(--color-faint)]'}
+                      className={isActive ? 'text-brand-500' : 'text-[color:var(--color-faint)]'}
                     />
-                    <span className="truncate">{channel.name}</span>
+                    <span className={`truncate ${isActive ? 'font-bold' : ''}`}>
+                      {channel.name}
+                    </span>
                   </Link>
                 );
               })}

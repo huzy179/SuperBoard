@@ -31,6 +31,7 @@ type PrivateShellProps = {
   navItems: NavItem[];
   pathname: string;
   onLogout: () => void;
+  noPadding?: boolean;
 };
 
 const NAV_ICONS: Record<NavItem['icon'], ReactNode> = {
@@ -42,7 +43,14 @@ const NAV_ICONS: Record<NavItem['icon'], ReactNode> = {
   docs: <FileText size={18} />,
 };
 
-export function PrivateShell({ children, user, navItems, pathname, onLogout }: PrivateShellProps) {
+export function PrivateShell({
+  children,
+  user,
+  navItems,
+  pathname,
+  onLogout,
+  noPadding,
+}: PrivateShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -153,10 +161,10 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
               onClick={() => setSidebarOpen(false)}
               className={`${baseClasses} group ${
                 isActive
-                  ? 'bg-brand-50 text-[color:var(--color-ink)] border border-brand-500/20'
+                  ? 'bg-brand-500/[0.06] text-brand-600 border border-brand-500/10 shadow-[0_1px_2px_rgba(0,0,0,0.02)]'
                   : isHighlighted
                     ? 'bg-black/[0.03] text-[color:var(--color-ink)] border border-surface-border'
-                    : 'text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)] border border-transparent'
+                    : 'text-[color:var(--color-muted)] hover:bg-black/[0.02] hover:text-[color:var(--color-ink)] border border-transparent'
               } ${sidebarCollapsed ? 'px-0 justify-center' : ''}`}
             >
               <div
@@ -164,9 +172,13 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
               >
                 {NAV_ICONS[item.icon]}
               </div>
-              {!sidebarCollapsed && <span className="flex items-center gap-2">{item.label}</span>}
+              {!sidebarCollapsed && (
+                <span className="flex items-center gap-2 font-semibold tracking-tight">
+                  {item.label}
+                </span>
+              )}
               {!sidebarCollapsed && isActive && (
-                <div className="ml-auto w-1 h-3 rounded-xs bg-brand-500" />
+                <div className="ml-auto w-1 h-3 rounded-full bg-brand-500" />
               )}
             </Link>
           );
@@ -217,7 +229,7 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
     <div className="flex h-screen overflow-hidden bg-surface-bg font-sans text-[color:var(--color-ink)]">
       {/* Desktop sidebar */}
       <aside
-        className={`hidden lg:flex shrink-0 flex-col z-50 transition-all duration-200 ease-in-out ${sidebarCollapsed ? 'w-24' : 'w-80'}`}
+        className={`hidden lg:flex shrink-0 flex-col z-50 transition-all duration-200 ease-in-out ${sidebarCollapsed ? 'w-20' : 'w-72'}`}
       >
         {sidebar}
       </aside>
@@ -264,8 +276,14 @@ export function PrivateShell({ children, user, navItems, pathname, onLogout }: P
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-[var(--space-8)] py-[var(--space-8)] md:px-[var(--space-10)] lg:px-[var(--space-12)] relative z-0">
-          <div className="max-w-[1700px] mx-auto relative z-10">{children}</div>
+        <main
+          className={`flex-1 overflow-y-auto relative z-0 ${noPadding ? '' : 'px-[var(--space-8)] py-[var(--space-8)] md:px-[var(--space-10)] lg:px-[var(--space-12)]'}`}
+        >
+          <div
+            className={`mx-auto relative z-10 ${noPadding ? 'h-full w-full' : 'max-w-[1700px]'}`}
+          >
+            {children}
+          </div>
         </main>
       </div>
 

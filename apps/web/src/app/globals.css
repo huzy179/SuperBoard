@@ -3,10 +3,8 @@
 
 :root {
   color-scheme: light;
-  --font-sans: var(--font-notion), Inter, -apple-system, system-ui, Segoe UI, Helvetica, Arial,
-    Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, sans-serif;
-  --font-display: var(--font-notion), Inter, -apple-system, system-ui, Segoe UI, Helvetica, Arial,
-    Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, sans-serif;
+  --font-sans: var(--font-hanken), Inter, sans-serif;
+  --font-display: var(--font-sora), Inter, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -49,7 +47,8 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
 @layer components {

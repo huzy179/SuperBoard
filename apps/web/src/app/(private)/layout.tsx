@@ -9,6 +9,7 @@ import { PRIVATE_NAV_ITEMS } from '@/lib/navigation';
 
 export default function PrivateLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const noPadding = pathname.startsWith('/chat') || pathname.startsWith('/docs');
 
   return (
     <QueryProvider>
@@ -19,6 +20,7 @@ export default function PrivateLayout({ children }: { children: ReactNode }) {
             pathname={pathname}
             navItems={PRIVATE_NAV_ITEMS}
             onLogout={logout}
+            noPadding={noPadding}
           >
             {children}
           </PrivateShell>

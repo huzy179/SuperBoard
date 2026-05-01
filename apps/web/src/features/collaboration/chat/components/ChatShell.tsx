@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { Hash, Lock, MoreVertical, Phone, Search, Users } from 'lucide-react';
 import type { Channel, Message } from '@superboard/shared';
 import { chatSocket } from '@/lib/realtime/chat-socket';
-import { ChannelSidebar } from './ChannelSidebar';
 import { DirectTransmissionHub } from './DirectTransmissionHub';
 import { MessageInput } from './MessageInput';
 import { MessageList } from './MessageList';
@@ -33,39 +32,37 @@ export function ChatShell({ channel }: ChatShellProps) {
 
   return (
     <div className="flex h-full w-full overflow-hidden bg-surface-bg">
-      <ChannelSidebar />
-
       <main className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-40 border-b border-surface-border bg-surface-card">
-          <div className="flex h-14 items-center justify-between gap-4 px-6">
-            <div className="flex items-center gap-3 min-w-0">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-surface-border bg-surface-bg text-[color:var(--color-muted)]">
-                {channel.type === 'PUBLIC' ? <Hash size={16} /> : <Lock size={16} />}
+        <header className="sticky top-0 z-40 border-b border-surface-border bg-white/80 backdrop-blur-md">
+          <div className="flex h-14 items-center justify-between gap-4 px-8">
+            <div className="flex items-center gap-4 min-w-0">
+              <span className="flex h-8 w-8 items-center justify-center rounded-sm border border-surface-border bg-surface-bg text-[color:var(--color-muted)]">
+                {channel.type === 'PUBLIC' ? <Hash size={14} /> : <Lock size={14} />}
               </span>
               <div className="min-w-0">
-                <div className="truncate text-sm font-semibold text-[color:var(--color-ink)]">
+                <div className="truncate text-sm font-bold tracking-tight text-[color:var(--color-ink)]">
                   {channel.name}
                 </div>
                 {channel.description ? (
-                  <div className="truncate text-xs text-[color:var(--color-muted)]">
+                  <div className="truncate text-xs font-medium text-[color:var(--color-muted)] opacity-80">
                     {channel.description}
                   </div>
                 ) : null}
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <IconBtn onClick={() => setShowTransmission(true)} label="Call">
-                <Phone size={16} />
+                <Phone size={14} />
               </IconBtn>
               <IconBtn onClick={() => {}} label="Search">
-                <Search size={16} />
+                <Search size={14} />
               </IconBtn>
               <IconBtn onClick={() => {}} label="Members">
-                <Users size={16} />
+                <Users size={14} />
               </IconBtn>
               <IconBtn onClick={() => {}} label="More">
-                <MoreVertical size={16} />
+                <MoreVertical size={14} />
               </IconBtn>
             </div>
           </div>

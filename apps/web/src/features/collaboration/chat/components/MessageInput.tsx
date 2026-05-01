@@ -56,15 +56,15 @@ export function MessageInput({ channelId }: MessageInputProps) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="rounded-lg border border-surface-border bg-surface-card shadow-sm">
-        <div className="flex items-end gap-2 p-3">
+    <div className="max-w-5xl mx-auto px-4">
+      <div className="rounded-sm border border-surface-border bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02)] transition-shadow focus-within:shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+        <div className="flex items-end gap-1 p-2">
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-surface-border bg-surface-bg text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)] transition-colors"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-sm text-[color:var(--color-muted)] hover:bg-black/[0.04] hover:text-[color:var(--color-ink)] transition-colors"
             aria-label="Attach"
           >
-            <Paperclip size={18} />
+            <Paperclip size={16} />
           </button>
 
           <textarea
@@ -74,30 +74,36 @@ export function MessageInput({ channelId }: MessageInputProps) {
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder="Nhập tin nhắn…"
-            className="flex-1 bg-transparent border-none resize-none py-2 text-sm text-[color:var(--color-ink)] placeholder:text-[color:var(--color-faint)] focus:outline-none min-h-[44px] max-h-[200px] leading-relaxed"
+            className="flex-1 bg-transparent border-none resize-none py-2 text-[14px] text-[color:var(--color-ink)] placeholder:text-[color:var(--color-faint)] focus:outline-none min-h-[40px] max-h-[200px] leading-relaxed"
           />
 
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-surface-border bg-surface-bg text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)] transition-colors"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-sm text-[color:var(--color-muted)] hover:bg-black/[0.04] hover:text-[color:var(--color-ink)] transition-colors"
             aria-label="Emoji"
           >
-            <Smile size={18} />
+            <Smile size={16} />
           </button>
 
           <button
             type="button"
             onClick={handleSend}
             disabled={!content.trim() || sendMessageMutation.isPending}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-brand-500 text-white transition-colors hover:bg-brand-600 disabled:opacity-40"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-sm bg-brand-500 text-white transition-colors hover:bg-brand-600 disabled:opacity-40 shadow-sm"
             aria-label="Send"
           >
-            <Send size={18} />
+            <Send size={16} />
           </button>
         </div>
 
-        <div className="border-t border-surface-border px-3 py-2 text-xs text-[color:var(--color-muted)]">
-          Enter để gửi • Shift+Enter xuống dòng
+        <div className="flex items-center justify-between border-t border-surface-border/50 px-3 py-1.5 bg-black/[0.01]">
+          <div className="text-[10px] font-bold text-[color:var(--color-muted)] uppercase tracking-wider opacity-60">
+            Markdown Supported
+          </div>
+          <div className="text-[10px] font-medium text-[color:var(--color-muted)] opacity-60">
+            <span className="font-bold text-brand-600">Enter</span> to send •{' '}
+            <span className="font-bold text-brand-600">Shift+Enter</span> for new line
+          </div>
         </div>
       </div>
     </div>

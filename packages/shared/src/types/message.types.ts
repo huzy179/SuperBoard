@@ -8,6 +8,7 @@ export interface Channel {
   name: string;
   description?: string | null;
   type: ChannelType;
+  lastMessageAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }

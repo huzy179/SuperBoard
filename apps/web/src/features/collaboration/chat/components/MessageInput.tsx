@@ -8,9 +8,10 @@ import { chatSocket } from '@/lib/realtime/chat-socket';
 
 interface MessageInputProps {
   channelId: string;
+  onSendDraft?: (content: string) => void;
 }
 
-export function MessageInput({ channelId }: MessageInputProps) {
+export function MessageInput({ channelId, onSendDraft }: MessageInputProps) {
   const [content, setContent] = useState('');
   const { user } = useAuthSession();
   const sendMessageMutation = useSendMessage(channelId);
@@ -27,12 +28,16 @@ export function MessageInput({ channelId }: MessageInputProps) {
     const trimmed = content.trim();
     if (!trimmed || sendMessageMutation.isPending) return;
 
-    sendMessageMutation.mutate({ content: trimmed });
+    if (onSendDraft) {
+      onSendDraft(trimmed);
+    } else {
+      sendMessageMutation.mutate({ content: trimmed });
+    }
     setContent('');
 
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
-      if (user) chatSocket.sendTyping(channelId, user.id, false);
+      if (user && !onSendDraft) chatSocket.sendTyping(channelId, user.id, false);
     }
   };
 
@@ -47,6 +52,7 @@ export function MessageInput({ channelId }: MessageInputProps) {
     setContent(e.target.value);
 
     if (!user) return;
+    if (onSendDraft) return;
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
 
     chatSocket.sendTyping(channelId, user.id, true);
@@ -56,9 +62,9 @@ export function MessageInput({ channelId }: MessageInputProps) {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4">
-      <div className="rounded-sm border border-surface-border bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02)] transition-shadow focus-within:shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
-        <div className="flex items-end gap-1 p-2">
+    <div className="w-full px-0">
+      <div className="group rounded-md border border-surface-border bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] transition-shadow focus-within:shadow-[0_6px_18px_rgba(0,0,0,0.06)]">
+        <div className="flex items-end gap-1.5 p-2">
           <button
             type="button"
             className="inline-flex h-9 w-9 items-center justify-center rounded-sm text-[color:var(--color-muted)] hover:bg-black/[0.04] hover:text-[color:var(--color-ink)] transition-colors"
@@ -74,7 +80,7 @@ export function MessageInput({ channelId }: MessageInputProps) {
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder="Nhập tin nhắn…"
-            className="flex-1 bg-transparent border-none resize-none py-2 text-[14px] text-[color:var(--color-ink)] placeholder:text-[color:var(--color-faint)] focus:outline-none min-h-[40px] max-h-[200px] leading-relaxed"
+            className="flex-1 bg-transparent border-none resize-none py-2 text-[14px] text-[color:var(--color-ink)] placeholder:text-[color:var(--color-faint)] focus:outline-none min-h-[40px] max-h-[160px] leading-relaxed"
           />
 
           <button
@@ -96,13 +102,13 @@ export function MessageInput({ channelId }: MessageInputProps) {
           </button>
         </div>
 
-        <div className="flex items-center justify-between border-t border-surface-border/50 px-3 py-1.5 bg-black/[0.01]">
+        <div className="hidden items-center justify-between border-t border-surface-border/50 px-3 py-1.5 bg-black/[0.01] group-focus-within:flex">
           <div className="text-[10px] font-bold text-[color:var(--color-muted)] uppercase tracking-wider opacity-60">
-            Markdown Supported
+            Markdown
           </div>
           <div className="text-[10px] font-medium text-[color:var(--color-muted)] opacity-60">
-            <span className="font-bold text-brand-600">Enter</span> to send •{' '}
-            <span className="font-bold text-brand-600">Shift+Enter</span> for new line
+            <span className="font-bold text-brand-600">Enter</span> gửi •{' '}
+            <span className="font-bold text-brand-600">Shift+Enter</span> xuống dòng
           </div>
         </div>
       </div>

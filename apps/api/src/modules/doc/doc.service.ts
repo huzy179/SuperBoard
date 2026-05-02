@@ -103,6 +103,20 @@ export class DocService {
     return doc;
   }
 
+  async getPublicDocById(docId: string) {
+    const doc = await this.prisma.doc.findUnique({
+      where: { id: docId },
+      include: {
+        creator: {
+          select: { id: true, fullName: true, avatarUrl: true },
+        },
+      },
+    });
+
+    if (!doc || doc.deletedAt) throw new NotFoundException('Document not found');
+    return doc;
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async updateDoc(docId: string, data: { title?: string; content?: any; parentDocId?: string }) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -209,6 +223,30 @@ export class DocService {
       orderBy: { savedAt: 'desc' },
       take: 20,
     });
+  }
+
+  async restoreVersion(docId: string, versionId: string) {
+    // Ensure doc exists and isn't deleted
+    const doc = await this.getDocById(docId);
+
+    const version = await this.prisma.docVersion.findFirst({
+      where: { id: versionId, docId },
+    });
+    if (!version) throw new NotFoundException('Doc version not found');
+
+    const updated = await this.prisma.doc.update({
+      where: { id: doc.id },
+      data: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        content: version.content as any,
+        updatedAt: new Date(),
+      },
+    });
+
+    // Trigger embedding sync in background
+    void this.syncDocEmbedding(updated.id, updated.title, updated.content);
+
+    return updated;
   }
 
   async getDocTextContent(docId: string): Promise<string> {

@@ -1,13 +1,18 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useDoc, useDocVersions } from '@/features/collaboration/docs/hooks/use-doc';
+import {
+  useDoc,
+  useDocVersions,
+  useRestoreDocVersion,
+} from '@/features/collaboration/docs/hooks/use-doc';
 import { RichTextEditor } from '@/features/collaboration/docs/components/RichTextEditor';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { ChevronLeft, Clock, RotateCcw, FileText, Check } from 'lucide-react';
 import { useState } from 'react';
 import type { DocVersion } from '@superboard/shared';
+import { toast } from 'sonner';
 
 export default function VersionHistoryPage() {
   const params = useParams<{ docId: string }>();
@@ -15,11 +20,30 @@ export default function VersionHistoryPage() {
   const { data: doc, isLoading: docLoading } = useDoc(params.docId);
   const { data: versions, isLoading: versionsLoading } = useDocVersions(params.docId);
   const [selectedVersion, setSelectedVersion] = useState<DocVersion | null>(null);
+  const restoreMutation = useRestoreDocVersion(params.docId);
 
   if (docLoading || versionsLoading) {
     return (
       <div className="flex flex-1 items-center justify-center h-full">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-600 border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!doc) {
+    return (
+      <div className="flex flex-1 items-center justify-center h-full p-10">
+        <div className="w-full max-w-lg rounded-lg border border-surface-border bg-surface-card shadow-luxe p-6">
+          <h3 className="text-base font-semibold text-[color:var(--color-ink)]">
+            Không tải được tài liệu
+          </h3>
+          <p className="mt-2 text-sm text-[color:var(--color-muted)]">
+            Không tìm thấy tài liệu hoặc bạn không có quyền truy cập.
+          </p>
+          <button type="button" onClick={() => router.back()} className="mt-4 btn btn-secondary">
+            Quay lại
+          </button>
+        </div>
       </div>
     );
   }
@@ -51,13 +75,23 @@ export default function VersionHistoryPage() {
         {isViewingHistory && (
           <button
             onClick={() => {
-              // Logic to restore would go here via a mutation
-              alert('Tính năng khôi phục đang được phê duyệt...');
+              const versionId = selectedVersion?.id;
+              if (!versionId) return;
+              restoreMutation
+                .mutateAsync(versionId)
+                .then(() => {
+                  setSelectedVersion(null);
+                  toast.success('Đã khôi phục và quay lại bản hiện tại');
+                })
+                .catch(() => {
+                  // toast handled in mutation
+                });
             }}
+            disabled={restoreMutation.isPending}
             className="flex items-center gap-2 px-3 py-2 rounded-md bg-brand-500 text-white text-[12px] font-semibold hover:bg-brand-600 transition-colors"
           >
             <RotateCcw size={14} />
-            Khôi phục bản này
+            {restoreMutation.isPending ? 'Đang khôi phục…' : 'Khôi phục bản này'}
           </button>
         )}
       </header>

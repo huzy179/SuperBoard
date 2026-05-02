@@ -76,7 +76,7 @@ export default function DocDetailPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-surface-bg">
+    <div className="flex flex-col h-full bg-[color:var(--color-surface-alt)]/20">
       <header className="sticky top-0 z-50 h-16 shrink-0 border-b border-surface-border bg-surface-card">
         <div className="h-full max-w-[1700px] mx-auto px-[var(--space-6)] flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
@@ -138,52 +138,67 @@ export default function DocDetailPage() {
 
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 overflow-y-auto px-[var(--space-6)] py-[var(--space-8)]">
-          <div className="max-w-4xl mx-auto space-y-8">
-            <div className="space-y-3">
-              <input
-                type="text"
-                value={localTitle}
-                onChange={(e) => setLocalTitle(e.target.value)}
-                placeholder="Tiêu đề…"
-                className="w-full -mx-2 px-2 py-1 rounded-md border-none bg-transparent text-4xl md:text-5xl font-semibold tracking-tight text-[color:var(--color-ink)] placeholder:text-[color:var(--color-faint)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-focus)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg"
-              />
-
-              <div className="flex flex-wrap items-center gap-4 text-sm text-[color:var(--color-muted)]">
-                <div className="flex items-center gap-2">
-                  <AssigneeAvatar
-                    name={doc?.creator?.fullName || 'User'}
-                    src={doc?.creator?.avatarUrl}
-                    size="sm"
+          <div className="max-w-5xl mx-auto">
+            <div className="rounded-xl border border-surface-border bg-surface-card shadow-sm overflow-hidden">
+              <div className="px-8 pt-8 pb-6 sm:px-10">
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    value={localTitle}
+                    onChange={(e) => setLocalTitle(e.target.value)}
+                    placeholder="Tiêu đề…"
+                    className="w-full -mx-2 px-2 py-1 rounded-md border-none bg-transparent text-3xl md:text-4xl font-semibold tracking-tight leading-tight text-[color:var(--color-ink)] placeholder:text-[color:var(--color-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-focus)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-card"
                   />
-                  <span className="font-medium">{doc?.creator?.fullName || 'User'}</span>
-                </div>
-                <span className="h-1 w-1 rounded-full bg-surface-border" aria-hidden />
-                <span>
-                  Updated{' '}
-                  {new Date(doc?.updatedAt || '').toLocaleString('en-US', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                  })}
-                </span>
-              </div>
-            </div>
 
-            <div className="min-h-[700px] pb-24">
-              <RichTextEditor
-                docId={params.docId}
-                content={localContent}
-                onChange={setLocalContent}
-                user={
-                  user
-                    ? {
-                        id: user.id,
-                        fullName: user.fullName,
-                        avatarColor: user.avatarColor ?? undefined,
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-[color:var(--color-muted)]">
+                    <div className="flex items-center gap-2">
+                      <AssigneeAvatar
+                        name={doc?.creator?.fullName || 'User'}
+                        src={doc?.creator?.avatarUrl}
+                        size="sm"
+                      />
+                      <span className="font-medium">{doc?.creator?.fullName || 'User'}</span>
+                    </div>
+                    <span className="h-1 w-1 rounded-full bg-surface-border" aria-hidden />
+                    <span>
+                      Updated{' '}
+                      {new Date(doc?.updatedAt || '').toLocaleString('en-US', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                      })}
+                    </span>
+                  </div>
+
+                  {!localContent ? (
+                    <p className="text-[13px] text-[color:var(--color-faint)] leading-relaxed">
+                      Mẹo: gõ <span className="font-mono">/</span> để mở lệnh nhanh, hoặc bôi đen
+                      đoạn văn để dùng AI.
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="border-t border-surface-border bg-surface-bg/40">
+                <div className="px-8 py-7 sm:px-10">
+                  <div className="min-h-[720px] pb-20">
+                    <RichTextEditor
+                      docId={params.docId}
+                      content={localContent}
+                      onChange={setLocalContent}
+                      user={
+                        user
+                          ? {
+                              id: user.id,
+                              fullName: user.fullName,
+                              avatarColor: user.avatarColor ?? undefined,
+                            }
+                          : undefined
                       }
-                    : undefined
-                }
-              />
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

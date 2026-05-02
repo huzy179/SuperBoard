@@ -53,7 +53,6 @@ export function RichTextEditor({
   variant = 'minimal',
   user,
 }: RichTextEditorProps) {
-  const [provider, setProvider] = useState<HocuspocusProvider | null>(null);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0, show: false });
   const [isAiProcessing, setIsAiProcessing] = useState(false);
   const [icon, setIcon] = useState('📑');
@@ -69,83 +68,132 @@ export function RichTextEditor({
 
   const ydoc = useMemo(() => new Y.Doc(), []);
 
-  const editor = useEditor(
-    {
-      extensions: [
-        StarterKit.configure({
-          heading: {
-            levels: [1, 2, 3],
-            HTMLAttributes: {
-              class: 'scroll-mt-24 font-semibold tracking-tight text-[color:var(--color-ink)] mb-4',
-            },
+  const provider = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    if (!docId || !user) return null;
+
+    const token = localStorage.getItem('access_token');
+    if (!token) return null;
+
+    return new HocuspocusProvider({
+      url: process.env.NEXT_PUBLIC_COLLAB_WS_URL || 'ws://localhost:1234',
+      name: docId,
+      document: ydoc,
+      token,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [docId, user?.id, ydoc]);
+
+  const extensions = useMemo(() => {
+    const base = [
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+          HTMLAttributes: {
+            class: 'scroll-mt-24 font-semibold tracking-tight text-[color:var(--color-ink)] mb-4',
           },
-        }),
+        },
+      }),
+      JiraTask,
+    ];
+
+    // CollaborationCursor expects a non-null provider with `.awareness`.
+    // In our flow, provider is created async, so guard these extensions.
+    if (provider) {
+      return [
+        ...base,
         Collaboration.configure({
           document: ydoc,
         }),
         CollaborationCursor.configure({
-          provider: provider,
+          provider,
           user: {
             name: user?.fullName || 'Người dùng',
             color: user?.avatarColor || '#6366f1',
           },
         }),
-        JiraTask,
-      ],
+      ];
+    }
+
+    return base;
+  }, [provider, user?.avatarColor, user?.fullName, ydoc]);
+
+  const editor = useEditor(
+    {
+      // TipTap can falsely detect SSR in Next.js App Router and cause hydration mismatches.
+      // Disable immediate render to ensure the editor mounts client-side cleanly.
+      immediatelyRender: false,
+      extensions,
       content: provider ? null : content,
       editable: editable,
       onUpdate: ({ editor }) => {
-        onChange(editor.getJSON());
+        try {
+          // Editor can briefly be in a transitional state when extensions/provider changes.
+          // Guard to avoid crashing the whole page.
+          if (!editor || (editor as unknown as { isDestroyed?: boolean }).isDestroyed) return;
+          if (!editor.state?.doc) return;
 
-        const { selection } = editor.state;
-        const isSlash = editor.state.doc.textBetween(selection.from - 1, selection.from) === '/';
-        if (isSlash) {
-          const { view } = editor;
-          const coords = view.coordsAtPos(selection.from);
-          setSlashMenu({
-            show: true,
-            top: coords.top + 20,
-            left: coords.left,
-            mode: 'default',
-          });
-        } else if (!slashMenu.show) {
-          // Do nothing if not already showing
-        } else {
-          // Close if not slash and not in search mode
-          if (slashMenu.mode === 'default') {
-            setSlashMenu((prev) => ({ ...prev, show: false }));
+          onChange(editor.getJSON());
+
+          const { selection } = editor.state;
+          if (!selection) return;
+
+          const from = Math.max(0, selection.from - 1);
+          const to = Math.max(0, selection.from);
+          const isSlash = editor.state.doc.textBetween(from, to) === '/';
+          if (isSlash) {
+            const { view } = editor;
+            const coords = view.coordsAtPos(selection.from);
+            setSlashMenu({
+              show: true,
+              top: coords.top + 20,
+              left: coords.left,
+              mode: 'default',
+            });
+          } else {
+            setSlashMenu((prev) =>
+              prev.show && prev.mode === 'default' ? { ...prev, show: false } : prev,
+            );
           }
+        } catch (err) {
+          // Never let editor runtime errors take down the entire docs page.
+          console.error('RichTextEditor onUpdate error', err);
         }
       },
       editorProps: {
         attributes: {
           class: `prose prose-slate max-w-none focus:outline-none ${
             editable ? 'min-h-[500px]' : ''
-          } prose-headings:text-[color:var(--color-ink)] prose-p:text-[color:var(--color-ink)] prose-strong:text-[color:var(--color-ink)] prose-a:text-brand-500 prose-code:text-emerald-700 prose-pre:bg-[color:var(--color-surface-alt)] prose-pre:border prose-pre:border-surface-border`,
+          } prose-headings:text-[color:var(--color-ink)] prose-p:text-[color:var(--color-ink)] prose-strong:text-[color:var(--color-ink)] prose-a:text-brand-600 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline prose-code:text-emerald-700 prose-pre:bg-[color:var(--color-surface-alt)] prose-pre:border prose-pre:border-surface-border prose-pre:shadow-sm prose-pre:rounded-lg prose-h1:text-3xl prose-h1:mt-0 prose-h1:mb-4 prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-3 prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-2 prose-p:leading-7 prose-li:my-1 prose-ul:my-4 prose-ol:my-4 prose-blockquote:border-surface-border prose-blockquote:text-[color:var(--color-muted)]`,
         },
       },
     },
-    [provider],
+    [extensions],
   );
 
   useEffect(() => {
     if (!editor || !editable) return;
 
     const handleSelection = () => {
-      const { from, to } = editor.state.selection;
-      if (from === to) {
-        setMenuPos((prev) => ({ ...prev, show: false }));
-        return;
+      try {
+        if ((editor as unknown as { isDestroyed?: boolean }).isDestroyed) return;
+        const { from, to } = editor.state.selection;
+        if (from === to) {
+          setMenuPos((prev) => ({ ...prev, show: false }));
+          return;
+        }
+
+        const { view } = editor;
+        const start = view.coordsAtPos(from);
+        const end = view.coordsAtPos(to);
+
+        const top = Math.min(start.top, end.top) - 50;
+        const left = (start.left + end.left) / 2;
+
+        setMenuPos({ top, left, show: true });
+      } catch (err) {
+        console.error('RichTextEditor selectionUpdate error', err);
       }
-
-      const { view } = editor;
-      const start = view.coordsAtPos(from);
-      const end = view.coordsAtPos(to);
-
-      const top = Math.min(start.top, end.top) - 50;
-      const left = (start.left + end.left) / 2;
-
-      setMenuPos({ top, left, show: true });
     };
 
     editor.on('selectionUpdate', handleSelection);
@@ -155,7 +203,8 @@ export function RichTextEditor({
   }, [editable, editor]);
 
   const handleAiAction = async (mode: string) => {
-    if (!editor) return;
+    if (!editor || (editor as unknown as { isDestroyed?: boolean }).isDestroyed) return;
+    if (!editor.state?.doc) return;
     const { from, to } = editor.state.selection;
     const selectedText = editor.state.doc.textBetween(from, to);
 
@@ -187,21 +236,10 @@ export function RichTextEditor({
   };
 
   useEffect(() => {
-    if (!docId || !user) return;
-
-    const newProvider = new HocuspocusProvider({
-      url: process.env.NEXT_PUBLIC_COLLAB_WS_URL || 'ws://localhost:1234',
-      name: docId,
-      document: ydoc,
-      token: localStorage.getItem('access_token') || '',
-    });
-
-    Promise.resolve().then(() => setProvider(newProvider));
-
     return () => {
-      newProvider.destroy();
+      provider?.destroy();
     };
-  }, [docId, user, ydoc]);
+  }, [provider]);
 
   useEffect(() => {
     if (editor && content && JSON.stringify(content) !== JSON.stringify(editor.getJSON())) {
@@ -493,39 +531,41 @@ export function RichTextEditor({
       )}
 
       {editable && (
-        <div className="sticky top-4 z-40 flex flex-wrap items-center gap-1 border border-surface-border bg-surface-card p-2 mb-6 shadow-sm rounded-md">
-          <MenuButton
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            active={editor.isActive('bold')}
-            icon={<Bold size={16} />}
-          />
-          <MenuButton
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            active={editor.isActive('italic')}
-            icon={<Italic size={16} />}
-          />
-          <div className="w-px h-6 bg-surface-border mx-2" />
-          <MenuButton
-            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-            active={editor.isActive('heading', { level: 1 })}
-            label="H1"
-          />
-          <MenuButton
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            active={editor.isActive('heading', { level: 2 })}
-            label="H2"
-          />
-          <MenuButton
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            active={editor.isActive('bulletList')}
-            icon={<ListIcon size={16} />}
-          />
-          <div className="w-px h-6 bg-surface-border mx-2" />
-          <MenuButton
-            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-            active={editor.isActive('codeBlock')}
-            icon={<Code size={16} />}
-          />
+        <div className="sticky top-4 z-40 mb-6">
+          <div className="inline-flex flex-wrap items-center gap-1 rounded-lg border border-surface-border bg-surface-card/90 backdrop-blur px-2 py-1.5 shadow-sm">
+            <MenuButton
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              active={editor.isActive('bold')}
+              icon={<Bold size={16} />}
+            />
+            <MenuButton
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              active={editor.isActive('italic')}
+              icon={<Italic size={16} />}
+            />
+            <div className="w-px h-6 bg-surface-border mx-2" />
+            <MenuButton
+              onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+              active={editor.isActive('heading', { level: 1 })}
+              label="H1"
+            />
+            <MenuButton
+              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+              active={editor.isActive('heading', { level: 2 })}
+              label="H2"
+            />
+            <MenuButton
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              active={editor.isActive('bulletList')}
+              icon={<ListIcon size={16} />}
+            />
+            <div className="w-px h-6 bg-surface-border mx-2" />
+            <MenuButton
+              onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+              active={editor.isActive('codeBlock')}
+              icon={<Code size={16} />}
+            />
+          </div>
         </div>
       )}
 

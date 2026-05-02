@@ -8,6 +8,13 @@ import { DirectTransmissionHub } from './DirectTransmissionHub';
 import { MessageInput } from './MessageInput';
 import { MessageList } from './MessageList';
 import { ThreadPanel } from './ThreadPanel';
+import { useJoinChannel } from '@/features/collaboration/chat/hooks/use-chat';
+import { ChatSearchOverlay } from './ChatSearchOverlay';
+import { ChatMembersOverlay } from './ChatMembersOverlay';
+import { ChatMoreOverlay } from './ChatMoreOverlay';
+import { ChatContainer } from './ChatContainer';
+import { useAuthSession } from '@/features/system/auth/hooks/use-auth-session';
+import { useWorkspaceMembers } from '@/features/system/workspace/hooks/use-workspace';
 
 interface ChatShellProps {
   channel: Channel;
@@ -17,6 +24,17 @@ export function ChatShell({ channel }: ChatShellProps) {
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [activeThread, setActiveThread] = useState<Message | null>(null);
   const [showTransmission, setShowTransmission] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [showMembers, setShowMembers] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+  const joinChannelMutation = useJoinChannel();
+  const { user } = useAuthSession();
+  const { data: workspaceMembers } = useWorkspaceMembers(channel.workspaceId);
+
+  useEffect(() => {
+    joinChannelMutation.mutate(channel.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [channel.id]);
 
   useEffect(() => {
     const unsubscribe = chatSocket.onTyping((data) => {
@@ -30,18 +48,31 @@ export function ChatShell({ channel }: ChatShellProps) {
     return () => unsubscribe();
   }, [channel.id]);
 
+  const title = getChannelDisplayName({
+    channelName: channel.name,
+    ...(user?.id ? { currentUserId: user.id } : {}),
+    ...(workspaceMembers
+      ? {
+          workspaceMembers: workspaceMembers.map((m) => ({
+            userId: m.userId,
+            fullName: m.fullName,
+          })),
+        }
+      : {}),
+  });
+
   return (
     <div className="flex h-full w-full overflow-hidden bg-surface-bg">
       <main className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-40 border-b border-surface-border bg-white/80 backdrop-blur-md">
-          <div className="flex h-14 items-center justify-between gap-4 px-8">
+          <ChatContainer className="flex h-14 items-center justify-between gap-4">
             <div className="flex items-center gap-4 min-w-0">
               <span className="flex h-8 w-8 items-center justify-center rounded-sm border border-surface-border bg-surface-bg text-[color:var(--color-muted)]">
                 {channel.type === 'PUBLIC' ? <Hash size={14} /> : <Lock size={14} />}
               </span>
               <div className="min-w-0">
                 <div className="truncate text-sm font-bold tracking-tight text-[color:var(--color-ink)]">
-                  {channel.name}
+                  {title}
                 </div>
                 {channel.description ? (
                   <div className="truncate text-xs font-medium text-[color:var(--color-muted)] opacity-80">
@@ -55,31 +86,37 @@ export function ChatShell({ channel }: ChatShellProps) {
               <IconBtn onClick={() => setShowTransmission(true)} label="Call">
                 <Phone size={14} />
               </IconBtn>
-              <IconBtn onClick={() => {}} label="Search">
+              <IconBtn onClick={() => setShowSearch(true)} label="Search">
                 <Search size={14} />
               </IconBtn>
-              <IconBtn onClick={() => {}} label="Members">
+              <IconBtn onClick={() => setShowMembers(true)} label="Members">
                 <Users size={14} />
               </IconBtn>
-              <IconBtn onClick={() => {}} label="More">
+              <IconBtn onClick={() => setShowMore(true)} label="More">
                 <MoreVertical size={14} />
               </IconBtn>
             </div>
-          </div>
+          </ChatContainer>
         </header>
 
         <div className="flex flex-1 min-h-0 overflow-hidden">
           <div className="flex min-h-0 flex-1 flex-col">
-            <MessageList channelId={channel.id} onOpenThread={setActiveThread} />
+            <ChatContainer className="flex min-h-0 flex-1 flex-col">
+              <MessageList channelId={channel.id} onOpenThread={setActiveThread} />
+            </ChatContainer>
 
             {typingUsers.length > 0 ? (
-              <div className="px-6 py-2 text-xs text-[color:var(--color-muted)] border-t border-surface-border bg-surface-card">
-                Đang nhập…
+              <div className="border-t border-surface-border bg-surface-card">
+                <ChatContainer className="py-2 text-xs text-[color:var(--color-muted)]">
+                  Đang nhập…
+                </ChatContainer>
               </div>
             ) : null}
 
-            <div className="px-6 pb-6 pt-3 bg-surface-bg">
-              <MessageInput channelId={channel.id} />
+            <div className="bg-surface-bg">
+              <ChatContainer className="pb-4 pt-3">
+                <MessageInput channelId={channel.id} />
+              </ChatContainer>
             </div>
           </div>
 
@@ -96,9 +133,52 @@ export function ChatShell({ channel }: ChatShellProps) {
             onClose={() => setShowTransmission(false)}
           />
         ) : null}
+
+        <ChatSearchOverlay
+          isOpen={showSearch}
+          onClose={() => setShowSearch(false)}
+          channelId={channel.id}
+        />
+        <ChatMembersOverlay
+          isOpen={showMembers}
+          onClose={() => setShowMembers(false)}
+          workspaceId={channel.workspaceId}
+          channelId={channel.id}
+        />
+        {showMore ? (
+          <ChatMoreOverlay
+            isOpen={showMore}
+            onClose={() => setShowMore(false)}
+            channelId={channel.id}
+            workspaceId={channel.workspaceId}
+            channelName={channel.name}
+          />
+        ) : null}
       </main>
     </div>
   );
+}
+
+function getChannelDisplayName({
+  channelName,
+  currentUserId,
+  workspaceMembers,
+}: {
+  channelName: string;
+  currentUserId?: string;
+  workspaceMembers?: { userId: string; fullName: string }[];
+}) {
+  if (!channelName.startsWith('dm:')) return channelName;
+  if (!currentUserId) return 'Tin nhắn trực tiếp';
+
+  const parts = channelName.split(':');
+  if (parts.length !== 3) return 'Tin nhắn trực tiếp';
+  const otherId =
+    parts[1] === currentUserId ? parts[2] : parts[2] === currentUserId ? parts[1] : null;
+  if (!otherId) return 'Tin nhắn trực tiếp';
+
+  const other = workspaceMembers?.find((m) => m.userId === otherId);
+  return other?.fullName || 'Tin nhắn trực tiếp';
 }
 
 function IconBtn({

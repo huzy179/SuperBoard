@@ -5,6 +5,7 @@
 import { Cpu, Download, Box, Globe, HardDrive, RefreshCcw } from 'lucide-react';
 import { useState } from 'react';
 import { apiPost } from '@/lib/api-client';
+import { API_ENDPOINTS } from '@/lib/api/endpoints';
 import { toast } from 'sonner';
 
 interface NeuralBriefingProps {
@@ -28,8 +29,8 @@ export function NeuralBriefing({ projectId }: NeuralBriefingProps) {
     toast.info('Đang tổng hợp Dataset từ Neural Signals...');
 
     try {
-      const { result } = await apiPost<any>(
-        '/v1/ai/dataset/export',
+      const result = await apiPost<any>(
+        API_ENDPOINTS.ai.datasetExport,
         {
           format: 'llama3',
           limit: 1000,

@@ -17,6 +17,8 @@ interface AppMutationOptions<TData, TError, TVariables, TContext> extends UseMut
   action?: ActionType;
   successMessage?: string;
   invalidateKeys?: ReadonlyArray<QueryKey>; // Support readonly keys
+  notifyOnSuccess?: boolean;
+  notifyOnError?: boolean;
 }
 
 /**
@@ -33,6 +35,8 @@ export function useAppMutation<
     action,
     successMessage,
     invalidateKeys,
+    notifyOnSuccess = true,
+    notifyOnError = true,
     onSuccess,
     onError,
     ...mutationOptions
@@ -51,10 +55,12 @@ export function useAppMutation<
     },
     onSuccess: (...args) => {
       // 1. Show notification
-      if (action && resource) {
-        notify.success(action, resource, successMessage);
-      } else if (successMessage) {
-        notify.success('update', '', successMessage);
+      if (notifyOnSuccess) {
+        if (action && resource) {
+          notify.success(action, resource, successMessage);
+        } else if (successMessage) {
+          notify.success('update', '', successMessage);
+        }
       }
 
       // 2. Invalidate queries
@@ -72,7 +78,9 @@ export function useAppMutation<
     onError: (...args) => {
       const [error] = args;
       // 1. Show error notification
-      notify.error(error, action, resource);
+      if (notifyOnError) {
+        notify.error(error, action, resource);
+      }
 
       // 2. Call original onError
       if (onError) {

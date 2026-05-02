@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@nestjs/common';
 import { DocService } from './doc.service';
 import { apiSuccess } from '../../common/api-response';
+import { Public } from '../../common/decorators/public.decorator';
 
 @Controller('docs')
 export class DocController {
@@ -21,6 +22,13 @@ export class DocController {
   async getWorkspaceDocs(@Query('workspaceId') workspaceId: string) {
     const docs = await this.docService.getWorkspaceDocs(workspaceId);
     return apiSuccess(docs);
+  }
+
+  @Public()
+  @Get('public/:docId')
+  async getPublicDocById(@Param('docId') docId: string) {
+    const doc = await this.docService.getPublicDocById(docId);
+    return apiSuccess(doc);
   }
 
   @Get(':docId')
@@ -56,5 +64,11 @@ export class DocController {
   async getDocVersions(@Param('docId') docId: string) {
     const versions = await this.docService.getDocVersions(docId);
     return apiSuccess(versions);
+  }
+
+  @Post(':docId/restore/:versionId')
+  async restoreVersion(@Param('docId') docId: string, @Param('versionId') versionId: string) {
+    const doc = await this.docService.restoreVersion(docId, versionId);
+    return apiSuccess(doc);
   }
 }

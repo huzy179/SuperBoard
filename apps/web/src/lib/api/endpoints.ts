@@ -14,6 +14,7 @@ export const API_ENDPOINTS = {
     restore: (projectId: string) => `/api/v1/projects/${projectId}/restore`,
     createTask: (projectId: string) => `/api/v1/projects/${projectId}/tasks`,
     bulkTask: (projectId: string) => `/api/v1/projects/${projectId}/tasks/bulk`,
+    batchCreateTasks: (projectId: string) => `/api/v1/projects/${projectId}/tasks/batch`,
     updateTaskStatus: (projectId: string, taskId: string) =>
       `/api/v1/projects/${projectId}/tasks/${taskId}/status`,
     updateTask: (projectId: string, taskId: string) =>
@@ -39,8 +40,10 @@ export const API_ENDPOINTS = {
     aiRefine: (taskId: string) => `/api/v1/tasks/${taskId}/ai/refine`,
     aiIntelligence: (taskId: string) => `/api/v1/tasks/${taskId}/ai/intelligence`,
     plan: (projectId: string) => `/api/v1/projects/${projectId}/plan`,
+    syncStatuses: (projectId: string) => `/api/v1/projects/${projectId}/statuses/sync`,
     chronology: (projectId: string) => `/api/v1/projects/${projectId}/chronology`,
     briefing: (projectId: string) => `/api/v1/projects/${projectId}/briefing`,
+    generateBriefing: (projectId: string) => `/api/v1/projects/${projectId}/generate-briefing`,
     forecast: (projectId: string) => `/api/v1/projects/${projectId}/forecast`,
     simulate: (projectId: string) => `/api/v1/projects/${projectId}/simulate`,
     predictiveHealth: (projectId: string) => `/api/v1/projects/${projectId}/predictive-health`,
@@ -90,7 +93,9 @@ export const API_ENDPOINTS = {
   search: {
     global: (query: string) => `/api/v1/search?q=${encodeURIComponent(query)}`,
     answer: '/api/v1/search/answer',
-    status: '/api/v1/search/status',
+    status: '/api/v1/search/sync-status',
+    relatedDocs: (taskNumber: number, taskTitle: string) =>
+      `/api/v1/search/related-docs?taskNumber=${taskNumber}&taskTitle=${encodeURIComponent(taskTitle)}`,
   },
   upload: {
     avatar: '/api/v1/upload/avatar',
@@ -98,7 +103,14 @@ export const API_ENDPOINTS = {
   chat: {
     channels: (workspaceId: string) => `/api/v1/chat/channels?workspaceId=${workspaceId}`,
     createChannel: (workspaceId: string) => `/api/v1/chat/channel?workspaceId=${workspaceId}`,
+    dm: (workspaceId: string) => `/api/v1/chat/dm?workspaceId=${workspaceId}`,
+    findDm: (workspaceId: string, otherUserId: string) =>
+      `/api/v1/chat/dm?workspaceId=${workspaceId}&otherUserId=${encodeURIComponent(otherUserId)}`,
     joinChannel: (channelId: string) => `/api/v1/chat/channels/${channelId}/join`,
+    members: (channelId: string) => `/api/v1/chat/channels/${channelId}/members`,
+    addMember: (channelId: string) => `/api/v1/chat/channels/${channelId}/members`,
+    updateChannel: (channelId: string) => `/api/v1/chat/channels/${channelId}`,
+    leaveChannel: (channelId: string) => `/api/v1/chat/channels/${channelId}/members/me`,
     messages: (channelId: string) => `/api/v1/chat/channels/${channelId}/messages`,
     sendMessage: (channelId: string) => `/api/v1/chat/channels/${channelId}/messages`,
     threadMessages: (messageId: string) => `/api/v1/chat/messages/${messageId}/thread`,
@@ -107,9 +119,11 @@ export const API_ENDPOINTS = {
     list: (workspaceId: string) => `/api/v1/docs?workspaceId=${workspaceId}`,
     create: (workspaceId: string) => `/api/v1/docs?workspaceId=${workspaceId}`,
     detail: (docId: string) => `/api/v1/docs/${docId}`,
+    public: (docId: string) => `/api/v1/docs/public/${docId}`,
     update: (docId: string) => `/api/v1/docs/${docId}`,
     delete: (docId: string) => `/api/v1/docs/${docId}`,
     versions: (docId: string) => `/api/v1/docs/${docId}/versions`,
+    restore: (docId: string, versionId: string) => `/api/v1/docs/${docId}/restore/${versionId}`,
   },
   executive: {
     adaptiveLayout: '/api/v1/executive/adaptive-layout',
@@ -124,6 +138,10 @@ export const API_ENDPOINTS = {
     workspaceDigest: (workspaceId: string) => `/api/v1/ai/workspace/${workspaceId}/digest`,
     projectBriefing: (projectId: string) => `/api/v1/ai/projects/${projectId}/briefing`,
     projectChat: (projectId: string) => `/api/v1/ai/projects/${projectId}/chat`,
+    summarizeDoc: (docId: string) => `/api/v1/ai/docs/${docId}/summarize`,
+    processText: '/api/v1/ai/text/process',
+    summarizeThread: (messageId: string) => `/api/v1/ai/messages/${messageId}/summarize`,
+    datasetExport: '/api/v1/ai/dataset/export',
   },
   automation: {
     pulse: '/api/v1/automation/pulse',
@@ -144,8 +162,10 @@ export const API_ENDPOINTS = {
     graph: (projectId: string) => `/api/v1/knowledge/graph/${projectId}`,
     diary: (projectId: string) => `/api/v1/knowledge/diary/${projectId}`,
     atlas: '/api/v1/knowledge/atlas',
-    diagnosis: '/api/v1/knowledge/diagnosis',
-    divergence: '/api/v1/knowledge/diagnosis/divergence',
+    // Note: API implements these routes as `silo-check` and `strategic-divergence`.
+    // Keep names stable on FE for readability.
+    diagnosis: '/api/v1/knowledge/silo-check',
+    divergence: '/api/v1/knowledge/strategic-divergence',
   },
   connect: {
     integrations: '/api/v1/connect/integrations',

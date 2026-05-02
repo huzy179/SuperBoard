@@ -7,9 +7,8 @@ Cấu trúc hạ tầng Docker chuyên nghiệp cho SuperBoard Monorepo.
 ```text
 docker/
 ├── compose/                # Docker Compose files (Orchestration)
-│   ├── docker-compose.yml        # Hạ tầng tối thiểu (Postgres, Redis, Collab)
-│   ├── docker-compose.full.yml   # Toàn bộ hệ thống (Keycloak, AI, ELK, etc.)
-│   └── docker-compose.monitoring.yml # Giám sát (Prometheus, Grafana)
+│   ├── docker-compose.yml        # Compose chính (dùng profiles: app/full/monitoring)
+│   └── docker-compose.dev.yml    # Override dev (hot reload cho các service chạy trong container)
 ├── config/                 # Service-specific configurations
 │   ├── postgres/           # Scripts khởi tạo DB
 │   ├── prometheus/         # Cấu hình quét metric
@@ -20,6 +19,12 @@ docker/
 ## 🚀 Hướng dẫn sử dụng nhanh
 
 Lưu ý: Mọi lệnh nên được chạy từ **thư mục gốc (root)** của dự án.
+
+## 🧩 Profiles trong `docker-compose.yml`
+
+- `app`: chạy các service ứng dụng (API/Web/Collab...) trong container.
+- `full`: bật thêm hạ tầng mở rộng (Keycloak, MinIO, Elasticsearch, MailHog, AI-service...).
+- `monitoring`: bật Prometheus + Grafana.
 
 ### 0. Chạy app trong Docker + tự cập nhật khi sửa code (Hot reload)
 
@@ -41,16 +46,34 @@ npm run dev:docker:hot
 docker compose -f docker/compose/docker-compose.yml up -d
 ```
 
+Hoặc dùng script:
+
+```bash
+npm run dev:infra
+```
+
 ### 2. Chạy toàn bộ hệ sinh thái (Kèm AI & Infra)
 
 ```bash
-docker compose -f docker/compose/docker-compose.full.yml up -d
+docker compose -f docker/compose/docker-compose.yml --profile full up -d
+```
+
+Hoặc dùng script:
+
+```bash
+npm run dev:infra:full
 ```
 
 ### 3. Chạy hệ thống giám sát (Monitoring)
 
 ```bash
-docker compose -f docker/compose/docker-compose.monitoring.yml up -d
+docker compose -f docker/compose/docker-compose.yml --profile monitoring up -d
+```
+
+### 4. Chạy tất cả (Full + Monitoring)
+
+```bash
+docker compose -f docker/compose/docker-compose.yml --profile full --profile monitoring up -d
 ```
 
 ## 📊 Monitoring Stack

@@ -2,7 +2,15 @@ import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } fro
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { AuthUserDTO } from '@superboard/shared';
 import { ChatService } from './chat.service';
-import { SendMessageDto, UpdateMessageDto, AddReactionDto } from './dto/chat.dto';
+import {
+  SendMessageDto,
+  UpdateMessageDto,
+  AddReactionDto,
+  CreateChannelDto,
+  CreateDmDto,
+  UpdateChannelDto,
+  AddChannelMemberDto,
+} from './dto/chat.dto';
 import { ChatGateway } from './chat.gateway';
 import { BearerAuthGuard } from '../../common/guards/bearer-auth.guard';
 import { apiSuccess } from '../../common/api-response';
@@ -21,9 +29,71 @@ export class ChatController {
     return apiSuccess(data);
   }
 
+  @Post('channel')
+  async createChannel(
+    @Query('workspaceId') workspaceId: string,
+    @Body() dto: CreateChannelDto,
+    @CurrentUser() user: AuthUserDTO,
+  ) {
+    const data = await this.chatService.createChannel(workspaceId, user.id, dto);
+    return apiSuccess(data);
+  }
+
+  @Post('dm')
+  async getOrCreateDm(
+    @Query('workspaceId') workspaceId: string,
+    @Body() dto: CreateDmDto,
+    @CurrentUser() user: AuthUserDTO,
+  ) {
+    const data = await this.chatService.getOrCreateDm(workspaceId, user.id, dto.otherUserId);
+    return apiSuccess(data);
+  }
+
+  @Get('dm')
+  async findDm(
+    @Query('workspaceId') workspaceId: string,
+    @Query('otherUserId') otherUserId: string,
+    @CurrentUser() user: AuthUserDTO,
+  ) {
+    const data = await this.chatService.findDm(workspaceId, user.id, otherUserId);
+    return apiSuccess(data);
+  }
+
   @Get('channels/:channelId/messages')
   async getMessages(@Param('channelId') channelId: string, @Query('cursor') cursor?: string) {
     const data = await this.chatService.getMessages(channelId, cursor);
+    return apiSuccess(data);
+  }
+
+  @Get('channels/:channelId/members')
+  async getChannelMembers(@Param('channelId') channelId: string, @CurrentUser() user: AuthUserDTO) {
+    const data = await this.chatService.getChannelMembers(channelId, user.id);
+    return apiSuccess(data);
+  }
+
+  @Post('channels/:channelId/members')
+  async addChannelMember(
+    @Param('channelId') channelId: string,
+    @Body() dto: AddChannelMemberDto,
+    @CurrentUser() user: AuthUserDTO,
+  ) {
+    const data = await this.chatService.addChannelMember(channelId, user.id, dto.userId);
+    return apiSuccess(data);
+  }
+
+  @Put('channels/:channelId')
+  async updateChannel(
+    @Param('channelId') channelId: string,
+    @Body() dto: UpdateChannelDto,
+    @CurrentUser() user: AuthUserDTO,
+  ) {
+    const data = await this.chatService.updateChannel(channelId, user.id, dto);
+    return apiSuccess(data);
+  }
+
+  @Delete('channels/:channelId/members/me')
+  async leaveChannel(@Param('channelId') channelId: string, @CurrentUser() user: AuthUserDTO) {
+    const data = await this.chatService.leaveChannel(channelId, user.id);
     return apiSuccess(data);
   }
 

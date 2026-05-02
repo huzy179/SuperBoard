@@ -48,9 +48,17 @@ export function AppButton({
       loading={isLoading}
       className={`${isDisabled ? 'grayscale' : ''} ${className}`}
     >
-      {leftIcon ? <span className="shrink-0">{leftIcon}</span> : null}
+      {leftIcon ? (
+        <span className="shrink-0 inline-flex items-center justify-center [&>svg]:h-4 [&>svg]:w-4 [&>svg]:text-current">
+          {leftIcon}
+        </span>
+      ) : null}
       {children}
-      {rightIcon ? <span className="shrink-0">{rightIcon}</span> : null}
+      {rightIcon ? (
+        <span className="shrink-0 inline-flex items-center justify-center [&>svg]:h-4 [&>svg]:w-4 [&>svg]:text-current">
+          {rightIcon}
+        </span>
+      ) : null}
     </QuantumButton>
   );
 }

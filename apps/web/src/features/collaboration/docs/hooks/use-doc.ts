@@ -6,6 +6,7 @@ import {
   getWorkspaceDocs,
   createDoc,
   summarizeDoc,
+  restoreVersion,
 } from '@/features/collaboration/docs/api/doc-service';
 import { toast } from 'sonner';
 import type { Doc, DocVersion } from '@superboard/shared';
@@ -113,6 +114,23 @@ export function useSummarizeDoc() {
     mutationFn: (docId: string) => summarizeDoc(docId),
     onError: (error: Error) => {
       toast.error(error.message || 'Không thể tạo tóm tắt tài liệu');
+    },
+  });
+}
+
+export function useRestoreDocVersion(docId: string | undefined) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (versionId: string) => restoreVersion(docId!, versionId),
+    onSuccess: (updatedDoc) => {
+      queryClient.setQueryData(['doc', docId], updatedDoc);
+      void queryClient.invalidateQueries({ queryKey: ['docs'] });
+      void queryClient.invalidateQueries({ queryKey: ['doc-versions', docId] });
+      toast.success('Đã khôi phục phiên bản');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Không thể khôi phục phiên bản');
     },
   });
 }

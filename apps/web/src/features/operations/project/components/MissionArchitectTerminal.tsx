@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { apiPost } from '@/lib/api-client';
 import { useQueryClient } from '@tanstack/react-query';
 import { AppOverlay } from '@/components/ui/app-overlay';
+import { API_ENDPOINTS } from '@/lib/api/endpoints';
 
 export function MissionArchitectTerminal() {
   const queryClient = useQueryClient();
@@ -45,8 +46,8 @@ export function MissionArchitectTerminal() {
     setIsAnalyzing(true);
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { result } = await apiPost<any>(
-        `/v1/projects/${projectId}/plan`,
+      const result = await apiPost<any>(
+        API_ENDPOINTS.projects.plan(projectId),
         {
           goal,
           image: imageEncoded,
@@ -74,7 +75,7 @@ export function MissionArchitectTerminal() {
         // 1. Sync Statuses first
         if (statusesToDeploy && statusesToDeploy.length > 0) {
           await apiPost(
-            `/v1/projects/${projectId}/statuses/sync`,
+            API_ENDPOINTS.projects.syncStatuses(projectId),
             {
               statuses: statusesToDeploy,
             },
@@ -84,7 +85,7 @@ export function MissionArchitectTerminal() {
 
         // 2. Batch create tasks
         await apiPost(
-          `/v1/projects/${projectId}/tasks/batch`,
+          API_ENDPOINTS.projects.batchCreateTasks(projectId),
           {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             tasks: tasksToDeploy.map((t: any) => ({
@@ -100,7 +101,7 @@ export function MissionArchitectTerminal() {
 
         // 3. Optional: Generate Briefing in background
         void apiPost(
-          `/v1/jira/projects/${projectId}/generate-briefing`,
+          API_ENDPOINTS.projects.generateBriefing(projectId),
           {
             goal: plan ? plan.goal : goal,
             tasks: tasksToDeploy,

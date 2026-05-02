@@ -5,6 +5,7 @@ import { Box, CheckSquare, Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { getProjects } from '@/features/operations/project/api/project-service';
 import { apiPost } from '@/lib/api-client';
+import { API_ENDPOINTS } from '@/lib/api/endpoints';
 import type { Message, ProjectItemDTO } from '@superboard/shared';
 
 interface MessageToTaskDialogProps {
@@ -48,7 +49,7 @@ export function MessageToTaskDialog({ message, isOpen, onClose }: MessageToTaskD
     setIsSubmitting(true);
     try {
       await apiPost(
-        `/v1/projects/${selectedProjectId}/tasks`,
+        API_ENDPOINTS.projects.createTask(selectedProjectId),
         { title, description, status: 'todo', priority: 'medium' },
         { auth: true },
       );

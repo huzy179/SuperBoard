@@ -11,7 +11,7 @@ export async function getDocDetail(docId: string): Promise<Doc> {
 }
 
 export async function getPublicDoc(docId: string): Promise<Doc> {
-  return apiGet<Doc>(`/docs/public/${docId}`); // Public route, no auth needed
+  return apiGet<Doc>(API_ENDPOINTS.docs.public(docId)); // Public route, no auth needed
 }
 
 export async function createDoc(
@@ -48,13 +48,13 @@ export async function getDocVersions(docId: string): Promise<DocVersion[]> {
 }
 
 export async function restoreVersion(docId: string, versionId: string): Promise<Doc> {
-  return apiPost<Doc>(`/docs/${docId}/restore/${versionId}`, {}, { auth: true });
+  return apiPost<Doc>(API_ENDPOINTS.docs.restore(docId, versionId), {}, { auth: true });
 }
 
 export async function summarizeDoc(docId: string): Promise<{ summary: string }> {
-  return apiPost<{ summary: string }>(`/ai/docs/${docId}/summarize`, {}, { auth: true });
+  return apiPost<{ summary: string }>(API_ENDPOINTS.ai.summarizeDoc(docId), {}, { auth: true });
 }
 
 export async function processText(text: string, mode: string): Promise<{ result: string }> {
-  return apiPost<{ result: string }>('/ai/text/process', { text, mode }, { auth: true });
+  return apiPost<{ result: string }>(API_ENDPOINTS.ai.processText, { text, mode }, { auth: true });
 }

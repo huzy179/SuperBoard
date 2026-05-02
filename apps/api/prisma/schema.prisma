@@ -573,6 +573,7 @@ model Doc {
   title        String
   content      Json? // TipTap JSON
   isPublic     Boolean      @default(false)
+  shareToken   String?      @unique
   parentDocId  String?
   createdById  String
   lastEditedBy String?

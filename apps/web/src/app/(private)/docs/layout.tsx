@@ -1,6 +1,6 @@
 'use client';
 
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useWorkspaces } from '@/features/system/workspace/hooks/use-workspaces';
@@ -25,6 +25,7 @@ export default function DocLayout({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const { data: workspaces, isLoading: workspacesLoading } = useWorkspaces();
   const activeWorkspace = workspaces?.[0];
+  const [quickQuery, setQuickQuery] = useState('');
 
   const { data: docs, isLoading: docsLoading } = useQuery<Doc[]>({
     queryKey: ['docs', activeWorkspace?.id],
@@ -49,6 +50,25 @@ export default function DocLayout({ children }: { children: ReactNode }) {
       createDocMutation.mutate({ title: 'Tài liệu không tên' });
     }
   };
+
+  const filteredDocs = useMemo(() => {
+    const query = quickQuery.trim().toLowerCase();
+    const nodes = docs || [];
+    if (!query) return nodes;
+
+    const filterTree = (items: Doc[]): Doc[] => {
+      const result: Doc[] = [];
+      for (const item of items) {
+        const title = (item.title || '').toLowerCase();
+        const children = item.children ? filterTree(item.children) : [];
+        const matches = title.includes(query) || children.length > 0;
+        if (matches) result.push({ ...item, children });
+      }
+      return result;
+    };
+
+    return filterTree(nodes);
+  }, [docs, quickQuery]);
 
   if (workspacesLoading || docsLoading) {
     return (
@@ -78,18 +98,20 @@ export default function DocLayout({ children }: { children: ReactNode }) {
         <div className="flex-1 overflow-y-auto py-2">
           {/* Quick Find */}
           <div className="px-3 mb-4 mt-2">
-            <button
-              type="button"
-              className="flex w-full items-center gap-2 px-3 py-2 rounded-md bg-black/[0.02] border border-surface-border text-[12px] text-[color:var(--color-muted)] hover:bg-black/[0.04] hover:text-[color:var(--color-ink)] transition-colors"
-            >
+            <div className="flex w-full items-center gap-2 px-3 py-2 rounded-md bg-black/[0.02] border border-surface-border text-[12px] text-[color:var(--color-muted)] focus-within:ring-2 focus-within:ring-[color:var(--color-focus)]/35 transition-colors">
               <Search size={12} />
-              <span>Tìm nhanh…</span>
-            </button>
+              <input
+                value={quickQuery}
+                onChange={(e) => setQuickQuery(e.target.value)}
+                placeholder="Tìm nhanh…"
+                className="w-full bg-transparent border-none outline-none text-[12px] text-[color:var(--color-ink)] placeholder:text-[color:var(--color-faint)]"
+              />
+            </div>
           </div>
 
           <nav className="px-2 space-y-0.5">
             <DocTreeItem
-              nodes={docs || []}
+              nodes={filteredDocs}
               activeId={params.docId as string}
               onCreateSubDoc={(parentDocId) =>
                 createDocMutation.mutate({ title: 'Tài liệu con mới', parentDocId })

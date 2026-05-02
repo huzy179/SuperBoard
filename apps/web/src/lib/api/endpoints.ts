@@ -119,7 +119,7 @@ export const API_ENDPOINTS = {
     list: (workspaceId: string) => `/api/v1/docs?workspaceId=${workspaceId}`,
     create: (workspaceId: string) => `/api/v1/docs?workspaceId=${workspaceId}`,
     detail: (docId: string) => `/api/v1/docs/${docId}`,
-    public: (docId: string) => `/api/v1/docs/public/${docId}`,
+    public: (shareToken: string) => `/api/v1/docs/public/${shareToken}`,
     update: (docId: string) => `/api/v1/docs/${docId}`,
     delete: (docId: string) => `/api/v1/docs/${docId}`,
     versions: (docId: string) => `/api/v1/docs/${docId}/versions`,

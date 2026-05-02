@@ -47,6 +47,10 @@ export async function getDocVersions(docId: string): Promise<DocVersion[]> {
   return apiGet<DocVersion[]>(API_ENDPOINTS.docs.versions(docId), { auth: true });
 }
 
+export async function createDocVersion(docId: string, content: unknown): Promise<DocVersion> {
+  return apiPost<DocVersion>(API_ENDPOINTS.docs.versions(docId), { content }, { auth: true });
+}
+
 export async function restoreVersion(docId: string, versionId: string): Promise<Doc> {
   return apiPost<Doc>(API_ENDPOINTS.docs.restore(docId, versionId), {}, { auth: true });
 }

@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import {
+  useCreateDocVersion,
   useDoc,
   useDocVersions,
   useRestoreDocVersion,
@@ -9,7 +10,7 @@ import {
 import { RichTextEditor } from '@/features/collaboration/docs/components/RichTextEditor';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { ChevronLeft, Clock, RotateCcw, FileText, Check } from 'lucide-react';
+import { ChevronLeft, Clock, RotateCcw, FileText, Check, Save } from 'lucide-react';
 import { useState } from 'react';
 import type { DocVersion } from '@superboard/shared';
 import { toast } from 'sonner';
@@ -21,6 +22,7 @@ export default function VersionHistoryPage() {
   const { data: versions, isLoading: versionsLoading } = useDocVersions(params.docId);
   const [selectedVersion, setSelectedVersion] = useState<DocVersion | null>(null);
   const restoreMutation = useRestoreDocVersion(params.docId);
+  const createVersionMutation = useCreateDocVersion(params.docId);
 
   if (docLoading || versionsLoading) {
     return (
@@ -72,28 +74,40 @@ export default function VersionHistoryPage() {
           </div>
         </div>
 
-        {isViewingHistory && (
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => {
-              const versionId = selectedVersion?.id;
-              if (!versionId) return;
-              restoreMutation
-                .mutateAsync(versionId)
-                .then(() => {
-                  setSelectedVersion(null);
-                  toast.success('Đã khôi phục và quay lại bản hiện tại');
-                })
-                .catch(() => {
-                  // toast handled in mutation
-                });
-            }}
-            disabled={restoreMutation.isPending}
-            className="flex items-center gap-2 px-3 py-2 rounded-md bg-brand-500 text-white text-[12px] font-semibold hover:bg-brand-600 transition-colors"
+            type="button"
+            onClick={() => createVersionMutation.mutate(doc.content)}
+            disabled={createVersionMutation.isPending}
+            className="flex items-center gap-2 px-3 py-2 rounded-md border border-surface-border bg-surface-card text-[12px] font-semibold text-[color:var(--color-ink)] hover:bg-black/[0.03] transition-colors disabled:opacity-60"
           >
-            <RotateCcw size={14} />
-            {restoreMutation.isPending ? 'Đang khôi phục…' : 'Khôi phục bản này'}
+            <Save size={14} />
+            {createVersionMutation.isPending ? 'Đang lưu…' : 'Lưu snapshot'}
           </button>
-        )}
+
+          {isViewingHistory && (
+            <button
+              onClick={() => {
+                const versionId = selectedVersion?.id;
+                if (!versionId) return;
+                restoreMutation
+                  .mutateAsync(versionId)
+                  .then(() => {
+                    setSelectedVersion(null);
+                    toast.success('Đã khôi phục và quay lại bản hiện tại');
+                  })
+                  .catch(() => {
+                    // toast handled in mutation
+                  });
+              }}
+              disabled={restoreMutation.isPending}
+              className="flex items-center gap-2 px-3 py-2 rounded-md bg-brand-500 text-white text-[12px] font-semibold hover:bg-brand-600 transition-colors disabled:opacity-60"
+            >
+              <RotateCcw size={14} />
+              {restoreMutation.isPending ? 'Đang khôi phục…' : 'Khôi phục bản này'}
+            </button>
+          )}
+        </div>
       </header>
 
       <div className="flex flex-1 overflow-hidden">

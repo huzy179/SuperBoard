@@ -91,7 +91,9 @@ export default function DocDetailPage() {
   }
 
   const publicUrl =
-    typeof window !== 'undefined' && doc ? `${window.location.origin}/share/${doc.id}` : '';
+    typeof window !== 'undefined' && doc?.shareToken
+      ? `${window.location.origin}/share/${doc.shareToken}`
+      : '';
 
   return (
     <div className="flex flex-col h-full bg-[color:var(--color-surface-alt)]/20">

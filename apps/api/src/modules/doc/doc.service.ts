@@ -106,7 +106,7 @@ export class DocService {
 
   async getPublicDocById(docId: string) {
     const doc = await this.prisma.doc.findUnique({
-      where: { id: docId },
+      where: { shareToken: docId },
       include: {
         creator: {
           select: { id: true, fullName: true, avatarUrl: true },
@@ -129,7 +129,24 @@ export class DocService {
     if (data.title !== undefined) updateData.title = data.title;
     if (data.content !== undefined) updateData.content = data.content as Prisma.InputJsonValue;
     if (data.parentDocId !== undefined) updateData.parentDocId = data.parentDocId;
-    if (data.isPublic !== undefined) updateData.isPublic = data.isPublic;
+    if (data.isPublic !== undefined) {
+      updateData.isPublic = data.isPublic;
+      if (data.isPublic === false) {
+        // Revoke token on disable
+        updateData.shareToken = null;
+      }
+    }
+
+    if (data.isPublic === true) {
+      const current = await this.prisma.doc.findUnique({
+        where: { id: docId },
+        select: { shareToken: true },
+      });
+      if (!current) throw new NotFoundException('Document not found');
+      if (!current.shareToken) {
+        updateData.shareToken = crypto.randomUUID();
+      }
+    }
 
     const doc = await this.prisma.doc.update({
       where: { id: docId },

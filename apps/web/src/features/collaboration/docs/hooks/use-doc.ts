@@ -7,6 +7,7 @@ import {
   createDoc,
   summarizeDoc,
   restoreVersion,
+  createDocVersion,
 } from '@/features/collaboration/docs/api/doc-service';
 import { toast } from 'sonner';
 import type { Doc, DocVersion } from '@superboard/shared';
@@ -94,6 +95,21 @@ export function useDocVersions(docId: string | undefined) {
     queryKey: ['doc-versions', docId],
     queryFn: () => getDocVersions(docId!),
     enabled: !!docId,
+  });
+}
+
+export function useCreateDocVersion(docId: string | undefined) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (content: unknown) => createDocVersion(docId!, content),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['doc-versions', docId] });
+      toast.success('Đã lưu snapshot');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Không thể lưu snapshot');
+    },
   });
 }
 

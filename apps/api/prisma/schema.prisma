@@ -572,6 +572,7 @@ model Doc {
   workspace    Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   title        String
   content      Json? // TipTap JSON
+  isPublic     Boolean      @default(false)
   parentDocId  String?
   createdById  String
   lastEditedBy String?

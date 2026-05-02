@@ -1,4 +1,5 @@
 import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import type { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
 import { logger } from '../../common/logger';
@@ -114,18 +115,21 @@ export class DocService {
     });
 
     if (!doc || doc.deletedAt) throw new NotFoundException('Document not found');
+    if (!doc.isPublic) throw new NotFoundException('Document not found');
     return doc;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async updateDoc(docId: string, data: { title?: string; content?: any; parentDocId?: string }) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updateData: any = {
+  async updateDoc(
+    docId: string,
+    data: { title?: string; content?: unknown; parentDocId?: string; isPublic?: boolean },
+  ) {
+    const updateData: Prisma.DocUncheckedUpdateInput = {
       updatedAt: new Date(),
     };
     if (data.title !== undefined) updateData.title = data.title;
-    if (data.content !== undefined) updateData.content = data.content;
+    if (data.content !== undefined) updateData.content = data.content as Prisma.InputJsonValue;
     if (data.parentDocId !== undefined) updateData.parentDocId = data.parentDocId;
+    if (data.isPublic !== undefined) updateData.isPublic = data.isPublic;
 
     const doc = await this.prisma.doc.update({
       where: { id: docId },

@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
-import { Loader2, Sparkles, X } from 'lucide-react';
+import { Loader2, Share2, Sparkles, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthSession } from '@/features/system/auth/hooks/use-auth-session';
 import { useDoc, useSummarizeDoc } from '@/features/collaboration/docs/hooks/use-doc';
@@ -11,12 +11,16 @@ import { DocTOC } from '@/features/collaboration/docs/components/DocTOC';
 import { DocVersionSidebar } from '@/features/collaboration/docs/components/DocVersionSidebar';
 import { AssigneeAvatar } from '@/features/operations/task/components/task-badges';
 import { AppButton } from '@/components/ui/app-button';
+import { updateDoc } from '@/features/collaboration/docs/api/doc-service';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function DocDetailPage() {
   const params = useParams<{ docId: string }>();
   const [showVersions, setShowVersions] = useState(false);
   const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
   const { user } = useAuthSession();
+  const queryClient = useQueryClient();
 
   const {
     data: doc,
@@ -32,6 +36,17 @@ export default function DocDetailPage() {
   } = useDoc(params.docId);
 
   const summarizeMutation = useSummarizeDoc();
+
+  const setPublicMutation = useMutation({
+    mutationFn: (isPublic: boolean) => updateDoc(params.docId, { isPublic }),
+    onSuccess: (updatedDoc) => {
+      queryClient.setQueryData(['doc', params.docId], updatedDoc);
+      toast.success(updatedDoc.isPublic ? 'Đã bật chia sẻ công khai' : 'Đã tắt chia sẻ công khai');
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Không thể cập nhật trạng thái chia sẻ');
+    },
+  });
 
   const handleSummarize = async () => {
     try {
@@ -75,6 +90,9 @@ export default function DocDetailPage() {
     );
   }
 
+  const publicUrl =
+    typeof window !== 'undefined' && doc ? `${window.location.origin}/share/${doc.id}` : '';
+
   return (
     <div className="flex flex-col h-full bg-[color:var(--color-surface-alt)]/20">
       <header className="sticky top-0 z-50 h-16 shrink-0 border-b border-surface-border bg-surface-card">
@@ -93,6 +111,89 @@ export default function DocDetailPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            <div className="relative">
+              <AppButton
+                type="button"
+                variant="secondary"
+                size="sm"
+                leftIcon={<Share2 size={14} />}
+                onClick={() => setShareOpen((v) => !v)}
+              >
+                Share
+              </AppButton>
+              {shareOpen && doc ? (
+                <div className="absolute right-0 top-[calc(100%+10px)] w-[360px] rounded-xl border border-surface-border bg-surface-card shadow-luxe p-4 z-50">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-sm font-semibold text-[color:var(--color-ink)]">
+                        Chia sẻ công khai
+                      </div>
+                      <div className="mt-1 text-xs text-[color:var(--color-muted)] leading-relaxed">
+                        Bật để bất kỳ ai có link đều xem được (read-only).
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShareOpen(false)}
+                      className="h-9 w-9 rounded-md border border-surface-border bg-surface-bg text-[color:var(--color-muted)] hover:bg-black/[0.03] hover:text-[color:var(--color-ink)] transition-colors"
+                      aria-label="Close share panel"
+                    >
+                      <X size={16} className="mx-auto" />
+                    </button>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-surface-border bg-[color:var(--color-surface-alt)]/35 px-3 py-2">
+                    <div className="text-sm font-medium text-[color:var(--color-ink)]">
+                      {doc.isPublic ? 'Công khai' : 'Riêng tư'}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setPublicMutation.mutate(!doc.isPublic)}
+                      disabled={setPublicMutation.isPending}
+                      className={`h-8 px-3 rounded-md text-xs font-semibold border transition-colors ${
+                        doc.isPublic
+                          ? 'bg-black/[0.02] border-surface-border text-[color:var(--color-muted)] hover:bg-black/[0.04]'
+                          : 'bg-brand-500 border-brand-500 text-white hover:bg-brand-600'
+                      } disabled:opacity-60`}
+                    >
+                      {setPublicMutation.isPending
+                        ? 'Đang cập nhật…'
+                        : doc.isPublic
+                          ? 'Tắt'
+                          : 'Bật'}
+                    </button>
+                  </div>
+
+                  <div className="mt-4 space-y-2">
+                    <div className="text-xs font-semibold text-[color:var(--color-muted)]">
+                      Link chia sẻ
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        readOnly
+                        value={doc.isPublic ? publicUrl : ''}
+                        placeholder="Bật công khai để tạo link"
+                        className="flex-1 h-10 rounded-md border border-surface-border bg-surface-bg px-3 text-sm text-[color:var(--color-ink)] placeholder:text-[color:var(--color-faint)]"
+                      />
+                      <AppButton
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        disabled={!doc.isPublic || !publicUrl}
+                        onClick={() => {
+                          void navigator.clipboard
+                            .writeText(publicUrl)
+                            .then(() => toast.success('Đã copy link'))
+                            .catch(() => toast.error('Không thể copy link'));
+                        }}
+                      >
+                        Copy
+                      </AppButton>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+            </div>
             <AppButton
               type="button"
               variant="secondary"

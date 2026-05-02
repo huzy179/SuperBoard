@@ -41,7 +41,7 @@ export class DocController {
   async updateDoc(
     @Param('docId') docId: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    @Body() data: { title?: string; content?: any; parentDocId?: string },
+    @Body() data: { title?: string; content?: any; parentDocId?: string; isPublic?: boolean },
   ) {
     const doc = await this.docService.updateDoc(docId, data);
     return apiSuccess(doc);

@@ -35,7 +35,7 @@ export function NeuralQaDashboard() {
       {
         id: '1',
         message: 'Cannot read property "id" of null',
-        url: '/api/v1/projects/undefined/stats',
+        url: '/api/v1/projects/<projectId>/stats',
         timestamp: '2026-04-28T14:24:02Z',
         severity: 'critical',
         stack: 'TypeError: Cannot read property "id" of null at ProjectService.getStats...',

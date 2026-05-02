@@ -6,6 +6,7 @@ export interface Doc {
   title: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   content: any; // TipTap JSON
+  isPublic?: boolean;
   parentDocId: ID | null;
   createdById: ID;
   creator?: {

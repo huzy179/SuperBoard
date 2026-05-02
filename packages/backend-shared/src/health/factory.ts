@@ -75,14 +75,15 @@ export function registerIndicatorsFromConfig(
 function createIndicator(dep: DependencyConfig, deps: HealthFactoryDeps): HealthIndicator | null {
   switch (dep.type) {
     case 'database': {
-      if (!deps.databasePool) return null;
+      const { databasePool } = deps;
+      if (!databasePool) return null;
       const cfg = dep.config as DatabaseConfig;
       return {
         name: dep.name,
         check: async () => {
           const start = Date.now();
           try {
-            const pool = await deps.databasePool!.getPool(cfg);
+            const pool = await databasePool.getPool(cfg);
             const client = await pool.connect();
             await client.query('SELECT 1');
             client.release();
@@ -98,14 +99,15 @@ function createIndicator(dep: DependencyConfig, deps: HealthFactoryDeps): Health
       };
     }
     case 'redis': {
-      if (!deps.redisPool) return null;
+      const { redisPool } = deps;
+      if (!redisPool) return null;
       const cfg = dep.config as RedisConfig;
       return {
         name: dep.name,
         check: async () => {
           const start = Date.now();
           try {
-            const client = await deps.redisPool!.getConnection(cfg);
+            const client = await redisPool.getConnection(cfg);
             const pong = await client.ping();
             return {
               status: pong === 'PONG' ? ('healthy' as const) : ('unhealthy' as const),
@@ -123,14 +125,15 @@ function createIndicator(dep: DependencyConfig, deps: HealthFactoryDeps): Health
       };
     }
     case 'rabbitmq': {
-      if (!deps.amqpConnections) return null;
+      const { amqpConnections } = deps;
+      if (!amqpConnections) return null;
       const cfg = dep.config as AMQPConfig;
       return {
         name: dep.name,
         check: async () => {
           const start = Date.now();
           try {
-            const conn = await deps.amqpConnections!.getConnection({
+            const conn = await amqpConnections.getConnection({
               ...cfg,
               maxReconnectAttempts: 1,
             });

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'SuperBoard Engineering'
+  short_description: 'Project coding rules for SuperBoard.'
+  default_prompt: 'Use SuperBoard engineering rules to make this code change safely.'

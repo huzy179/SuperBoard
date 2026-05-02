@@ -14,7 +14,8 @@ describe('RabbitMQ Topology Properties', () => {
    */
   test('should declare all consumer queues with x-dead-letter-exchange pointing to DLX', async () => {
     await fc.assert(
-      fc.asyncProperty(fc.constant(null), async (_null) => {
+      fc.asyncProperty(fc.constant(null), async (nullValue) => {
+        void nullValue;
         // Mock channel to capture assertQueue calls
         const assertQueueCalls: Array<{ queue: string; options: Record<string, unknown> }> = [];
         const mockChannel = {

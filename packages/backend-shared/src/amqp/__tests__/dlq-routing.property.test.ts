@@ -67,17 +67,19 @@ describe('Property 8: Dead Letter Queue Routing Consistency', () => {
           };
 
           const deadLetter: DeadLetterQueueConfig = {
-            exchange: config.deadLetterExchange!,
-            queue: config.deadLetterQueue!,
+            exchange: config.deadLetterExchange ?? `${exchange}.dlx`,
+            queue: config.deadLetterQueue ?? `${queue}.dlq`,
             routingKey: queue,
           };
 
-          let published: {
-            exchange: string;
-            routingKey: string;
-            content: string;
-            options: Record<string, unknown>;
-          } | null = null;
+          const state: {
+            published: {
+              exchange: string;
+              routingKey: string;
+              content: string;
+              options: Record<string, unknown>;
+            } | null;
+          } = { published: null };
           let acked = false;
           let nacked = false;
 
@@ -97,7 +99,12 @@ describe('Property 8: Dead Letter Queue Routing Consistency', () => {
           // Inject stub channel
           (consumer as unknown as ExposedConsumer).channel = {
             publish: (ex: string, rk: string, buf: Buffer, options: Record<string, unknown>) => {
-              published = { exchange: ex, routingKey: rk, content: buf.toString('utf8'), options };
+              state.published = {
+                exchange: ex,
+                routingKey: rk,
+                content: buf.toString('utf8'),
+                options,
+              };
               return true;
             },
             ack: () => {
@@ -119,15 +126,19 @@ describe('Property 8: Dead Letter Queue Routing Consistency', () => {
 
           expect(acked).toBe(true);
           expect(nacked).toBe(false);
-          expect(published).not.toBeNull();
-          expect(published!.exchange).toBe(deadLetter.exchange);
-          expect(published!.routingKey).toBe(deadLetter.routingKey);
-          expect(published!.options.correlationId).toBe(correlationId);
-          expect((published!.options.headers as Record<string, unknown>)['x-original-queue']).toBe(
-            queue,
-          );
+          expect(state.published).not.toBeNull();
+          if (state.published === null) {
+            throw new Error('Expected DLQ publish payload to be set');
+          }
+          const publishedMessage = state.published;
+          expect(publishedMessage.exchange).toBe(deadLetter.exchange);
+          expect(publishedMessage.routingKey).toBe(deadLetter.routingKey);
+          expect(publishedMessage.options.correlationId).toBe(correlationId);
+          expect(
+            (publishedMessage.options.headers as Record<string, unknown>)['x-original-queue'],
+          ).toBe(queue);
 
-          const parsed = JSON.parse(published!.content) as {
+          const parsed = JSON.parse(publishedMessage.content) as {
             error: { message: string };
             context: { correlationId: string; originalMessage: { contentBase64: string } };
           };

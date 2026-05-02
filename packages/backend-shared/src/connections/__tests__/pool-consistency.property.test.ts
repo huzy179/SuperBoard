@@ -8,9 +8,9 @@
  */
 
 import fc from 'fast-check';
-import { RedisPoolManager } from '../../connections/redis-pool';
 import { DatabasePoolManager } from '../../connections/database-pool';
-import { RedisConfig, DatabaseConfig } from '../../types';
+import { RedisPoolManager } from '../../connections/redis-pool';
+import { DatabaseConfig, RedisConfig } from '../../types';
 
 describe('Property 9: Connection Pool Management Consistency', () => {
   describe('Redis Pool Manager', () => {

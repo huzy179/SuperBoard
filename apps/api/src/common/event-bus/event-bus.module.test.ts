@@ -29,14 +29,16 @@ describe('EventBusModule Property Tests', () => {
 
           // Mock RabbitMQEventBusService
           const mockRabbitMQService = {
-            publish: async (_event: DomainEvent) => {
+            publish: async (event: DomainEvent) => {
+              void event;
               rabbitMQCalled = true;
             },
           };
 
           // Mock EventBusService (BullMQ)
           const mockBullMQService = {
-            publish: async (_event: DomainEvent) => {
+            publish: async (event: DomainEvent) => {
+              void event;
               bullMQCalled = true;
             },
           };
@@ -95,7 +97,8 @@ describe('EventBusModule Property Tests', () => {
           // Mock NotificationWorkerService behavior - this represents the BullMQ job processor
           // which should work independently of the domain event routing
           const mockNotificationWorker = {
-            processNotificationJob: async (_job: Record<string, unknown>) => {
+            processNotificationJob: async (job: Record<string, unknown>) => {
+              void job;
               notificationProcessed = true;
               return { success: true };
             },

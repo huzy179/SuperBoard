@@ -12,8 +12,8 @@ import {
   ConfigFileLoader,
   ConfigLoadError,
   loadConfig,
-  loadEnvironmentConfig,
   loadConfigFromFile,
+  loadEnvironmentConfig,
 } from '../loaders';
 import { AMQPConfigSchema, RedisConfigSchema } from '../validators';
 

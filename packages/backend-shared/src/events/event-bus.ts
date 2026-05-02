@@ -1,8 +1,8 @@
 import type { DomainEvent } from '../types';
-import type { EventBus as EventBusInterface, EventHandler, EventProcessingMetrics } from './types';
-import { BaseEventHandler } from './base-handler';
 import type { MetricsService } from '../metrics/metrics.service';
-import { createEventStandardMetrics, type EventStandardMetrics } from '../metrics/standard';
+import { type EventStandardMetrics, createEventStandardMetrics } from '../metrics/standard';
+import { BaseEventHandler } from './base-handler';
+import type { EventBus as EventBusInterface, EventHandler, EventProcessingMetrics } from './types';
 
 export interface EventBusOptions {
   onError?: (params: {

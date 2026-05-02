@@ -12,11 +12,11 @@ import * as fc from 'fast-check';
 import { ConfigService } from '../config.service';
 import {
   AMQPConfigSchema,
-  RedisConfigSchema,
+  BootstrapConfigSchema,
   DatabaseConfigSchema,
   HealthConfigSchema,
   MetricsConfigSchema,
-  BootstrapConfigSchema,
+  RedisConfigSchema,
 } from '../validators';
 
 describe('Property 2: Configuration Round-trip Consistency', () => {

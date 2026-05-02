@@ -2,7 +2,7 @@
  * Mock factories for common dependencies
  */
 
-import { AMQPConfig, DomainEvent, RedisConfig, DatabaseConfig, HealthConfig } from '../types';
+import { AMQPConfig, DatabaseConfig, DomainEvent, HealthConfig, RedisConfig } from '../types';
 
 export class MockFactories {
   static createAMQPConfig(overrides?: Partial<AMQPConfig>): AMQPConfig {

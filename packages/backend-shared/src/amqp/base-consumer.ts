@@ -1,8 +1,8 @@
 import type { Channel, ConsumeMessage, Options } from 'amqplib';
 import { Logger } from '@nestjs/common';
-import { AMQPConnectionManager } from './connection-manager';
 import type { MetricsService } from '../metrics/metrics.service';
-import { createAmqpStandardMetrics, type AmqpStandardMetrics } from '../metrics/standard';
+import { type AmqpStandardMetrics, createAmqpStandardMetrics } from '../metrics/standard';
+import { AMQPConnectionManager } from './connection-manager';
 import type {
   AMQPConfig,
   AMQPConsumerMetrics,

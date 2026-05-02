@@ -7,37 +7,37 @@
 
 import { z } from 'zod';
 import type {
-  ConfigOptions,
-  EnvironmentConfig,
-  APIServiceConfig,
   AIServiceConfig,
-  AutomationServiceConfig,
-  CollaborationServiceConfig,
-  NotificationServiceConfig,
-  SearchServiceConfig,
   AMQPConfig,
-  RedisConfig,
+  APIServiceConfig,
+  AutomationServiceConfig,
+  BootstrapConfig,
+  CollaborationServiceConfig,
+  ConfigOptions,
   DatabaseConfig,
+  EnvironmentConfig,
   HealthConfig,
   MetricsConfig,
-  BootstrapConfig,
+  NotificationServiceConfig,
+  RedisConfig,
+  SearchServiceConfig,
 } from './types';
 import {
-  EnvironmentConfigSchema,
+  AIServiceConfigSchema,
   AMQPConfigSchema,
-  RedisConfigSchema,
+  APIServiceConfigSchema,
+  AutomationServiceConfigSchema,
+  BootstrapConfigSchema,
+  CollaborationServiceConfigSchema,
   DatabaseConfigSchema,
+  EnvironmentConfigSchema,
   HealthConfigSchema,
   MetricsConfigSchema,
-  BootstrapConfigSchema,
-  APIServiceConfigSchema,
-  AIServiceConfigSchema,
-  AutomationServiceConfigSchema,
-  CollaborationServiceConfigSchema,
   NotificationServiceConfigSchema,
+  RedisConfigSchema,
   SearchServiceConfigSchema,
 } from './validators';
-import { ConfigFileLoader, ConfigLoaderOptions } from './loaders';
+import { ConfigFileLoader, type ConfigLoaderOptions } from './loaders';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class ConfigService<T = any> {

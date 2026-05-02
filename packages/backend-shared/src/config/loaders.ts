@@ -80,11 +80,11 @@ export class ConfigFileLoader {
   private readonly filePatterns: string[];
 
   constructor(options: ConfigLoaderOptions = {}) {
-    this.configDir = options.configDir || process.cwd();
-    this.environment = options.environment || this.detectEnvironment();
+    this.configDir = options.configDir ?? process.cwd();
+    this.environment = options.environment ?? this.detectEnvironment();
     this.mergeDefaults = options.mergeDefaults ?? true;
     this.validate = options.validate ?? true;
-    this.filePatterns = options.filePatterns || this.getDefaultFilePatterns();
+    this.filePatterns = options.filePatterns ?? this.getDefaultFilePatterns();
   }
 
   /**
@@ -386,7 +386,7 @@ export class ConfigFileLoader {
     const fileMap = new Map<string, ConfigFileInfo>();
 
     for (const file of files) {
-      const key = `${path.basename(file.path, path.extname(file.path))}_${file.environment || 'base'}`;
+      const key = `${path.basename(file.path, path.extname(file.path))}_${file.environment ?? 'base'}`;
       const existing = fileMap.get(key);
 
       if (

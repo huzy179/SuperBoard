@@ -14,21 +14,18 @@ WORKDIR /app
 # First install dependencies (as they change less often)
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/package-lock.json ./package-lock.json
-RUN npm install
-RUN npm install @prisma/client@7.8.0
+RUN npm ci
 
 # Build the project and its dependencies
 COPY --from=builder /app/out/full/ .
 COPY --from=builder /app/turbo.json ./turbo.json
-
-# DEBUG: Check schema content
-RUN cat apps/api/prisma/schema.prisma
 
 # Generate Prisma Client
 ENV PRISMA_CLIENT_ENGINE_TYPE=binary
 ENV PRISMA_CLI_QUERY_ENGINE_TYPE=binary
 RUN npx prisma generate --schema apps/api/prisma/schema.prisma
 RUN npx turbo run build --filter=@superboard/api
+RUN npm prune --omit=dev
 FROM node:20-alpine AS runner
 WORKDIR /app
 RUN apk add --no-cache openssl libgcc libstdc++

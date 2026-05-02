@@ -13,7 +13,7 @@ COPY --from=builder /app/out/package-lock.json ./package-lock.json
 RUN npm install
 COPY --from=builder /app/out/full/ .
 COPY --from=builder /app/turbo.json ./turbo.json
-RUN npm run build --workspace=@superboard/collaboration
+RUN npx turbo run build --filter=@superboard/collaboration
 
 FROM node:22-alpine AS runner
 WORKDIR /app

@@ -80,12 +80,24 @@ services:
     environment:
       DATABASE_URL: postgresql://dev:devpassword@postgres:5432/superboard
       REDIS_URL: redis://redis:6379
-      RABBITMQ_URL: amqp://${RABBITMQ_USER:-superboard}:${RABBITMQ_PASS:-password}@rabbitmq:5672/superboard
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-dev}:${RABBITMQ_PASS:-devpassword}@rabbitmq:5672/superboard
       JWT_SECRET: superboard-secure-secret-2024
       # Dev-only helper endpoint: GET /api/v1/_debug/routes
       ENABLE_DEBUG_ROUTES: 'true'
       PRISMA_CLIENT_ENGINE_TYPE: binary
       PRISMA_CLI_QUERY_ENGINE_TYPE: binary
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:4000/api/v1/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1));",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
     networks:
       - superboard
 
@@ -98,9 +110,22 @@ services:
     ports:
       - '3000:3000'
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:4000
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:3000', (res) => process.exit(res.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1));",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
     networks:
       - superboard
 
@@ -120,6 +145,18 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:3001/ready', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1));",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
     networks:
       - superboard
 
@@ -137,6 +174,18 @@ services:
     environment:
       - REDIS_URL=redis://redis:6379
       - NODE_ENV=production
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:3001/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1));",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
     networks:
       - superboard
 
@@ -213,6 +262,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       REDIS_URL: redis://redis:6379
       AMQP_URL: amqp://${RABBITMQ_USER:-dev}:${RABBITMQ_PASS:-devpassword}@rabbitmq:5672/superboard
@@ -237,7 +288,7 @@ services:
     image: grafana/grafana-oss:latest
     container_name: superboard-grafana
     ports:
-      - '3001:3000'
+      - '3002:3000'
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false

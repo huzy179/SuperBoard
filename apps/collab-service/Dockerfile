@@ -22,13 +22,12 @@ RUN npm install @prisma/client@7.8.0 esbuild
 COPY --from=builder /app/out/full/ .
 COPY --from=builder /app/turbo.json ./turbo.json
 
-# DEBUG: Check schema content
-RUN cat apps/api/prisma/schema.prisma
-
 # Generate Prisma Client
 ENV PRISMA_CLIENT_ENGINE_TYPE=binary
 ENV PRISMA_CLI_QUERY_ENGINE_TYPE=binary
-RUN npx prisma generate --schema apps/api/prisma/schema.prisma
+RUN cp apps/api/prisma/schema.prisma ./collab-schema.prisma \
+  && sed -i '/^[[:space:]]*output[[:space:]]*=/d' ./collab-schema.prisma \
+  && npx prisma generate --schema ./collab-schema.prisma
 RUN npx turbo run build --filter=@superboard/collab-service
 
 FROM node:20-alpine AS runner

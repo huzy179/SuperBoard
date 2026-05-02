@@ -14,7 +14,7 @@ WORKDIR /app
 # First install dependencies
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/package-lock.json ./package-lock.json
-RUN npm install
+RUN npm ci
 
 # Build the project
 COPY --from=builder /app/out/full/ .
@@ -26,6 +26,7 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npx turbo run build --filter=@superboard/web
+RUN npm prune --omit=dev
 
 FROM node:20-slim AS runner
 WORKDIR /app

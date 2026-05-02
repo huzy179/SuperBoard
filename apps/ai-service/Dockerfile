@@ -22,7 +22,7 @@ COPY apps/ai-service .
 EXPOSE 50051
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import grpc; grpc.insecure_channel('localhost:50051')" || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD python -c "import socket; s=socket.create_connection(('127.0.0.1', 50051), 2); s.close()" || exit 1
 
 CMD ["python", "grpc_server.py"]

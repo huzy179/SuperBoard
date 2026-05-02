@@ -9,15 +9,15 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
 export default function PublicDocPage() {
-  const params = useParams<{ docId: string }>();
+  const params = useParams<{ token: string }>();
 
   const {
     data: doc,
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['public-doc', params.docId],
-    queryFn: () => getPublicDoc(params.docId),
+    queryKey: ['public-doc', params.token],
+    queryFn: () => getPublicDoc(params.token),
   });
 
   if (isLoading) {

@@ -12,11 +12,11 @@
     "setup": "node scripts/setup.mjs",
     "prepare": "husky",
     "dev": "turbo run dev --parallel",
-    "dev:infra": "docker compose -f docker/compose/docker-compose.yml up -d",
-    "dev:docker": "docker compose -f docker/compose/docker-compose.yml --profile app up -d",
-    "dev:docker:hot": "docker compose -f docker/compose/docker-compose.yml -f docker/compose/docker-compose.dev.yml --profile app --profile full up",
-    "dev:infra:full": "docker compose -f docker/compose/docker-compose.yml --profile full up -d",
-    "dev:infra:down": "docker compose -f docker/compose/docker-compose.yml down",
+    "dev:infra": "docker compose --env-file docker/compose/.env -f docker/compose/docker-compose.yml up -d",
+    "dev:docker": "docker compose --env-file docker/compose/.env -f docker/compose/docker-compose.yml --profile app up -d",
+    "dev:docker:hot": "docker compose --env-file docker/compose/.env -f docker/compose/docker-compose.yml -f docker/compose/docker-compose.dev.yml --profile app --profile full up",
+    "dev:infra:full": "docker compose --env-file docker/compose/.env -f docker/compose/docker-compose.yml --profile full up -d",
+    "dev:infra:down": "docker compose --env-file docker/compose/.env -f docker/compose/docker-compose.yml down",
     "health:check": "node scripts/health-check.mjs",
     "dev:start": "bash scripts/dev-start.sh",
     "build": "turbo run build",
@@ -60,8 +60,8 @@
     "typescript": "^5.8.2"
   },
   "overrides": {
-    "@hono/node-server": "1.19.11",
-    "hono": "4.12.8",
+    "@hono/node-server": "1.19.13",
+    "hono": "4.12.14",
     "lodash": "4.17.23"
   },
   "engines": {

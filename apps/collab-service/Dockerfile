@@ -29,6 +29,7 @@ RUN cp apps/api/prisma/schema.prisma ./collab-schema.prisma \
   && sed -i '/^[[:space:]]*output[[:space:]]*=/d' ./collab-schema.prisma \
   && npx prisma generate --schema ./collab-schema.prisma
 RUN npx turbo run build --filter=@superboard/collab-service
+RUN npm prune --omit=dev
 
 FROM node:20-alpine AS runner
 WORKDIR /app

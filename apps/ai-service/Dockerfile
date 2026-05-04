@@ -13,7 +13,10 @@ COPY packages/backend-shared /packages/backend-shared
 
 # Copy requirements and install dependencies
 COPY apps/ai-service/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN grep -Ev '^(hypothesis|pytest|pytest-asyncio|grpcio-tools)==' requirements.txt > requirements.runtime.txt \
+    && pip install --no-cache-dir -r requirements.runtime.txt \
+    && apt-get purge -y --auto-remove build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy application code
 COPY apps/ai-service .

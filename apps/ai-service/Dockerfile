@@ -3,17 +3,14 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
-
 # Copy local Python packages that are referenced in requirements.txt via relative paths
 COPY packages/backend-shared /packages/backend-shared
 
 # Copy requirements and install dependencies
 COPY apps/ai-service/requirements.txt .
-RUN grep -Ev '^(hypothesis|pytest|pytest-asyncio|grpcio-tools)==' requirements.txt > requirements.runtime.txt \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential \
+    && grep -Ev '^(hypothesis|pytest|pytest-asyncio|grpcio-tools)==' requirements.txt > requirements.runtime.txt \
     && pip install --no-cache-dir -r requirements.runtime.txt \
     && apt-get purge -y --auto-remove build-essential \
     && rm -rf /var/lib/apt/lists/*
